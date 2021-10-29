@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -47,6 +48,7 @@ class Prive extends StatelessWidget {
         home: const HomeScreen(),
         routes: {
           R.routes.loginRoute: (ctx) => const LoginScreen(),
+          R.routes.verifyAccountRoute: (ctx) => const VerifyAccountScreen(),
         },
       ),
     );

@@ -49,6 +49,15 @@ class _ScreenSliderState extends State<ScreenSlider>
 
     return Stack(
       children: <Widget>[
+        FutureBuilder(
+          future: Future.value(true),
+          builder: (BuildContext context, AsyncSnapshot<void> snap) {
+            if (!snap.hasData) {
+              return Container();
+            }
+            return Container();
+          },
+        ),
         Container(
           color: Colors.white,
           child: container,

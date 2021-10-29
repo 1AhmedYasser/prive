@@ -70,7 +70,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 activeDotColor: Color(0xff1293a8),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 50),
             ElevatedButton(
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, R.routes.loginRoute),
@@ -82,7 +82,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 primary: Theme.of(context).primaryColor,
                 elevation: 0,
                 minimumSize: Size(
-                  MediaQuery.of(context).size.width - 100,
+                  MediaQuery.of(context).size.width - 50,
                   50,
                 ),
                 shape: RoundedRectangleBorder(

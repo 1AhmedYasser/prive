@@ -26,6 +26,7 @@ class Constants {
 
 class Routes {
   String loginRoute = '/Login_Screen';
+  String verifyAccountRoute = '/VerifyAccount_screen';
 }
 
 class R {
