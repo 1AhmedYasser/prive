@@ -69,7 +69,6 @@ flutter:
   assets:
     - assets/images/
     - assets/translations/
-    - assets/animations/
 
   fonts:
     - family: SFPro
