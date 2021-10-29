@@ -4,6 +4,11 @@ class Images {
   String introImage1 = "$path/intro_image1.png";
   String introImage2 = "$path/intro_image2.png";
   String introImage3 = "$path/intro_image3.png";
+  String chatTabImage = "$path/chat_tab_image.png";
+  String phoneTabImage = "$path/phone_tab_image.png";
+  String addTabImage = "$path/add_tab_image.png";
+  String micTabImage = "$path/mic_tab_image.png";
+  String moreTabImage = "$path/more_tab_image.png";
 }
 
 class Animations {
@@ -27,6 +32,7 @@ class Constants {
 class Routes {
   String loginRoute = '/Login_Screen';
   String verifyAccountRoute = '/VerifyAccount_screen';
+  String navigatorRoute = '/Navigator_Screen';
 }
 
 class R {

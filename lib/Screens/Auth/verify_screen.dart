@@ -94,8 +94,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       activeColor: Theme.of(context).primaryColor,
                       shape: PinCodeFieldShape.box,
                       borderRadius: BorderRadius.circular(15),
-                      fieldHeight: 80,
-                      fieldWidth: 65,
+                      fieldHeight: 70,
+                      fieldWidth: 70,
                       activeFillColor: Colors.white,
                     ),
                     cursorColor: Colors.black,
@@ -110,7 +110,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       BoxShadow(
                         offset: Offset(0, 1),
                         color: Colors.black12,
-                        blurRadius: 10,
+                        blurRadius: 5,
                       )
                     ],
                     onChanged: (String value) {},
@@ -126,39 +126,41 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
-                   child: Row(
-                        children: [
-                             const Text(
-                                '00:60',
-                              style: TextStyle(
-                                color: Color(0xff5d5d63),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400
-
-
-                              ),
-                            ),
-                          
-                        const Expanded(
-                          child: SizedBox()),
-                           TextButton(
-                              onPressed: () {
-                                // _resendCode();
-                              },
-                                  child: Text(
-                                    "Resend Code".tr(),
-                                    style: const TextStyle(
-                                        color: Color(0xff1293a8),
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 17),
-                                  ),
-                                ),
-        ]
+                child: Row(
+                  children: [
+                    const Text(
+                      '00:60',
+                      style: TextStyle(
+                          color: Color(0xff5d5d63),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Expanded(child: SizedBox()),
+                    TextButton(
+                      onPressed: () {
+                        // _resendCode();
+                      },
+                      child: Text(
+                        "Resend Code".tr(),
+                        style: const TextStyle(
+                            color: Color(0xff1293a8),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 17),
                       ),
                     ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      R.routes.navigatorRoute,
+                    );
+                  }
+                },
                 child: const Text(
                   "Verify Account",
                   style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
@@ -175,9 +177,9 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   ),
                 ),
               ),
-                  ],
-                ),
-              ),
+            ],
+          ),
+        ),
       ),
     );
   }
