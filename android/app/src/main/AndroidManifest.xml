@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.engaz.prive.prive">
+    package="com.engaz.prive">
    <application
-        android:label="prive"
+        android:name="androidx.multidex.MultiDexApplication"
+        android:label="Prive"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

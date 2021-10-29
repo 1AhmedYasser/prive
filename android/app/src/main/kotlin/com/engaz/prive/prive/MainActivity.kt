@@ -1,4 +1,4 @@
-package com.engaz.prive.prive
+package com.engaz.prive
 
 import io.flutter.embedding.android.FlutterActivity
 
