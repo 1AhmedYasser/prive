@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class IntroSliderWidget extends StatelessWidget {
@@ -22,10 +23,13 @@ class IntroSliderWidget extends StatelessWidget {
             height: 120,
           ),
           Expanded(
-            child: SizedBox(
-              child: Image.asset(
-                image,
-                fit: BoxFit.contain,
+            child: Padding(
+              padding:  EdgeInsets.all(MediaQuery.of(context).size.width * 0.030,),
+              child: SizedBox(
+                child: Image.asset(
+                  image,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -36,22 +40,25 @@ class IntroSliderWidget extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xff230469),
-                fontSize: 30),
+              fontWeight: FontWeight.bold,
+              color: Color(0xff232323),
+              fontSize: 32,
+            ),
           ),
           const SizedBox(
             height: 20,
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width - 150,
-            child: Text(
+            child: AutoSizeText(
               description,
               textAlign: TextAlign.center,
+              maxLines: 2,
               style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                  fontSize: 17),
+                fontWeight: FontWeight.w400,
+                color: Color(0xff5d5d63),
+                fontSize: 22,
+              ),
             ),
           )
         ],

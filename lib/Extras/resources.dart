@@ -1,6 +1,9 @@
 class Images {
   static String path = "assets/images";
   String splashImage = "$path/splash_image.png";
+  String introImage1 = "$path/intro_image1.png";
+  String introImage2 = "$path/intro_image2.png";
+  String introImage3 = "$path/intro_image3.png";
 }
 
 class Animations {
@@ -22,6 +25,7 @@ class Constants {
 }
 
 class Routes {
+  String loginRoute = '/Login_Screen';
 }
 
 class R {

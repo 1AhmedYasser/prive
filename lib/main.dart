@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'Extras/resources.dart';
+import 'Screens/Auth/login_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
 void main() async {
@@ -43,6 +45,9 @@ class Prive extends StatelessWidget {
         builder: BotToastInit(),
         navigatorObservers: [BotToastNavigatorObserver()],
         home: const HomeScreen(),
+        routes: {
+          R.routes.loginRoute: (ctx) => const LoginScreen(),
+        },
       ),
     );
   }
