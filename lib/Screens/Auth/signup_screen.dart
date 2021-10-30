@@ -26,6 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -42,7 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20),
+                  padding: EdgeInsets.only(left: 20, right: 20, top: 100),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -123,6 +124,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 30),
                 Container(
                   height: 110,
+                  width: 110,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -132,6 +134,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: CachedImage(
                       url:
                           "https://me.kaspersky.com/content/ar-ae/images/repository/isc/2020/9910/a-guide-to-qr-codes-and-how-to-scan-qr-codes-2.png",
+                      containerColor: Colors.transparent,
                     ),
                   ),
                 ),
@@ -186,14 +189,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Navigator.pushNamed(context, R.routes.navigatorRoute),
                   child: const Text(
                     "Sign Up",
-                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
                   ),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     elevation: 0,
                     minimumSize: Size(
                       MediaQuery.of(context).size.width - 50,
-                      50,
+                      55,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
