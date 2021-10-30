@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:prive/Extras/resources.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +13,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String phoneNumber = "";
+  TextEditingController phoneController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,41 +33,70 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                  'Phone Number',
+                'Phone Number',
                 textAlign: TextAlign.start,
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w500,
-
                 ),
               ),
-              const SizedBox(height: 15,),
+              const SizedBox(
+                height: 15,
+              ),
               const Text(
-                  'Please confirm your country code and enter your \n phone number',
+                'Please confirm your country code and enter your \n phone number',
                 style: TextStyle(
                   fontSize: 17,
                   color: Color(0xff5d5d63),
                 ),
               ),
-              const SizedBox(height: 20,),
-              IntlPhoneField(
-                iconPosition: IconPosition.trailing,
-                keyboardType: const TextInputType.numberWithOptions(
-                    signed: true, decimal: true),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  hintText:  "Mobile Number",
-                  labelStyle: const TextStyle(color: Color(0xff777777)),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      style: BorderStyle.solid,
-                        color: Theme.of(context).primaryColor, width: 2),
-                    borderRadius: BorderRadius.circular(10),
+              const SizedBox(
+                height: 20,
+              ),
+              Form(
+                //key: _phoneKey,
+                child: InternationalPhoneNumberInput(
+                  onInputChanged: (PhoneNumber number) {
+                    phoneNumber = number.phoneNumber.toString();
+                  },
+                  onInputValidated: (valid) {
+                    // isPhoneNumberValid = valid;
+                  },
+                  validator: (value) {
+                    // if (!isPhoneNumberValid) {
+                    //   return "Enter A Valid Phone Number";
+                    // }
+                    // return null;
+                  },
+                  selectorConfig: const SelectorConfig(
+                    selectorType: PhoneInputSelectorType.DROPDOWN,
+                    setSelectorButtonAsPrefixIcon: true,
+                    trailingSpace: false,
+                  ),
+                  ignoreBlank: false,
+                  inputDecoration: InputDecoration(
+                    hintText: "Phone Number",
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                  autoValidateMode: AutovalidateMode.disabled,
+                  selectorTextStyle: const TextStyle(color: Colors.black),
+                  // initialValue: number,
+                  textFieldController: phoneController,
+                  formatInput: true,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: true,
+                    decimal: true,
                   ),
                 ),
-                onChanged: (phone) {
-                  phoneNumber = phone.completeNumber;
-                },
               ),
               const SizedBox(height: 40),
               ElevatedButton(
