@@ -9,6 +9,7 @@ class Images {
   String addTabImage = "$path/add_tab_image.png";
   String micTabImage = "$path/mic_tab_image.png";
   String moreTabImage = "$path/more_tab_image.png";
+  String cameraImage = "$path/camera_image.png";
 }
 
 class Animations {
@@ -31,6 +32,7 @@ class Constants {
 
 class Routes {
   String loginRoute = '/Login_Screen';
+  String signupRoute = '/Signup_Screen';
   String verifyAccountRoute = '/VerifyAccount_screen';
   String navigatorRoute = '/Navigator_Screen';
 }

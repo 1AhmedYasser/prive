@@ -157,7 +157,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   if (_formKey.currentState!.validate()) {
                     Navigator.pushReplacementNamed(
                       context,
-                      R.routes.navigatorRoute,
+                      R.routes.signupRoute,
                     );
                   }
                 },

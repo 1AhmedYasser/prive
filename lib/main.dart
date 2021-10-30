@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
@@ -41,6 +42,7 @@ class Prive extends StatelessWidget {
         locale: context.locale,
         theme: ThemeData(
           primaryColor: const Color(0xff3cc7bd),
+          primaryColorDark: const Color(0xff1293a8),
           fontFamily: 'SFPro',
         ),
         debugShowCheckedModeBanner: false,
@@ -49,6 +51,7 @@ class Prive extends StatelessWidget {
         home: const HomeScreen(),
         routes: {
           R.routes.loginRoute: (ctx) => const LoginScreen(),
+          R.routes.signupRoute: (ctx) => const SignUpScreen(),
           R.routes.verifyAccountRoute: (ctx) => const VerifyAccountScreen(),
           R.routes.navigatorRoute: (ctx) => const NavigatorScreen(),
         },
