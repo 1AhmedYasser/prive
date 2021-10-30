@@ -115,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Row(
                     children: [
                       buildGender("Male", 0),
-                      const SizedBox(width: 30),
+                      const SizedBox(width: 40),
                       buildGender("Female", 1),
                     ],
                   ),
