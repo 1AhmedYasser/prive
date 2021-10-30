@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 15,
               ),
               const Text(
-                'Please confirm your country code and enter your \n phone number',
+                'Please confirm your country code and enter your phone number',
                 style: TextStyle(
                   fontSize: 17,
                   color: Color(0xff5d5d63),

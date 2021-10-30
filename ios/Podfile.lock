@@ -1,4 +1,8 @@
 PODS:
+  - bs_flutter_selectbox (0.0.1):
+    - Flutter
+  - bs_flutter_utils (0.0.1):
+    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - Reachability
@@ -66,6 +70,14 @@ PODS:
     - GoogleUtilities/Logger
   - image_picker (0.0.1):
     - Flutter
+  - libphonenumber (0.0.1):
+    - Flutter
+    - libPhoneNumber-iOS
+  - libPhoneNumber-iOS (0.9.15)
+  - libphonenumber_plugin (0.0.1):
+    - Flutter
+    - libphonenumber
+    - libPhoneNumber-iOS
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
     - nanopb/encode (= 2.30908.0)
@@ -88,12 +100,16 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - bs_flutter_selectbox (from `.symlinks/plugins/bs_flutter_selectbox/ios`)
+  - bs_flutter_utils (from `.symlinks/plugins/bs_flutter_utils/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - libphonenumber (from `.symlinks/plugins/libphonenumber/ios`)
+  - libphonenumber_plugin (from `.symlinks/plugins/libphonenumber_plugin/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
@@ -111,11 +127,16 @@ SPEC REPOS:
     - FMDB
     - GoogleDataTransport
     - GoogleUtilities
+    - libPhoneNumber-iOS
     - nanopb
     - PromisesObjC
     - Reachability
 
 EXTERNAL SOURCES:
+  bs_flutter_selectbox:
+    :path: ".symlinks/plugins/bs_flutter_selectbox/ios"
+  bs_flutter_utils:
+    :path: ".symlinks/plugins/bs_flutter_utils/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   firebase_core:
@@ -128,6 +149,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  libphonenumber:
+    :path: ".symlinks/plugins/libphonenumber/ios"
+  libphonenumber_plugin:
+    :path: ".symlinks/plugins/libphonenumber_plugin/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   permission_handler:
@@ -142,6 +167,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
+  bs_flutter_selectbox: 6f8f2635cb0e3f10096fcd774af6d90272bb089b
+  bs_flutter_utils: 8f7e9550c45adfa0d9b77d5ac395bc33b6d18eb3
   connectivity_plus: 5f0eb61093bec56935f21a1699dd2758bc895587
   Firebase: 629510f1a9ddb235f3a7c5c8ceb23ba887f0f814
   firebase_core: 3b4c707f5a8eff38f52fd5580895bcd89357bf42
@@ -156,6 +183,9 @@ SPEC CHECKSUMS:
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
   GoogleUtilities: 684ee790a24f73ebb2d1d966e9711c203f2a4237
   image_picker: 9aa50e1d8cdacdbed739e925b7eea16d014367e6
+  libphonenumber: bd14d5abfc5939ab0b0767234e2d8e2593af258e
+  libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
+  libphonenumber_plugin: 7cf755ad1656145935d6c208173a476bd3f12898
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   path_provider: d1e9807085df1f9cc9318206cd649dc0b76be3de
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0

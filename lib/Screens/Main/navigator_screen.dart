@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
@@ -155,12 +156,15 @@ class _ChipBuilder extends ChipBuilder {
                         : const Color(0xff7a8fa6),
                   ),
                 ),
-                Text(
-                  getTitles(index),
-                  style: TextStyle(
-                    color: active
-                        ? Theme.of(context).primaryColor
-                        : const Color(0xff7a8fa6),
+                Expanded(
+                  child: AutoSizeText(
+                    getTitles(index),
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: active
+                          ? Theme.of(context).primaryColor
+                          : const Color(0xff7a8fa6),
+                    ),
                   ),
                 )
               ],
