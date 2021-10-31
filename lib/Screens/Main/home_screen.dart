@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
@@ -18,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    //NotificationsManager.setupNotifications(context);
+    NotificationsManager.setupNotifications(context);
     _checkIfUserIsLoggedIn();
     super.initState();
   }
@@ -27,23 +28,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return isLoggedIn != null
         ? isLoggedIn == true
-        ? const NavigatorScreen()
-        : const IntroScreen()
+            ? const NavigatorScreen()
+            : const IntroScreen()
         : Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(R.images.splashImage),
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    );
+            body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(R.images.splashImage),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          );
   }
 
   void _checkIfUserIsLoggedIn() async {
     var loginStatus = await Utils.getBool(R.pref.isLoggedIn);
     if (loginStatus == true) {
+      isLoggedIn = (loginStatus == null) ? false : loginStatus;
+      setState(() {});
       //_checkForNewNotifications(loginStatus);
     } else {
       isLoggedIn = (loginStatus == null) ? false : loginStatus;

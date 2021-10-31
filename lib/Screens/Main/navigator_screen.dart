@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/utils.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -62,48 +63,208 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return const Center(
-          child: Text(
-            "Chats",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Chats",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  Utils.saveString(R.pref.token, "");
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    R.routes.loginRoute,
+                  );
+                },
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width - 50,
+                    50,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       case 1:
-        return const Center(
-          child: Text(
-            "Calls",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Calls",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  Utils.saveString(R.pref.token, "");
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    R.routes.loginRoute,
+                  );
+                },
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width - 50,
+                    50,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       case 2:
-        return const Center(
-          child: Text(
-            "Add",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Add",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  Utils.saveString(R.pref.token, "");
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    R.routes.loginRoute,
+                  );
+                },
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width - 50,
+                    50,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       case 3:
-        return const Center(
-          child: Text(
-            "Chat Rooms",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Chat Rooms",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  Utils.saveString(R.pref.token, "");
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    R.routes.loginRoute,
+                  );
+                },
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width - 50,
+                    50,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       case 4:
-        return const Center(
-          child: Text(
-            "More",
-            style: TextStyle(
-              fontSize: 30,
-            ),
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "More",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  Utils.saveString(R.pref.token, "");
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    R.routes.loginRoute,
+                  );
+                },
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  minimumSize: Size(
+                    MediaQuery.of(context).size.width - 50,
+                    50,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       default:
@@ -174,23 +335,35 @@ class _ChipBuilder extends ChipBuilder {
 
   String getImage(int index) {
     switch (index) {
-      case 0 : return R.images.chatTabImage;
-      case 1 : return R.images.phoneTabImage;
-      case 2 : return R.images.addTabImage;
-      case 3 : return R.images.micTabImage;
-      case 4 : return R.images.moreTabImage;
-      default: return R.images.chatTabImage;
+      case 0:
+        return R.images.chatTabImage;
+      case 1:
+        return R.images.phoneTabImage;
+      case 2:
+        return R.images.addTabImage;
+      case 3:
+        return R.images.micTabImage;
+      case 4:
+        return R.images.moreTabImage;
+      default:
+        return R.images.chatTabImage;
     }
   }
 
   String getTitles(int index) {
     switch (index) {
-      case 0 : return "Chat";
-      case 1 : return "Calls";
-      case 2 : return "";
-      case 3 : return "Chat Rooms";
-      case 4 : return "More";
-      default: return "Chat";
+      case 0:
+        return "Chat";
+      case 1:
+        return "Calls";
+      case 2:
+        return "";
+      case 3:
+        return "Chat Rooms";
+      case 4:
+        return "More";
+      default:
+        return "Chat";
     }
   }
 }

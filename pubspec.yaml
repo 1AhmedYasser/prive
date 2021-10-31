@@ -46,14 +46,17 @@ dependencies:
   convex_bottom_bar: ^3.0.0
   intl_phone_number_input: ^0.7.0+2
   bs_flutter_selectbox: ^1.3.0
+  timer_count_down: ^2.2.0
 
   # Utils
   supercharged: ^2.1.1
   intl: ^0.17.0
   share_plus: ^3.0.4
+  country_calling_code_picker: ^2.0.0
 
   # Firebase
   firebase_core: ^1.8.0
+  firebase_auth: ^3.1.4
   firebase_messaging: ^10.0.9
 
 dev_dependencies:

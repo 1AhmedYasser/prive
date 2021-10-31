@@ -1,14 +1,21 @@
 import 'dart:async';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:bot_toast/bot_toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Models/login.dart';
+import 'package:prive/Screens/Auth/signup_screen.dart';
+import 'package:timer_count_down/timer_count_down.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
   final String phoneNumber;
+  final LoginData? loginData;
 
-  const VerifyAccountScreen({Key? key, this.phoneNumber = ""})
+  const VerifyAccountScreen({Key? key, this.phoneNumber = "", this.loginData})
       : super(key: key);
 
   @override
@@ -16,29 +23,18 @@ class VerifyAccountScreen extends StatefulWidget {
 }
 
 class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? verificationId;
   TextEditingController codeController = TextEditingController();
   StreamController<ErrorAnimationType>? errorController;
   final _formKey = GlobalKey<FormState>();
+  bool isTimerOn = true;
 
   @override
   void initState() {
     errorController = StreamController<ErrorAnimationType>();
+    phoneSignIn();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    errorController!.close();
-    super.dispose();
-  }
-
-  snackBar(String? message) {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message!),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   @override
@@ -88,17 +84,18 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                     animationType: AnimationType.fade,
                     mainAxisAlignment: MainAxisAlignment.center,
                     pinTheme: PinTheme(
-                        selectedColor: Theme.of(context).primaryColor,
-                        selectedFillColor: Colors.white,
-                        inactiveColor: Colors.white,
-                        inactiveFillColor: Colors.white,
-                        activeColor: Theme.of(context).primaryColor,
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(15),
-                        fieldHeight: MediaQuery.of(context).size.height * 0.075,
-                        fieldWidth: MediaQuery.of(context).size.width * 0.104,
-                        activeFillColor: Colors.white,
-                        fieldOuterPadding: const EdgeInsets.all(5)),
+                      selectedColor: Theme.of(context).primaryColor,
+                      selectedFillColor: Colors.white,
+                      inactiveColor: Colors.white,
+                      inactiveFillColor: Colors.white,
+                      activeColor: Theme.of(context).primaryColor,
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(15),
+                      fieldHeight: MediaQuery.of(context).size.height * 0.075,
+                      fieldWidth: MediaQuery.of(context).size.width * 0.104,
+                      activeFillColor: Colors.white,
+                      fieldOuterPadding: const EdgeInsets.all(5),
+                    ),
                     cursorColor: Colors.black,
                     animationDuration: const Duration(milliseconds: 300),
                     enableActiveFill: true,
@@ -129,37 +126,82 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 padding: const EdgeInsets.only(left: 10),
                 child: Row(
                   children: [
-                    const Text(
-                      '00:60',
-                      style: TextStyle(
-                          color: Color(0xff5d5d63),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400),
-                    ),
+                    if (isTimerOn)
+                      Countdown(
+                        seconds: 60,
+                        build: (BuildContext context, double time) => Text(
+                          time.toInt().toString(),
+                          style: const TextStyle(
+                            color: Color(0xff5d5d63),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        interval: const Duration(milliseconds: 100),
+                        onFinished: () {
+                          setState(() {
+                            isTimerOn = false;
+                          });
+                        },
+                      ),
                     const Expanded(child: SizedBox()),
                     TextButton(
                       onPressed: () {
-                        // _resendCode();
+                        if (isTimerOn == false) {
+                          phoneSignIn();
+                          setState(() {
+                            isTimerOn = true;
+                          });
+                        }
                       },
                       child: Text(
                         "Resend Code".tr(),
-                        style: const TextStyle(
-                            color: Color(0xff1293a8),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 17),
+                        style: TextStyle(
+                          color:
+                              isTimerOn ? Colors.grey : const Color(0xff1293a8),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                        ),
                       ),
+                      style:
+                          TextButton.styleFrom(shadowColor: Colors.transparent),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      R.routes.signupRoute,
+                    PhoneAuthCredential credential =
+                        PhoneAuthProvider.credential(
+                      verificationId: verificationId ?? "",
+                      smsCode: codeController.text,
                     );
+                    await _auth.signInWithCredential(credential).then((value) {
+                      if (widget.loginData?.accountState == "NewAccount") {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(
+                              phoneNumber: widget.phoneNumber,
+                              loginData: widget.loginData,
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          R.routes.navigatorRoute,
+                        );
+                      }
+                    }).catchError((error) {
+                      showOkAlertDialog(
+                        context: context,
+                        title: "Prive",
+                        message: "You Entered An Invalid Code",
+                      );
+                    });
                   }
                 },
                 child: const Text(
@@ -183,5 +225,51 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> phoneSignIn() async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: widget.phoneNumber,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: _onVerificationCompleted,
+      verificationFailed: _onVerificationFailed,
+      codeSent: _onCodeSent,
+      codeAutoRetrievalTimeout: _onCodeTimeout,
+    );
+  }
+
+  _onVerificationCompleted(PhoneAuthCredential authCredential) async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (authCredential.smsCode != null) {
+      try {
+        await user!.linkWithCredential(authCredential);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'provider-already-linked') {
+          await _auth.signInWithCredential(authCredential);
+        }
+      }
+    }
+  }
+
+  _onVerificationFailed(FirebaseAuthException exception) {
+    if (exception.code == 'invalid-phone-number') {
+      print("The phone number entered is invalid!");
+    }
+  }
+
+  _onCodeSent(String verificationId, int? forceResendingToken) {
+    this.verificationId = verificationId;
+  }
+
+  _onCodeTimeout(String timeout) {
+    print("code timeout");
+  }
+
+  @override
+  void dispose() {
+    BotToast.removeAll();
+    errorController!.close();
+    super.dispose();
   }
 }

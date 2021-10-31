@@ -6,11 +6,18 @@ PODS:
   - connectivity_plus (0.0.1):
     - Flutter
     - Reachability
+  - Firebase/Auth (8.8.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (~> 8.8.0)
   - Firebase/CoreOnly (8.8.0):
     - FirebaseCore (= 8.8.0)
   - Firebase/Messaging (8.8.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 8.8.0)
+  - firebase_auth (3.1.4):
+    - Firebase/Auth (= 8.8.0)
+    - firebase_core
+    - Flutter
   - firebase_core (1.8.0):
     - Firebase/CoreOnly (= 8.8.0)
     - Flutter
@@ -18,6 +25,11 @@ PODS:
     - Firebase/Messaging (= 8.8.0)
     - firebase_core
     - Flutter
+  - FirebaseAuth (8.8.0):
+    - FirebaseCore (~> 8.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.4)
+    - GoogleUtilities/Environment (~> 7.4)
+    - GTMSessionFetcher/Core (~> 1.5)
   - FirebaseCore (8.8.0):
     - FirebaseCoreDiagnostics (~> 8.0)
     - GoogleUtilities/Environment (~> 7.4)
@@ -44,6 +56,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - flutter_sim_country_code (0.0.1):
+    - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -68,6 +82,7 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (7.6.0):
     - GoogleUtilities/Logger
+  - GTMSessionFetcher/Core (1.7.0)
   - image_picker (0.0.1):
     - Flutter
   - libphonenumber (0.0.1):
@@ -103,10 +118,12 @@ DEPENDENCIES:
   - bs_flutter_selectbox (from `.symlinks/plugins/bs_flutter_selectbox/ios`)
   - bs_flutter_utils (from `.symlinks/plugins/bs_flutter_utils/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
+  - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_sim_country_code (from `.symlinks/plugins/flutter_sim_country_code/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - libphonenumber (from `.symlinks/plugins/libphonenumber/ios`)
   - libphonenumber_plugin (from `.symlinks/plugins/libphonenumber_plugin/ios`)
@@ -120,6 +137,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Firebase
+    - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseInstallations
@@ -127,6 +145,7 @@ SPEC REPOS:
     - FMDB
     - GoogleDataTransport
     - GoogleUtilities
+    - GTMSessionFetcher
     - libPhoneNumber-iOS
     - nanopb
     - PromisesObjC
@@ -139,6 +158,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/bs_flutter_utils/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
+  firebase_auth:
+    :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -147,6 +168,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_sim_country_code:
+    :path: ".symlinks/plugins/flutter_sim_country_code/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   libphonenumber:
@@ -171,17 +194,21 @@ SPEC CHECKSUMS:
   bs_flutter_utils: 8f7e9550c45adfa0d9b77d5ac395bc33b6d18eb3
   connectivity_plus: 5f0eb61093bec56935f21a1699dd2758bc895587
   Firebase: 629510f1a9ddb235f3a7c5c8ceb23ba887f0f814
+  firebase_auth: 0b7168e2db1bff6e5b40a7dc268447b8dedb59c1
   firebase_core: 3b4c707f5a8eff38f52fd5580895bcd89357bf42
   firebase_messaging: c2570c4b5aeb1b9dc1b40a3b4a246e246cd583a8
+  FirebaseAuth: bcf0adeff88bda5dcb3beeabe5760f1226ab7b2f
   FirebaseCore: 98b29e3828f0a53651c363937a7f7d92a19f1ba2
   FirebaseCoreDiagnostics: fe77f42da6329d6d83d21fd9d621a6b704413bfc
   FirebaseInstallations: 2563cb18a723ef9c6ef18318a49519b75dce613c
   FirebaseMessaging: 419b5c9d84f294a753c6501d8cfb9ced1ce37304
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
+  flutter_sim_country_code: 364e91e71f067cdec1dd1228eb4d1f13ab1a54e5
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
   GoogleUtilities: 684ee790a24f73ebb2d1d966e9711c203f2a4237
+  GTMSessionFetcher: 43748f93435c2aa068b1cbe39655aaf600652e91
   image_picker: 9aa50e1d8cdacdbed739e925b7eea16d014367e6
   libphonenumber: bd14d5abfc5939ab0b0767234e2d8e2593af258e
   libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75

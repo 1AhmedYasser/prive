@@ -1,5 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
@@ -15,6 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   EasyLocalization.logger.enableBuildModes = [];
+  await Firebase.initializeApp();
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],

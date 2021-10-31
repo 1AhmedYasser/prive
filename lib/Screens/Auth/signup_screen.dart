@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -5,10 +8,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/Models/login.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:dio/dio.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  final String phoneNumber;
+  final LoginData? loginData;
+
+  const SignUpScreen({Key? key, this.phoneNumber = "", this.loginData})
+      : super(key: key);
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -20,8 +31,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController ageController = TextEditingController();
+  CancelToken cancelToken = CancelToken();
   final _formKey = GlobalKey<FormState>();
   int selectedGender = 0;
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -146,9 +159,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Text(
                       "By Signing Up,",
                       style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xff7a8fa6)),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff7a8fa6),
+                      ),
                     ),
                   ),
                 ),
@@ -185,8 +199,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.navigatorRoute),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      if (profileImage.path.isEmpty) {
+                        showOkAlertDialog(
+                          context: context,
+                          title: "Prive",
+                          message: "Please Choose An Image",
+                        );
+                      } else {
+                        if (loading == false) {
+                          List<int> imageBytes =
+                              await profileImage.readAsBytes();
+                          String base64Image = base64Encode(imageBytes);
+                          loading = true;
+                          UltraNetwork.request(
+                            context,
+                            signup,
+                            cancelToken: cancelToken,
+                            formData: FormData.fromMap({
+                              "UserFirstName": firstNameController.text,
+                              "UserLastName": lastNameController.text,
+                              "UserPhoto": base64Image,
+                              "UserGender":
+                                  selectedGender == 0 ? "Male" : "Female",
+                              "UserBarCode": "783473487",
+                              "UserID": widget.loginData?.userID
+                            }),
+                          ).then((value) {
+                            loading = false;
+                            Login signup = value;
+                            if (signup.success == true) {
+                              LoginData? signupData = signup.data?[0];
+                              Utils.saveString(R.pref.token, signupData?.token ?? "");
+                              Utils.saveString(R.pref.userId, signupData?.userID ?? "");
+                              Utils.saveBool(R.pref.isLoggedIn, true);
+                              Navigator.pushReplacementNamed(
+                                  context, R.routes.navigatorRoute);
+                            }
+                          });
+                        }
+                      }
+                    }
+                  },
                   child: const Text(
                     "Sign Up",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
@@ -282,6 +337,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: Colors.grey.shade200,
+              width: 1.2,
+            ),
+            borderRadius: BorderRadius.circular(13),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: Colors.red,
+              width: 1.2,
+            ),
+            borderRadius: BorderRadius.circular(13),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: Colors.red,
               width: 1.2,
             ),
             borderRadius: BorderRadius.circular(13),

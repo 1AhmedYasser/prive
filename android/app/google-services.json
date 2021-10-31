@@ -1,0 +1,92 @@
+{
+  "project_info": {
+    "project_number": "315367381637",
+    "project_id": "private-8dc20",
+    "storage_bucket": "private-8dc20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315367381637:android:2284710205dbc5ee39a7ec",
+        "android_client_info": {
+          "package_name": "com.engaz.prive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "315367381637-8qbq83ivm4imgvc8q35i62it47hjl4fh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXq-DZm6Yw3ysoUamtVQ5KJp8y_FcPJ8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "315367381637-8qbq83ivm4imgvc8q35i62it47hjl4fh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "315367381637-9ffk5m9k3bm388tp2e4osm3c1g97qvo6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.engaz.prive",
+                "app_store_id": "12345678"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315367381637:android:9f81eb0b6755681139a7ec",
+        "android_client_info": {
+          "package_name": "com.example.aprivate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "315367381637-lphhjahdnppmcas15c5qv5srd432291g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aprivate",
+            "certificate_hash": "0e650dd8da68858a4b5d2d6a58f8c95ef705623f"
+          }
+        },
+        {
+          "client_id": "315367381637-8qbq83ivm4imgvc8q35i62it47hjl4fh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXq-DZm6Yw3ysoUamtVQ5KJp8y_FcPJ8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "315367381637-8qbq83ivm4imgvc8q35i62it47hjl4fh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "315367381637-9ffk5m9k3bm388tp2e4osm3c1g97qvo6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.engaz.prive",
+                "app_store_id": "12345678"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

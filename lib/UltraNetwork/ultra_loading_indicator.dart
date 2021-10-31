@@ -22,7 +22,7 @@ class _UltraLoadingIndicatorState extends State<UltraLoadingIndicator> {
           padding: const EdgeInsets.all(10.0),
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).primaryColorDark,
+              Theme.of(context).primaryColor,
             ),
           ),
         ),
