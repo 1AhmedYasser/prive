@@ -88,11 +88,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                   return null;
                 },
-                selectorConfig: const SelectorConfig(
-                  selectorType: PhoneInputSelectorType.DROPDOWN,
-                  setSelectorButtonAsPrefixIcon: true,
-                  trailingSpace: false,
+                searchBoxDecoration: InputDecoration(
+                  label: const Text("Search by country name or dial code"),
+                  labelStyle: TextStyle(
+                      fontSize: 14, color: Theme.of(context).primaryColorDark),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                  ),
+                  errorBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                  focusedErrorBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
+                selectorConfig: const SelectorConfig(
+                    selectorType: PhoneInputSelectorType.DIALOG,
+                    setSelectorButtonAsPrefixIcon: true,
+                    trailingSpace: false,
+                    leadingPadding: 20),
                 ignoreBlank: false,
                 inputDecoration: InputDecoration(
                   hintText: "Phone Number",
@@ -137,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         formData: FormData.fromMap({
                           "UserPhone": phoneNumber,
                           "FirebaseToken":
-                          await Utils.getString(R.pref.firebaseToken),
+                              await Utils.getString(R.pref.firebaseToken),
                           "Country": countryName
                         }),
                       ).then((value) {
@@ -145,15 +168,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         Login login = value;
                         if (login.success == true) {
                           LoginData? loginData = value.data?[0];
-                          Utils.saveString(R.pref.token, loginData?.token ?? "");
-                          Navigator.pushReplacement(
+                          Utils.saveString(
+                              R.pref.token, loginData?.token ?? "");
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  VerifyAccountScreen(
-                                    phoneNumber: phoneNumber,
-                                    loginData: loginData,
-                                  ),
+                              builder: (context) => VerifyAccountScreen(
+                                phoneNumber: phoneNumber,
+                                loginData: loginData,
+                              ),
                             ),
                           );
                         }

@@ -47,6 +47,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarBrightness: Brightness.light,
         ),
+        leading: const BackButton(color: Colors.black,),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -242,12 +243,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (authCredential.smsCode != null) {
+      print(authCredential.smsCode);
       try {
         await user!.linkWithCredential(authCredential);
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'provider-already-linked') {
-          await _auth.signInWithCredential(authCredential);
-        }
+        await _auth.signInWithCredential(authCredential);
       }
     }
   }
@@ -260,6 +260,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
 
   _onCodeSent(String verificationId, int? forceResendingToken) {
     this.verificationId = verificationId;
+    print("Code Sent");
   }
 
   _onCodeTimeout(String timeout) {
