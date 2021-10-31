@@ -117,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 autoValidateMode: AutovalidateMode.disabled,
                 selectorTextStyle: const TextStyle(color: Colors.black),
-                // initialValue: number,
                 textFieldController: phoneController,
                 formatInput: true,
                 keyboardType: const TextInputType.numberWithOptions(
