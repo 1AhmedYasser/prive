@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.engaz.prive">
+    package="com.engaz.prive_app">
    <application
         android:name="androidx.multidex.MultiDexApplication"
         android:label="Prive"
