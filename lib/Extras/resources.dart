@@ -10,6 +10,9 @@ class Images {
   String micTabImage = "$path/mic_tab_image.png";
   String moreTabImage = "$path/more_tab_image.png";
   String cameraImage = "$path/camera_image.png";
+  String logoImage = "$path/logo.png";
+  String searchImage = "$path/icon_search.png";
+  String profileImage = "$path/profile.png";
 }
 
 class Animations {
@@ -35,6 +38,7 @@ class Routes {
   String signupRoute = '/Signup_Screen';
   String verifyAccountRoute = '/VerifyAccount_screen';
   String navigatorRoute = '/Navigator_Screen';
+  String chatRoute = '/Chat_Screen';
 }
 
 class R {

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
+import 'Screens/Home/chat_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
 void main() async {
@@ -56,6 +57,7 @@ class Prive extends StatelessWidget {
           R.routes.signupRoute: (ctx) => const SignUpScreen(),
           R.routes.verifyAccountRoute: (ctx) => const VerifyAccountScreen(),
           R.routes.navigatorRoute: (ctx) => const NavigatorScreen(),
+          R.routes.chatRoute: (ctx) => const ChatScreen(),
         },
       ),
     );
