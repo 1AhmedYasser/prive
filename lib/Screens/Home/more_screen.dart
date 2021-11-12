@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
@@ -47,77 +48,48 @@ class _MoreScreenState extends State<MoreScreen> {
                     ),
                   ),
                 ),
-                _buildMoreOption(() {},
-                    image: R.images.myGroupsImage, title: "My Groups"),
-                _buildMoreOption(() {},
-                    image: R.images.myChannelsImage, title: "My Channels"),
-                _buildMoreOption(() {},
-                    image: R.images.catalogManagerImage,
-                    title: "Catalog Manager"),
-                _buildMoreOption(() {},
-                    image: R.images.contactsImage, title: "Contacts"),
-                _buildMoreOption(() {},
-                    image: R.images.peopleNearbyImage, title: "People Nearby"),
-                _buildMoreOption(() {},
-                    image: R.images.inviteFriendsImage,
-                    title: "Invite Friends"),
-                _buildMoreOption(
-                  () {
-                    Navigator.pushNamed(context, R.routes.settingsRoute);
-                  },
+                OptionRowWidget(
+                  image: R.images.myGroupsImage,
+                  title: "My Groups",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.myChannelsImage,
+                  title: "My Channels",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.catalogManagerImage,
+                  title: "Catalog Manager",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.contactsImage,
+                  title: "Contacts",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.peopleNearbyImage,
+                  title: "People Nearby",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.inviteFriendsImage,
+                  title: "Invite Friends",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
                   image: R.images.settingsImage,
                   title: "Settings",
                   showDivider: false,
+                  onPressed: () {
+                    Navigator.pushNamed(context, R.routes.settingsRoute);
+                  },
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildMoreOption(Function onPressed,
-      {String image = "", String title = "", bool showDivider = true}) {
-    return InkWell(
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      onTap: () => onPressed(),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 22, right: 27, bottom: 15),
-            child: Row(
-              children: [
-                Image.asset(
-                  image,
-                  width: 30,
-                  height: 23,
-                ),
-                const SizedBox(width: 18),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Expanded(child: SizedBox()),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 17,
-                  color: Color(0xffc2c4ca),
-                )
-              ],
-            ),
-          ),
-          if (showDivider)
-            const Padding(
-              padding: EdgeInsets.only(left: 22),
-              child: Divider(),
-            ),
-          const SizedBox(height: 18)
-        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -46,19 +47,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               children: [
                 const SizedBox(height: 30),
-                _buildMoreOption(() {},
-                    image: R.images.notificationBellImage,
-                    title: "Notifications & Sounds"),
-                _buildMoreOption(() {},
-                    image: R.images.chatImage, title: "Chat Settings"),
-                _buildMoreOption(() {},
-                    image: R.images.blockedUserImage, title: "Blocked Users"),
-                _buildMoreOption(
-                  () {
-                    Navigator.pushNamed(context, R.routes.settingsRoute);
-                  },
+                OptionRowWidget(
+                  image: R.images.notificationBellImage,
+                  title: "Notifications & Sounds",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.chatImage,
+                  title: "Chat Settings",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
+                  image: R.images.blockedUserImage,
+                  title: "Blocked Users",
+                  onPressed: () {},
+                ),
+                OptionRowWidget(
                   image: R.images.languageImage,
                   title: "Language",
+                  onPressed: () {},
                 ),
                 const SizedBox(height: 5),
                 buildSettingsChoices("Help", () {},
@@ -88,51 +95,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: textColor,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildMoreOption(Function onPressed,
-      {String image = "", String title = "", bool showDivider = true}) {
-    return InkWell(
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      onTap: () => onPressed(),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 22, right: 27, bottom: 15),
-            child: Row(
-              children: [
-                Image.asset(
-                  image,
-                  width: 30,
-                  height: 23,
-                ),
-                const SizedBox(width: 18),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Expanded(child: SizedBox()),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 17,
-                  color: Color(0xffc2c4ca),
-                )
-              ],
-            ),
-          ),
-          if (showDivider)
-            const Padding(
-              padding: EdgeInsets.only(left: 22),
-              child: Divider(),
-            ),
-          const SizedBox(height: 18)
-        ],
       ),
     );
   }
