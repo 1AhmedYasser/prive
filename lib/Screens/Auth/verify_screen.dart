@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
@@ -47,7 +48,9 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarBrightness: Brightness.light,
         ),
-        leading: const BackButton(color: Colors.black,),
+        leading: const BackButton(
+          color: Colors.black,
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -195,6 +198,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           context,
                           R.routes.navigatorRoute,
                         );
+                        Utils.saveBool(R.pref.isLoggedIn, true);
                       }
                     }).catchError((error) {
                       showOkAlertDialog(
