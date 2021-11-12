@@ -21,6 +21,9 @@ class Images {
   String chatImage = "$path/chat_image.png";
   String languageImage = "$path/language_image.png";
   String notificationBellImage = "$path/notification_bell_image.png";
+  String logoImage = "$path/logo.png";
+  String searchImage = "$path/icon_search.png";
+  String profileImage = "$path/profile.png";
 }
 
 class Animations {
@@ -47,6 +50,7 @@ class Routes {
   String verifyAccountRoute = '/VerifyAccount_screen';
   String navigatorRoute = '/Navigator_Screen';
   String settingsRoute = '/Settings_Screen';
+  String chatRoute = '/Chat_Screen';
 }
 
 class R {
