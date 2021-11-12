@@ -17,6 +17,10 @@ class Images {
   String myGroupsImage = "$path/my_groups_image.png";
   String peopleNearbyImage = "$path/people_nearby_image.png";
   String settingsImage = "$path/settings_image.png";
+  String blockedUserImage = "$path/blocked_user_image.png";
+  String chatImage = "$path/chat_image.png";
+  String languageImage = "$path/language_image.png";
+  String notificationBellImage = "$path/notification_bell_image.png";
 }
 
 class Animations {
