@@ -59,6 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   unselectedLabelColor: Colors.grey,
                                   indicatorSize: TabBarIndicatorSize.label,
                                   isScrollable: true,
+                                  labelStyle: const TextStyle(color:Color(0xff1293a8) ),
                                   labelPadding:
                                       const EdgeInsets.only(left: 5, right: 5),
                                   indicator: BoxDecoration(
@@ -77,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(50),
-                                              color: Colors.transparent,
+                                         //     color: Color(0xff1293a8),
                                               border: Border.all(
                                                 color: Colors.transparent,
                                                 width: 0.3,
