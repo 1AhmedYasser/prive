@@ -65,46 +65,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Chats",
-                style: TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  Utils.saveString(R.pref.token, "");
-                  Utils.saveString(R.pref.userId, "");
-                  Utils.saveBool(R.pref.isLoggedIn, false);
-                  Navigator.pushReplacementNamed(
-                    context,
-                    R.routes.loginRoute,
-                  );
-                },
-                child: const Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  elevation: 0,
-                  minimumSize: Size(
-                    MediaQuery.of(context).size.width - 50,
-                    50,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return const ChatScreen();
       case 1:
         return Center(
           child: Column(
