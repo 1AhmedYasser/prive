@@ -148,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> {
             position: index,
             duration: const Duration(milliseconds: 375),
             child: SlideAnimation(
-              horizontalOffset: 50,
+              verticalOffset: 50,
               child: Padding(
                 padding: const EdgeInsets.only(
                     right: 22, top: 30, left: 15, bottom: 10),
@@ -158,12 +158,35 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Row(
                       children: [
-                        SizedBox(
-                          child: Image.asset(
-                            R.images.profileImage,
-                            width: 80,
-                            fit: BoxFit.fill,
-                          ),
+                        Stack(
+                          children: [
+                            SizedBox(
+                              child: Image.asset(
+                                R.images.profileImage,
+                                width: 75,
+                                height: 75,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            if (index % 2 == 0)
+                              Positioned(
+                                bottom: 2,
+                                right: 0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(2),
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.green,
+                                      radius: 6,
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ],
                         ),
                         const SizedBox(
                           width: 20,
@@ -189,6 +212,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                   Text('8:30'),
                                 ],
                               ),
+                              const SizedBox(
+                                height: 3,
+                              ),
                               Row(
                                 children: [
                                   const Expanded(
@@ -196,7 +222,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       'Why Did You Do That ?',
                                       style: TextStyle(
                                           fontSize: 16,
-                                          fontWeight: FontWeight.w300,
+                                          fontWeight: FontWeight.w400,
                                           color: Color(0xff1293a8)),
                                     ),
                                   ),
@@ -210,8 +236,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: const Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                            left: 5,
-                                            right: 5,
+                                            left: 8,
+                                            right: 8,
                                             top: 3.5,
                                             bottom: 3.5),
                                         child: Text(
