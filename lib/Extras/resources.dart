@@ -24,6 +24,9 @@ class Images {
   String logoImage = "$path/logo.png";
   String searchImage = "$path/icon_search.png";
   String profileImage = "$path/profile.png";
+  String logoutImage = "$path/logout_image.png";
+  String cameraIconImage = "$path/camera_icon_image.png";
+  String cameraPlaceholder = "$path/camera_placeholder.png";
 }
 
 class Animations {
@@ -52,6 +55,7 @@ class Routes {
   String settingsRoute = '/Settings_Screen';
   String chatRoute = '/Chat_Screen';
   String termsPrivacyRoute = '/termsPrivacy_Screen';
+  String profileRoute = '/profile_Screen';
 }
 
 class R {

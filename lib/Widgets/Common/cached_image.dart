@@ -12,12 +12,12 @@ class CachedImage extends StatelessWidget {
 
   const CachedImage(
       {Key? key,
-        this.url = "",
-        this.placeholder = "",
-        this.placeholderPadding = 13,
-        this.fit = BoxFit.fill,
-        this.containerColor = const Color(0xffeeeeee),
-        this.withLoading = false})
+      this.url = "",
+      this.placeholder = "",
+      this.placeholderPadding = 13,
+      this.fit = BoxFit.fill,
+      this.containerColor = const Color(0xffeeeeee),
+      this.withLoading = false})
       : super(key: key);
 
   @override
@@ -29,44 +29,44 @@ class CachedImage extends StatelessWidget {
       fit: fit,
       placeholder: (context, url) => placeholder.isEmpty
           ? Container(
-        color: containerColor,
-        child: withLoading
-            ? const SpinKitThreeBounce(
-          color: Color(0xff3a1782),
-          size: 28,
-        )
-            : null,
-      )
+              color: containerColor,
+              child: withLoading
+                  ? const SpinKitThreeBounce(
+                      color: Color(0xff3a1782),
+                      size: 28,
+                    )
+                  : null,
+            )
           : Container(
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(placeholderPadding),
-          child: Image.asset(
-            placeholder,
-            fit: BoxFit.fill,
-          ),
-        ),
-      ),
+              color: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(placeholderPadding),
+                child: Image.asset(
+                  placeholder,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
       errorWidget: (context, url, error) => placeholder.isEmpty
           ? Container(
-        color: containerColor,
-        child: withLoading
-            ? const SpinKitThreeBounce(
-          color: Color(0xff3a1782),
-          size: 28,
-        )
-            : null,
-      )
+              color: containerColor,
+              child: withLoading
+                  ? const SpinKitThreeBounce(
+                      color: Color(0xff3a1782),
+                      size: 28,
+                    )
+                  : null,
+            )
           : Container(
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(placeholderPadding),
-          child: Image.asset(
-            placeholder,
-            fit: BoxFit.fill,
-          ),
-        ),
-      ),
+              color: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(placeholderPadding),
+                child: Image.asset(
+                  placeholder,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
     );
   }
 }

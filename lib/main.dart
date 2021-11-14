@@ -6,6 +6,7 @@ import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
+import 'package:prive/Screens/More/profile_screen.dart';
 import 'package:prive/Screens/More/settings_screen.dart';
 import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
@@ -62,6 +63,7 @@ class Prive extends StatelessWidget {
           R.routes.settingsRoute: (ctx) => const SettingsScreen(),
           R.routes.chatRoute: (ctx) => const ChatScreen(),
           R.routes.termsPrivacyRoute: (ctx) => const TermsPrivacyScreen(),
+          R.routes.profileRoute: (ctx) => const ProfileScreen(),
         },
       ),
     );
