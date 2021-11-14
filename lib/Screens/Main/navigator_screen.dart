@@ -53,7 +53,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           child: ImageIcon(
             AssetImage(image),
             color: _currentIndex == index
-                ? Theme.of(context).primaryColor
+                ? Theme.of(context).primaryColorDark
                 : const Color(0xff7a8fa6),
           ),
         ),
@@ -237,7 +237,7 @@ class _ChipBuilder extends ChipBuilder {
                   child: ImageIcon(
                     AssetImage(getImage(index)),
                     color: active
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).primaryColorDark
                         : const Color(0xff7a8fa6),
                   ),
                 ),
@@ -247,7 +247,7 @@ class _ChipBuilder extends ChipBuilder {
                     maxLines: 1,
                     style: TextStyle(
                       color: active
-                          ? Theme.of(context).primaryColor
+                          ? Theme.of(context).primaryColorDark
                           : const Color(0xff7a8fa6),
                     ),
                   ),
