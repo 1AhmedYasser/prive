@@ -23,7 +23,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       bottomNavigationBar: ConvexAppBar(
         chipBuilder: _ChipBuilder(),
         color: const Color(0xff7a8fa6),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
         activeColor: Theme.of(context).primaryColor,
         elevation: 0.5,
         style: TabStyle.fixed,
@@ -222,8 +222,24 @@ class _ChipBuilder extends ChipBuilder {
                 child: Align(
                   alignment: Alignment.center,
                   child: Padding(
-                    padding: const EdgeInsets.all(11),
-                    child: Image.asset(R.images.addTabImage),
+                    padding: const EdgeInsets.all(6),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade400.withOpacity(0.5),
+                            spreadRadius: 0.3,
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Image.asset(R.images.addTabImage),
+                      ),
+                    ),
                   ),
                 ),
               )
