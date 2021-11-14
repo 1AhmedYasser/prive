@@ -51,6 +51,7 @@ class Routes {
   String navigatorRoute = '/Navigator_Screen';
   String settingsRoute = '/Settings_Screen';
   String chatRoute = '/Chat_Screen';
+  String termsPrivacyRoute = '/termsPrivacy_Screen';
 }
 
 class R {

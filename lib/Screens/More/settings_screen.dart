@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -71,8 +72,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 buildSettingsChoices("Help", () {},
                     bottom: 30, textColor: const Color(0xff232323)),
                 buildSettingsChoices("Ask a Question", () {}),
-                buildSettingsChoices("Terms & Conditions", () {}),
-                buildSettingsChoices("Privacy Policy", () {}),
+                buildSettingsChoices(
+                  "Terms & Conditions",
+                  () =>
+                      Navigator.pushNamed(context, R.routes.termsPrivacyRoute),
+                ),
+                buildSettingsChoices(
+                  "Privacy Policy",
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TermsPrivacyScreen(
+                          isTerms: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
