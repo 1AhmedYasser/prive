@@ -57,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 OptionRowWidget(
                   image: R.images.chatImage,
                   title: "Chat Settings",
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushNamed(context, R.routes.chatSettingsRoute),
                 ),
                 OptionRowWidget(
                   image: R.images.blockedUserImage,

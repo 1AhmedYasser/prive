@@ -27,6 +27,13 @@ class Images {
   String logoutImage = "$path/logout_image.png";
   String cameraIconImage = "$path/camera_icon_image.png";
   String cameraPlaceholder = "$path/camera_placeholder.png";
+  String chatBackgroundImage = "$path/chat_background_image.png";
+  String colorTheme1 = "$path/color_theme_1.png";
+  String colorTheme2 = "$path/color_theme_2.png";
+  String colorTheme3 = "$path/color_theme_3.png";
+  String colorTheme4 = "$path/color_theme_4.png";
+  String colorTheme5 = "$path/color_theme_5.png";
+  String undoImage = "$path/undo_image.png";
 }
 
 class Animations {
@@ -57,6 +64,7 @@ class Routes {
   String termsPrivacyRoute = '/termsPrivacy_Screen';
   String profileRoute = '/profile_Screen';
   String languageRoute = '/language_Screen';
+  String chatSettingsRoute = '/chatSettings_Screen';
 }
 
 class R {
