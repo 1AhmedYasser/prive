@@ -53,6 +53,7 @@ dependencies:
   intl: ^0.17.0
   share_plus: ^3.0.4
   country_calling_code_picker: ^2.0.0
+  font_awesome_flutter: ^9.2.0
 
   # Firebase
   firebase_core: ^1.10.0

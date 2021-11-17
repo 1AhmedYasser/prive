@@ -10,10 +10,10 @@ import 'package:prive/Screens/More/profile_screen.dart';
 import 'package:prive/Screens/More/settings_screen.dart';
 import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
-
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
 import 'Screens/Home/chat_screen.dart';
+import 'Screens/More/language_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
 void main() async {
@@ -64,6 +64,7 @@ class Prive extends StatelessWidget {
           R.routes.chatRoute: (ctx) => const ChatScreen(),
           R.routes.termsPrivacyRoute: (ctx) => const TermsPrivacyScreen(),
           R.routes.profileRoute: (ctx) => const ProfileScreen(),
+          R.routes.languageRoute: (ctx) => const LanguageScreen(),
         },
       ),
     );

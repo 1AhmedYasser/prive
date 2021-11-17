@@ -56,6 +56,7 @@ class Routes {
   String chatRoute = '/Chat_Screen';
   String termsPrivacyRoute = '/termsPrivacy_Screen';
   String profileRoute = '/profile_Screen';
+  String languageRoute = '/language_Screen';
 }
 
 class R {

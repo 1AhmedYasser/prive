@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -66,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 OptionRowWidget(
                   image: R.images.languageImage,
                   title: "Language",
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushNamed(context, R.routes.languageRoute),
                 ),
                 const SizedBox(height: 5),
                 buildSettingsChoices("Help", () {},
@@ -111,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             fontWeight: FontWeight.w400,
             color: textColor,
           ),
-        ),
+        ).tr(),
       ),
     );
   }

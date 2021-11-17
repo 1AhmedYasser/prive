@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OptionRowWidget extends StatelessWidget {
   final String image;
@@ -38,7 +39,7 @@ class OptionRowWidget extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
-                ),
+                ).tr(),
                 const Expanded(child: SizedBox()),
                 const Icon(
                   Icons.arrow_forward_ios_rounded,
