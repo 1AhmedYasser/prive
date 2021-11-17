@@ -197,7 +197,12 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
               child: InkWell(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                onTap: () {},
+                onTap: () {
+                  setState(() {
+                    currentSelectedIndex = 0;
+                    textSize = 14;
+                  });
+                },
                 child: Row(
                   children: [
                     Image.asset(
