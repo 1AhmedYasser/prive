@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
-import 'Screens/Home/chat_screen.dart';
+import 'Screens/Home/channels_screen.dart';
 import 'Screens/More/language_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
@@ -79,7 +79,7 @@ class Prive extends StatelessWidget {
           R.routes.verifyAccountRoute: (ctx) => const VerifyAccountScreen(),
           R.routes.navigatorRoute: (ctx) => const NavigatorScreen(),
           R.routes.settingsRoute: (ctx) => const SettingsScreen(),
-          R.routes.chatRoute: (ctx) => const ChatScreen(),
+          R.routes.chatRoute: (ctx) => const ChannelsScreen(),
           R.routes.termsPrivacyRoute: (ctx) => const TermsPrivacyScreen(),
           R.routes.profileRoute: (ctx) => const ProfileScreen(),
           R.routes.languageRoute: (ctx) => const LanguageScreen(),

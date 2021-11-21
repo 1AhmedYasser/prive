@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+class ChannelsScreen extends StatefulWidget {
+  const ChannelsScreen({Key? key}) : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _ChannelsScreenState createState() => _ChannelsScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChannelsScreenState extends State<ChannelsScreen> {
   final List<String> _tabs = ["Chats", "Groups", "Important", "Archive"];
+
+  final channelListController = ChannelListController();
 
   @override
   Widget build(BuildContext context) {
@@ -140,129 +143,166 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         ),
-        body: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: 6,
-          itemBuilder: (BuildContext context, int index) =>
-              AnimationConfiguration.staggeredList(
-            position: index,
-            duration: const Duration(milliseconds: 375),
-            child: SlideAnimation(
-              verticalOffset: 50,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    right: 22, top: 30, left: 15, bottom: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+        body: ChannelListCore(
+          channelListController: channelListController,
+          filter: Filter.and(
+            [
+              Filter.equal('type', 'messaging'),
+              Filter.in_('members', [
+                StreamChatCore.of(context).currentUser!.id,
+              ])
+            ],
+          ),
+          emptyBuilder: (context) => const Center(
+            child: Text(
+              'So empty.\nGo and message someone.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          errorBuilder: (context, error) => Center(
+            child: Text(
+              'Error: $error',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          loadingBuilder: (
+            context,
+          ) =>
+              const Center(
+            child: SizedBox(
+              height: 100,
+              width: 100,
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          listBuilder: (context, channels) {
+            return ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: 6,
+              itemBuilder: (BuildContext context, int index) =>
+                  AnimationConfiguration.staggeredList(
+                position: index,
+                duration: const Duration(milliseconds: 375),
+                child: SlideAnimation(
+                  verticalOffset: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        right: 22, top: 30, left: 15, bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Stack(
+                        Row(
                           children: [
-                            SizedBox(
-                              child: Image.asset(
-                                R.images.profileImage,
-                                width: 75,
-                                height: 75,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                            if (index % 2 == 0)
-                              Positioned(
-                                bottom: 2,
-                                right: 0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(2),
-                                    child: CircleAvatar(
-                                      backgroundColor: Colors.green,
-                                      radius: 6,
-                                    ),
+                            Stack(
+                              children: [
+                                SizedBox(
+                                  child: Image.asset(
+                                    R.images.profileImage,
+                                    width: 75,
+                                    height: 75,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
-                              )
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Expanded(
-                                    child: Text(
-                                      'Ehab Sayed',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20,
+                                if (index % 2 == 0)
+                                  Positioned(
+                                    bottom: 2,
+                                    right: 0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(50),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('8:30'),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 3,
-                              ),
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      'Why Did You Do That ?',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff1293a8)),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: const Color(0xff53c662)),
-                                    child: const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 8,
-                                            right: 8,
-                                            top: 3.5,
-                                            bottom: 3.5),
-                                        child: Text(
-                                          '6',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13.5,
-                                          ),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(2),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.green,
+                                          radius: 6,
                                         ),
                                       ),
                                     ),
+                                  )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: const [
+                                      Expanded(
+                                        child: Text(
+                                          'Ehab Sayed',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text('8:30'),
+                                    ],
                                   ),
+                                  const SizedBox(
+                                    height: 3,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Expanded(
+                                        child: Text(
+                                          'Why Did You Do That ?',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xff1293a8)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: const Color(0xff53c662)),
+                                        child: const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 8,
+                                                right: 8,
+                                                top: 3.5,
+                                                bottom: 3.5),
+                                            child: Text(
+                                              '6',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13.5,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
                                 ],
-                              )
-                            ],
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

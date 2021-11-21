@@ -3,7 +3,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Screens/Home/chat_screen.dart';
+import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/more_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -65,7 +65,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return const ChatScreen();
+        return const ChannelsScreen();
       case 1:
         return Center(
           child: Column(
