@@ -170,6 +170,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           LoginData? loginData = value.data?[0];
                           Utils.saveString(
                               R.pref.token, loginData?.token ?? "");
+                          Utils.saveString(
+                              R.pref.userId, loginData?.userID ?? "");
+                          Utils.saveString(
+                              R.pref.userImage, loginData?.userPhoto ?? "");
+                          Utils.saveString(
+                              R.pref.userPhone, loginData?.userPhone ?? "");
+                          Utils.saveString(R.pref.userName,
+                              "${loginData?.userFirstName ?? ""} ${loginData?.userLastName ?? ""}");
                           Navigator.push(
                             context,
                             MaterialPageRoute(

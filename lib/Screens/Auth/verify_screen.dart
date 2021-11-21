@@ -194,11 +194,13 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           ),
                         );
                       } else {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          R.routes.navigatorRoute,
-                        );
-                        Utils.saveBool(R.pref.isLoggedIn, true);
+                        Utils.connectUserToStream(context).then((value) {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            R.routes.navigatorRoute,
+                          );
+                          Utils.saveBool(R.pref.isLoggedIn, true);
+                        });
                       }
                     }).catchError((error) {
                       showOkAlertDialog(

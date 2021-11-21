@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class Utils {
   static Future<void> showImagePickerSelector(
@@ -115,7 +117,7 @@ class Utils {
 
   static bool isValidEmail(String email) {
     return RegExp(
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
         .hasMatch(email);
   }
 
@@ -138,6 +140,25 @@ class Utils {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
   }
+
+  static Future<void> connectUserToStream(BuildContext context) async {
+    try {
+      final client = StreamChatCore.of(context).client;
+      await client.connectUser(
+        User(
+          id: await Utils.getString(R.pref.userId) ?? "",
+          extraData: {
+            'name': await Utils.getString(R.pref.userName),
+            'image': await Utils.getString(R.pref.userImage),
+            'phone': await Utils.getString(R.pref.userPhone),
+          },
+        ),
+        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
+      );
+    } on Exception catch (e, st) {
+      print('Could not connect user');
+    }
+  }
 }
 
 class MyHttpOverrides extends HttpOverrides {
@@ -145,4 +166,10 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
+}
+
+extension StreamChatContext on BuildContext {
+  String? get currentUserImage => currentUser!.image;
+
+  User? get currentUser => StreamChatCore.of(this).currentUser;
 }

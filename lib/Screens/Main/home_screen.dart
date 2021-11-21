@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _checkIfUserIsLoggedIn() async {
     var loginStatus = await Utils.getBool(R.pref.isLoggedIn);
     if (loginStatus == true) {
+      Utils.connectUserToStream(context);
       isLoggedIn = (loginStatus == null) ? false : loginStatus;
       setState(() {});
       //_checkForNewNotifications(loginStatus);

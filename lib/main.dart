@@ -11,6 +11,7 @@ import 'package:prive/Screens/More/profile_screen.dart';
 import 'package:prive/Screens/More/settings_screen.dart';
 import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
 import 'Screens/Home/chat_screen.dart';
@@ -22,18 +23,24 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   EasyLocalization.logger.enableBuildModes = [];
   await Firebase.initializeApp();
+  final client = StreamChatClient(R.constants.streamKey);
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: const Prive(),
+      child: Prive(
+        client: client,
+      ),
     ),
   );
 }
 
 class Prive extends StatelessWidget {
-  const Prive({Key? key}) : super(key: key);
+  Prive({Key? key, required this.client}) : super(key: key);
+
+  final StreamChatClient client;
+  final botToastBuilder = BotToastInit();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +60,17 @@ class Prive extends StatelessWidget {
           fontFamily: 'SFPro',
         ),
         debugShowCheckedModeBanner: false,
-        builder: BotToastInit(),
+        builder: (context, child) {
+          child = botToastBuilder(context, child);
+          return StreamChatCore(
+            client: client,
+            child: ChannelsBloc(
+              child: UsersBloc(
+                child: child,
+              ),
+            ),
+          );
+        },
         navigatorObservers: [BotToastNavigatorObserver()],
         home: const HomeScreen(),
         routes: {

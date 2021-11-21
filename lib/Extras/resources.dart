@@ -47,11 +47,14 @@ class SharedPref {
   String hasNewNotifications = "has_new_notifications";
   String userName = "user_name";
   String userEmail = "user_email";
+  String userPhone = "user_phone";
+  String userImage = "user_image";
   String facebookId = "facebook_Id";
   String googleId = "google_Id";
 }
 
 class Constants {
+  String streamKey = 'vze6yter44yq';
 }
 
 class Routes {
