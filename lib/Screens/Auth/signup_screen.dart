@@ -231,8 +231,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Login signup = value;
                             if (signup.success == true) {
                               LoginData? signupData = signup.data?[0];
-                              Utils.saveString(R.pref.token, signupData?.token ?? "");
-                              Utils.saveString(R.pref.userId, signupData?.userID ?? "");
+                              Utils.saveString(
+                                  R.pref.token, signupData?.token ?? "");
+                              Utils.saveString(
+                                  R.pref.userId, signupData?.userID ?? "");
+                              Utils.saveString(R.pref.userImage,
+                                  signupData?.userPhoto ?? "");
+                              Utils.saveString(R.pref.userPhone,
+                                  signupData?.userPhone ?? "");
+                              Utils.saveString(R.pref.userName,
+                                  "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
+                              Utils.connectUserToStream(context);
                               Utils.saveBool(R.pref.isLoggedIn, true);
                               Navigator.pushReplacementNamed(
                                   context, R.routes.navigatorRoute);
