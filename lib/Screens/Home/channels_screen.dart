@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChannelsScreen extends StatefulWidget {
@@ -11,10 +13,18 @@ class ChannelsScreen extends StatefulWidget {
   _ChannelsScreenState createState() => _ChannelsScreenState();
 }
 
-class _ChannelsScreenState extends State<ChannelsScreen> {
+class _ChannelsScreenState extends State<ChannelsScreen>
+    with TickerProviderStateMixin {
   final List<String> _tabs = ["Chats", "Groups", "Important", "Archive"];
 
   final channelListController = ChannelListController();
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(vsync: this);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,10 +163,41 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               ])
             ],
           ),
-          emptyBuilder: (context) => const Center(
-            child: Text(
-              'So empty.\nGo and message someone.',
-              textAlign: TextAlign.center,
+          emptyBuilder: (context) => SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  R.animations.emptyChannels,
+                  width: MediaQuery.of(context).size.width / 1.6,
+                  fit: BoxFit.fill,
+                  controller: _animationController,
+                  onLoaded: (composition) {
+                    // Configure the AnimationController with the duration of the
+                    // Lottie file and start the animation.
+                    _animationController
+                      ..duration = composition.duration
+                      ..forward()
+                      ..repeat(min: 0.2,max: 1);
+                  },
+                ),
+                const SizedBox(height: 25),
+                const Text(
+                  "No Messages Yet",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 15),
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: Text(
+                    "Start Chatting With Your Friends Right Now",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
+                )
+              ],
             ),
           ),
           errorBuilder: (context, error) => Center(
@@ -168,13 +209,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
           loadingBuilder: (
             context,
           ) =>
-              const Center(
-            child: SizedBox(
-              height: 100,
-              width: 100,
-              child: CircularProgressIndicator(),
-            ),
-          ),
+              const UltraLoadingIndicator(),
           listBuilder: (context, channels) {
             return ListView.builder(
               scrollDirection: Axis.vertical,
@@ -306,5 +341,11 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 }

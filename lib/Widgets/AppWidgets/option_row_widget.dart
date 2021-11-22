@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 class OptionRowWidget extends StatelessWidget {
   final String image;
+  final Color? imageColor;
   final String title;
   final Function onPressed;
   final bool showDivider;
@@ -11,6 +12,7 @@ class OptionRowWidget extends StatelessWidget {
       {Key? key,
       this.image = "",
       this.title = "",
+      this.imageColor,
       required this.onPressed,
       this.showDivider = true})
       : super(key: key);
@@ -29,6 +31,7 @@ class OptionRowWidget extends StatelessWidget {
               children: [
                 Image.asset(
                   image,
+                  color: imageColor,
                   width: 30,
                   height: 23,
                 ),

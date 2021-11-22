@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _checkIfUserIsLoggedIn() async {
     var loginStatus = await Utils.getBool(R.pref.isLoggedIn);
     if (loginStatus == true) {
-      Utils.connectUserToStream(context);
+      StreamManager.connectUserToStream(context);
       isLoggedIn = (loginStatus == null) ? false : loginStatus;
       setState(() {});
       //_checkForNewNotifications(loginStatus);

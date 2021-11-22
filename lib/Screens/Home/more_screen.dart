@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 
 class MoreScreen extends StatefulWidget {
@@ -83,9 +85,27 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: R.images.settingsImage,
                   title: "Settings",
-                  showDivider: false,
                   onPressed: () {
                     Navigator.pushNamed(context, R.routes.settingsRoute);
+                  },
+                ),
+                OptionRowWidget(
+                  image: R.images.logoutImage,
+                  imageColor: const Color(0xff7a8fa6).withOpacity(0.9),
+                  title: "Logout",
+                  showDivider: false,
+                  onPressed: () {
+                    Utils.saveString(R.pref.token, "");
+                    Utils.saveString(R.pref.userId, "");
+                    Utils.saveString(R.pref.userName, "");
+                    Utils.saveString(R.pref.userEmail, "");
+                    Utils.saveString(R.pref.userPhone, "");
+                    Utils.saveBool(R.pref.isLoggedIn, false);
+                    StreamManager.disconnectUserFromStream(context);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      R.routes.loginRoute,
+                    );
                   },
                 ),
               ],

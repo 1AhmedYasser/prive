@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Models/login.dart';
@@ -241,7 +242,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   signupData?.userPhone ?? "");
                               Utils.saveString(R.pref.userName,
                                   "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
-                              Utils.connectUserToStream(context);
+                              StreamManager.connectUserToStream(context);
                               Utils.saveBool(R.pref.isLoggedIn, true);
                               Navigator.pushReplacementNamed(
                                   context, R.routes.navigatorRoute);

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
@@ -194,7 +195,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           ),
                         );
                       } else {
-                        Utils.connectUserToStream(context).then((value) {
+                        StreamManager.connectUserToStream(context).then((value) {
                           Navigator.pushReplacementNamed(
                             context,
                             R.routes.navigatorRoute,

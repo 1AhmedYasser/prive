@@ -140,25 +140,6 @@ class Utils {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
   }
-
-  static Future<void> connectUserToStream(BuildContext context) async {
-    try {
-      final client = StreamChatCore.of(context).client;
-      await client.connectUser(
-        User(
-          id: await Utils.getString(R.pref.userId) ?? "",
-          extraData: {
-            'name': await Utils.getString(R.pref.userName),
-            'image': await Utils.getString(R.pref.userImage),
-            'phone': await Utils.getString(R.pref.userPhone),
-          },
-        ),
-        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
-      );
-    } on Exception catch (e, st) {
-      print('Could not connect user');
-    }
-  }
 }
 
 class MyHttpOverrides extends HttpOverrides {
@@ -166,10 +147,4 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
-}
-
-extension StreamChatContext on BuildContext {
-  String? get currentUserImage => currentUser!.image;
-
-  User? get currentUser => StreamChatCore.of(this).currentUser;
 }
