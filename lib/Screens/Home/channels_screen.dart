@@ -7,6 +7,7 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:intl/intl.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({Key? key}) : super(key: key);
@@ -291,7 +292,16 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      const Text('8:30'),
+                                      BetterStreamBuilder<DateTime>(
+                                        stream:
+                                            channels[index].lastMessageAtStream,
+                                        initialData:
+                                            channels[index].lastMessageAt,
+                                        builder: (context, data) {
+                                          return Text(
+                                              getLatestMessageDate(data));
+                                        },
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(
@@ -380,6 +390,30 @@ class _ChannelsScreenState extends State<ChannelsScreen>
         ),
       ),
     );
+  }
+
+  String getLatestMessageDate(DateTime data) {
+    final now = DateTime.now();
+    DateTime messageDate = data.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final messageDateFormatted =
+        DateTime(messageDate.year, messageDate.month, messageDate.day);
+
+    if (messageDateFormatted == today) {
+      return DateFormat('hh:mm a').format(messageDate);
+    } else if (messageDateFormatted == yesterday) {
+      return "Yesterday";
+    } else {
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
+        return DateFormat('d/MM/yyyy').format(messageDate);
+      } else {
+        return DateFormat('EEEE').format(messageDate);
+      }
+    }
   }
 
   @override
