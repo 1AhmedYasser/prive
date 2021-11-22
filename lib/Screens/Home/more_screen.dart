@@ -53,9 +53,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: R.images.myGroupsImage,
                   title: "My Groups",
-                  onPressed: () {
-                    Navigator.pushNamed(context, R.routes.profileRoute);
-                  },
+                  onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.myChannelsImage,

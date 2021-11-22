@@ -48,6 +48,8 @@ class SharedPref {
   String userId = "user_id";
   String hasNewNotifications = "has_new_notifications";
   String userName = "user_name";
+  String userFirstName = "user_first_name";
+  String userLastName = "user_last_name";
   String userEmail = "user_email";
   String userPhone = "user_phone";
   String userImage = "user_image";

@@ -141,14 +141,19 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                       ),
                     ),
                     const SizedBox(width: 20),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CachedImage(
-                          url: context.currentUserImage ?? "",
-                          fit: BoxFit.fill,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, R.routes.profileRoute);
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CachedImage(
+                            url: context.currentUserImage ?? "",
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
                     ),

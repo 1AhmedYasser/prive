@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class Utils {
   static Future<void> showImagePickerSelector(

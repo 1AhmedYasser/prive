@@ -176,6 +176,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               R.pref.userImage, loginData?.userPhoto ?? "");
                           Utils.saveString(
                               R.pref.userPhone, loginData?.userPhone ?? "");
+                          Utils.saveString(R.pref.userFirstName,
+                              loginData?.userFirstName ?? "");
+                          Utils.saveString(R.pref.userLastName,
+                              loginData?.userLastName ?? "");
                           Utils.saveString(R.pref.userName,
                               "${loginData?.userFirstName ?? ""} ${loginData?.userLastName ?? ""}");
                           Navigator.push(

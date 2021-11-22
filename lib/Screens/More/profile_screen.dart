@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "dart:io";
@@ -21,6 +22,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late File profileImage = File("");
   final imagePicker = ImagePicker();
+
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   borderRadius: BorderRadius.circular(30),
                                   child: (profileImage.path.isEmpty)
                                       ? CachedImage(
-                                          url: "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_12.jpg",
+                                          url: context.currentUserImage ?? "",
                                           placeholder: R.images.cameraImage,
                                           containerColor: Colors.grey.shade300,
                                         )
@@ -244,6 +251,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return null;
       },
     );
+  }
+
+  void getUserInfo() async{
+   firstNameController.text = await Utils.getString(R.pref.userFirstName) ?? "";
+   lastNameController.text = await Utils.getString(R.pref.userLastName) ?? "";
+   phoneNumberController.text = await Utils.getString(R.pref.userPhone) ?? "";
   }
 
   Future getImage(ImageSource source) async {

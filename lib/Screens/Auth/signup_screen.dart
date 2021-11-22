@@ -240,6 +240,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   signupData?.userPhoto ?? "");
                               Utils.saveString(R.pref.userPhone,
                                   signupData?.userPhone ?? "");
+                              Utils.saveString(R.pref.userFirstName,
+                                  signupData?.userFirstName ?? "");
+                              Utils.saveString(R.pref.userLastName,
+                                  signupData?.userLastName ?? "");
                               Utils.saveString(R.pref.userName,
                                   "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
                               StreamManager.connectUserToStream(context);
