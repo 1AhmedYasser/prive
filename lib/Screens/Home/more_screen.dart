@@ -101,9 +101,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     Utils.saveBool(R.pref.isLoggedIn, false);
                     StreamManager.disconnectUserFromStream(context);
                     Navigator.pushReplacementNamed(
-                      context,
-                      R.routes.loginRoute,
-                    );
+                        context, R.routes.loginRoute);
                   },
                 ),
               ],

@@ -43,7 +43,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Utils.saveString(R.pref.token, "");
+              Utils.saveString(R.pref.userId, "");
+              Utils.saveString(R.pref.userName, "");
+              Utils.saveString(R.pref.userEmail, "");
+              Utils.saveString(R.pref.userPhone, "");
+              Utils.saveBool(R.pref.isLoggedIn, false);
+              StreamManager.disconnectUserFromStream(context);
+              Navigator.pushReplacementNamed(
+                  context, R.routes.loginRoute);
+            },
             child: Row(
               children: [
                 Image.asset(
