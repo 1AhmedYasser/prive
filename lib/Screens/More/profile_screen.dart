@@ -53,8 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Utils.saveString(R.pref.userPhone, "");
               Utils.saveBool(R.pref.isLoggedIn, false);
               StreamManager.disconnectUserFromStream(context);
-              Navigator.pushReplacementNamed(
-                  context, R.routes.loginRoute);
+              Navigator.pushNamedAndRemoveUntil(context, R.routes.loginRoute,
+                  (Route<dynamic> route) => false);
             },
             child: Row(
               children: [
@@ -265,10 +265,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void getUserInfo() async{
-   firstNameController.text = await Utils.getString(R.pref.userFirstName) ?? "";
-   lastNameController.text = await Utils.getString(R.pref.userLastName) ?? "";
-   phoneNumberController.text = await Utils.getString(R.pref.userPhone) ?? "";
+  void getUserInfo() async {
+    firstNameController.text =
+        await Utils.getString(R.pref.userFirstName) ?? "";
+    lastNameController.text = await Utils.getString(R.pref.userLastName) ?? "";
+    phoneNumberController.text = await Utils.getString(R.pref.userPhone) ?? "";
   }
 
   Future getImage(ImageSource source) async {

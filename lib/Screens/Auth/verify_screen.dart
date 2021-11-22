@@ -195,11 +195,12 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           ),
                         );
                       } else {
-                        StreamManager.connectUserToStream(context).then((value) {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            R.routes.navigatorRoute,
-                          );
+                        StreamManager.connectUserToStream(this.context)
+                            .then((value) {
+                          Navigator.pushNamedAndRemoveUntil(
+                              this.context,
+                              R.routes.navigatorRoute,
+                              (Route<dynamic> route) => false);
                           Utils.saveBool(R.pref.isLoggedIn, true);
                         });
                       }
