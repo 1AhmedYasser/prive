@@ -47,6 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Utils.saveString(R.pref.token, "");
               Utils.saveString(R.pref.userId, "");
               Utils.saveString(R.pref.userName, "");
+              Utils.saveString(R.pref.userFirstName, "");
+              Utils.saveString(R.pref.userLastName, "");
               Utils.saveString(R.pref.userEmail, "");
               Utils.saveString(R.pref.userPhone, "");
               Utils.saveBool(R.pref.isLoggedIn, false);
