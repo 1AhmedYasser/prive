@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_send_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/connection_status_builder.dart';
@@ -44,81 +45,116 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final channel = StreamChannel.of(context).channel;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leadingWidth: 54,
-        leading: const BackButton(
-          color: Colors.black,
-        ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              child: CachedImage(
-                url: StreamManager.getChannelImage(
-                      channel,
-                      context.currentUser!,
-                    ) ??
-                    "",
-              ),
-              radius: 20,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(65),
+        child: AppBar(
+          toolbarHeight: 90,
+          centerTitle: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leadingWidth: 40,
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: BackButton(
+              color: Colors.black,
             ),
-            const SizedBox(
-              width: 16,
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    StreamManager.getChannelName(
-                      channel,
-                      context.currentUser!,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+          ),
+          title: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: CircleAvatar(
+                  child: CachedImage(
+                    url: StreamManager.getChannelImage(
+                          channel,
+                          context.currentUser!,
+                        ) ??
+                        "",
                   ),
-                  const SizedBox(height: 2),
-                  BetterStreamBuilder<List<Member>>(
-                    stream: channel.state!.membersStream,
-                    initialData: channel.state!.members,
-                    builder: (context, data) => ConnectionStatusBuilder(
-                      statusBuilder: (context, status) {
-                        switch (status) {
-                          case ConnectionStatus.connected:
-                            return _buildConnectedTitleState(context, data);
-                          case ConnectionStatus.connecting:
-                            return const Text(
-                              'Connecting',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            );
-                          case ConnectionStatus.disconnected:
-                            return const Text(
-                              'Offline',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                              ),
-                            );
-                          default:
-                            return const SizedBox.shrink();
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  radius: 27,
+                ),
               ),
-            )
+              const SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      StreamManager.getChannelName(
+                        channel,
+                        context.currentUser!,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 15, color: Colors.black),
+                    ),
+                    const SizedBox(height: 2),
+                    BetterStreamBuilder<List<Member>>(
+                      stream: channel.state!.membersStream,
+                      initialData: channel.state!.members,
+                      builder: (context, data) => ConnectionStatusBuilder(
+                        statusBuilder: (context, status) {
+                          switch (status) {
+                            case ConnectionStatus.connected:
+                              return _buildConnectedTitleState(context, data);
+                            case ConnectionStatus.connecting:
+                              return const Text(
+                                'Connecting',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              );
+                            case ConnectionStatus.disconnected:
+                              return const Text(
+                                'Offline',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              );
+                            default:
+                              return const SizedBox.shrink();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {},
+              child: Image.asset(
+                R.images.videoCallImage,
+                width: 25,
+              ),
+            ),
+            const SizedBox(width: 20),
+            GestureDetector(
+              onTap: () {},
+              child: Image.asset(
+                R.images.voiceCallImage,
+                width: 22,
+              ),
+            ),
+            const SizedBox(width: 20),
+            GestureDetector(
+              onTap: () {},
+              child: Image.asset(
+                R.images.chatMoreImage,
+                width: 20,
+              ),
+            ),
+            const SizedBox(width: 15),
           ],
         ),
-        actions: [],
       ),
       body: Column(
         children: [
@@ -175,7 +211,7 @@ class _ChatScreenState extends State<ChatScreen> {
           alternativeWidget = const Text(
             'Online',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: Colors.green,
             ),
@@ -185,7 +221,7 @@ class _ChatScreenState extends State<ChatScreen> {
             'Last online: ',
             //'${Jiffy(otherMember.user?.lastActive).fromNow()}',
             style: const TextStyle(
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: Colors.red,
             ),
