@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Widgets/ChatWidgets/chat_list_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_send_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/connection_status_builder.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class ChatScreen extends StatefulWidget {
   static Route routeWithChannel(Channel channel) => MaterialPageRoute(
@@ -34,11 +34,11 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
 
-    // unreadCountSubscription = StreamChannel.of(context)
-    //     .channel
-    //     .state!
-    //     .unreadCountStream
-    //     .listen(_unreadCountHandler);
+    unreadCountSubscription = StreamChannel.of(context)
+        .channel
+        .state!
+        .unreadCountStream
+        .listen(_unreadCountHandler);
   }
 
   @override
@@ -165,7 +165,16 @@ class _ChatScreenState extends State<ChatScreen> {
               },
               emptyBuilder: (context) => const SizedBox.shrink(),
               errorBuilder: (context, error) => Container(),
-              messageListBuilder: (context, messages) => Container(),
+              messageListBuilder: (context, messages) {
+                // messages.forEach((element) {
+                //   print(element.type);
+                // });
+                return ChatListWidget(
+                  messages: messages,
+                  messageFocus: messageFocus,
+                  chatScrollController: _chatScrollController,
+                );
+              },
             ),
           ),
           ChatSendWidget(
@@ -218,7 +227,7 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         } else {
           alternativeWidget = Text(
-            'Last online: ',
+            'last seen: ',
             //'${Jiffy(otherMember.user?.lastActive).fromNow()}',
             style: const TextStyle(
               fontSize: 12,

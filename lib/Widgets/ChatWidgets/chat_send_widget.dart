@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChatSendWidget extends StatefulWidget {
   final TextEditingController messageController;
@@ -19,7 +20,6 @@ class ChatSendWidget extends StatefulWidget {
 }
 
 class _ChatSendWidgetState extends State<ChatSendWidget> {
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -36,16 +36,15 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
           Row(
             children: [
               const SizedBox(width: 20),
-              if (widget.messageController.text.isEmpty)
-                GestureDetector(
-                  onTap: () {},
-                  child: Image.asset(
-                    R.images.attachmentImage,
-                    width: 21,
-                    height: 21,
-                    fit: BoxFit.fill,
-                  ),
+              GestureDetector(
+                onTap: () {},
+                child: Image.asset(
+                  R.images.attachmentImage,
+                  width: 21,
+                  height: 21,
+                  fit: BoxFit.fill,
                 ),
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, right: 8),
@@ -106,7 +105,9 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
                 onTap: () {
                   if (widget.messageController.text.isNotEmpty) {
                     widget.messageFocus.unfocus();
-                    print("send message");
+                    StreamChannel.of(context).channel.sendMessage(
+                          Message(text: widget.messageController.text),
+                        );
                     widget.messageController.text = "";
                     setState(() {});
                   } else {

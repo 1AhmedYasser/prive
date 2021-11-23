@@ -48,6 +48,8 @@ dependencies:
   bs_flutter_selectbox: ^1.3.0
   timer_count_down: ^2.2.0
   syncfusion_flutter_sliders: ^19.3.54
+  grouped_list: ^4.1.0
+  flutter_chat_bubble: ^2.0.0
 
   # Utils
   supercharged: ^2.1.1
@@ -55,6 +57,7 @@ dependencies:
   share_plus: ^3.0.4
   country_calling_code_picker: ^2.0.0
   font_awesome_flutter: ^9.2.0
+  timeago: ^3.1.0
 
   # Firebase
   firebase_core: ^1.10.0
