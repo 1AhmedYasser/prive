@@ -57,7 +57,7 @@ class ChatListWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 10, right: 10, top: 7, bottom: 7),
                 child: Text(
-                  DateFormat.yMMMd(context.locale.languageCode)
+                  DateFormat.MMMd(context.locale.languageCode)
                       .format(element.createdAt),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
