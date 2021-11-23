@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Screens/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -202,171 +203,184 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                       duration: const Duration(milliseconds: 375),
                       child: SlideAnimation(
                         verticalOffset: 50,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              right: 22, top: 30, left: 15, bottom: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      SizedBox(
-                                        width: 72,
-                                        height: 72,
-                                        child: CachedImage(
-                                          url: StreamManager.getChannelImage(
-                                                channels[index],
-                                                context.currentUser!,
-                                              ) ??
-                                              "",
-                                          fit: BoxFit.fill,
-                                        ),
-                                      ),
-                                      if (index % 2 == 0)
-                                        Positioned(
-                                          bottom: 2,
-                                          right: 0,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(2),
-                                              child: CircleAvatar(
-                                                backgroundColor: Colors.green,
-                                                radius: 6,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 20,
-                                  ),
-                                  Expanded(
-                                    child: Column(
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () => Navigator.of(context).push(
+                              ChatScreen.routeWithChannel(channels[index])),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                right: 22, top: 30, left: 15, bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    Stack(
                                       children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                StreamManager.getChannelName(
+                                        SizedBox(
+                                          width: 72,
+                                          height: 72,
+                                          child: CachedImage(
+                                            url: StreamManager.getChannelImage(
                                                   channels[index],
                                                   context.currentUser!,
-                                                ),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 18.5,
+                                                ) ??
+                                                "",
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                        if (index % 2 == 0)
+                                          Positioned(
+                                            bottom: 2,
+                                            right: 0,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(2),
+                                                child: CircleAvatar(
+                                                  backgroundColor: Colors.green,
+                                                  radius: 6,
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            BetterStreamBuilder<DateTime>(
-                                              stream: channels[index]
-                                                  .lastMessageAtStream,
-                                              initialData:
-                                                  channels[index].lastMessageAt,
-                                              builder: (context, data) {
-                                                return Text(
-                                                    getLatestMessageDate(data));
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        BetterStreamBuilder<int>(
-                                          stream: channels[index]
-                                              .state!
-                                              .unreadCountStream,
-                                          initialData: channels[index]
-                                                  .state
-                                                  ?.unreadCount ??
-                                              0,
-                                          builder: (context, count) {
-                                            return Row(
-                                              children: [
-                                                BetterStreamBuilder<Message>(
-                                                  stream: channels[index]
-                                                      .state!
-                                                      .lastMessageStream,
-                                                  initialData: channels[index]
-                                                      .state!
-                                                      .lastMessage,
-                                                  builder:
-                                                      (context, lastMessage) {
-                                                    return Expanded(
-                                                      child: Text(
-                                                        lastMessage.text ?? "",
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 14.5,
-                                                          fontWeight: count > 0
-                                                              ? FontWeight.w500
-                                                              : FontWeight.w400,
-                                                          color: count > 0
-                                                              ? const Color(
-                                                                  0xff1293a8)
-                                                              : Colors.grey,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color:
-                                                        const Color(0xff53c662),
+                                          )
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  StreamManager.getChannelName(
+                                                    channels[index],
+                                                    context.currentUser!,
                                                   ),
-                                                  child: Center(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 8,
-                                                              right: 8,
-                                                              top: 3.5,
-                                                              bottom: 3.5),
-                                                      child: Text(
-                                                        "$count",
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 13.5,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 18.5,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              BetterStreamBuilder<DateTime>(
+                                                stream: channels[index]
+                                                    .lastMessageAtStream,
+                                                initialData: channels[index]
+                                                    .lastMessageAt,
+                                                builder: (context, data) {
+                                                  return Text(
+                                                      getLatestMessageDate(
+                                                          data));
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          BetterStreamBuilder<int>(
+                                            stream: channels[index]
+                                                .state!
+                                                .unreadCountStream,
+                                            initialData: channels[index]
+                                                    .state
+                                                    ?.unreadCount ??
+                                                0,
+                                            builder: (context, count) {
+                                              return Row(
+                                                children: [
+                                                  BetterStreamBuilder<Message>(
+                                                    stream: channels[index]
+                                                        .state!
+                                                        .lastMessageStream,
+                                                    initialData: channels[index]
+                                                        .state!
+                                                        .lastMessage,
+                                                    builder:
+                                                        (context, lastMessage) {
+                                                      return Expanded(
+                                                        child: Text(
+                                                          lastMessage.text ??
+                                                              "",
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            fontSize: 14.5,
+                                                            fontWeight:
+                                                                count > 0
+                                                                    ? FontWeight
+                                                                        .w500
+                                                                    : FontWeight
+                                                                        .w400,
+                                                            color: count > 0
+                                                                ? const Color(
+                                                                    0xff1293a8)
+                                                                : Colors.grey,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color: const Color(
+                                                          0xff53c662),
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 8,
+                                                                right: 8,
+                                                                top: 3.5,
+                                                                bottom: 3.5),
+                                                        child: Text(
+                                                          "$count",
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 13.5,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        )
-                                      ],
+                                                ],
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

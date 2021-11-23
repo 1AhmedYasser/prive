@@ -34,6 +34,12 @@ class Images {
   String colorTheme4 = "$path/color_theme_4.png";
   String colorTheme5 = "$path/color_theme_5.png";
   String undoImage = "$path/undo_image.png";
+  String attachmentImage = "$path/attachment_image.png";
+  String chatMoreImage = "$path/chat_more_image.png";
+  String emojiImage = "$path/emoji_image.png";
+  String recordMicImage = "$path/record_mic_image.png";
+  String videoCallImage = "$path/video_call_image.png";
+  String voiceCallImage = "$path/voice_call_image.png";
 }
 
 class Animations {
