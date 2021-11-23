@@ -62,7 +62,8 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
                   width: 21,
                   height: 21,
                   fit: BoxFit.fill,
-                  color: isEmojisShown ? const Color(0xff37dabc) : null,
+                  color:
+                      isEmojisShown ? Theme.of(context).primaryColorDark : null,
                 ),
               ),
               Expanded(
@@ -170,31 +171,33 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
               height: 250,
               child: EmojiPicker(
                 onEmojiSelected: (category, emoji) {
-                  // Do something when emoji is tapped
+                  print("Enoji: ${emoji.emoji}");
+                  widget.messageController.text = emoji.emoji;
                 },
                 onBackspacePressed: () {
-                  // Backspace-Button tapped logic
-                  // Remove this line to also remove the button in the UI
+                 setState(() {
+                   isEmojisShown = false;
+                 });
                 },
                 config: Config(
-                    columns: 7,
-                    emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-                    verticalSpacing: 0,
-                    horizontalSpacing: 0,
-                    initCategory: Category.RECENT,
-                    bgColor: Colors.grey.shade100,
-                    indicatorColor: Colors.blue,
-                    iconColor: Colors.grey,
-                    iconColorSelected: Colors.blue,
-                    progressIndicatorColor: Colors.blue,
-                    showRecentsTab: true,
-                    recentsLimit: 28,
-                    noRecentsText: "No Recents",
-                    noRecentsStyle:
-                        const TextStyle(fontSize: 20, color: Colors.black26),
-                    tabIndicatorAnimDuration: kTabScrollDuration,
-                    categoryIcons: const CategoryIcons(),
-                    buttonMode: ButtonMode.MATERIAL),
+                  columns: 7,
+                  emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                  verticalSpacing: 0,
+                  horizontalSpacing: 0,
+                  initCategory: Category.RECENT,
+                  bgColor: Colors.grey.shade100,
+                  indicatorColor: Colors.blue,
+                  iconColor: Colors.grey,
+                  iconColorSelected: Colors.blue,
+                  progressIndicatorColor: Colors.blue,
+                  showRecentsTab: true,
+                  recentsLimit: 28,
+                  noRecentsText: "No Recents",
+                  noRecentsStyle:
+                      const TextStyle(fontSize: 20, color: Colors.black26),
+                  tabIndicatorAnimDuration: kTabScrollDuration,
+                  // categoryIcons: const CategoryIcons(),
+                ),
               ),
             )
         ],
