@@ -56,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
           leading: const Padding(
             padding: EdgeInsets.only(left: 10),
             child: BackButton(
-              color: Colors.black,
+              color: Color(0xff7a8ea6),
             ),
           ),
           title: Row(
@@ -152,7 +152,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 width: 20,
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 20),
           ],
         ),
       ),
