@@ -28,7 +28,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
           position: index,
           duration: const Duration(milliseconds: 375),
           child: SlideAnimation(
-            verticalOffset: 50,
+            horizontalOffset: 50,
             child: InkWell(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
-import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
-import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
+import 'package:prive/Screens/Chat/Channels/archive_tab.dart';
+import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
+import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
+import 'package:prive/Screens/Chat/Channels/important_tab.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -15,18 +16,8 @@ class ChannelsScreen extends StatefulWidget {
   _ChannelsScreenState createState() => _ChannelsScreenState();
 }
 
-class _ChannelsScreenState extends State<ChannelsScreen>
-    with TickerProviderStateMixin {
+class _ChannelsScreenState extends State<ChannelsScreen> {
   final List<String> _tabs = ["Chats", "Groups", "Important", "Archive"];
-
-  final channelListController = ChannelListController();
-  late final AnimationController _animationController;
-
-  @override
-  void initState() {
-    _animationController = AnimationController(vsync: this);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,44 +153,15 @@ class _ChannelsScreenState extends State<ChannelsScreen>
             ),
           ),
         ),
-        body: ChannelListCore(
-          channelListController: channelListController,
-          filter: Filter.and(
-            [
-              Filter.equal('type', 'messaging'),
-              Filter.in_('members', [
-                StreamChatCore.of(context).currentUser!.id,
-              ])
-            ],
-          ),
-          emptyBuilder: (context) =>
-              ChannelsEmptyState(animationController: _animationController),
-          errorBuilder: (context, error) => Center(
-            child: Text(
-              'Error: $error',
-              textAlign: TextAlign.center,
-            ),
-          ),
-          loadingBuilder: (
-            context,
-          ) =>
-              const UltraLoadingIndicator(),
-          listBuilder: (context, channels) {
-            channels = channels
-                .where((element) => element.lastMessageAt != null)
-                .toList();
-            return channels.isEmpty
-                ? ChannelsEmptyState(animationController: _animationController)
-                : ChannelsListWidget(channels: channels);
-          },
+        body: const TabBarView(
+          children: [
+            ChannelsTab(),
+            GroupsTab(),
+            ImportantTab(),
+            ArchiveTab(),
+          ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 }
