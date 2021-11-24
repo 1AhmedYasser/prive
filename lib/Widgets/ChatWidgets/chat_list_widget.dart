@@ -39,7 +39,7 @@ class ChatListWidget extends StatelessWidget {
         reverse: true,
         floatingHeader: true,
         controller: _chatScrollController,
-        //useStickyGroupSeparators: true,
+        useStickyGroupSeparators: true,
         groupBy: (Message element) => DateTime(element.createdAt.year,
             element.createdAt.month, element.createdAt.day),
         itemComparator: (message1, message2) =>
