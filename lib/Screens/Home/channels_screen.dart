@@ -33,7 +33,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
             ),
             child: AppBar(
               elevation: 0,
-              backgroundColor: Colors.grey.shade200.withOpacity(0.4),
+              backgroundColor: Colors.grey.shade200.withOpacity(0.3),
               titleSpacing: 0,
               title: Align(
                 alignment: Alignment.centerLeft,
@@ -59,7 +59,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                               Expanded(
                                 child: TabBar(
                                   onTap: (index) {},
-                                  unselectedLabelColor: Colors.grey,
+                                  unselectedLabelColor: Colors.grey.shade400,
                                   indicatorSize: TabBarIndicatorSize.label,
                                   labelColor:
                                       Theme.of(context).primaryColorDark,
