@@ -108,7 +108,27 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                                       initialData:
                                           widget.channels[index].lastMessageAt,
                                       builder: (context, data) {
-                                        return Text(getLatestMessageDate(data));
+                                        return BetterStreamBuilder<int>(
+                                          stream: widget.channels[index].state!
+                                              .unreadCountStream,
+                                          initialData: widget.channels[index]
+                                                  .state?.unreadCount ??
+                                              0,
+                                          builder: (context, count) {
+                                            return Text(
+                                              getLatestMessageDate(data),
+                                              style: TextStyle(
+                                                color: count > 0
+                                                    ? Theme.of(context)
+                                                        .primaryColorDark
+                                                    : Colors.black,
+                                                fontWeight: count > 0
+                                                    ? FontWeight.w500
+                                                    : FontWeight.w400,
+                                              ),
+                                            );
+                                          },
+                                        );
                                       },
                                     ),
                                   ],
