@@ -40,6 +40,21 @@ class Images {
   String recordMicImage = "$path/record_mic_image.png";
   String videoCallImage = "$path/video_call_image.png";
   String voiceCallImage = "$path/voice_call_image.png";
+  String chatBackground1 = "$path/chat_background1.png";
+  String chatBackground2 = "$path/chat_background2.png";
+  String chatBackground3 = "$path/chat_background3.png";
+  String chatBackground4 = "$path/chat_background4.png";
+  String chatBackground5 = "$path/chat_background5.png";
+  String chatBackground6 = "$path/chat_background6.png";
+  String chatBackground7 = "$path/chat_background7.png";
+  String chatBackground8 = "$path/chat_background8.png";
+  String chatBackground9 = "$path/chat_background9.png";
+  String chatBackground10 = "$path/chat_background10.png";
+  String chatBackground11 = "$path/chat_background11.png";
+  String chatBackground12 = "$path/chat_background12.png";
+  String chatBackground13 = "$path/chat_background13.png";
+  String seenImage = "$path/seen_image.png";
+  String sendImage = "$path/sent_image.png";
 }
 
 class Animations {
