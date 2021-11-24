@@ -196,230 +196,241 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                 : ListView.builder(
                     scrollDirection: Axis.vertical,
                     itemCount: channels.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                        AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: const Duration(milliseconds: 375),
-                      child: SlideAnimation(
-                        verticalOffset: 50,
-                        child: InkWell(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () => Navigator.of(context).push(
-                              ChatScreen.routeWithChannel(channels[index])),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                right: 22, top: 30, left: 15, bottom: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        SizedBox(
-                                          width: 72,
-                                          height: 72,
-                                          child: CachedImage(
-                                            url: StreamManager.getChannelImage(
-                                                  channels[index],
-                                                  context.currentUser!,
-                                                ) ??
-                                                "",
-                                            fit: BoxFit.fill,
-                                          ),
-                                        ),
-                                        if (index % 2 == 0)
-                                          Positioned(
-                                            bottom: 2,
-                                            right: 0,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
-                                              child: const Padding(
-                                                padding: EdgeInsets.all(2),
-                                                child: CircleAvatar(
-                                                  backgroundColor: Colors.green,
-                                                  radius: 6,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Expanded(
-                                      child: Column(
+                    itemBuilder: (BuildContext context, int index) {
+                      print("hello");
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 375),
+                        child: SlideAnimation(
+                          verticalOffset: 50,
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () => Navigator.of(context).push(
+                                ChatScreen.routeWithChannel(channels[index])),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 22, top: 30, left: 15, bottom: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Stack(
                                         children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  StreamManager.getChannelName(
-                                                    channels[index],
-                                                    context.currentUser!,
-                                                  ),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 18.5,
+                                          SizedBox(
+                                            width: 72,
+                                            height: 72,
+                                            child: CachedImage(
+                                              url:
+                                                  StreamManager.getChannelImage(
+                                                        channels[index],
+                                                        context.currentUser!,
+                                                      ) ??
+                                                      "",
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                          if (index % 2 == 0)
+                                            Positioned(
+                                              bottom: 2,
+                                              right: 0,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(2),
+                                                  child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    radius: 6,
                                                   ),
                                                 ),
                                               ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              BetterStreamBuilder<DateTime>(
-                                                stream: channels[index]
-                                                    .lastMessageAtStream,
-                                                initialData: channels[index]
-                                                    .lastMessageAt,
-                                                builder: (context, data) {
-                                                  return Text(
-                                                      getLatestMessageDate(
-                                                          data));
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          BetterStreamBuilder<int>(
-                                            stream: channels[index]
-                                                .state!
-                                                .unreadCountStream,
-                                            initialData: channels[index]
-                                                    .state
-                                                    ?.unreadCount ??
-                                                0,
-                                            builder: (context, count) {
-                                              return BetterStreamBuilder<
-                                                  Message>(
-                                                stream: channels[index]
-                                                    .state!
-                                                    .lastMessageStream,
-                                                initialData: channels[index]
-                                                    .state!
-                                                    .lastMessage,
-                                                builder:
-                                                    (context, lastMessage) {
-                                                  return Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          lastMessage.text ??
-                                                              "",
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontSize: 14.5,
-                                                            fontWeight:
-                                                                count > 0
-                                                                    ? FontWeight
-                                                                        .w500
-                                                                    : FontWeight
-                                                                        .w400,
-                                                            color: count > 0
-                                                                ? const Color(
-                                                                    0xff1293a8)
-                                                                : Colors.grey,
+                                            )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    StreamManager
+                                                        .getChannelName(
+                                                      channels[index],
+                                                      context.currentUser!,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 18.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                BetterStreamBuilder<DateTime>(
+                                                  stream: channels[index]
+                                                      .lastMessageAtStream,
+                                                  initialData: channels[index]
+                                                      .lastMessageAt,
+                                                  builder: (context, data) {
+                                                    return Text(
+                                                        getLatestMessageDate(
+                                                            data));
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            BetterStreamBuilder<int>(
+                                              stream: channels[index]
+                                                  .state!
+                                                  .unreadCountStream,
+                                              initialData: channels[index]
+                                                      .state
+                                                      ?.unreadCount ??
+                                                  0,
+                                              builder: (context, count) {
+                                                return BetterStreamBuilder<
+                                                    Message>(
+                                                  stream: channels[index]
+                                                      .state!
+                                                      .lastMessageStream,
+                                                  initialData: channels[index]
+                                                      .state!
+                                                      .lastMessage,
+                                                  builder:
+                                                      (context, lastMessage) {
+                                                    return Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            lastMessage.text ??
+                                                                "",
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              fontSize: 14.5,
+                                                              fontWeight: count >
+                                                                      0
+                                                                  ? FontWeight
+                                                                      .w500
+                                                                  : FontWeight
+                                                                      .w400,
+                                                              color: count > 0
+                                                                  ? const Color(
+                                                                      0xff1293a8)
+                                                                  : Colors.grey,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      if (count == 0)
                                                         const SizedBox(
-                                                          height: 23,
+                                                          width: 10,
                                                         ),
-                                                      if (count > 0)
-                                                        Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            color: const Color(
-                                                                0xff53c662),
+                                                        if (count == 0)
+                                                          const SizedBox(
+                                                            height: 23,
                                                           ),
-                                                          child: Center(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      left: 8,
-                                                                      right: 8,
-                                                                      top: 3.5,
-                                                                      bottom:
-                                                                          3.5),
-                                                              child: Text(
-                                                                "$count",
-                                                                style:
-                                                                    const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize:
-                                                                      13.5,
+                                                        if (count > 0)
+                                                          Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: const Color(
+                                                                  0xff53c662),
+                                                            ),
+                                                            child: Center(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        left: 8,
+                                                                        right:
+                                                                            8,
+                                                                        top:
+                                                                            3.5,
+                                                                        bottom:
+                                                                            3.5),
+                                                                child: Text(
+                                                                  "$count",
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        13.5,
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                      if (lastMessage
-                                                              .user?.id ==
-                                                          context
-                                                              .currentUser?.id)
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                            right: context
-                                                                        .locale
-                                                                        .languageCode ==
-                                                                    "en"
-                                                                ? 20
-                                                                : 0,
-                                                            left: context.locale
-                                                                        .languageCode ==
-                                                                    "en"
-                                                                ? 0
-                                                                : 20,
-                                                          ),
-                                                          child: Image.asset(
-                                                            R.images.seenImage,
-                                                            width: 20,
-                                                          ),
-                                                        )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          )
-                                        ],
+                                                        if (lastMessage
+                                                                .user?.id ==
+                                                            context.currentUser
+                                                                ?.id)
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                              right: context
+                                                                          .locale
+                                                                          .languageCode ==
+                                                                      "en"
+                                                                  ? 20
+                                                                  : 0,
+                                                              left: context
+                                                                          .locale
+                                                                          .languageCode ==
+                                                                      "en"
+                                                                  ? 0
+                                                                  : 20,
+                                                            ),
+                                                            child: Image.asset(
+                                                              R.images
+                                                                  .seenImage,
+                                                              width: 20,
+                                                            ),
+                                                          )
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
           },
         ),
