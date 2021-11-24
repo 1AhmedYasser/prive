@@ -3,6 +3,7 @@ import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
@@ -159,7 +160,7 @@ class ChatListWidget extends StatelessWidget {
                         elevation: 1,
                       ),
                       const SizedBox(
-                        height: 3,
+                        height: 5,
                       ),
                       Padding(
                         padding: EdgeInsets.only(
@@ -170,12 +171,24 @@ class ChatListWidget extends StatelessWidget {
                           alignment: !isMe
                               ? Alignment.centerRight
                               : Alignment.centerLeft,
-                          child: Text(
-                            DateFormat('hh:mm a').format(message.createdAt.toLocal()),
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12.5,
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                DateFormat('hh:mm a')
+                                    .format(message.createdAt.toLocal()),
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12.5,
+                                ),
+                              ),
+                              if (isMe) const SizedBox(width: 4),
+                              if (isMe)
+                                Image.asset(
+                                  R.images.seenImage,
+                                  width: 20,
+                                  color: Theme.of(context).primaryColor,
+                                )
+                            ],
                           ),
                         ),
                       ),

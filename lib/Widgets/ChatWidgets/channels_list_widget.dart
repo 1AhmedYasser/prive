@@ -187,17 +187,19 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                                                 right: context.locale
                                                             .languageCode ==
                                                         "en"
-                                                    ? 20
+                                                    ? 18
                                                     : 0,
                                                 left: context.locale
                                                             .languageCode ==
                                                         "en"
                                                     ? 0
-                                                    : 20,
+                                                    : 18,
                                               ),
                                               child: Image.asset(
                                                 R.images.seenImage,
                                                 width: 20,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
                                               ),
                                             )
                                         ],

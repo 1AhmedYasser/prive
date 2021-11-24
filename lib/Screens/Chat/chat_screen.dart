@@ -9,6 +9,7 @@ import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChatScreen extends StatefulWidget {
   static Route routeWithChannel(Channel channel) => MaterialPageRoute(
@@ -226,18 +227,18 @@ class _ChatScreenState extends State<ChatScreen> {
             'Online',
             style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               color: Colors.green,
             ),
           );
         } else {
           alternativeWidget = Text(
-            'last seen: ',
-            //'${Jiffy(otherMember.user?.lastActive).fromNow()}',
-            style: const TextStyle(
+            getLastSeenDate(
+                otherMember.user?.lastActive?.toLocal() ?? DateTime.now()),
+            style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade500,
             ),
           );
         }
@@ -247,6 +248,34 @@ class _ChatScreenState extends State<ChatScreen> {
     return TypingIndicator(
       alternativeWidget: alternativeWidget,
     );
+  }
+
+  String getLastSeenDate(DateTime data) {
+    String lastSeen = "last seen ";
+    final now = DateTime.now();
+    DateTime lastSeenDate = data.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final lastSeenDateFormatted =
+        DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
+
+    if (lastSeenDateFormatted == today) {
+      lastSeen += "today at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+    } else if (lastSeenDateFormatted == yesterday) {
+      lastSeen += "yesterday at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+    } else {
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (lastSeenDate.isBefore(firstDayOfTheCurrentWeek)) {
+        lastSeen +=
+            "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      } else {
+        lastSeen +=
+            "${DateFormat('EEEE').format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      }
+    }
+    return lastSeen;
   }
 
   @override
