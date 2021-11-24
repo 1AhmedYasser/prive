@@ -168,7 +168,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         _currentIndex = index;
       });
     } else if (index == 2) {
-      print("show popup");
+      Utils.showMainMenu(context);
     }
   }
 }

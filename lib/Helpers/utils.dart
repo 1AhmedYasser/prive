@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
@@ -110,6 +112,69 @@ class Utils {
           ),
         );
       },
+    );
+  }
+
+  static Future<dynamic> showMainMenu(BuildContext context) {
+    Map<String, String> mainMenuItems = {
+      R.images.addContactImage: "Add Contact",
+      R.images.loadContactsListImage: "Load Contact List",
+      R.images.newGroupImage: "New Group",
+      R.images.newSecretChatImage: "New Secret Chat",
+      R.images.newChannelImage: "New Channel",
+      R.images.newCatalogImage: "New Catalog",
+    };
+    return showMaterialModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+      context: context,
+      builder: (context) =>
+          StatefulBuilder(builder: (BuildContext context, setState) {
+        return Padding(
+          padding:
+              const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 30),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeBottom: true,
+            removeTop: true,
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 2.8 / 2,
+              ),
+              itemBuilder: (context, index) {
+                return InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          mainMenuItems.keys.toList()[index],
+                          width: 80,
+                        ),
+                        const SizedBox(height: 11),
+                        Text(
+                          mainMenuItems[mainMenuItems.keys.toList()[index]] ??
+                              "",
+                          style: const TextStyle(
+                              color: Color(0xff7a8fa6), fontSize: 15),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+              itemCount: mainMenuItems.length,
+            ),
+          ),
+        );
+      }),
     );
   }
 
