@@ -57,8 +57,7 @@ class ChatListWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 10, right: 10, top: 7, bottom: 7),
                 child: Text(
-                  DateFormat.MMMd(context.locale.languageCode)
-                      .format(element.createdAt),
+                  getHeaderDate(context, element),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
@@ -189,5 +188,23 @@ class ChatListWidget extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String getHeaderDate(BuildContext context, Message element) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final messageDateFormatted = DateTime(
+        element.createdAt.year, element.createdAt.month, element.createdAt.day);
+
+    if (messageDateFormatted == today) {
+      return "Today";
+    } else if (messageDateFormatted == yesterday) {
+      return "Yesterday";
+    } else {
+      return DateFormat.MMMd(context.locale.languageCode)
+          .format(element.createdAt);
+    }
   }
 }
