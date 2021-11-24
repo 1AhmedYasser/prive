@@ -97,6 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       initialData: channel.state!.members,
                       builder: (context, data) => ConnectionStatusBuilder(
                         statusBuilder: (context, status) {
+                          print("hey");
                           switch (status) {
                             case ConnectionStatus.connected:
                               return _buildConnectedTitleState(context, data);

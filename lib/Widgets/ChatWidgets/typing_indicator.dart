@@ -28,15 +28,16 @@ class TypingIndicator extends StatelessWidget {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: data.isNotEmpty == true
-                ? const Align(
+                ? Align(
                     alignment: Alignment.centerLeft,
-                    key: ValueKey('typing-text'),
+                    key: const ValueKey('typing-text'),
                     child: Text(
-                      'Typing message',
+                      'Typing ...',
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade500,
                       ),
                     ),
                   )
