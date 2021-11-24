@@ -50,6 +50,7 @@ dependencies:
   syncfusion_flutter_sliders: ^19.3.54
   grouped_list: ^4.1.0
   flutter_chat_bubble: ^2.0.0
+  cool_dropdown: ^1.4.1
 
   # Utils
   supercharged: ^2.1.1

@@ -10,7 +10,7 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class ChatListWidget extends StatelessWidget {
+class ChatListWidget extends StatefulWidget {
   final List<Message> messages;
 
   const ChatListWidget({
@@ -25,20 +25,26 @@ class ChatListWidget extends StatelessWidget {
   final ScrollController _chatScrollController;
 
   @override
+  State<ChatListWidget> createState() => _ChatListWidgetState();
+}
+
+class _ChatListWidgetState extends State<ChatListWidget> {
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       onTap: () {
-        messageFocus.unfocus();
+        widget.messageFocus.unfocus();
       },
       child: GroupedListView<Message, DateTime>(
         shrinkWrap: true,
-        elements: messages,
+        elements: widget.messages,
         order: GroupedListOrder.DESC,
         reverse: true,
         floatingHeader: true,
-        controller: _chatScrollController,
+        controller: widget._chatScrollController,
         useStickyGroupSeparators: true,
         groupBy: (Message element) => DateTime(element.createdAt.year,
             element.createdAt.month, element.createdAt.day),

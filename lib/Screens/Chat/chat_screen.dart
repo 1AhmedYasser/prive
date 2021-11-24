@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -30,10 +31,32 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController = TextEditingController();
   FocusNode messageFocus = FocusNode();
   final ScrollController _chatScrollController = ScrollController();
+  List<Map> chatMoreMenu = [];
+  List<String> chatMoreMenuTitles = [
+    "Search",
+    "Clear History",
+    "Mute Notifications",
+    "Delete Chat"
+  ];
 
   @override
   void initState() {
     super.initState();
+
+    for (var i = 0; i < chatMoreMenuTitles.length; i++) {
+      chatMoreMenu.add({
+        'label': chatMoreMenuTitles[i],
+        'value': chatMoreMenuTitles[i],
+        'icon': SizedBox(
+          height: 25,
+          width: 25,
+          child: Image.asset(
+            R.images.chatMoreImage,
+            width: 22,
+          ),
+        ),
+      });
+    }
 
     unreadCountSubscription = StreamChannel.of(context)
         .channel
@@ -97,7 +120,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       initialData: channel.state!.members,
                       builder: (context, data) => ConnectionStatusBuilder(
                         statusBuilder: (context, status) {
-                          print("hey");
                           switch (status) {
                             case ConnectionStatus.connected:
                               return _buildConnectedTitleState(context, data);
@@ -147,12 +169,43 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             const SizedBox(width: 20),
-            GestureDetector(
-              onTap: () {},
-              child: Image.asset(
-                R.images.chatMoreImage,
-                width: 20,
+            CoolDropdown(
+              dropdownList: chatMoreMenu,
+              dropdownItemPadding: EdgeInsets.zero,
+              onChange: (dropdownItem) {},
+              resultHeight: 62,
+              resultWidth: 30,
+              dropdownWidth: 80,
+              dropdownHeight: 180,
+              dropdownItemHeight: 30,
+              dropdownItemGap: 10,
+              resultIcon: SizedBox(
+                width: 21,
+                height: 21,
+                child: Image.asset(
+                  R.images.chatMoreImage,
+                ),
               ),
+              resultBD: const BoxDecoration(color: Colors.transparent),
+              resultIconLeftGap: 0,
+              dropdownItemBottomGap: 0,
+              resultPadding: EdgeInsets.zero,
+              resultIconRotation: true,
+              resultIconRotationValue: 1,
+              isDropdownLabel: false,
+              isResultLabel: false,
+              isResultIconLabel: false,
+              dropdownPadding: const EdgeInsets.all(20),
+              isTriangle: false,
+              selectedItemPadding: EdgeInsets.zero,
+              resultAlign: Alignment.center,
+              resultMainAxis: MainAxisAlignment.center,
+              selectedItemBD: const BoxDecoration(color: Colors.transparent),
+              triangleWidth: 0,
+              triangleHeight: 0,
+              triangleAlign: 'center',
+              dropdownAlign: 'center',
+              gap: 20,
             ),
             const SizedBox(width: 20),
           ],

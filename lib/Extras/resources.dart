@@ -55,6 +55,10 @@ class Images {
   String chatBackground13 = "$path/chat_background13.png";
   String seenImage = "$path/seen_image.png";
   String sentImage = "$path/sent_image.png";
+  String clearHistoryImage = "$path/clear_history_image.png";
+  String deleteChatImage = "$path/delete_chat_image.png";
+  String muteNotificationsImage = "$path/mute_notifications_image.png";
+  String searchChatImage = "$path/search_chat_image.png";
 }
 
 class Animations {
