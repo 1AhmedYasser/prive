@@ -37,6 +37,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Pick Images and User Photo</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Start Chatting With Contacts</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pick Images and User Photo</string>
 	<key>UIBackgroundModes</key>
