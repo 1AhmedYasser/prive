@@ -38,7 +38,7 @@ class ChatListWidget extends StatelessWidget {
         reverse: true,
         floatingHeader: true,
         controller: _chatScrollController,
-        useStickyGroupSeparators: true,
+        //useStickyGroupSeparators: true,
         groupBy: (Message element) => DateTime(element.createdAt.year,
             element.createdAt.month, element.createdAt.day),
         itemComparator: (message1, message2) =>
@@ -171,7 +171,7 @@ class ChatListWidget extends StatelessWidget {
                               ? Alignment.centerRight
                               : Alignment.centerLeft,
                           child: Text(
-                            DateFormat('hh:mm a').format(message.createdAt),
+                            DateFormat('hh:mm a').format(message.createdAt.toLocal()),
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 12.5,
@@ -192,6 +192,7 @@ class ChatListWidget extends StatelessWidget {
 
   String getHeaderDate(BuildContext context, Message element) {
     final now = DateTime.now();
+    DateTime messageDate = element.createdAt.toLocal();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
@@ -203,8 +204,13 @@ class ChatListWidget extends StatelessWidget {
     } else if (messageDateFormatted == yesterday) {
       return "Yesterday";
     } else {
-      return DateFormat.MMMd(context.locale.languageCode)
-          .format(element.createdAt);
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
+        return DateFormat.MMMd(context.locale.languageCode).format(messageDate);
+      } else {
+        return DateFormat('EEEE').format(messageDate);
+      }
     }
   }
 }

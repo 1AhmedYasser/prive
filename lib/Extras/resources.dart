@@ -54,7 +54,7 @@ class Images {
   String chatBackground12 = "$path/chat_background12.png";
   String chatBackground13 = "$path/chat_background13.png";
   String seenImage = "$path/seen_image.png";
-  String sendImage = "$path/sent_image.png";
+  String sentImage = "$path/sent_image.png";
 }
 
 class Animations {

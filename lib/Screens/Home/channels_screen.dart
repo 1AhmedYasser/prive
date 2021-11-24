@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/chat_screen.dart';
@@ -10,6 +9,7 @@ import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({Key? key}) : super(key: key);
@@ -95,7 +95,6 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(50),
-                                              //     color: Color(0xff1293a8),
                                               border: Border.all(
                                                 color: Colors.transparent,
                                                 width: 0.3,
@@ -302,18 +301,19 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                                                     ?.unreadCount ??
                                                 0,
                                             builder: (context, count) {
-                                              return Row(
-                                                children: [
-                                                  BetterStreamBuilder<Message>(
-                                                    stream: channels[index]
-                                                        .state!
-                                                        .lastMessageStream,
-                                                    initialData: channels[index]
-                                                        .state!
-                                                        .lastMessage,
-                                                    builder:
-                                                        (context, lastMessage) {
-                                                      return Expanded(
+                                              return BetterStreamBuilder<
+                                                  Message>(
+                                                stream: channels[index]
+                                                    .state!
+                                                    .lastMessageStream,
+                                                initialData: channels[index]
+                                                    .state!
+                                                    .lastMessage,
+                                                builder:
+                                                    (context, lastMessage) {
+                                                  return Row(
+                                                    children: [
+                                                      Expanded(
                                                         child: Text(
                                                           lastMessage.text ??
                                                               "",
@@ -334,43 +334,78 @@ class _ChannelsScreenState extends State<ChannelsScreen>
                                                                 : Colors.grey,
                                                           ),
                                                         ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: const Color(
-                                                          0xff53c662),
-                                                    ),
-                                                    child: Center(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                left: 8,
-                                                                right: 8,
-                                                                top: 3.5,
-                                                                bottom: 3.5),
-                                                        child: Text(
-                                                          "$count",
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 13.5,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      if (count == 0)
+                                                        const SizedBox(
+                                                          height: 23,
+                                                        ),
+                                                      if (count > 0)
+                                                        Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: const Color(
+                                                                0xff53c662),
+                                                          ),
+                                                          child: Center(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 8,
+                                                                      right: 8,
+                                                                      top: 3.5,
+                                                                      bottom:
+                                                                          3.5),
+                                                              child: Text(
+                                                                "$count",
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize:
+                                                                      13.5,
+                                                                ),
+                                                              ),
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                                      if (lastMessage
+                                                              .user?.id ==
+                                                          context
+                                                              .currentUser?.id)
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            right: context
+                                                                        .locale
+                                                                        .languageCode ==
+                                                                    "en"
+                                                                ? 20
+                                                                : 0,
+                                                            left: context.locale
+                                                                        .languageCode ==
+                                                                    "en"
+                                                                ? 0
+                                                                : 20,
+                                                          ),
+                                                          child: Image.asset(
+                                                            R.images.seenImage,
+                                                            width: 20,
+                                                          ),
+                                                        )
+                                                    ],
+                                                  );
+                                                },
                                               );
                                             },
                                           )

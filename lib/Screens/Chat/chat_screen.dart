@@ -166,13 +166,18 @@ class _ChatScreenState extends State<ChatScreen> {
               emptyBuilder: (context) => const SizedBox.shrink(),
               errorBuilder: (context, error) => Container(),
               messageListBuilder: (context, messages) {
-                // messages.forEach((element) {
-                //   print(element.type);
-                // });
-                return ChatListWidget(
-                  messages: messages,
-                  messageFocus: messageFocus,
-                  chatScrollController: _chatScrollController,
+                return Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(R.images.chatBackground1),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: ChatListWidget(
+                    messages: messages,
+                    messageFocus: messageFocus,
+                    chatScrollController: _chatScrollController,
+                  ),
                 );
               },
             ),
@@ -246,7 +251,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    //unreadCountSubscription.cancel();
+    unreadCountSubscription.cancel();
     super.dispose();
   }
 }
