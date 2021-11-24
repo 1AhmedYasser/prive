@@ -59,6 +59,17 @@ class Images {
   String deleteChatImage = "$path/delete_chat_image.png";
   String muteNotificationsImage = "$path/mute_notifications_image.png";
   String searchChatImage = "$path/search_chat_image.png";
+  String addContactImage = "$path/add_contact_image.png";
+  String attachmentCameraImage = "$path/attachment_camera_image.png";
+  String catalogImage = "$path/catalog_image.png";
+  String contactImage = "$path/contact_image.png";
+  String galleryImage = "$path/gallery_image.png";
+  String loadContactsListImage = "$path/load_contacts_list_image.png";
+  String musicImage = "$path/music_image.png";
+  String newCatalogImage = "$path/new_catalog_image.png";
+  String newChannelImage = "$path/new_channel_image.png";
+  String newGroupImage = "$path/new_group_image.png";
+  String newSecretChatImage = "$path/new_secret_chat_image.png";
 }
 
 class Animations {

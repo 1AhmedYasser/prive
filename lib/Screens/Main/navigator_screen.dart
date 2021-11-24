@@ -107,47 +107,6 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             ],
           ),
         );
-      case 2:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Add",
-                style: TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  Utils.saveString(R.pref.token, "");
-                  Utils.saveString(R.pref.userId, "");
-                  Utils.saveBool(R.pref.isLoggedIn, false);
-                  Navigator.pushReplacementNamed(
-                    context,
-                    R.routes.loginRoute,
-                  );
-                },
-                child: const Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  elevation: 0,
-                  minimumSize: Size(
-                    MediaQuery.of(context).size.width - 50,
-                    50,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
       case 3:
         return Center(
           child: Column(
@@ -204,9 +163,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   }
 
   void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index != 2) {
+      setState(() {
+        _currentIndex = index;
+      });
+    } else if (index == 2) {
+      print("show popup");
+    }
   }
 }
 
