@@ -21,7 +21,7 @@ dependencies:
   permission_handler: ^8.3.0
 
   # State Management
-  provider: ^6.0.1
+  provider: 5.0.0
   shared_preferences: ^2.0.9
 
   # Network
@@ -68,6 +68,9 @@ dependencies:
 
   # Stream
   stream_chat_flutter_core: ^3.2.0
+  stream_chat_flutter: ^3.2.0
+  stream_chat_persistence: ^3.0.0
+  stream_chat_localizations: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_list_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_send_widget.dart';
@@ -11,6 +12,7 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
   static Route routeWithChannel(Channel channel) => MaterialPageRoute(
@@ -31,10 +33,13 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController = TextEditingController();
   FocusNode messageFocus = FocusNode();
   final ScrollController _chatScrollController = ScrollController();
+  bool? isAFile;
+  String chatBackground = R.images.chatBackground1;
 
   @override
   void initState() {
     super.initState();
+    _getChatBackground();
 
     unreadCountSubscription = StreamChannel.of(context)
         .channel
@@ -164,10 +169,15 @@ class _ChatScreenState extends State<ChatScreen> {
               messageListBuilder: (context, messages) {
                 return Container(
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(R.images.chatBackground1),
-                      fit: BoxFit.cover,
-                    ),
+                    image: isAFile == true
+                        ? DecorationImage(
+                            image: FileImage(File(chatBackground)),
+                            fit: BoxFit.cover,
+                          )
+                        : DecorationImage(
+                            image: AssetImage(chatBackground),
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   child: ChatListWidget(
                     messages: messages,
@@ -271,6 +281,13 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     }
     return lastSeen;
+  }
+
+  Future<void> _getChatBackground() async {
+    isAFile = await Utils.getBool(R.pref.isChosenChatBackgroundAFile);
+    chatBackground = await Utils.getString(R.pref.chosenChatBackground) ??
+        R.images.chatBackground1;
+    setState(() {});
   }
 
   @override

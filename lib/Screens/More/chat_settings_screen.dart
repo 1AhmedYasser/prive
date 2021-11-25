@@ -85,7 +85,8 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
               child: InkWell(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                onTap: () {},
+                onTap: () =>
+                    Navigator.pushNamed(context, R.routes.chatBackgroundRoute),
                 child: Row(
                   children: [
                     Image.asset(

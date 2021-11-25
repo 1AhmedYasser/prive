@@ -91,6 +91,8 @@ class SharedPref {
   String userImage = "user_image";
   String facebookId = "facebook_Id";
   String googleId = "google_Id";
+  String chosenChatBackground = "chosen_chat_background";
+  String isChosenChatBackgroundAFile = "is_chosen_chat_background_a_file";
 }
 
 class Constants {
@@ -108,6 +110,7 @@ class Routes {
   String profileRoute = '/profile_Screen';
   String languageRoute = '/language_Screen';
   String chatSettingsRoute = '/chatSettings_Screen';
+  String chatBackgroundRoute = '/chatBackground_Screen';
 }
 
 class R {
