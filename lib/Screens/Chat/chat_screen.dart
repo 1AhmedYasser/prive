@@ -250,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     }
 
-    return TypingIndicator(
+    return TypingIndicatorWidget(
       alternativeWidget: alternativeWidget,
     );
   }

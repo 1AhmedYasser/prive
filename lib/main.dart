@@ -12,6 +12,7 @@ import 'package:prive/Screens/More/profile_screen.dart';
 import 'package:prive/Screens/More/settings_screen.dart';
 import 'package:prive/Screens/More/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
@@ -63,11 +64,14 @@ class Prive extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         builder: (context, child) {
           child = botToastBuilder(context, child);
-          return StreamChatCore(
+          return StreamChat(
             client: client,
-            child: ChannelsBloc(
-              child: UsersBloc(
-                child: child,
+            child: StreamChatCore(
+              client: client,
+              child: ChannelsBloc(
+                child: UsersBloc(
+                  child: child,
+                ),
               ),
             ),
           );

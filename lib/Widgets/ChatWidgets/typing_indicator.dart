@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 /// Widget to show the current list of typing users
-class TypingIndicator extends StatelessWidget {
+class TypingIndicatorWidget extends StatelessWidget {
   /// Instantiate a new TypingIndicator
-  const TypingIndicator({
+  const TypingIndicatorWidget({
     Key? key,
     this.alternativeWidget,
   }) : super(key: key);

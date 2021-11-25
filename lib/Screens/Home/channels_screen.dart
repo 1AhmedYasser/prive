@@ -7,7 +7,6 @@ import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
 import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
 import 'package:prive/Screens/Chat/Channels/important_tab.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({Key? key}) : super(key: key);
