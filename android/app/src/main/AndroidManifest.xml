@@ -2,6 +2,7 @@
     package="com.engaz.prive_app">
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
    <application
         android:name="androidx.multidex.MultiDexApplication"
         android:label="Prive"

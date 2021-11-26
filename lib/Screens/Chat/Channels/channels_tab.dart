@@ -34,7 +34,6 @@ class _ChannelsTabState extends State<ChannelsTab>
         sort: const [SortOption('last_message_at')],
         presence: true,
         limit: 20,
-        channelWidget: const ChannelPage(),
         separatorBuilder: (context, index) => const SizedBox.shrink(),
         emptyBuilder: (context) =>
             ChannelsEmptyState(animationController: _animationController),
@@ -45,7 +44,6 @@ class _ChannelsTabState extends State<ChannelsTab>
           ),
         ),
         loadingBuilder: (context) => const UltraLoadingIndicator(),
-       // channelPreviewBuilder: _channelPreviewBuilder,
         listBuilder: (context, channels) =>
             ChannelsListWidget(channels: channels),
       ),
@@ -56,27 +54,5 @@ class _ChannelsTabState extends State<ChannelsTab>
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-}
-
-
-class ChannelPage extends StatelessWidget {
-  const ChannelPage({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const ChannelHeader(),
-      body: Column(
-        children: const <Widget>[
-          Expanded(
-            child: MessageListView(),
-          ),
-          MessageInput(),
-        ],
-      ),
-    );
   }
 }

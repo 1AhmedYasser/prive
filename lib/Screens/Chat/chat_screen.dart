@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Widgets/ChatWidgets/chat_list_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/audio_loading_message_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/audio_player_message.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/chat_send_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/connection_status_builder.dart';
+import 'package:prive/Widgets/ChatWidgets/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -167,9 +169,9 @@ class _ChatScreenState extends State<ChatScreen> {
               emptyBuilder: (context) => const SizedBox.shrink(),
               errorBuilder: (context, error) => Container(),
               messageListBuilder: (context, messages) {
-                return Container(
-                  decoration: BoxDecoration(
-                    image: isAFile == true
+                return MessageListViewTheme(
+                  data: MessageListViewTheme.of(context).copyWith(
+                    backgroundImage: isAFile == true
                         ? DecorationImage(
                             image: FileImage(File(chatBackground)),
                             fit: BoxFit.cover,
@@ -179,22 +181,110 @@ class _ChatScreenState extends State<ChatScreen> {
                             fit: BoxFit.cover,
                           ),
                   ),
-                  child: ChatListWidget(
-                    messages: messages,
-                    messageFocus: messageFocus,
-                    chatScrollController: _chatScrollController,
+                  child: MessageListView(
+                    highlightInitialMessage: false,
+                    dateDividerBuilder: (date) {
+                      return SizedBox(
+                        height: 60,
+                        child: Align(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xff1293a8),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, top: 7, bottom: 7),
+                              child: Text(
+                                getHeaderDate(context, date),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    messageHighlightColor: Colors.transparent,
+                    messageBuilder:
+                        (context, details, messages, defaultMessage) {
+                      return defaultMessage.copyWith(
+                        customAttachmentBuilders: {
+                          'voicenote': (context, defaultMessage, attachments) {
+                            final url = attachments.first.assetUrl;
+                            if (url == null) {
+                              return const AudioLoadingMessage();
+                            }
+                            return AudioPlayerMessage(
+                              source: AudioSource.uri(Uri.parse(url)),
+                              id: defaultMessage.id,
+                            );
+                          }
+                        },
+                      );
+                    },
                   ),
                 );
               },
             ),
           ),
-          ChatSendWidget(
-            messageController: messageController,
-            messageFocus: messageFocus,
-            chatScrollController: _chatScrollController,
+          MessageInput(
+            showCommandsButton: false,
+            idleSendButton: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: RecordButton(
+                recordingFinishedCallback: _recordingFinishedCallback,
+              ),
+            ),
+            activeSendButton: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xff37dabc),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: const Padding(
+                  padding:
+                      EdgeInsets.only(left: 12, right: 8, top: 10, bottom: 10),
+                  child: Center(
+                    child: Icon(
+                      Icons.send,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  void _recordingFinishedCallback(String path) {
+    final uri = Uri.parse(path);
+    File file = File(uri.path);
+    file.length().then(
+      (fileSize) {
+        StreamChannel.of(context).channel.sendMessage(
+              Message(
+                attachments: [
+                  Attachment(
+                    type: 'voicenote',
+                    file: AttachmentFile(
+                      size: fileSize,
+                      path: uri.path,
+                    ),
+                  )
+                ],
+              ),
+            );
+      },
     );
   }
 
@@ -288,6 +378,30 @@ class _ChatScreenState extends State<ChatScreen> {
     chatBackground = await Utils.getString(R.pref.chosenChatBackground) ??
         R.images.chatBackground1;
     setState(() {});
+  }
+
+  String getHeaderDate(BuildContext context, DateTime element) {
+    final now = DateTime.now();
+    DateTime messageDate = element.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final messageDateFormatted =
+        DateTime(element.year, element.month, element.day);
+
+    if (messageDateFormatted == today) {
+      return "Today";
+    } else if (messageDateFormatted == yesterday) {
+      return "Yesterday";
+    } else {
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
+        return DateFormat.MMMd(context.locale.languageCode).format(messageDate);
+      } else {
+        return DateFormat('EEEE').format(messageDate);
+      }
+    }
   }
 
   @override
