@@ -73,7 +73,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
         title: const Text(
           "Chat Background",
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: Colors.black,
             fontWeight: FontWeight.w400,
           ),

@@ -55,6 +55,7 @@ dependencies:
   grouped_list: ^4.1.0
   flutter_chat_bubble: ^2.0.0
   cool_dropdown: ^1.4.1
+  side_header_list_view: ^1.0.0-nullsafety.0
 
   # Utils
   supercharged: ^2.1.1

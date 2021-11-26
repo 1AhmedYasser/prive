@@ -26,7 +26,7 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen> {
         title: Text(
           widget.isTerms ? "Terms & Conditions" : "Privacy Policy",
           style: const TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: Colors.black,
             fontWeight: FontWeight.w400,
           ),

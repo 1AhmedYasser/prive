@@ -111,6 +111,7 @@ class Routes {
   String languageRoute = '/language_Screen';
   String chatSettingsRoute = '/chatSettings_Screen';
   String chatBackgroundRoute = '/chatBackground_Screen';
+  String contactsRoute = '/contacts_Screen';
 }
 
 class R {

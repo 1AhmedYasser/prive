@@ -39,7 +39,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
         title: const Text(
           "Chat Settings",
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: Colors.black,
             fontWeight: FontWeight.w400,
           ),

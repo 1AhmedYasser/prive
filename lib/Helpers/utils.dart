@@ -149,7 +149,29 @@ class Utils {
                 return InkWell(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    switch (index) {
+                      case 0:
+                        print("hi1");
+                        break;
+                      case 1:
+                        Navigator.pushNamed(context, R.routes.contactsRoute);
+                        break;
+                      case 2:
+                        print("hi3");
+                        break;
+                      case 3:
+                        print("hi4");
+                        break;
+                      case 4:
+                        print("hi5");
+                        break;
+                      case 5:
+                        print("hi6");
+                        break;
+                    }
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(

@@ -5,6 +5,8 @@ import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
+import '../chat_screen.dart';
+
 class ChannelsTab extends StatefulWidget {
   const ChannelsTab({Key? key}) : super(key: key);
 
@@ -44,8 +46,12 @@ class _ChannelsTabState extends State<ChannelsTab>
           ),
         ),
         loadingBuilder: (context) => const UltraLoadingIndicator(),
-        listBuilder: (context, channels) =>
-            ChannelsListWidget(channels: channels),
+        listBuilder: (context, channels) {
+          channels = channels
+              .where((channel) => channel.lastMessageAt != null)
+              .toList();
+          return ChannelsListWidget(channels: channels);
+        },
       ),
     );
   }

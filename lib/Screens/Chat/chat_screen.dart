@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/audio_player_message.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
@@ -71,8 +72,10 @@ class _ChatScreenState extends State<ChatScreen> {
           title: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: CircleAvatar(
+                borderRadius: BorderRadius.circular(100),
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
                   child: CachedImage(
                     url: StreamManager.getChannelImage(
                           channel,
@@ -80,7 +83,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         ) ??
                         "",
                   ),
-                  radius: 27,
                 ),
               ),
               const SizedBox(
@@ -164,9 +166,25 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: MessageListCore(
               loadingBuilder: (context) {
-                return const Center(child: CircularProgressIndicator());
+                return const UltraLoadingIndicator();
               },
-              emptyBuilder: (context) => const SizedBox.shrink(),
+              emptyBuilder: (context) {
+                return isAFile == true
+                    ? SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Image.file(
+                          File(chatBackground),
+                          fit: BoxFit.fill,
+                        ),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Image.asset(
+                          chatBackground,
+                          fit: BoxFit.fill,
+                        ),
+                      );
+              },
               errorBuilder: (context, error) => Container(),
               messageListBuilder: (context, messages) {
                 return MessageListViewTheme(

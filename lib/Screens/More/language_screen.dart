@@ -37,7 +37,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
         title: const Text(
           "Language",
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: Colors.black,
             fontWeight: FontWeight.w400,
           ),

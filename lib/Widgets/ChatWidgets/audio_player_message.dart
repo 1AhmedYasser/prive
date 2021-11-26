@@ -73,7 +73,7 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
       stream: _audioPlayer.playingStream,
       builder: (context, _) {
         final color =
-            _audioPlayer.playerState.playing ? Colors.red : Colors.blue;
+            _audioPlayer.playerState.playing ? Colors.blue : Colors.blue;
         final icon =
             _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow;
         return Padding(
