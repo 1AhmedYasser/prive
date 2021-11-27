@@ -77,6 +77,9 @@ dependencies:
   stream_chat_persistence: ^3.0.0
   stream_chat_localizations: ^2.0.0
 
+  # Agora
+  agora_rtc_engine: ^4.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
