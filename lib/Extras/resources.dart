@@ -96,7 +96,7 @@ class SharedPref {
 }
 
 class Constants {
-  String streamKey = 'xenq5pdxpwvq';
+  String streamKey = 'bpggr7rwjtxe';
 }
 
 class Routes {
