@@ -7,18 +7,19 @@ import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
 import 'package:prive/Screens/MainMenu/contacts_screen.dart';
-import 'package:prive/Screens/More/chat_backgrounds_screen.dart';
-import 'package:prive/Screens/More/chat_settings_screen.dart';
+import 'package:prive/Screens/More/Settings/chat_backgrounds_screen.dart';
+import 'package:prive/Screens/More/Settings/chat_settings_screen.dart';
+import 'package:prive/Screens/More/Settings/notifications_sounds_screen.dart';
 import 'package:prive/Screens/More/profile_screen.dart';
 import 'package:prive/Screens/More/settings_screen.dart';
-import 'package:prive/Screens/More/terms_privacy_screen.dart';
+import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
 import 'Screens/Home/channels_screen.dart';
-import 'Screens/More/language_screen.dart';
+import 'Screens/More/Settings/language_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
 void main() async {
@@ -92,6 +93,7 @@ class Prive extends StatelessWidget {
           R.routes.chatSettingsRoute: (ctx) => const ChatSettingsScreen(),
           R.routes.chatBackgroundRoute: (ctx) => const ChatBackgroundsScreen(),
           R.routes.contactsRoute: (ctx) => const ContactsScreen(),
+          R.routes.notificationsSoundsRoute: (ctx) => const NotificationsSoundsScreen(),
         },
       ),
     );

@@ -112,6 +112,7 @@ class Routes {
   String chatSettingsRoute = '/chatSettings_Screen';
   String chatBackgroundRoute = '/chatBackground_Screen';
   String contactsRoute = '/contacts_Screen';
+  String notificationsSoundsRoute = '/notificationsSounds_Screen';
 }
 
 class R {

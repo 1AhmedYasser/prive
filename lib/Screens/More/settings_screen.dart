@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
-import 'package:prive/Screens/More/terms_privacy_screen.dart';
+import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -52,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 OptionRowWidget(
                   image: R.images.notificationBellImage,
                   title: "Notifications & Sounds",
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushNamed(context, R.routes.notificationsSoundsRoute),
                 ),
                 OptionRowWidget(
                   image: R.images.chatImage,

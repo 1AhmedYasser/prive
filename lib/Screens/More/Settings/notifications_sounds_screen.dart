@@ -1,0 +1,145 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:prive/Screens/More/Settings/notifications_inner_settings_screen.dart';
+
+class NotificationsSoundsScreen extends StatefulWidget {
+  const NotificationsSoundsScreen({Key? key}) : super(key: key);
+
+  @override
+  _NotificationsSoundsScreenState createState() =>
+      _NotificationsSoundsScreenState();
+}
+
+class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
+  List<bool> currentValues = [false, false, false];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade100,
+        elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.light,
+        ),
+        leading: const BackButton(
+          color: Color(0xff7a8fa6),
+        ),
+        title: const Text(
+          "Notifications & Sounds",
+          style: TextStyle(
+            fontSize: 23,
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+          ),
+        ).tr(),
+      ),
+      body: SingleChildScrollView(
+        child: AnimationLimiter(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: AnimationConfiguration.toStaggeredList(
+              duration: const Duration(milliseconds: 300),
+              childAnimationBuilder: (widget) => SlideAnimation(
+                horizontalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: widget,
+                ),
+              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 25, left: 25, bottom: 17, right: 20),
+                  child: Text(
+                    "Notifications & Sounds",
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                buildSetting("Private Chats", "Tab To Change", 0),
+                const SizedBox(height: 5),
+                buildDivider(),
+                const SizedBox(height: 5),
+                buildSetting("Groups", "Tab To Change", 1),
+                const SizedBox(height: 5),
+                buildDivider(),
+                const SizedBox(height: 5),
+                buildSetting("Channels", "Tab To Change", 2),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDivider() {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: context.locale.languageCode == "en" ? 25 : 0,
+        right: context.locale.languageCode == "en" ? 0 : 25,
+      ),
+      child: const Divider(),
+    );
+  }
+
+  Widget buildSetting(String title, String subTitle, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 25, right: 25),
+      child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NotificationsInnerSettingsScreen(
+                title: title,
+              ),
+            ),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subTitle,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff7a8fa6),
+                  ),
+                ),
+              ],
+            ),
+            Switch(
+              value: currentValues[index],
+              activeColor: Theme.of(context).primaryColor,
+              onChanged: (value) {
+                setState(() {
+                  currentValues[index] = value;
+                });
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
