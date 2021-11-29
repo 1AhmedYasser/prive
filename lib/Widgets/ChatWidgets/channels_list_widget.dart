@@ -37,6 +37,9 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                   highlightColor: Colors.transparent,
                   onTap: () => Navigator.of(context).push(
                       ChatScreen.routeWithChannel(widget.channels[index])),
+                  onLongPress: () {
+                    print("hi");
+                  },
                   child: Padding(
                     padding: const EdgeInsets.only(
                         right: 22, top: 30, left: 15, bottom: 10),
@@ -229,26 +232,36 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                                                         ? 0
                                                         : 18,
                                                   ),
-                                                  child: SendingIndicator(
-                                                    message: lastMessage,
-                                                    size: 22,
-                                                    isMessageRead: widget
-                                                        .channels[index]
-                                                        .state!
-                                                        .read
-                                                        .where((element) =>
-                                                            element.user.id !=
-                                                            widget
-                                                                .channels[index]
-                                                                .client
-                                                                .state
-                                                                .currentUser!
-                                                                .id)
-                                                        .where((element) => element
-                                                            .lastRead
-                                                            .isAfter(lastMessage
-                                                                .createdAt))
-                                                        .isNotEmpty,
+                                                  child: StreamChatTheme(
+                                                    data: StreamChatThemeData
+                                                        .fromTheme(
+                                                      ThemeData.from(
+                                                        colorScheme:
+                                                            const ColorScheme.dark(),
+                                                      ),
+                                                    ),
+                                                    child: SendingIndicator(
+                                                      message: lastMessage,
+                                                      size: 22.5,
+                                                      isMessageRead: widget
+                                                          .channels[index]
+                                                          .state!
+                                                          .read
+                                                          .where((element) =>
+                                                              element.user.id !=
+                                                              widget
+                                                                  .channels[
+                                                                      index]
+                                                                  .client
+                                                                  .state
+                                                                  .currentUser!
+                                                                  .id)
+                                                          .where((element) => element
+                                                              .lastRead
+                                                              .isAfter(lastMessage
+                                                                  .createdAt))
+                                                          .isNotEmpty,
+                                                    ),
                                                   ),
                                                 ),
                                             ],

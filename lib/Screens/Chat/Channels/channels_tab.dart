@@ -51,13 +51,6 @@ class _ChannelsTabState extends State<ChannelsTab>
             ChatScreen.routeWithChannel(channel),
           );
         },
-        // channelPreviewBuilder: (context, channel) {
-        //   return channel.lastMessageAt != null
-        //       ? ChannelPreview(
-        //           channel: channel,
-        //         )
-        //       : const SizedBox.shrink();
-        // },
         listBuilder: (context, channels) {
           channels = channels
               .where((channel) => channel.lastMessageAt != null)
