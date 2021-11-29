@@ -3,7 +3,9 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
+import 'package:prive/Screens/Home/chat_rooms_screen.dart';
 import 'package:prive/Screens/Home/more_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -67,98 +69,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       case 0:
         return const ChannelsScreen();
       case 1:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Calls",
-                style: TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  Utils.saveString(R.pref.token, "");
-                  Utils.saveString(R.pref.userId, "");
-                  Utils.saveBool(R.pref.isLoggedIn, false);
-                  Navigator.pushReplacementNamed(
-                    context,
-                    R.routes.loginRoute,
-                  );
-                },
-                child: const Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  elevation: 0,
-                  minimumSize: Size(
-                    MediaQuery.of(context).size.width - 50,
-                    50,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return const CallsScreen();
       case 3:
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Chat Rooms",
-                style: TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  Utils.saveString(R.pref.token, "");
-                  Utils.saveString(R.pref.userId, "");
-                  Utils.saveBool(R.pref.isLoggedIn, false);
-                  Navigator.pushReplacementNamed(
-                    context,
-                    R.routes.loginRoute,
-                  );
-                },
-                child: const Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  elevation: 0,
-                  minimumSize: Size(
-                    MediaQuery.of(context).size.width - 50,
-                    50,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return const ChatRoomsScreen();
       case 4:
         return const MoreScreen();
       default:
-        return const Center(
-          child: Text(
-            "Chats",
-            style: TextStyle(
-              fontSize: 30,
-            ),
-          ),
-        );
+        return const ChannelsScreen();
     }
   }
 

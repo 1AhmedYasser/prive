@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
@@ -230,13 +229,28 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                                                         ? 0
                                                         : 18,
                                                   ),
-                                                  child: Image.asset(
-                                                    R.images.seenImage,
-                                                    width: 20,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
+                                                  child: SendingIndicator(
+                                                    message: lastMessage,
+                                                    size: 22,
+                                                    isMessageRead: widget
+                                                        .channels[index]
+                                                        .state!
+                                                        .read
+                                                        .where((element) =>
+                                                            element.user.id !=
+                                                            widget
+                                                                .channels[index]
+                                                                .client
+                                                                .state
+                                                                .currentUser!
+                                                                .id)
+                                                        .where((element) => element
+                                                            .lastRead
+                                                            .isAfter(lastMessage
+                                                                .createdAt))
+                                                        .isNotEmpty,
                                                   ),
-                                                )
+                                                ),
                                             ],
                                           );
                                         },

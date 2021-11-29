@@ -3,10 +3,13 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 
 class ChannelsEmptyState extends StatelessWidget {
-  const ChannelsEmptyState({
-    Key? key,
-    required AnimationController animationController,
-  })  : _animationController = animationController,
+  final String title;
+
+  const ChannelsEmptyState(
+      {Key? key,
+      required AnimationController animationController,
+      this.title = "No Messages Yet"})
+      : _animationController = animationController,
         super(key: key);
 
   final AnimationController _animationController;
@@ -31,10 +34,10 @@ class ChannelsEmptyState extends StatelessWidget {
             },
           ),
           const SizedBox(height: 25),
-          const Text(
-            "No Messages Yet",
+          Text(
+            title,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 15),
           const Padding(
