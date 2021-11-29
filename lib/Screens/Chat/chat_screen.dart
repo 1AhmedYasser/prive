@@ -35,13 +35,15 @@ class _ChatScreenState extends State<ChatScreen> {
   late StreamSubscription<int> unreadCountSubscription;
   TextEditingController messageController = TextEditingController();
   FocusNode messageFocus = FocusNode();
-  final ScrollController _chatScrollController = ScrollController();
   bool? isAFile;
   String chatBackground = R.images.chatBackground1;
+  Message? _quotedMessage;
+  FocusNode? _focusNode;
 
   @override
   void initState() {
     super.initState();
+    _focusNode = FocusNode();
     _getChatBackground();
 
     unreadCountSubscription = StreamChannel.of(context)
@@ -229,9 +231,20 @@ class _ChatScreenState extends State<ChatScreen> {
                       );
                     },
                     messageHighlightColor: Colors.transparent,
+                    onMessageSwiped: _reply,
+                    messageFilter: defaultFilter,
                     messageBuilder:
                         (context, details, messages, defaultMessage) {
                       return defaultMessage.copyWith(
+                        showUsername: false,
+                        messageTheme: getMessageTheme(context, details),
+                        onReplyTap: _reply,
+                        showUserAvatar: DisplayWidget.gone,
+                        showReplyMessage: true,
+                        showPinButton: true,
+                        deletedBottomRowBuilder: (context, message) {
+                          return const VisibleFootnote();
+                        },
                         customAttachmentBuilders: {
                           'voicenote': (context, defaultMessage, attachments) {
                             final url = attachments.first.assetUrl;
@@ -253,6 +266,12 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           MessageInput(
             showCommandsButton: false,
+            focusNode: _focusNode,
+            quotedMessage: _quotedMessage,
+            onQuotedMessageCleared: () {
+              setState(() => _quotedMessage = null);
+              _focusNode!.unfocus();
+            },
             idleSendButton: Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: RecordButton(
@@ -282,6 +301,17 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  MessageThemeData getMessageTheme(
+      BuildContext context, MessageDetails details) {
+    return StreamChatTheme.of(context).ownMessageTheme.copyWith(
+          messageBackgroundColor:
+              details.isMyMessage ? const Color(0xff7a8fa6) : Colors.white,
+          messageTextStyle: TextStyle(
+            color: details.isMyMessage ? Colors.white : Colors.black,
+          ),
+        );
   }
 
   void _recordingFinishedCallback(String path) {
@@ -422,9 +452,25 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void _reply(Message message) {
+    setState(() => _quotedMessage = message);
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _focusNode!.requestFocus();
+    });
+  }
+
+  bool defaultFilter(Message m) {
+    var _currentUser = StreamChat.of(context).currentUser;
+    final isMyMessage = m.user?.id == _currentUser?.id;
+    final isDeletedOrShadowed = m.isDeleted == true || m.shadowed == true;
+    if (isDeletedOrShadowed && !isMyMessage) return false;
+    return true;
+  }
+
   @override
   void dispose() {
     unreadCountSubscription.cancel();
+    _focusNode!.dispose();
     super.dispose();
   }
 }
