@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class TermsPrivacyScreen extends StatefulWidget {
   final bool isTerms;
@@ -14,23 +15,10 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-        ),
-        leading: const BackButton(
-          color: Color(0xff7a8fa6),
-        ),
-        title: Text(
-          widget.isTerms ? "Terms & Conditions" : "Privacy Policy",
-          style: const TextStyle(
-            fontSize: 23,
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 60),
+        child: PriveAppBar(
+            title: widget.isTerms ? "Terms & Conditions" : "Privacy Policy"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

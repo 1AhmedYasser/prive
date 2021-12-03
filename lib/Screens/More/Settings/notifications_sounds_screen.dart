@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Screens/More/Settings/notifications_inner_settings_screen.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class NotificationsSoundsScreen extends StatefulWidget {
   const NotificationsSoundsScreen({Key? key}) : super(key: key);
@@ -18,23 +19,9 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-        ),
-        leading: const BackButton(
-          color: Color(0xff7a8fa6),
-        ),
-        title: const Text(
-          "Notifications & Sounds",
-          style: TextStyle(
-            fontSize: 23,
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
-        ).tr(),
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 60),
+        child: const PriveAppBar(title: "Notifications & Sounds"),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(

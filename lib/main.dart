@@ -6,6 +6,7 @@ import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
+import 'package:prive/Screens/MainMenu/add_contact_screen.dart';
 import 'package:prive/Screens/MainMenu/contacts_screen.dart';
 import 'package:prive/Screens/More/Settings/chat_backgrounds_screen.dart';
 import 'package:prive/Screens/More/Settings/chat_settings_screen.dart';
@@ -94,6 +95,7 @@ class Prive extends StatelessWidget {
           R.routes.chatBackgroundRoute: (ctx) => const ChatBackgroundsScreen(),
           R.routes.contactsRoute: (ctx) => const ContactsScreen(),
           R.routes.notificationsSoundsRoute: (ctx) => const NotificationsSoundsScreen(),
+          R.routes.addContactScreen: (ctx) => const AddContactScreen(),
         },
       ),
     );

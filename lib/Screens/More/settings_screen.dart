@@ -6,6 +6,7 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -18,23 +19,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-        ),
-        leading: const BackButton(
-          color: Color(0xff7a8fa6),
-        ),
-        title: const Text(
-          "Settings",
-          style: TextStyle(
-            fontSize: 23,
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 60),
+        child: const PriveAppBar(title: "Settings"),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(

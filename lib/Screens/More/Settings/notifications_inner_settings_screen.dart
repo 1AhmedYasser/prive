@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class NotificationsInnerSettingsScreen extends StatefulWidget {
   final String title;
@@ -21,23 +22,9 @@ class _NotificationsInnerSettingsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-        ),
-        leading: const BackButton(
-          color: Color(0xff7a8fa6),
-        ),
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            fontSize: 23,
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
-        ).tr(),
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 60),
+        child: PriveAppBar(title: widget.title),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(
