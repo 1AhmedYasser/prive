@@ -153,7 +153,7 @@ class Utils {
                     Navigator.pop(context);
                     switch (index) {
                       case 0:
-                        print("hi1");
+                        Navigator.pushNamed(context, R.routes.addContactScreen);
                         break;
                       case 1:
                         Navigator.pushNamed(context, R.routes.contactsRoute);
