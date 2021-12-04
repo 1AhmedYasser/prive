@@ -120,7 +120,6 @@ class Utils {
       R.images.addContactImage: "Add Contact",
       R.images.loadContactsListImage: "Load Contact List",
       R.images.newGroupImage: "New Group",
-      R.images.newSecretChatImage: "New Secret Chat",
       R.images.newChannelImage: "New Channel",
       R.images.newCatalogImage: "New Catalog",
     };
@@ -166,9 +165,6 @@ class Utils {
                         break;
                       case 4:
                         print("hi5");
-                        break;
-                      case 5:
-                        print("hi6");
                         break;
                     }
                   },
