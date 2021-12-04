@@ -5,10 +5,12 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
-import 'package:prive/Widgets/ChatWidgets/audio_loading_message_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/audio_player_message.dart';
+import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/record_button_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -16,16 +18,24 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart' as loc;
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatScreen extends StatefulWidget {
+  final Channel channel;
+
   static Route routeWithChannel(Channel channel) => MaterialPageRoute(
         builder: (context) => StreamChannel(
           channel: channel,
-          child: const ChatScreen(),
+          child: ChatScreen(
+            channel: channel,
+          ),
         ),
       );
 
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({Key? key, required this.channel}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -39,6 +49,9 @@ class _ChatScreenState extends State<ChatScreen> {
   String chatBackground = R.images.chatBackground1;
   Message? _quotedMessage;
   FocusNode? _focusNode;
+  loc.Location? location;
+  StreamSubscription<loc.LocationData>? locationSubscription;
+  final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
 
   @override
   void initState() {
@@ -255,7 +268,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               source: AudioSource.uri(Uri.parse(url)),
                               id: defaultMessage.id,
                             );
-                          }
+                          },
+                          'location': _buildLocationMessage
                         },
                       );
                     },
@@ -266,8 +280,17 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           MessageInput(
             showCommandsButton: false,
+            key: _messageInputKey,
             focusNode: _focusNode,
             quotedMessage: _quotedMessage,
+            actions: [
+              GestureDetector(
+                onTap: () => onLocationRequestPressed(),
+                child: const Icon(
+                  Icons.location_history,
+                ),
+              ),
+            ],
             onQuotedMessageCleared: () {
               setState(() => _quotedMessage = null);
               _focusNode!.unfocus();
@@ -297,6 +320,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
+            attachmentThumbnailBuilders: {
+              'location': (context, attachment) => MapThumbnailWidget(
+                    lat: attachment.extraData['lat'] as double,
+                    long: attachment.extraData['long'] as double,
+                  )
+            },
           ),
         ],
       ),
@@ -472,5 +501,118 @@ class _ChatScreenState extends State<ChatScreen> {
     unreadCountSubscription.cancel();
     _focusNode!.dispose();
     super.dispose();
+  }
+
+  Future<bool> setupLocation() async {
+    location ??= loc.Location();
+    var _serviceEnabled = await location!.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location!.requestService();
+      if (!_serviceEnabled) {
+        return false;
+      }
+    }
+
+    var _permissionGranted = await location!.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location!.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<void> onLocationRequestPressed() async {
+    final canSendLocation = await setupLocation();
+    if (canSendLocation != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              "We can't access your location at this time. Did you allow location access?"),
+        ),
+      );
+    }
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    //final locationData = loc.Location();
+    _messageInputKey.currentState?.addAttachment(
+      Attachment(
+        type: 'location',
+        uploadState: const UploadState.success(),
+        extraData: {
+          'lat': position.latitude,
+          'long': position.longitude,
+        },
+      ),
+    );
+    return;
+  }
+
+  Future<void> startLocationTracking(
+    String messageId,
+    String attachmentId,
+  ) async {
+    final canSendLocation = await setupLocation();
+    if (canSendLocation != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              "We can't access your location at this time. Did you allow location access?"),
+        ),
+      );
+    }
+
+    locationSubscription = location!.onLocationChanged.listen(
+      (loc.LocationData event) {
+        widget.channel.sendEvent(
+          Event(
+            type: 'location_update',
+            extraData: {
+              'lat': event.latitude,
+              'long': event.longitude,
+            },
+          ),
+        );
+      },
+    );
+
+    return;
+  }
+
+  void cancelLocationSubscription() => locationSubscription?.cancel();
+
+  Widget _buildLocationMessage(
+    BuildContext context,
+    Message details,
+    List<Attachment> _,
+  ) {
+    final username = details.user!.name;
+    final lat = details.attachments.first.extraData['lat'] as double;
+    final long = details.attachments.first.extraData['long'] as double;
+    return InkWell(
+      onTap: () {
+        startLocationTracking(details.id, details.attachments.first.id);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => GoogleMapsViewWidget(
+              onBack: cancelLocationSubscription,
+              message: details,
+              channelName: username,
+              channel: widget.channel,
+            ),
+          ),
+        );
+      },
+      child: wrapAttachmentWidget(
+        context,
+        MapThumbnailWidget(
+          lat: lat,
+          long: long,
+        ),
+        const RoundedRectangleBorder(),
+        true,
+      ),
+    );
   }
 }

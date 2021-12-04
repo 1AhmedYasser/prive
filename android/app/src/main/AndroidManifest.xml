@@ -13,6 +13,8 @@
         android:name="androidx.multidex.MultiDexApplication"
         android:label="Prive"
         android:icon="@mipmap/launcher_icon">
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyCkYgschahRvE2oDkNRGhOP2kDRMED2AJw"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

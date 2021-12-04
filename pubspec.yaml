@@ -80,6 +80,11 @@ dependencies:
   # Agora
   agora_rtc_engine: ^4.0.7
 
+  # Maps
+  location: ^4.3.0
+  geolocator: ^8.0.0
+  google_maps_flutter: ^2.1.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
