@@ -28,9 +28,13 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
       filter: Filter.and(
         [
           Filter.equal('type', 'messaging'),
-          Filter.in_('members', [
-            StreamChatCore.of(context).currentUser!.id,
-          ])
+          Filter.in_(
+            'members',
+            [
+              StreamChatCore.of(context).currentUser!.id,
+            ],
+          ),
+          Filter.equal('channel_type', 'Group'),
         ],
       ),
       emptyBuilder: (context) =>
@@ -42,12 +46,12 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
         ),
       ),
       loadingBuilder: (
-          context,
-          ) =>
-      const UltraLoadingIndicator(),
+        context,
+      ) =>
+          const UltraLoadingIndicator(),
       listBuilder: (context, channels) {
-        channels =
-            channels.where((element) => element.lastMessageAt != null).toList();
+        // channels =
+        //     channels.where((element) => element.lastMessageAt != null).toList();
         return channels.isEmpty
             ? ChannelsEmptyState(animationController: _animationController)
             : ChannelsListWidget(channels: channels);

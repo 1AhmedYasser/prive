@@ -18,7 +18,6 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -86,18 +85,12 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           title: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: CachedImage(
-                    url: StreamManager.getChannelImage(
-                          channel,
-                          context.currentUser!,
-                        ) ??
-                        "",
-                  ),
+              ChannelAvatar(
+                borderRadius: BorderRadius.circular(50),
+                channel: channel,
+                constraints: const BoxConstraints(
+                  maxWidth: 50,
+                  maxHeight: 50,
                 ),
               ),
               const SizedBox(

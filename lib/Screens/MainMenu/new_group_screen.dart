@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Screens/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -16,6 +16,7 @@ class NewGroupScreen extends StatefulWidget {
 
 class _NewGroupScreenState extends State<NewGroupScreen> {
   TextEditingController? _controller;
+  TextEditingController groupNameController = TextEditingController();
 
   String _userNameQuery = '';
 
@@ -72,6 +73,45 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
             fontWeight: FontWeight.w400,
           ),
         ).tr(),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              icon: const Icon(Icons.done),
+              color: _selectedUsers.isNotEmpty &&
+                      groupNameController.text.isNotEmpty
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey,
+              onPressed: () async {
+                if (groupNameController.text.isNotEmpty &&
+                    _selectedUsers.isNotEmpty) {
+                  try {
+                    final groupName = groupNameController.text;
+                    final client = StreamChat.of(context).client;
+                    final channel = client.channel('messaging', extraData: {
+                      'members': [
+                        client.state.currentUser!.id,
+                        ..._selectedUsers.map((e) => e.id),
+                      ],
+                      'name': groupName,
+                      'channel_type': "Group",
+                      'is_important' : false,
+                      'is_archive' : false
+                    });
+                    await channel.watch();
+                    Navigator.of(context).push(
+                      ChatScreen.routeWithChannel(channel),
+                    );
+                  } catch (err) {
+                    print(err);
+                  }
+                }
+              },
+            ),
+          ),
+        ],
       ),
       // appBar: AppBar(
       //   elevation: 1,
@@ -135,6 +175,30 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 15, left: 15, right: 15, bottom: 10),
+                      child: TextField(
+                        controller: groupNameController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Group Name ...",
+                          contentPadding: const EdgeInsets.only(left: 20),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade500),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   SliverToBoxAdapter(
                     child: SearchTextField(
                       controller: _controller,

@@ -29,9 +29,17 @@ class _ChannelsTabState extends State<ChannelsTab>
   Widget build(BuildContext context) {
     return ChannelsBloc(
       child: ChannelListView(
-        filter: Filter.in_(
-          'members',
-          [StreamChat.of(context).currentUser!.id],
+        filter: Filter.and(
+          [
+            Filter.equal('type', 'messaging'),
+            Filter.in_(
+              'members',
+              [
+                StreamChatCore.of(context).currentUser!.id,
+              ],
+            ),
+            Filter.equal('channel_type', 'Normal'),
+          ],
         ),
         sort: const [SortOption('last_message_at')],
         presence: true,

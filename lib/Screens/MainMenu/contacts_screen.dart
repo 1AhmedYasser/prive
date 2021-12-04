@@ -63,7 +63,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
       'members': [
         core.currentUser!.id,
         user.id,
-      ]
+      ],
+      'channel_type': "Normal",
+      'is_important' : false,
+      'is_archive' : false
     });
     await channel.watch();
 
