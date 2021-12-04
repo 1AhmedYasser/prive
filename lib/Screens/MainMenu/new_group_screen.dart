@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -254,6 +255,12 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
                     selectedUsers: _selectedUsers,
                     pullToRefresh: false,
                     groupAlphabetically: _isSearchActive ? false : true,
+                    filter: Filter.and([
+                      if (_userNameQuery.isNotEmpty)
+                        Filter.autoComplete('name', _userNameQuery),
+                      Filter.notEqual("id", context.currentUser!.id),
+                      Filter.notEqual("role", "admin"),
+                    ]),
                     onUserTap: (user, _) {
                       if (!_selectedUsers.contains(user)) {
                         setState(() {
@@ -266,12 +273,6 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
                       }
                     },
                     limit: 25,
-                    filter: Filter.and([
-                      if (_userNameQuery.isNotEmpty)
-                        Filter.autoComplete('name', _userNameQuery),
-                      Filter.notEqual(
-                          'id', StreamChat.of(context).currentUser!.id),
-                    ]),
                     sort: const [
                       SortOption(
                         'name',
