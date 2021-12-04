@@ -114,6 +114,7 @@ class Routes {
   String contactsRoute = '/contacts_Screen';
   String notificationsSoundsRoute = '/notificationsSounds_Screen';
   String addContactScreen = '/addContact_Screen';
+  String newGroupScreen = '/newGroup_Screen';
 }
 
 class R {

@@ -159,7 +159,7 @@ class Utils {
                         Navigator.pushNamed(context, R.routes.contactsRoute);
                         break;
                       case 2:
-                        print("hi3");
+                        Navigator.pushNamed(context, R.routes.newGroupScreen);
                         break;
                       case 3:
                         print("hi4");
