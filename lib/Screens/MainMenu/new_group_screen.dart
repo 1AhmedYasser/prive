@@ -219,7 +219,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: _HeaderDelegate(
-                      height: 30,
+                      height: 32,
                       child: Container(
                         width: double.maxFinite,
                         decoration: BoxDecoration(
