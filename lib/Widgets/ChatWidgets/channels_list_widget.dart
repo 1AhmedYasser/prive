@@ -51,6 +51,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                           children: [
                             ChannelAvatar(
                               channel: widget.channels[index],
+                              borderRadius: BorderRadius.circular(50),
                               constraints: const BoxConstraints(
                                 maxWidth: 65,
                                 maxHeight: 65,
