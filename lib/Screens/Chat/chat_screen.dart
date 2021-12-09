@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
@@ -157,7 +158,24 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(width: 20),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (BuildContext context, _, __) {
+                      return CallScreen(
+                        channel: channel,
+                      );
+                    },
+                    transitionsBuilder:
+                        (_, Animation<double> animation, __, Widget child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
               child: Image.asset(
                 R.images.voiceCallImage,
                 width: 22,

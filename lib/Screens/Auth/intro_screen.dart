@@ -1,6 +1,8 @@
+import 'package:callkeep/callkeep.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/screen_slider.dart';
 import 'package:prive/Widgets/Common/intro_slider_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -30,6 +32,12 @@ class _IntroScreenState extends State<IntroScreen> {
         title: "Chat Room",
         description: "Join chat room and take\nto your favorite room"),
   ];
+
+  @override
+  void initState() {
+    NotificationsManager.setupNotifications(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

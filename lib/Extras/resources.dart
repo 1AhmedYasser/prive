@@ -70,11 +70,17 @@ class Images {
   String newChannelImage = "$path/new_channel_image.png";
   String newGroupImage = "$path/new_group_image.png";
   String newSecretChatImage = "$path/new_secret_chat_image.png";
+  String closeCall = "$path/close_call.png";
 }
 
 class Animations {
   static String path = "assets/animations";
   String emptyChannels = "$path/EmptyChannels.json";
+}
+
+class Sounds {
+  static String path = "assets/sounds";
+  String calling = "$path/calling.mp3";
 }
 
 class SharedPref {
@@ -119,6 +125,7 @@ class Routes {
 
 class R {
   static Images images = Images();
+  static Sounds sounds = Sounds();
   static Routes routes = Routes();
   static Constants constants = Constants();
   static Animations animations = Animations();

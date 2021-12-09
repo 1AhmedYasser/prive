@@ -1,7 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:callkeep/callkeep.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
@@ -17,6 +19,12 @@ class NavigatorScreen extends StatefulWidget {
 
 class _NavigatorScreenState extends State<NavigatorScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    NotificationsManager.setupNotifications(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

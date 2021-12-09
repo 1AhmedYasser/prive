@@ -64,7 +64,7 @@ class _ChannelsTabState extends State<ChannelsTab>
               .where((channel) => channel.lastMessageAt != null)
               .toList();
           return ChannelsListWidget(channels: channels);
-        },
+       },
       ),
     );
   }

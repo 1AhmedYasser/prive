@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    NotificationsManager.setupNotifications(context);
+    // NotificationsManager.setupNotifications(context);
     _checkIfUserIsLoggedIn();
     super.initState();
   }
