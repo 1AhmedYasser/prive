@@ -44,6 +44,7 @@ class _ChannelsTabState extends State<ChannelsTab>
         sort: const [SortOption('last_message_at')],
         presence: true,
         limit: 20,
+        swipeToAction: true,
         separatorBuilder: (context, index) => const SizedBox.shrink(),
         emptyBuilder: (context) =>
             ChannelsEmptyState(animationController: _animationController),

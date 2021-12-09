@@ -29,9 +29,13 @@ class _ImportantTabState extends State<ImportantTab>
       filter: Filter.and(
         [
           Filter.equal('type', 'messaging'),
-          Filter.in_('members', [
-            StreamChatCore.of(context).currentUser!.id,
-          ])
+          Filter.in_(
+            'members',
+            [
+              StreamChatCore.of(context).currentUser!.id,
+            ],
+          ),
+          Filter.equal('is_important', true),
         ],
       ),
       emptyBuilder: (context) =>

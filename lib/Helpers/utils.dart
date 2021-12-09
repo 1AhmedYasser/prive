@@ -117,10 +117,10 @@ class Utils {
 
   static Future<dynamic> showMainMenu(BuildContext context) {
     Map<String, String> mainMenuItems = {
-      R.images.newChannelImage: "New Channel",
-      R.images.newGroupImage: "New Group",
       R.images.addContactImage: "Add Contact",
       R.images.loadContactsListImage: "Load Contact List",
+      R.images.newChannelImage: "New Channel",
+      R.images.newGroupImage: "New Group",
       R.images.newCatalogImage: "New Catalog",
     };
     return showMaterialModalBottomSheet(
@@ -152,18 +152,17 @@ class Utils {
                     Navigator.pop(context);
                     switch (index) {
                       case 0:
-                        break;
-                      case 1:
-                        Navigator.pushNamed(context, R.routes.newGroupScreen);
-                        break;
-                      case 2:
                         Navigator.pushNamed(context, R.routes.addContactScreen);
                         break;
-                      case 3:
+                      case 1:
                         Navigator.pushNamed(context, R.routes.contactsRoute);
                         break;
+                      case 2:
+                        break;
+                      case 3:
+                        Navigator.pushNamed(context, R.routes.newGroupScreen);
+                        break;
                       case 4:
-                        print("hi5");
                         break;
                     }
                   },

@@ -28,9 +28,13 @@ class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {
       filter: Filter.and(
         [
           Filter.equal('type', 'messaging'),
-          Filter.in_('members', [
-            StreamChatCore.of(context).currentUser!.id,
-          ])
+          Filter.in_(
+            'members',
+            [
+              StreamChatCore.of(context).currentUser!.id,
+            ],
+          ),
+          Filter.equal('is_archive', true),
         ],
       ),
       emptyBuilder: (context) =>

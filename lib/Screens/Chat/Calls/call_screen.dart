@@ -46,97 +46,86 @@ class _CallScreenState extends State<CallScreen> {
         elevation: 0,
       ),
       extendBodyBehindAppBar: true,
-      body: SizedBox(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Blur(
-                blur: 12,
-                blurColor: Colors.black,
-                child: Center(
-                  child: ChannelAvatar(
-                    borderRadius: BorderRadius.circular(0),
-                    channel: widget.channel,
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      maxHeight: MediaQuery
-                          .of(context)
-                          .size
-                          .height,
-                    ),
+      body: buildCallingState(),
+    );
+  }
+
+  SizedBox buildCallingState() {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Blur(
+              blur: 12,
+              blurColor: Colors.black,
+              child: Center(
+                child: ChannelAvatar(
+                  borderRadius: BorderRadius.circular(0),
+                  channel: widget.channel,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width,
+                    maxHeight: MediaQuery.of(context).size.height,
                   ),
                 ),
               ),
             ),
-            Positioned.fill(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ChannelAvatar(
-                    borderRadius: BorderRadius.circular(50),
-                    channel: widget.channel,
-                    constraints: const BoxConstraints(
-                      maxWidth: 100,
-                      maxHeight: 100,
-                    ),
+          ),
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChannelAvatar(
+                  borderRadius: BorderRadius.circular(50),
+                  channel: widget.channel,
+                  constraints: const BoxConstraints(
+                    maxWidth: 100,
+                    maxHeight: 100,
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    StreamManager.getChannelName(
-                      widget.channel,
-                      context.currentUser!,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 21,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  const Text(
-                    "Calling ...",
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: MediaQuery
-                  .of(context)
-                  .size
-                  .height / 8,
-              left: 0,
-              right: 0,
-              child: IconButton(
-                iconSize: 60,
-                icon: Image.asset(
-                  R.images.closeCall,
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                const SizedBox(height: 20),
+                Text(
+                  StreamManager.getChannelName(
+                    widget.channel,
+                    context.currentUser!,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                const Text(
+                  "Calling ...",
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).size.height / 8,
+            left: 0,
+            right: 0,
+            child: IconButton(
+              iconSize: 60,
+              icon: Image.asset(
+                R.images.closeCall,
               ),
-            )
-          ],
-        ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          )
+        ],
       ),
     );
   }
