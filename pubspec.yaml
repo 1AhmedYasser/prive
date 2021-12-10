@@ -82,6 +82,7 @@ dependencies:
 
   # Agora
   agora_rtc_engine: ^4.0.7
+  agora_uikit: ^0.0.4
   callkeep: ^0.3.2
 
   # Maps

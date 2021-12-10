@@ -9,7 +9,7 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:prive/Models/login.dart';
+import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Models/login.dart';
+import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'dart:io';

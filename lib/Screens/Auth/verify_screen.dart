@@ -9,7 +9,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Models/login.dart';
+import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 

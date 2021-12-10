@@ -6,39 +6,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'Utils.dart';
 
 class NotificationsManager {
   static late FlutterLocalNotificationsPlugin notificationPlugin;
-  static BuildContext? notificationsContext;
-  static FlutterCallkeep _callKeep = FlutterCallkeep();
+  static late BuildContext notificationsContext;
+  static final FlutterCallkeep _callKeep = FlutterCallkeep();
   static bool _callKeepInitiated = false;
-  static Map<String, dynamic> callSetup = {
-    'ios': {
-      'appName': 'Prive',
-    },
-    'android': {
-      'alertTitle': 'Permissions required',
-      'alertDescription':
-          'This application needs to access your phone accounts',
-      'cancelButton': 'Cancel',
-      'okButton': 'ok',
-      'foregroundService': {
-        'channelId': 'com.company.my',
-        'channelName': 'Foreground service for my app',
-        'notificationTitle': 'My app is running on background',
-        'notificationIcon': 'Path to the resource icon of the notification',
-      },
-    },
-  };
 
   static void setupNotifications(BuildContext context) {
     notificationsContext = context;
     initializeNotifications();
     requestPermissions();
     getToken();
+    _callKeep.setup(context, <String, dynamic>{
+      'ios': {
+        'appName': 'CallKeepDemo',
+      },
+      'android': {
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+            'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+        "additionalPermissions": <String>[],
+        'foregroundService': {
+          'channelId': 'com.company.my',
+          'channelName': 'Foreground service for my app',
+          'notificationTitle': 'My app is running on background',
+          'notificationIcon': 'Path to the resource icon of the notification',
+        },
+      },
+    });
   }
 
   static void getToken() {
@@ -91,20 +93,37 @@ class NotificationsManager {
     print('backgroundMessage: message => ${message.toString()}');
     var payload = message.data;
     var callerId = payload['caller_id'] as String;
-    var callerName = payload['caller_name'] as String;
+    var channelName = payload['channel_name'] as String;
     var uuid = payload['uuid'] as String;
     var hasVideo = payload['has_video'] == "true";
 
-    final callUUID = uuid;
+    final callUUID = const Uuid().v4();
     _callKeep.on(CallKeepPerformAnswerCallAction(),
         (CallKeepPerformAnswerCallAction event) {
-      print(
-          'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
-      Timer(const Duration(seconds: 1), () {
-        print(
-            '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
-        _callKeep.setCurrentCallActive(callUUID);
-      });
+      Navigator.of(notificationsContext).push(
+        PageRouteBuilder(
+          pageBuilder: (BuildContext context, _, __) {
+            return CallScreen(
+              channelName: channelName,
+              isJoining: true,
+            );
+          },
+          transitionsBuilder:
+              (_, Animation<double> animation, __, Widget child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+      // print(
+      //     'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
+      // Timer(const Duration(seconds: 1), () {
+      //   print(
+      //       '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
+      //   _callKeep.setCurrentCallActive(callUUID);
+      // });
       //_callKeep.endCall(event.callUUID);
     });
 
@@ -115,21 +134,16 @@ class NotificationsManager {
     });
     if (!_callKeepInitiated) {
       if (Platform.isAndroid) {
-        print("hi 1");
         final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-        print("hi 2");
-        print("has phone account $hasPhoneAccount");
-        print("Conettextt :");
         if (hasPhoneAccount == false) {
-          print("heeloz1 ");
-          print(notificationsContext);
           await _callKeep
-              .hasDefaultPhoneAccount(notificationsContext!, <String, dynamic>{
+              .hasDefaultPhoneAccount(notificationsContext, <String, dynamic>{
             'alertTitle': 'Permissions required',
             'alertDescription':
                 'This application needs to access your phone accounts',
             'cancelButton': 'Cancel',
             'okButton': 'ok',
+            "additionalPermissions": <String>[],
             'foregroundService': {
               'channelId': 'com.company.my',
               'channelName': 'Foreground service for my app',
@@ -138,11 +152,8 @@ class NotificationsManager {
                   'Path to the resource icon of the notification',
             },
           });
-          print("heeloz2");
         }
       }
-
-      print("hi");
       _callKeep.setup(
           notificationsContext,
           <String, dynamic>{
@@ -155,6 +166,7 @@ class NotificationsManager {
                   'This application needs to access your phone accounts',
               'cancelButton': 'Cancel',
               'okButton': 'ok',
+              "additionalPermissions": <String>[],
               'foregroundService': {
                 'channelId': 'com.company.my',
                 'channelName': 'Foreground service for my app',
@@ -170,7 +182,7 @@ class NotificationsManager {
 
     print('backgroundMessage: displayIncomingCall ($callerId)');
     _callKeep.displayIncomingCall(callUUID, callerId,
-        localizedCallerName: callerName, hasVideo: hasVideo);
+        localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
     _callKeep.backToForeground();
     return;
   }
@@ -181,21 +193,74 @@ class NotificationsManager {
       body: message.notification?.body ?? "",
     );
 
+    if (Platform.isAndroid) {
+      final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+      if (hasPhoneAccount == false) {
+        await _callKeep
+            .hasDefaultPhoneAccount(notificationsContext, <String, dynamic>{
+          'alertTitle': 'Permissions required',
+          'alertDescription':
+              'This application needs to access your phone accounts',
+          'cancelButton': 'Cancel',
+          'okButton': 'ok',
+          "additionalPermissions": <String>[],
+          'foregroundService': {
+            'channelId': 'com.company.my',
+            'channelName': 'Foreground service for my app',
+            'notificationTitle': 'My app is running on background',
+            'notificationIcon': 'Path to the resource icon of the notification',
+          },
+        });
+      }
+    }
+
+    print(message.data);
     var payload = message.data;
     var type = payload['type'] as String;
     if (type == "call") {
       var callerId = payload['caller_id'] as String;
-      var callerName = payload['caller_name'] as String;
+      var channelName = payload['channel_name'] as String;
       var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == "true";
-      final callUUID = uuid ?? const Uuid().v4();
+      final callUUID = const Uuid().v4();
       print("heyy kiddo $callUUID");
       print("heyy kiddo $callerId");
-      print("heyy kiddo $callerName");
+      print("heyy kiddo $channelName");
       print("heyy kiddo $hasVideo");
       print("call keep ${await _callKeep.hasPhoneAccount()}");
       _callKeep.displayIncomingCall(callUUID, callerId,
-          localizedCallerName: callerName, hasVideo: hasVideo);
+          localizedCallerName: "Incoming Call ...",
+          hasVideo: hasVideo,
+          handleType: "number");
+
+      _callKeep.on(CallKeepPerformAnswerCallAction(),
+          (CallKeepPerformAnswerCallAction event) {
+        // Timer(const Duration(seconds: 1), () {
+        //   _callKeep.setCurrentCallActive(callUUID);
+        // });
+        //_callKeep.endCall(event.callUUID);
+        print("Contextt $notificationsContext");
+        Navigator.of(notificationsContext).push(
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, _, __) {
+              return CallScreen(
+                channelName: channelName,
+                isJoining: true,
+              );
+            },
+            transitionsBuilder:
+                (_, Animation<double> animation, __, Widget child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
+      });
+
+      _callKeep.on(CallKeepPerformEndCallAction(),
+          (CallKeepPerformEndCallAction event) {});
     }
 
     if (type != "call") {
