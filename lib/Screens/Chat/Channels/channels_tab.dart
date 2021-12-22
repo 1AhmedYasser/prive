@@ -64,8 +64,10 @@ class _ChannelsTabState extends State<ChannelsTab>
           channels = channels
               .where((channel) => channel.lastMessageAt != null)
               .toList();
-          return ChannelsListWidget(channels: channels);
-       },
+          return channels.isNotEmpty
+              ? ChannelsListWidget(channels: channels)
+              : ChannelsEmptyState(animationController: _animationController);
+        },
       ),
     );
   }

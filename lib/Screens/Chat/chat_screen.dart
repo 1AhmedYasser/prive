@@ -13,7 +13,6 @@ import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import 'package:collection/collection.dart';
@@ -150,7 +149,24 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           actions: [
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (BuildContext context, _, __) {
+                      return CallScreen(
+                        channel: channel,
+                      );
+                    },
+                    transitionsBuilder:
+                        (_, Animation<double> animation, __, Widget child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
               child: Image.asset(
                 R.images.videoCallImage,
                 width: 25,
@@ -312,6 +328,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 recordingFinishedCallback: _recordingFinishedCallback,
               ),
             ),
+            preMessageSending: (message) {
+              Utils.playSound(R.sounds.sendMessage);
+              return message;
+            },
             activeSendButton: Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: Container(

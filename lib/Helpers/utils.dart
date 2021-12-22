@@ -2,11 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
+  static final player = AudioPlayer();
+
   static Future<void> showImagePickerSelector(
       BuildContext context, Function getImage) async {
     return showDialog(
@@ -142,7 +145,7 @@ class Utils {
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 2.8 / 2,
+                childAspectRatio: 2.5 / 2,
               ),
               itemBuilder: (context, index) {
                 return InkWell(
@@ -192,6 +195,11 @@ class Utils {
         );
       }),
     );
+  }
+
+  static void playSound(String sound, {bool isLooping = false}) async {
+    await player.setAsset(sound);
+    player.play();
   }
 
   static bool isValidEmail(String email) {

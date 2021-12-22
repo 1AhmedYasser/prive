@@ -81,6 +81,7 @@ class Animations {
 class Sounds {
   static String path = "assets/sounds";
   String calling = "$path/calling.mp3";
+  String sendMessage = "$path/send_message.mp3";
 }
 
 class SharedPref {
@@ -102,7 +103,7 @@ class SharedPref {
 }
 
 class Constants {
-  String streamKey = 'bpggr7rwjtxe';
+  String streamKey = 'tv3c4tjhs5kw';
 }
 
 class Routes {
