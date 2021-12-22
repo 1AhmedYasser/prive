@@ -1299,28 +1299,23 @@ packages:
       name: stream_chat
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.3.0"
+    version: "3.3.1"
   stream_chat_flutter:
     dependency: "direct main"
     description:
-      name: stream_chat_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.3.1"
+      path: "packages/stream_chat_flutter"
+      ref: HEAD
+      resolved-ref: "13a863fb81e9fa60e2358671d80f2b4bd265d3a7"
+      url: "https://github.com/1AhmedYasser/stream-chat-flutter.git"
+    source: git
+    version: "3.3.2"
   stream_chat_flutter_core:
     dependency: "direct main"
     description:
       name: stream_chat_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.3.0"
-  stream_chat_localizations:
-    dependency: "direct main"
-    description:
-      name: stream_chat_localizations
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
+    version: "3.3.1"
   stream_chat_persistence:
     dependency: "direct main"
     description:

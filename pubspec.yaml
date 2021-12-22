@@ -76,9 +76,11 @@ dependencies:
 
   # Stream
   stream_chat_flutter_core: ^3.3.0
-  stream_chat_flutter: ^3.3.1
   stream_chat_persistence: ^3.0.0
-  stream_chat_localizations: ^2.0.0
+  stream_chat_flutter:
+    git:
+      path: packages/stream_chat_flutter
+      url: https://github.com/1AhmedYasser/stream-chat-flutter.git
 
   # Agora
   agora_rtc_engine: ^4.0.7
