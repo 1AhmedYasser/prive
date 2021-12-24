@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'Utils.dart';
@@ -45,6 +46,7 @@ class NotificationsManager {
 
   static void getToken() {
     FirebaseMessaging.instance.getToken().then((token) async {
+      StreamChat.of(notificationsContext).client.addDevice(token ?? "", PushProvider.firebase);
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
