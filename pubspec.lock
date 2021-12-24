@@ -951,7 +951,7 @@ packages:
       name: path_provider_android
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.10"
+    version: "2.0.11"
   path_provider_ios:
     dependency: transitive
     description:
@@ -1284,7 +1284,7 @@ packages:
     description:
       path: "packages/stream_chat_flutter"
       ref: develop
-      resolved-ref: "005b16710452c464343deddf13dc8cb2c63fc74e"
+      resolved-ref: "356d5e8064260a22fdacd2a348d23ffa0181368d"
       url: "https://github.com/1AhmedYasser/stream-chat-flutter.git"
     source: git
     version: "3.3.2"
@@ -1560,7 +1560,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.3"
   x509:
     dependency: transitive
     description:
