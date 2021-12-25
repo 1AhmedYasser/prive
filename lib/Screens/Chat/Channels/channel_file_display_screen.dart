@@ -62,19 +62,10 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
               color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
               fontSize: 16.0),
         ),
-        leading: Center(
-          child: InkWell(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: StreamSvgIcon.left(
-                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                size: 24.0,
-              ),
-            ),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: BackButton(
+            color: Color(0xff7a8ea6),
           ),
         ),
         backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,

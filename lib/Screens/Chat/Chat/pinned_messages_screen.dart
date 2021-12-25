@@ -70,7 +70,12 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
             fontSize: 16.0,
           ),
         ),
-        leading: const StreamBackButton(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: BackButton(
+            color: Color(0xff7a8ea6),
+          ),
+        ),
         backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
       ),
       body: _buildMediaGrid(),
