@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Screens/Chat/Chat/chat_info_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
+import 'package:prive/Screens/Chat/Chat/group_info_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
@@ -38,7 +40,40 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                   onTap: () => Navigator.of(context).push(
                       ChatScreen.routeWithChannel(widget.channels[index])),
                   onLongPress: () {
-                    print("hi");
+                    Channel channel = widget.channels[index];
+                    if (channel.memberCount == 2 && channel.isDistinct) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StreamChannel(
+                            channel: channel,
+                            child: ChatInfoScreen(
+                              messageTheme:
+                                  StreamChatTheme.of(context).ownMessageTheme,
+                              user: channel.state!.members
+                                  .where((m) =>
+                                      m.userId !=
+                                      channel.client.state.currentUser!.id)
+                                  .first
+                                  .user,
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StreamChannel(
+                            channel: channel,
+                            child: GroupInfoScreen(
+                              messageTheme:
+                                  StreamChatTheme.of(context).ownMessageTheme,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(
@@ -238,7 +273,8 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                                                         .fromTheme(
                                                       ThemeData.from(
                                                         colorScheme:
-                                                            const ColorScheme.dark(),
+                                                            const ColorScheme
+                                                                .dark(),
                                                       ),
                                                     ),
                                                     child: SendingIndicator(
