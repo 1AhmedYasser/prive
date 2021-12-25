@@ -102,40 +102,13 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  "No Pinned Items",
+                  "No Pinned Messages",
                   style: TextStyle(
                     fontSize: 17.0,
                     color:
                     StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 8.0),
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(children: [
-                    TextSpan(
-                      text: 'Long Press Message',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .textHighEmphasis
-                            .withOpacity(0.5),
-                      ),
-                    ),
-                    TextSpan(
-                      text: "Pin To Conversation",
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .textHighEmphasis
-                            .withOpacity(0.5),
-                      ),
-                    ),
-                  ]),
                 ),
               ],
             ),
