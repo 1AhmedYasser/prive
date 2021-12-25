@@ -284,6 +284,21 @@ class _ChatScreenState extends State<ChatScreen> {
                         deletedBottomRowBuilder: (context, message) {
                           return const VisibleFootnote();
                         },
+                        customActions: [
+                          MessageAction(
+                            leading: const Icon(
+                              Icons.check_circle_outlined,
+                              color: Color(0xff7e7e7e),
+                            ),
+                            title: const Text(
+                              'Select',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            onTap: (message) {
+                              /// Complete action here
+                            },
+                          ),
+                        ],
                         customAttachmentBuilders: {
                           'voicenote': (context, defaultMessage, attachments) {
                             final url = attachments.first.assetUrl;
