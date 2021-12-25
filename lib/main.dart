@@ -50,6 +50,12 @@ class Prive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeData(
+      primaryColor: const Color(0xff3cc7bd),
+      primaryColorDark: const Color(0xff1293a8),
+      fontFamily: 'SFPro',
+    );
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -60,16 +66,14 @@ class Prive extends StatelessWidget {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        theme: ThemeData(
-          primaryColor: const Color(0xff3cc7bd),
-          primaryColorDark: const Color(0xff1293a8),
-          fontFamily: 'SFPro',
-        ),
+        theme: theme,
         debugShowCheckedModeBanner: false,
         builder: (context, child) {
           child = botToastBuilder(context, child);
           return StreamChat(
             client: client,
+            streamChatThemeData:
+                StreamChatThemeData.fromTheme(theme).copyWith(),
             child: StreamChatCore(
               client: client,
               child: ChannelsBloc(
@@ -95,7 +99,8 @@ class Prive extends StatelessWidget {
           R.routes.chatSettingsRoute: (ctx) => const ChatSettingsScreen(),
           R.routes.chatBackgroundRoute: (ctx) => const ChatBackgroundsScreen(),
           R.routes.contactsRoute: (ctx) => const ContactsScreen(),
-          R.routes.notificationsSoundsRoute: (ctx) => const NotificationsSoundsScreen(),
+          R.routes.notificationsSoundsRoute: (ctx) =>
+              const NotificationsSoundsScreen(),
           R.routes.addContactScreen: (ctx) => const AddContactScreen(),
           R.routes.newGroupScreen: (ctx) => const NewGroupScreen(),
         },
