@@ -279,7 +279,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         showUsername: false,
                         messageTheme: getMessageTheme(context, details),
                         onReplyTap: _reply,
-                        showUserAvatar: DisplayWidget.gone,
                         showReplyMessage: true,
                         showPinButton: true,
                         deletedBottomRowBuilder: (context, message) {
