@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Screens/Chat/chat_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';

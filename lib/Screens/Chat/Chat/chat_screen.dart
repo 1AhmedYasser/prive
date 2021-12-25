@@ -22,6 +22,9 @@ import 'package:location/location.dart' as loc;
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'chat_info_screen.dart';
+import 'group_info_screen.dart';
+
 class ChatScreen extends StatefulWidget {
   final Channel channel;
 
@@ -85,12 +88,56 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           title: Row(
             children: [
-              ChannelAvatar(
-                borderRadius: BorderRadius.circular(50),
-                channel: channel,
-                constraints: const BoxConstraints(
-                  maxWidth: 50,
-                  maxHeight: 50,
+              GestureDetector(
+                onTap: () async {
+                  var channel = StreamChannel.of(context).channel;
+
+                  if (channel.memberCount == 2 && channel.isDistinct) {
+                    final currentUser = StreamChat.of(context).currentUser;
+                    final otherUser = channel.state!.members.firstWhereOrNull(
+                      (element) => element.user!.id != currentUser!.id,
+                    );
+                    if (otherUser != null) {
+                      final pop = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StreamChannel(
+                            child: ChatInfoScreen(
+                              messageTheme:
+                                  StreamChatTheme.of(context).ownMessageTheme,
+                              user: otherUser.user,
+                            ),
+                            channel: channel,
+                          ),
+                        ),
+                      );
+
+                      if (pop == true) {
+                        Navigator.pop(context);
+                      }
+                    }
+                  } else {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StreamChannel(
+                          child: GroupInfoScreen(
+                            messageTheme:
+                                StreamChatTheme.of(context).ownMessageTheme,
+                          ),
+                          channel: channel,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: ChannelAvatar(
+                  borderRadius: BorderRadius.circular(50),
+                  channel: channel,
+                  constraints: const BoxConstraints(
+                    maxWidth: 50,
+                    maxHeight: 50,
+                  ),
                 ),
               ),
               const SizedBox(

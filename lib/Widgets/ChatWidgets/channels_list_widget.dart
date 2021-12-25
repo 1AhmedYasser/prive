@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Screens/Chat/chat_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';

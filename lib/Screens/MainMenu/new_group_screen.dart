@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Screens/Chat/chat_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
