@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
@@ -17,36 +19,39 @@ class NotificationsManager {
   static late BuildContext notificationsContext;
   static final FlutterCallkeep _callKeep = FlutterCallkeep();
   static bool _callKeepInitiated = false;
+  static Map<String, dynamic> callKeepSetupMap = {
+    'ios': {
+      'appName': 'CallKeepDemo',
+    },
+    'android': {
+      'alertTitle': 'Permissions required',
+      'alertDescription':
+          'This application needs to access your phone accounts',
+      'cancelButton': 'Cancel',
+      'okButton': 'ok',
+      "additionalPermissions": <String>[],
+      'foregroundService': {
+        'channelId': 'com.company.my',
+        'channelName': 'Foreground service for my app',
+        'notificationTitle': 'My app is running on background',
+        'notificationIcon': 'Path to the resource icon of the notification',
+      },
+    },
+  };
 
   static void setupNotifications(BuildContext context) {
     notificationsContext = context;
     initializeNotifications();
     requestPermissions();
     getToken();
-    _callKeep.setup(context, <String, dynamic>{
-      'ios': {
-        'appName': 'CallKeepDemo',
-      },
-      'android': {
-        'alertTitle': 'Permissions required',
-        'alertDescription':
-            'This application needs to access your phone accounts',
-        'cancelButton': 'Cancel',
-        'okButton': 'ok',
-        "additionalPermissions": <String>[],
-        'foregroundService': {
-          'channelId': 'com.company.my',
-          'channelName': 'Foreground service for my app',
-          'notificationTitle': 'My app is running on background',
-          'notificationIcon': 'Path to the resource icon of the notification',
-        },
-      },
-    });
+    _callKeep.setup(context, callKeepSetupMap);
   }
 
   static void getToken() {
     FirebaseMessaging.instance.getToken().then((token) async {
-      StreamChat.of(notificationsContext).client.addDevice(token ?? "", PushProvider.firebase);
+      StreamChat.of(notificationsContext)
+          .client
+          .addDevice(token ?? "", PushProvider.firebase);
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
@@ -80,18 +85,60 @@ class NotificationsManager {
       _firebaseMessagingHandler(message);
     });
 
+    RemoteMessage? initialMessage =
+    await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      Map<String, dynamic> channelData =
+      Map<String, dynamic>.from(json.decode(initialMessage.data["channel"]));
+      Channel? channel;
+      StreamChatCore.of(notificationsContext)
+          .client
+          .state
+          .channels
+          .forEach((key, value) {
+        if (value.id == channelData['id']) {
+          channel = value;
+        }
+      });
+      if (channel != null) {
+        Navigator.of(notificationsContext).push(
+          ChatScreen.routeWithChannel(channel!),
+        );
+      }
+    }
+
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // When Selecting the notification while the app is opened
+      Map<String, dynamic> channelData =
+          Map<String, dynamic>.from(json.decode(message.data["channel"]));
+      Channel? channel;
+      StreamChatCore.of(notificationsContext)
+          .client
+          .state
+          .channels
+          .forEach((key, value) {
+        if (value.id == channelData['id']) {
+          channel = value;
+        }
+      });
+      print("hey");
+      if (channel != null) {
+        Navigator.of(notificationsContext).push(
+          ChatScreen.routeWithChannel(channel!),
+        );
+      }
     });
   }
 
   static Future<dynamic> onSelectNotification(String? notification) async {
     // When Selecting the notification
+    print("hi");
   }
 
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
+    print("helloooooozy");
     print('backgroundMessage: message => ${message.toString()}');
     var payload = message.data;
     var callerId = payload['caller_id'] as String;
@@ -138,46 +185,11 @@ class NotificationsManager {
       if (Platform.isAndroid) {
         final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
         if (hasPhoneAccount == false) {
-          await _callKeep
-              .hasDefaultPhoneAccount(notificationsContext, <String, dynamic>{
-            'alertTitle': 'Permissions required',
-            'alertDescription':
-                'This application needs to access your phone accounts',
-            'cancelButton': 'Cancel',
-            'okButton': 'ok',
-            "additionalPermissions": <String>[],
-            'foregroundService': {
-              'channelId': 'com.company.my',
-              'channelName': 'Foreground service for my app',
-              'notificationTitle': 'My app is running on background',
-              'notificationIcon':
-                  'Path to the resource icon of the notification',
-            },
-          });
+          await _callKeep.hasDefaultPhoneAccount(
+              notificationsContext, callKeepSetupMap);
         }
       }
-      _callKeep.setup(
-          notificationsContext,
-          <String, dynamic>{
-            'ios': {
-              'appName': 'Prive',
-            },
-            'android': {
-              'alertTitle': 'Permissions required',
-              'alertDescription':
-                  'This application needs to access your phone accounts',
-              'cancelButton': 'Cancel',
-              'okButton': 'ok',
-              "additionalPermissions": <String>[],
-              'foregroundService': {
-                'channelId': 'com.company.my',
-                'channelName': 'Foreground service for my app',
-                'notificationTitle': 'My app is running on background',
-                'notificationIcon':
-                    'Path to the resource icon of the notification',
-              },
-            },
-          },
+      _callKeep.setup(notificationsContext, callKeepSetupMap,
           backgroundMode: true);
       _callKeepInitiated = true;
     }
@@ -198,38 +210,21 @@ class NotificationsManager {
     if (Platform.isAndroid) {
       final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
       if (hasPhoneAccount == false) {
-        await _callKeep
-            .hasDefaultPhoneAccount(notificationsContext, <String, dynamic>{
-          'alertTitle': 'Permissions required',
-          'alertDescription':
-              'This application needs to access your phone accounts',
-          'cancelButton': 'Cancel',
-          'okButton': 'ok',
-          "additionalPermissions": <String>[],
-          'foregroundService': {
-            'channelId': 'com.company.my',
-            'channelName': 'Foreground service for my app',
-            'notificationTitle': 'My app is running on background',
-            'notificationIcon': 'Path to the resource icon of the notification',
-          },
-        });
+        await _callKeep.hasDefaultPhoneAccount(
+            notificationsContext, callKeepSetupMap);
       }
     }
 
     print(message.data);
     var payload = message.data;
     var type = payload['type'] as String;
+    print("type $type");
     if (type == "call") {
       var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
       var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == "true";
       final callUUID = const Uuid().v4();
-      print("heyy kiddo $callUUID");
-      print("heyy kiddo $callerId");
-      print("heyy kiddo $channelName");
-      print("heyy kiddo $hasVideo");
-      print("call keep ${await _callKeep.hasPhoneAccount()}");
       _callKeep.displayIncomingCall(callUUID, callerId,
           localizedCallerName: "Incoming Call ...",
           hasVideo: hasVideo,

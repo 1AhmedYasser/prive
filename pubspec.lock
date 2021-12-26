@@ -1277,7 +1277,7 @@ packages:
     description:
       path: "packages/stream_chat_flutter"
       ref: develop
-      resolved-ref: f2080a1daf4eb82ce3df60813c85cf36ddf77910
+      resolved-ref: "747f7585a602b1405deca2297736702e029e00d6"
       url: "https://github.com/1AhmedYasser/stream-chat-flutter.git"
     source: git
     version: "3.3.2"

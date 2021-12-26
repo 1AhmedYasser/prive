@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:location/location.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
@@ -19,7 +20,6 @@ import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:location/location.dart' as loc;
-import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'chat_info_screen.dart';
@@ -51,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String chatBackground = R.images.chatBackground1;
   Message? _quotedMessage;
   FocusNode? _focusNode;
-  loc.Location? location;
+  loc.Location location = loc.Location();
   StreamSubscription<loc.LocationData>? locationSubscription;
   final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
 
@@ -70,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("Chat Channel Id ${widget.channel.id}");
     final channel = StreamChannel.of(context).channel;
     return Scaffold(
       appBar: PreferredSize(
@@ -595,46 +596,15 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  Future<bool> setupLocation() async {
-    location ??= loc.Location();
-    var _serviceEnabled = await location!.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location!.requestService();
-      if (!_serviceEnabled) {
-        return false;
-      }
-    }
-
-    var _permissionGranted = await location!.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location!.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   Future<void> onLocationRequestPressed() async {
-    final canSendLocation = await setupLocation();
-    if (canSendLocation != true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              "We can't access your location at this time. Did you allow location access?"),
-        ),
-      );
-    }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    //final locationData = loc.Location();
+    LocationData _locationData = await location.getLocation();
     _messageInputKey.currentState?.addAttachment(
       Attachment(
         type: 'location',
         uploadState: const UploadState.success(),
         extraData: {
-          'lat': position.latitude,
-          'long': position.longitude,
+          'lat': _locationData.latitude,
+          'long': _locationData.longitude,
         },
       ),
     );
@@ -645,17 +615,7 @@ class _ChatScreenState extends State<ChatScreen> {
     String messageId,
     String attachmentId,
   ) async {
-    final canSendLocation = await setupLocation();
-    if (canSendLocation != true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              "We can't access your location at this time. Did you allow location access?"),
-        ),
-      );
-    }
-
-    locationSubscription = location!.onLocationChanged.listen(
+    locationSubscription = location.onLocationChanged.listen(
       (loc.LocationData event) {
         widget.channel.sendEvent(
           Event(
