@@ -122,7 +122,6 @@ class NotificationsManager {
           channel = value;
         }
       });
-      print("hey");
       if (channel != null) {
         Navigator.of(notificationsContext).push(
           ChatScreen.routeWithChannel(channel!),

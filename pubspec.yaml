@@ -116,21 +116,11 @@ flutter:
   fonts:
     - family: SFPro
       fonts:
-        - asset: assets/fonts/SF-Pro-Display-Black.otf
-        - asset: assets/fonts/SF-Pro-Display-BlackItalic.otf
         - asset: assets/fonts/SF-Pro-Display-Bold.otf
         - asset: assets/fonts/SF-Pro-Display-BoldItalic.otf
-        - asset: assets/fonts/SF-Pro-Display-Heavy.otf
-        - asset: assets/fonts/SF-Pro-Display-HeavyItalic.otf
-        - asset: assets/fonts/SF-Pro-Display-Light.otf
-        - asset: assets/fonts/SF-Pro-Display-LightItalic.otf
         - asset: assets/fonts/SF-Pro-Display-Medium.otf
         - asset: assets/fonts/SF-Pro-Display-MediumItalic.otf
         - asset: assets/fonts/SF-Pro-Display-Regular.otf
         - asset: assets/fonts/SF-Pro-Display-RegularItalic.otf
         - asset: assets/fonts/SF-Pro-Display-Semibold.otf
         - asset: assets/fonts/SF-Pro-Display-SemiboldItalic.otf
-        - asset: assets/fonts/SF-Pro-Display-Thin.otf
-        - asset: assets/fonts/SF-Pro-Display-ThinItalic.otf
-        - asset: assets/fonts/SF-Pro-Display-Ultralight.otf
-        - asset: assets/fonts/SF-Pro-Display-UltralightItalic.otf
