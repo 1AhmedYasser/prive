@@ -86,11 +86,11 @@ class NotificationsManager {
     });
 
     RemoteMessage? initialMessage =
-    await FirebaseMessaging.instance.getInitialMessage();
+        await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
-      Map<String, dynamic> channelData =
-      Map<String, dynamic>.from(json.decode(initialMessage.data["channel"]));
+      Map<String, dynamic> channelData = Map<String, dynamic>.from(
+          json.decode(initialMessage.data["channel"]));
       Channel? channel;
       StreamChatCore.of(notificationsContext)
           .client
@@ -137,66 +137,68 @@ class NotificationsManager {
 
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print("helloooooozy");
-    print('backgroundMessage: message => ${message.toString()}');
     var payload = message.data;
-    var callerId = payload['caller_id'] as String;
-    var channelName = payload['channel_name'] as String;
-    var uuid = payload['uuid'] as String;
-    var hasVideo = payload['has_video'] == "true";
+    String type = payload['type'];
+    if (type == "call") {
+      var callerId = payload['caller_id'] as String;
+      var channelName = payload['channel_name'] as String;
+      var uuid = payload['uuid'] as String;
+      var hasVideo = payload['has_video'] == "true";
 
-    final callUUID = const Uuid().v4();
-    _callKeep.on(CallKeepPerformAnswerCallAction(),
-        (CallKeepPerformAnswerCallAction event) {
-      Navigator.of(notificationsContext).push(
-        PageRouteBuilder(
-          pageBuilder: (BuildContext context, _, __) {
-            return CallScreen(
-              channelName: channelName,
-              isJoining: true,
-            );
-          },
-          transitionsBuilder:
-              (_, Animation<double> animation, __, Widget child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
-      // print(
-      //     'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
-      // Timer(const Duration(seconds: 1), () {
-      //   print(
-      //       '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
-      //   _callKeep.setCurrentCallActive(callUUID);
-      // });
-      //_callKeep.endCall(event.callUUID);
-    });
+      final callUUID = const Uuid().v4();
+      _callKeep.on(CallKeepPerformAnswerCallAction(),
+          (CallKeepPerformAnswerCallAction event) {
+        Navigator.of(notificationsContext).push(
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, _, __) {
+              return CallScreen(
+                channelName: channelName,
+                isJoining: true,
+              );
+            },
+            transitionsBuilder:
+                (_, Animation<double> animation, __, Widget child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
 
-    _callKeep.on(CallKeepPerformEndCallAction(),
-        (CallKeepPerformEndCallAction event) {
-      print(
-          'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
-    });
-    if (!_callKeepInitiated) {
-      if (Platform.isAndroid) {
-        final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-        if (hasPhoneAccount == false) {
-          await _callKeep.hasDefaultPhoneAccount(
-              notificationsContext, callKeepSetupMap);
+        // print(
+        //     'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
+        // Timer(const Duration(seconds: 1), () {
+        //   print(
+        //       '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
+        //   _callKeep.setCurrentCallActive(callUUID);
+        // });
+        //_callKeep.endCall(event.callUUID);
+      });
+
+      _callKeep.on(CallKeepPerformEndCallAction(),
+          (CallKeepPerformEndCallAction event) {
+        print(
+            'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+      });
+      if (!_callKeepInitiated) {
+        if (Platform.isAndroid) {
+          final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+          if (hasPhoneAccount == false) {
+            await _callKeep.hasDefaultPhoneAccount(
+                notificationsContext, callKeepSetupMap);
+          }
         }
+        _callKeep.setup(notificationsContext, callKeepSetupMap,
+            backgroundMode: true);
+        _callKeepInitiated = true;
       }
-      _callKeep.setup(notificationsContext, callKeepSetupMap,
-          backgroundMode: true);
-      _callKeepInitiated = true;
-    }
 
-    print('backgroundMessage: displayIncomingCall ($callerId)');
-    _callKeep.displayIncomingCall(callUUID, callerId,
-        localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
-    _callKeep.backToForeground();
+      print('backgroundMessage: displayIncomingCall ($callerId)');
+      _callKeep.displayIncomingCall(callUUID, callerId,
+          localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
+      _callKeep.backToForeground();
+    }
     return;
   }
 
