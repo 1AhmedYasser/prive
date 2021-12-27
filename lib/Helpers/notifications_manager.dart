@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -92,18 +93,17 @@ class NotificationsManager {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
       Channel? channel;
-      StreamChatCore.of(notificationsContext)
-          .client
-          .state
-          .channels
-          .forEach((key, value) {
+      final channels = await StreamChatCore.of(notificationsContext).client.queryChannels().last;
+
+      for (var value in channels) {
         if (value.id == channelData['id']) {
           channel = value;
         }
-      });
+      }
+
       if (channel != null) {
         Navigator.of(notificationsContext).push(
-          ChatScreen.routeWithChannel(channel!),
+          ChatScreen.routeWithChannel(channel),
         );
       }
     }

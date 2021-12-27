@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/chat_rooms_screen.dart';
 import 'package:prive/Screens/Home/more_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
