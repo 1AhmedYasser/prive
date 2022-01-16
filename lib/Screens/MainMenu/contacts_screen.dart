@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -65,8 +63,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
         user.id,
       ],
       'channel_type': "Normal",
-      'is_important' : false,
-      'is_archive' : false
+      'is_important': false,
+      'is_archive': false
     });
     await channel.watch();
 

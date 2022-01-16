@@ -18,7 +18,7 @@ class StreamManager {
         ),
         client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
       );
-    } on Exception catch (e, st) {
+    } on Exception catch (_) {
       print('Could not connect user');
     }
   }

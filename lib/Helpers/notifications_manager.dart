@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,12 +8,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:io';
+
 import 'Utils.dart';
 
 class NotificationsManager {
@@ -93,7 +93,10 @@ class NotificationsManager {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
       Channel? channel;
-      final channels = await StreamChatCore.of(notificationsContext).client.queryChannels().last;
+      final channels = await StreamChatCore.of(notificationsContext)
+          .client
+          .queryChannels()
+          .last;
 
       for (var value in channels) {
         if (value.id == channelData['id']) {
