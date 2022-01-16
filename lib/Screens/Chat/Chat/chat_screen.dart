@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:io';
+
+import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
+import 'package:location/location.dart' as loc;
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
@@ -9,18 +14,13 @@ import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
-import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
-import 'package:collection/collection.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'dart:io';
-import 'package:location/location.dart' as loc;
-import 'package:permission_handler/permission_handler.dart';
 
 import 'chat_info_screen.dart';
 import 'group_info_screen.dart';
