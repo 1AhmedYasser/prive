@@ -57,6 +57,7 @@ dependencies:
   flutter_chat_bubble: ^2.0.0
   cool_dropdown: ^1.4.1
   blur: ^3.0.0
+  community_material_icon: ^5.9.55
 
   # Utils
   supercharged: ^2.1.1

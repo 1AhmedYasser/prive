@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -54,6 +55,8 @@ class _ChatScreenState extends State<ChatScreen> {
   loc.Location location = loc.Location();
   StreamSubscription<loc.LocationData>? locationSubscription;
   final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
+  bool isMessageSelectionOn = true;
+  List<Message> selectedMessages = [];
 
   @override
   void initState() {
@@ -70,185 +73,229 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Chat Channel Id ${widget.channel.id}");
     final channel = StreamChannel.of(context).channel;
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(65),
+        preferredSize: Size.fromHeight(!isMessageSelectionOn ? 65 : 55),
         child: AppBar(
           toolbarHeight: 90,
           centerTitle: false,
           backgroundColor: Colors.white,
           elevation: 0,
           leadingWidth: 40,
-          leading: const Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: BackButton(
-              color: Color(0xff7a8ea6),
-            ),
-          ),
-          title: Row(
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  var channel = StreamChannel.of(context).channel;
-
-                  if (channel.memberCount == 2 && channel.isDistinct) {
-                    final currentUser = StreamChat.of(context).currentUser;
-                    final otherUser = channel.state!.members.firstWhereOrNull(
-                      (element) => element.user!.id != currentUser!.id,
-                    );
-                    if (otherUser != null) {
-                      final pop = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StreamChannel(
-                            child: ChatInfoScreen(
-                              messageTheme:
-                                  StreamChatTheme.of(context).ownMessageTheme,
-                              user: otherUser.user,
-                            ),
-                            channel: channel,
-                          ),
-                        ),
-                      );
-
-                      if (pop == true) {
-                        Navigator.pop(context);
-                      }
-                    }
-                  } else {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StreamChannel(
-                          child: GroupInfoScreen(
-                            messageTheme:
-                                StreamChatTheme.of(context).ownMessageTheme,
-                          ),
-                          channel: channel,
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: ChannelAvatar(
-                  borderRadius: BorderRadius.circular(50),
-                  channel: channel,
-                  constraints: const BoxConstraints(
-                    maxWidth: 50,
-                    maxHeight: 50,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: !isMessageSelectionOn
+                ? const BackButton(
+                    color: Color(0xff7a8ea6),
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedMessages.clear();
+                        isMessageSelectionOn = false;
+                      });
+                    },
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                width: 16,
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          title: !isMessageSelectionOn
+              ? Row(
                   children: [
-                    Text(
-                      StreamManager.getChannelName(
-                        channel,
-                        context.currentUser!,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 15, color: Colors.black),
-                    ),
-                    const SizedBox(height: 2),
-                    BetterStreamBuilder<List<Member>>(
-                      stream: channel.state!.membersStream,
-                      initialData: channel.state!.members,
-                      builder: (context, data) => ConnectionStatusBuilder(
-                        statusBuilder: (context, status) {
-                          switch (status) {
-                            case ConnectionStatus.connected:
-                              return _buildConnectedTitleState(context, data);
-                            case ConnectionStatus.connecting:
-                              return const Text(
-                                'Connecting',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                    GestureDetector(
+                      onTap: () async {
+                        var channel = StreamChannel.of(context).channel;
+
+                        if (channel.memberCount == 2 && channel.isDistinct) {
+                          final currentUser =
+                              StreamChat.of(context).currentUser;
+                          final otherUser =
+                              channel.state!.members.firstWhereOrNull(
+                            (element) => element.user!.id != currentUser!.id,
+                          );
+                          if (otherUser != null) {
+                            final pop = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StreamChannel(
+                                  child: ChatInfoScreen(
+                                    messageTheme: StreamChatTheme.of(context)
+                                        .ownMessageTheme,
+                                    user: otherUser.user,
+                                  ),
+                                  channel: channel,
                                 ),
-                              );
-                            case ConnectionStatus.disconnected:
-                              return const Text(
-                                'Offline',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
-                                ),
-                              );
-                            default:
-                              return const SizedBox.shrink();
+                              ),
+                            );
+
+                            if (pop == true) {
+                              Navigator.pop(context);
+                            }
                           }
-                        },
+                        } else {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StreamChannel(
+                                child: GroupInfoScreen(
+                                  messageTheme: StreamChatTheme.of(context)
+                                      .ownMessageTheme,
+                                ),
+                                channel: channel,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: ChannelAvatar(
+                        borderRadius: BorderRadius.circular(50),
+                        channel: channel,
+                        constraints: const BoxConstraints(
+                          maxWidth: 50,
+                          maxHeight: 50,
+                        ),
                       ),
                     ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            StreamManager.getChannelName(
+                              channel,
+                              context.currentUser!,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black),
+                          ),
+                          const SizedBox(height: 2),
+                          BetterStreamBuilder<List<Member>>(
+                            stream: channel.state!.membersStream,
+                            initialData: channel.state!.members,
+                            builder: (context, data) => ConnectionStatusBuilder(
+                              statusBuilder: (context, status) {
+                                switch (status) {
+                                  case ConnectionStatus.connected:
+                                    return _buildConnectedTitleState(
+                                        context, data);
+                                  case ConnectionStatus.connecting:
+                                    return const Text(
+                                      'Connecting',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                      ),
+                                    );
+                                  case ConnectionStatus.disconnected:
+                                    return const Text(
+                                      'Offline',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    );
+                                  default:
+                                    return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
-                ),
-              )
-            ],
-          ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (BuildContext context, _, __) {
-                      return CallScreen(
-                        channel: channel,
+                )
+              : selectedMessages.isNotEmpty
+                  ? Row(
+                      children: [
+                        Text(
+                          "${selectedMessages.length}",
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 17),
+                        ),
+                      ],
+                    )
+                  : const Text(
+                      "Select Messages",
+                      style: TextStyle(color: Colors.black, fontSize: 17),
+                    ),
+          actions: !isMessageSelectionOn
+              ? [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (BuildContext context, _, __) {
+                            return CallScreen(
+                              channel: channel,
+                            );
+                          },
+                          transitionsBuilder: (_, Animation<double> animation,
+                              __, Widget child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
                       );
                     },
-                    transitionsBuilder:
-                        (_, Animation<double> animation, __, Widget child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
+                    child: Image.asset(
+                      R.images.videoCallImage,
+                      width: 25,
+                    ),
                   ),
-                );
-              },
-              child: Image.asset(
-                R.images.videoCallImage,
-                width: 25,
-              ),
-            ),
-            const SizedBox(width: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (BuildContext context, _, __) {
-                      return CallScreen(
-                        channel: channel,
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (BuildContext context, _, __) {
+                            return CallScreen(
+                              channel: channel,
+                            );
+                          },
+                          transitionsBuilder: (_, Animation<double> animation,
+                              __, Widget child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
                       );
                     },
-                    transitionsBuilder:
-                        (_, Animation<double> animation, __, Widget child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
+                    child: Image.asset(
+                      R.images.voiceCallImage,
+                      width: 22,
+                    ),
                   ),
-                );
-              },
-              child: Image.asset(
-                R.images.voiceCallImage,
-                width: 22,
-              ),
-            ),
-            const SizedBox(width: 20),
-            const ChatMenuWidget(),
-            const SizedBox(width: 20),
-          ],
+                  const SizedBox(width: 20),
+                  const ChatMenuWidget(),
+                  const SizedBox(width: 20),
+                ]
+              : [
+                  Image.asset(
+                    R.images.forwardIcon,
+                    width: 20.5,
+                  ),
+                  const SizedBox(width: 30),
+                  Image.asset(
+                    R.images.deleteChatImage,
+                    width: 16.5,
+                  ),
+                  const SizedBox(width: 25),
+                ],
         ),
       ),
       body: Column(
@@ -323,44 +370,49 @@ class _ChatScreenState extends State<ChatScreen> {
                     messageFilter: defaultFilter,
                     messageBuilder:
                         (context, details, messages, defaultMessage) {
-                      return defaultMessage.copyWith(
-                        showUsername: false,
-                        messageTheme: getMessageTheme(context, details),
-                        onReplyTap: _reply,
-                        showReplyMessage: true,
-                        showPinButton: true,
-                        deletedBottomRowBuilder: (context, message) {
-                          return const VisibleFootnote();
-                        },
-                        customActions: [
-                          MessageAction(
-                            leading: const Icon(
-                              Icons.check_circle_outlined,
-                              color: Color(0xff7e7e7e),
-                            ),
-                            title: const Text(
-                              'Select',
-                              style: TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                            onTap: (message) {
-                              /// Complete action here
-                            },
-                          ),
-                        ],
-                        customAttachmentBuilders: {
-                          'voicenote': (context, defaultMessage, attachments) {
-                            final url = attachments.first.assetUrl;
-                            if (url == null) {
-                              return const AudioLoadingMessage();
-                            }
-                            return AudioPlayerMessage(
-                              source: AudioSource.uri(Uri.parse(url)),
-                              id: defaultMessage.id,
-                            );
-                          },
-                          'location': _buildLocationMessage
-                        },
-                      );
+                      return isMessageSelectionOn
+                          ? Container(
+                              color: selectedMessages
+                                      .contains(defaultMessage.message)
+                                  ? Colors.green.withOpacity(0.4)
+                                  : Colors.transparent,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                ),
+                                child: CheckboxListTile(
+                                  activeColor: Colors.green,
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  contentPadding: EdgeInsets.zero,
+                                  value: selectedMessages
+                                      .contains(defaultMessage.message),
+                                  onChanged: (value) {
+                                    if (isMessageSelectionOn) {
+                                      setState(() {
+                                        if (selectedMessages
+                                            .contains(defaultMessage.message)) {
+                                          selectedMessages
+                                              .remove(defaultMessage.message);
+                                        } else {
+                                          selectedMessages
+                                              .add(defaultMessage.message);
+                                        }
+                                      });
+                                    }
+                                  },
+                                  title: _buildChatMessage(
+                                    defaultMessage,
+                                    details,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : _buildChatMessage(defaultMessage, details);
                     },
                   ),
                 );
@@ -454,6 +506,74 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             );
+      },
+    );
+  }
+
+  Widget _buildChatMessage(
+      MessageWidget defaultMessage, MessageDetails details) {
+    return defaultMessage.copyWith(
+      showUsername: false,
+      messageTheme: getMessageTheme(context, details),
+      onReplyTap: _reply,
+      showReplyMessage: true,
+      showPinButton: true,
+      onMessageTap: (message) {
+        if (isMessageSelectionOn) {
+          setState(() {
+            if (selectedMessages.contains(defaultMessage.message)) {
+              selectedMessages.remove(defaultMessage.message);
+            } else {
+              selectedMessages.add(defaultMessage.message);
+            }
+          });
+        }
+      },
+      deletedBottomRowBuilder: (context, message) {
+        return const VisibleFootnote();
+      },
+      customActions: [
+        MessageAction(
+          leading: const Icon(
+            CommunityMaterialIcons.share_outline,
+            color: Color(0xff7e7e7e),
+          ),
+          title: const Text(
+            'Forward',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          onTap: (message) {},
+        ),
+        MessageAction(
+          leading: const Icon(
+            Icons.check_circle_outlined,
+            color: Color(0xff7e7e7e),
+          ),
+          title: const Text(
+            'Select',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          onTap: (message) {
+            Navigator.pop(context);
+            setState(() {
+              selectedMessages.add(message);
+              isMessageSelectionOn = true;
+            });
+          },
+        ),
+      ],
+      customAttachmentBuilders: {
+        'voicenote': (context, defaultMessage, attachments) {
+          final url = attachments.first.assetUrl;
+          if (url == null) {
+            return const AudioLoadingMessage();
+          }
+          return AudioPlayerMessage(
+            source: AudioSource.uri(Uri.parse(url)),
+            id: defaultMessage.id,
+          );
+        },
+        'location': _buildLocationMessage
       },
     );
   }

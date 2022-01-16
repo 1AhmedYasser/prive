@@ -71,6 +71,7 @@ class Images {
   String newGroupImage = "$path/new_group_image.png";
   String newSecretChatImage = "$path/new_secret_chat_image.png";
   String closeCall = "$path/close_call.png";
+  String forwardIcon = "$path/forward_icon.png";
 }
 
 class Animations {
