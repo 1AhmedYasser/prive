@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
@@ -61,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
   bool isMessageSelectionOn = false;
   List<Message> selectedMessages = [];
+  int randomNumber = Random().nextInt(3);
 
   @override
   void initState() {
@@ -509,7 +511,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               const SizedBox(height: 20),
                               SizedBox(
                                 width: 120,
-                                child: Lottie.asset(R.animations.chatHello1),
+                                height: 120,
+                                child: _buildLottieAnimation(),
                               ),
                             ],
                           ),
@@ -576,6 +579,19 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildLottieAnimation() {
+    switch (randomNumber) {
+      case 0:
+        return Lottie.asset(R.animations.chatHello1);
+      case 1:
+        return Lottie.asset(R.animations.chatHello2);
+      case 2:
+        return Lottie.asset(R.animations.chatHello3);
+      default:
+        return Lottie.asset(R.animations.chatHello1);
+    }
   }
 
   MessageThemeData getMessageTheme(

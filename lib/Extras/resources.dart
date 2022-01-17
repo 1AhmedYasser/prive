@@ -78,6 +78,10 @@ class Animations {
   static String path = "assets/animations";
   String emptyChannels = "$path/EmptyChannels.json";
   String chatHello1 = "$path/ChatHello1.json";
+  String chatHello2 = "$path/ChatHello2.json";
+  String chatHello3 = "$path/ChatHello3.json";
+  String chatHello4 = "$path/ChatHello4.json";
+  String chatHello5 = "$path/ChatHello5.json";
 }
 
 class Sounds {
