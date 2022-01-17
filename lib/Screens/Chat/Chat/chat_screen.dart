@@ -6,6 +6,7 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
@@ -21,6 +22,7 @@ import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -288,6 +290,25 @@ class _ChatScreenState extends State<ChatScreen> {
                 ]
               : [
                   GestureDetector(
+                    child: Icon(
+                      Icons.ios_share,
+                      color: selectedMessages.isEmpty
+                          ? Colors.grey.withOpacity(0.4)
+                          : const Color(0xff7a8fa6),
+                    ),
+                    onTap: () {
+                      if (selectedMessages.isNotEmpty) {
+                        String shareText = "";
+                        for (var message in selectedMessages) {
+                          shareText +=
+                              "${message.user?.name}, [${DateFormat('MMM dd, yyyy').format(message.createdAt.toLocal())} at ${DateFormat('hh:mm a').format(message.createdAt.toLocal())}]\n${message.text}\n\n";
+                        }
+                        Share.share(shareText);
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 25),
+                  GestureDetector(
                     child: Image.asset(
                       R.images.forwardIcon,
                       color: selectedMessages.isEmpty
@@ -424,31 +445,28 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                   ),
                                 ),
-                                child: CheckboxListTile(
-                                  activeColor: Colors.green,
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                  contentPadding: EdgeInsets.zero,
-                                  value: selectedMessages
-                                      .contains(defaultMessage.message),
-                                  onChanged: (value) {
-                                    if (isMessageSelectionOn) {
-                                      setState(() {
-                                        if (selectedMessages
-                                            .contains(defaultMessage.message)) {
-                                          selectedMessages
-                                              .remove(defaultMessage.message);
-                                        } else {
-                                          selectedMessages
-                                              .add(defaultMessage.message);
-                                        }
-                                      });
-                                    }
-                                  },
-                                  title: _buildChatMessage(
-                                    defaultMessage,
-                                    details,
-                                  ),
+                                child: Row(
+                                  children: [
+                                    IgnorePointer(
+                                      child: Checkbox(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        value: selectedMessages.contains(
+                                                defaultMessage.message)
+                                            ? true
+                                            : false,
+                                        onChanged: (value) {},
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: _buildChatMessage(
+                                        defaultMessage,
+                                        details,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             )
@@ -587,7 +605,12 @@ class _ChatScreenState extends State<ChatScreen> {
             if (selectedMessages.contains(defaultMessage.message)) {
               selectedMessages.remove(defaultMessage.message);
             } else {
-              selectedMessages.add(defaultMessage.message);
+              final isDeletedOrShadowed =
+                  defaultMessage.message.isDeleted == true ||
+                      defaultMessage.message.shadowed == true;
+              if (!isDeletedOrShadowed) {
+                selectedMessages.add(defaultMessage.message);
+              }
             }
           });
         }
