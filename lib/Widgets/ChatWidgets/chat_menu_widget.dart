@@ -1,6 +1,7 @@
 import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ChatMenuWidget extends StatefulWidget {
   const ChatMenuWidget({
@@ -37,7 +38,21 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
     return CoolDropdown(
       dropdownList: chatMoreMenu,
       dropdownItemPadding: EdgeInsets.zero,
-      onChange: (dropdownItem) {},
+      onChange: (dropdownItem) {
+        switch (dropdownItem['value']) {
+          case "Search":
+            break;
+          case "Clear History":
+            break;
+          case "Mute Notifications":
+            break;
+          case "Delete Chat":
+            _showDeleteChatDialog();
+            break;
+          default:
+            break;
+        }
+      },
       resultHeight: 62,
       resultWidth: 30,
       dropdownWidth: 170,
@@ -97,6 +112,25 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
             chatMoreMenuIcons[i],
           ),
         )
+      });
+    }
+  }
+
+  void _showDeleteChatDialog() async {
+    final res = await showConfirmationDialog(
+      context,
+      title: "Delete Conversation",
+      okText: "Delete",
+      question: "Are You Sure ?",
+      cancelText: "Cancel",
+      icon: StreamSvgIcon.delete(
+        color: StreamChatTheme.of(context).colorTheme.accentError,
+      ),
+    );
+    var channel = StreamChannel.of(context).channel;
+    if (res == true) {
+      await channel.delete().then((value) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       });
     }
   }

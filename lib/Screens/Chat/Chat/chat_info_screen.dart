@@ -428,8 +428,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
     var channel = StreamChannel.of(context).channel;
     if (res == true) {
       await channel.delete().then((value) {
-        Navigator.pop(context);
-        Navigator.pop(context);
+        Navigator.of(context).popUntil((route) => route.isFirst);
       });
     }
   }
