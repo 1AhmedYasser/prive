@@ -4,6 +4,7 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:collection/collection.dart';
 
 class ChannelItemWidget extends StatefulWidget {
   final Channel channel;
@@ -97,12 +98,16 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             stream: widget.channel.state!.lastMessageStream,
                             initialData: widget.channel.state!.lastMessage,
                             builder: (context, lastMessage) {
+                              final lastMessage = widget.channel.state?.messages
+                                  .lastWhereOrNull(
+                                (m) => !m.isDeleted && !m.shadowed,
+                              );
                               return Row(
                                 children: [
                                   Expanded(
                                     child: TypingIndicatorWidget(
                                       alternativeWidget: Text(
-                                        lastMessage.text ?? "",
+                                        lastMessage?.text ?? "",
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -148,7 +153,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                         ),
                                       ),
                                     ),
-                                  if (lastMessage.user?.id ==
+                                  if (lastMessage?.user?.id ==
                                       context.currentUser?.id)
                                     Padding(
                                       padding: EdgeInsets.only(
@@ -169,7 +174,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                           ),
                                         ),
                                         child: SendingIndicator(
-                                          message: lastMessage,
+                                          message: lastMessage ?? Message(),
                                           size: 22.5,
                                           isMessageRead: widget
                                               .channel.state!.read
@@ -179,7 +184,8 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                                       .currentUser!.id)
                                               .where((element) =>
                                                   element.lastRead.isAfter(
-                                                      lastMessage.createdAt))
+                                                      lastMessage?.createdAt ??
+                                                          DateTime.now()))
                                               .isNotEmpty,
                                         ),
                                       ),
