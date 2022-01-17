@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
@@ -551,6 +552,7 @@ class _ChatScreenState extends State<ChatScreen> {
       onReplyTap: _reply,
       showReplyMessage: true,
       showPinButton: true,
+      showDeleteMessage: false,
       usernameBuilder: (context, message) {
         if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
           return Row(
@@ -588,6 +590,61 @@ class _ChatScreenState extends State<ChatScreen> {
         return const VisibleFootnote();
       },
       customActions: [
+        MessageAction(
+          leading: Padding(
+            padding: const EdgeInsets.only(right: 3),
+            child: Image.asset(
+              R.images.deleteChatImage,
+              width: 15,
+              color: Colors.red,
+            ),
+          ),
+          title: const Text(
+            'Delete Message',
+            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
+          ),
+          onTap: (message) {
+            Navigator.pop(context);
+            showCupertinoModalPopup(
+              context: context,
+              builder: (context) => CupertinoActionSheet(
+                actions: [
+                  if (message.user?.id ==
+                      StreamChatCore.of(context).currentUser?.id)
+                    CupertinoActionSheetAction(
+                      child: Text(
+                        "Delete For Everyone",
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        widget.channel.deleteMessage(message, hard: true);
+                      },
+                    ),
+                  CupertinoActionSheetAction(
+                    child: Text(
+                      "Delete For Me",
+                      style:
+                          TextStyle(color: Theme.of(context).primaryColorDark),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      widget.channel.deleteMessage(message);
+                    },
+                  )
+                ],
+                cancelButton: CupertinoActionSheetAction(
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            );
+          },
+        ),
         MessageAction(
           leading: const Icon(
             CommunityMaterialIcons.share_outline,
