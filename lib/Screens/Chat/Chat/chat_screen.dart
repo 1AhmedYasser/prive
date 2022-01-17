@@ -324,7 +324,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     onTap: () {
                       if (selectedMessages.isNotEmpty) {
-                        print("Delete Messages");
+                        for (var message in selectedMessages) {
+                          widget.channel.deleteMessage(message);
+                        }
+                        setState(() {
+                          selectedMessages.clear();
+                          isMessageSelectionOn = false;
+                        });
                       }
                     },
                   ),
@@ -605,44 +611,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           onTap: (message) {
             Navigator.pop(context);
-            showCupertinoModalPopup(
-              context: context,
-              builder: (context) => CupertinoActionSheet(
-                actions: [
-                  if (message.user?.id ==
-                      StreamChatCore.of(context).currentUser?.id)
-                    CupertinoActionSheetAction(
-                      child: Text(
-                        "Delete For Everyone",
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorDark),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        widget.channel.deleteMessage(message, hard: true);
-                      },
-                    ),
-                  CupertinoActionSheetAction(
-                    child: Text(
-                      "Delete For Me",
-                      style:
-                          TextStyle(color: Theme.of(context).primaryColorDark),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.channel.deleteMessage(message);
-                    },
-                  )
-                ],
-                cancelButton: CupertinoActionSheetAction(
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            );
+            showDeletePopup(message);
           },
         ),
         MessageAction(
@@ -697,6 +666,44 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         'location': _buildLocationMessage
       },
+    );
+  }
+
+  void showDeletePopup(Message message) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          if (message.user?.id == StreamChatCore.of(context).currentUser?.id)
+            CupertinoActionSheetAction(
+              child: Text(
+                "Delete For Everyone",
+                style: TextStyle(color: Theme.of(context).primaryColorDark),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                widget.channel.deleteMessage(message, hard: true);
+              },
+            ),
+          CupertinoActionSheetAction(
+            child: Text(
+              "Delete For Me",
+              style: TextStyle(color: Theme.of(context).primaryColorDark),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              widget.channel.deleteMessage(message);
+            },
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: const Text(
+            "Cancel",
+            style: TextStyle(color: Colors.red),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
     );
   }
 
