@@ -6,10 +6,10 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
+import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
@@ -285,7 +285,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  const ChatMenuWidget(),
+                  ChatMenuWidget(
+                    channel: widget.channel,
+                  ),
                   const SizedBox(width: 20),
                 ]
               : [
@@ -362,119 +364,160 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: MessageListCore(
-              loadingBuilder: (context) {
-                return const UltraLoadingIndicator();
-              },
-              emptyBuilder: (context) {
-                return isAFile == true
-                    ? SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: Image.file(
-                          File(chatBackground),
-                          fit: BoxFit.fill,
-                        ),
-                      )
-                    : SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: Image.asset(
-                          chatBackground,
-                          fit: BoxFit.fill,
-                        ),
-                      );
-              },
-              errorBuilder: (context, error) => Container(),
-              messageListBuilder: (context, messages) {
-                return MessageListViewTheme(
-                  data: MessageListViewTheme.of(context).copyWith(
-                    backgroundImage: isAFile == true
-                        ? DecorationImage(
-                            image: FileImage(File(chatBackground)),
-                            fit: BoxFit.cover,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                MessageListCore(
+                  loadingBuilder: (context) {
+                    return const UltraLoadingIndicator();
+                  },
+                  emptyBuilder: (context) {
+                    return isAFile == true
+                        ? SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Image.file(
+                              File(chatBackground),
+                              fit: BoxFit.fill,
+                            ),
                           )
-                        : DecorationImage(
-                            image: AssetImage(chatBackground),
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                  child: MessageListView(
-                    highlightInitialMessage: false,
-                    dateDividerBuilder: (date) {
-                      return SizedBox(
-                        height: 60,
-                        child: Align(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xff1293a8),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20.0),
-                              ),
+                        : SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Image.asset(
+                              chatBackground,
+                              fit: BoxFit.fill,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10, right: 10, top: 7, bottom: 7),
-                              child: Text(
-                                getHeaderDate(context, date),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400,
+                          );
+                  },
+                  errorBuilder: (context, error) => Container(),
+                  messageListBuilder: (context, messages) {
+                    return MessageListViewTheme(
+                      data: MessageListViewTheme.of(context).copyWith(
+                        backgroundImage: isAFile == true
+                            ? DecorationImage(
+                                image: FileImage(File(chatBackground)),
+                                fit: BoxFit.cover,
+                              )
+                            : DecorationImage(
+                                image: AssetImage(chatBackground),
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      child: MessageListView(
+                        highlightInitialMessage: false,
+                        dateDividerBuilder: (date) {
+                          return SizedBox(
+                            height: 60,
+                            child: Align(
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Color(0xff1293a8),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    messageHighlightColor: Colors.transparent,
-                    onMessageSwiped: _reply,
-                    messageFilter: defaultFilter,
-                    messageBuilder:
-                        (context, details, messages, defaultMessage) {
-                      return isMessageSelectionOn
-                          ? Container(
-                              color: selectedMessages
-                                      .contains(defaultMessage.message)
-                                  ? Colors.green.withOpacity(0.4)
-                                  : Colors.transparent,
-                              child: Theme(
-                                data: ThemeData(
-                                  checkboxTheme: CheckboxThemeData(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, top: 7, bottom: 7),
+                                  child: Text(
+                                    getHeaderDate(context, date),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    IgnorePointer(
-                                      child: Checkbox(
+                              ),
+                            ),
+                          );
+                        },
+                        messageHighlightColor: Colors.transparent,
+                        onMessageSwiped: _reply,
+                        messageFilter: defaultFilter,
+                        messageBuilder:
+                            (context, details, messages, defaultMessage) {
+                          return isMessageSelectionOn
+                              ? Container(
+                                  color: selectedMessages
+                                          .contains(defaultMessage.message)
+                                      ? Colors.green.withOpacity(0.4)
+                                      : Colors.transparent,
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(5),
                                         ),
-                                        value: selectedMessages.contains(
-                                                defaultMessage.message)
-                                            ? true
-                                            : false,
-                                        onChanged: (value) {},
                                       ),
                                     ),
-                                    Expanded(
-                                      child: _buildChatMessage(
-                                        defaultMessage,
-                                        details,
-                                      ),
+                                    child: Row(
+                                      children: [
+                                        IgnorePointer(
+                                          child: Checkbox(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            value: selectedMessages.contains(
+                                                    defaultMessage.message)
+                                                ? true
+                                                : false,
+                                            onChanged: (value) {},
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: _buildChatMessage(
+                                            defaultMessage,
+                                            details,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
+                                )
+                              : _buildChatMessage(defaultMessage, details);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                if (channel.state?.messages.isEmpty == true)
+                  Positioned(
+                    child: IgnorePointer(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 1.8,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .primaryColorDark
+                              .withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(17),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                "No Messages Yet!",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18,
                                 ),
                               ),
-                            )
-                          : _buildChatMessage(defaultMessage, details);
-                    },
-                  ),
-                );
-              },
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 120,
+                                child: Lottie.asset(R.animations.chatHello1),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+              ],
             ),
           ),
           MessageInput(

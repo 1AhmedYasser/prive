@@ -4,7 +4,10 @@ import 'package:prive/Extras/resources.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ChatMenuWidget extends StatefulWidget {
+  final Channel channel;
+
   const ChatMenuWidget({
+    required this.channel,
     Key? key,
   }) : super(key: key);
 
@@ -43,6 +46,11 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
           case "Search":
             break;
           case "Clear History":
+            for (Message message in widget.channel.state?.messages ?? []) {
+              if (message.isDeleted == false) {
+                widget.channel.deleteMessage(message, hard: true);
+              }
+            }
             break;
           case "Mute Notifications":
             break;

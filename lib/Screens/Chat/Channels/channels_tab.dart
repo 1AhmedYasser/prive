@@ -44,6 +44,7 @@ class _ChannelsTabState extends State<ChannelsTab>
         sort: const [SortOption('last_message_at')],
         presence: true,
         limit: 20,
+        watch: true,
         swipeToAction: true,
         separatorBuilder: (context, index) => const SizedBox.shrink(),
         emptyBuilder: (context) =>
@@ -62,7 +63,7 @@ class _ChannelsTabState extends State<ChannelsTab>
         },
         listBuilder: (context, channels) {
           channels = channels
-              .where((channel) => channel.lastMessageAt != null)
+              .where((channel) => channel.state?.messages.isNotEmpty ?? false)
               .toList();
           return channels.isNotEmpty
               ? ChannelsListWidget(channels: channels)
