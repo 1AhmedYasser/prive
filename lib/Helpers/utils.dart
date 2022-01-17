@@ -227,6 +227,58 @@ class Utils {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
   }
+
+  static String getLatestMessageDate(DateTime data) {
+    final now = DateTime.now();
+    DateTime messageDate = data.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final messageDateFormatted =
+        DateTime(messageDate.year, messageDate.month, messageDate.day);
+
+    if (messageDateFormatted == today) {
+      return DateFormat('hh:mm a').format(messageDate);
+    } else if (messageDateFormatted == yesterday) {
+      return "Yesterday";
+    } else {
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
+        return DateFormat('d/MM/yyyy').format(messageDate);
+      } else {
+        return DateFormat('EEEE').format(messageDate);
+      }
+    }
+  }
+
+  static String getLastSeenDate(DateTime data, BuildContext context) {
+    String lastSeen = "last seen ";
+    final now = DateTime.now();
+    DateTime lastSeenDate = data.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    final lastSeenDateFormatted =
+        DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
+
+    if (lastSeenDateFormatted == today) {
+      lastSeen += "today at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+    } else if (lastSeenDateFormatted == yesterday) {
+      lastSeen += "yesterday at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+    } else {
+      DateTime firstDayOfTheCurrentWeek =
+          now.subtract(Duration(days: now.weekday - 1));
+      if (lastSeenDate.isBefore(firstDayOfTheCurrentWeek)) {
+        lastSeen +=
+            "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      } else {
+        lastSeen +=
+            "${DateFormat('EEEE').format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      }
+    }
+    return lastSeen;
+  }
 }
 
 class MyHttpOverrides extends HttpOverrides {

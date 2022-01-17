@@ -24,6 +24,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 import 'chat_info_screen.dart';
+import 'forward_screen.dart';
 import 'group_info_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -55,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
   loc.Location location = loc.Location();
   StreamSubscription<loc.LocationData>? locationSubscription;
   final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
-  bool isMessageSelectionOn = true;
+  bool isMessageSelectionOn = false;
   List<Message> selectedMessages = [];
 
   @override
@@ -285,14 +286,46 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 20),
                 ]
               : [
-                  Image.asset(
-                    R.images.forwardIcon,
-                    width: 20.5,
+                  GestureDetector(
+                    child: Image.asset(
+                      R.images.forwardIcon,
+                      color: selectedMessages.isEmpty
+                          ? Colors.grey.withOpacity(0.4)
+                          : null,
+                      width: 20.5,
+                    ),
+                    onTap: () {
+                      if (selectedMessages.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ForwardScreen(
+                              selectedMessages: selectedMessages,
+                            ),
+                          ),
+                        ).then((value) {
+                          setState(() {
+                            selectedMessages.clear();
+                            isMessageSelectionOn = false;
+                          });
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(width: 30),
-                  Image.asset(
-                    R.images.deleteChatImage,
-                    width: 16.5,
+                  GestureDetector(
+                    child: Image.asset(
+                      R.images.deleteChatImage,
+                      color: selectedMessages.isEmpty
+                          ? Colors.grey.withOpacity(0.4)
+                          : null,
+                      width: 16.5,
+                    ),
+                    onTap: () {
+                      if (selectedMessages.isNotEmpty) {
+                        print("Delete Messages");
+                      }
+                    },
                   ),
                   const SizedBox(width: 25),
                 ],
@@ -513,11 +546,33 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildChatMessage(
       MessageWidget defaultMessage, MessageDetails details) {
     return defaultMessage.copyWith(
-      showUsername: false,
+      showUsername: true,
       messageTheme: getMessageTheme(context, details),
       onReplyTap: _reply,
       showReplyMessage: true,
       showPinButton: true,
+      usernameBuilder: (context, message) {
+        if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
+          return Row(
+            children: [
+              Image.asset(
+                R.images.forwardIcon,
+                width: 15,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                "Forwarded",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
       onMessageTap: (message) {
         if (isMessageSelectionOn) {
           setState(() {
@@ -542,7 +597,17 @@ class _ChatScreenState extends State<ChatScreen> {
             'Forward',
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
-          onTap: (message) {},
+          onTap: (message) {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ForwardScreen(
+                  selectedMessages: [message],
+                ),
+              ),
+            );
+          },
         ),
         MessageAction(
           leading: const Icon(

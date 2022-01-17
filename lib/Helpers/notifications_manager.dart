@@ -135,7 +135,6 @@ class NotificationsManager {
 
   static Future<dynamic> onSelectNotification(String? notification) async {
     // When Selecting the notification
-    print("hi");
   }
 
   static Future<void> firebaseMessagingBackgroundHandler(
@@ -240,7 +239,6 @@ class NotificationsManager {
         //   _callKeep.setCurrentCallActive(callUUID);
         // });
         //_callKeep.endCall(event.callUUID);
-        print("Contextt $notificationsContext");
         Navigator.of(notificationsContext).push(
           PageRouteBuilder(
             pageBuilder: (BuildContext context, _, __) {

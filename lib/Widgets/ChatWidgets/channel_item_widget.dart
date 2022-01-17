@@ -1,0 +1,202 @@
+import 'package:flutter/material.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+class ChannelItemWidget extends StatefulWidget {
+  final Channel channel;
+  final bool isForward;
+
+  const ChannelItemWidget(
+      {Key? key, required this.channel, this.isForward = false})
+      : super(key: key);
+
+  @override
+  _ChannelItemWidgetState createState() => _ChannelItemWidgetState();
+}
+
+class _ChannelItemWidgetState extends State<ChannelItemWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 22, top: 30, left: 15, bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              ChannelAvatar(
+                channel: widget.channel,
+                borderRadius: BorderRadius.circular(50),
+                constraints: const BoxConstraints(
+                  maxWidth: 65,
+                  maxHeight: 65,
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Expanded(
+                          child: ChannelName(
+                            textStyle: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18.5,
+                            ),
+                          ),
+                        ),
+                        if (!widget.isForward)
+                          const SizedBox(
+                            width: 10,
+                          ),
+                        if (!widget.isForward)
+                          BetterStreamBuilder<DateTime>(
+                            stream: widget.channel.lastMessageAtStream,
+                            initialData: widget.channel.lastMessageAt,
+                            builder: (context, data) {
+                              return BetterStreamBuilder<int>(
+                                stream: widget.channel.state!.unreadCountStream,
+                                initialData:
+                                    widget.channel.state?.unreadCount ?? 0,
+                                builder: (context, count) {
+                                  return Text(
+                                    Utils.getLatestMessageDate(data),
+                                    style: TextStyle(
+                                      color: count > 0
+                                          ? Theme.of(context).primaryColorDark
+                                          : Colors.black,
+                                      fontWeight: count > 0
+                                          ? FontWeight.w500
+                                          : FontWeight.w400,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                    if (!widget.isForward)
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    if (!widget.isForward)
+                      BetterStreamBuilder<int>(
+                        stream: widget.channel.state!.unreadCountStream,
+                        initialData: widget.channel.state?.unreadCount ?? 0,
+                        builder: (context, count) {
+                          return BetterStreamBuilder<Message>(
+                            stream: widget.channel.state!.lastMessageStream,
+                            initialData: widget.channel.state!.lastMessage,
+                            builder: (context, lastMessage) {
+                              return Row(
+                                children: [
+                                  Expanded(
+                                    child: TypingIndicatorWidget(
+                                      alternativeWidget: Text(
+                                        lastMessage.text ?? "",
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 14.5,
+                                          fontWeight: count > 0
+                                              ? FontWeight.w500
+                                              : FontWeight.w400,
+                                          color: count > 0
+                                              ? const Color(0xff1293a8)
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  if (count == 0)
+                                    const SizedBox(
+                                      height: 23,
+                                    ),
+                                  if (count > 0)
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: const Color(0xff53c662),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 8,
+                                              right: 8,
+                                              top: 3.5,
+                                              bottom: 3.5),
+                                          child: Text(
+                                            "$count",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if (lastMessage.user?.id ==
+                                      context.currentUser?.id)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        right:
+                                            context.locale.languageCode == "en"
+                                                ? 18
+                                                : 0,
+                                        left:
+                                            context.locale.languageCode == "en"
+                                                ? 0
+                                                : 18,
+                                      ),
+                                      child: StreamChatTheme(
+                                        data: StreamChatThemeData.fromTheme(
+                                          ThemeData.from(
+                                            colorScheme:
+                                                const ColorScheme.dark(),
+                                          ),
+                                        ),
+                                        child: SendingIndicator(
+                                          message: lastMessage,
+                                          size: 22.5,
+                                          isMessageRead: widget
+                                              .channel.state!.read
+                                              .where((element) =>
+                                                  element.user.id !=
+                                                  widget.channel.client.state
+                                                      .currentUser!.id)
+                                              .where((element) =>
+                                                  element.lastRead.isAfter(
+                                                      lastMessage.createdAt))
+                                              .isNotEmpty,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

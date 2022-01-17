@@ -1,10 +1,12 @@
 import 'dart:convert';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
+
 import 'ultra_error.dart';
 import 'ultra_helpers.dart';
 import 'ultra_loading_indicator.dart';
@@ -101,8 +103,8 @@ class UltraNetwork with ChangeNotifier {
                   ),
                 );
         }
-         print("Ultra Request ${request.path}");
-         print("Ultra Response ${response.data}");
+        print("Ultra Request ${request.path}");
+        print("Ultra Response ${response.data}");
         return request.model;
       }
     } else {
