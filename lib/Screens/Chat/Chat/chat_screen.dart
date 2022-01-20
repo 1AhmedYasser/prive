@@ -7,6 +7,7 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
@@ -65,7 +66,8 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Message> selectedMessages = [];
   int randomNumber = Random().nextInt(3);
   bool isMessageSearchOn = false;
-  TextEditingController _messageSearchController = TextEditingController();
+  final TextEditingController _messageSearchController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -230,6 +232,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         Expanded(
                           child: SearchTextField(
                             controller: _messageSearchController,
+                            autoFocus: true,
+                            closeOnSearch: false,
+                            onChanged: (keyword) {
+                              setState(() {});
+                            },
                             showCloseButton:
                                 _messageSearchController.text.isNotEmpty
                                     ? true
@@ -332,7 +339,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Text(
                                 "Cancel",
                                 style: TextStyle(
-                                    color: Theme.of(context).primaryColor),
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
                           ],
@@ -570,59 +579,84 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
-          MessageInput(
-            showCommandsButton: false,
-            key: _messageInputKey,
-            focusNode: _focusNode,
-            quotedMessage: _quotedMessage,
-            actions: [
-              GestureDetector(
-                onTap: () => onLocationRequestPressed(),
-                child: const Icon(
-                  Icons.location_history,
-                ),
-              ),
-            ],
-            onQuotedMessageCleared: () {
-              setState(() => _quotedMessage = null);
-              _focusNode!.unfocus();
-            },
-            idleSendButton: Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              child: RecordButton(
-                recordingFinishedCallback: _recordingFinishedCallback,
+          if (isMessageSearchOn)
+            Container(
+              height: 50,
+              color: const Color(0xffd0d4da).withOpacity(0.9),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 15),
+                    child: Icon(
+                      FontAwesomeIcons.chevronUp,
+                      color: _messageSearchController.text.isNotEmpty
+                          ? Theme.of(context).primaryColorDark
+                          : Colors.grey.shade400,
+                    ),
+                  ),
+                  Icon(
+                    FontAwesomeIcons.chevronDown,
+                    color: _messageSearchController.text.isNotEmpty
+                        ? Theme.of(context).primaryColorDark
+                        : Colors.grey.shade400,
+                  ),
+                ],
               ),
             ),
-            preMessageSending: (message) {
-              Utils.playSound(R.sounds.sendMessage);
-              return message;
-            },
-            activeSendButton: Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xff37dabc),
-                  borderRadius: BorderRadius.circular(50),
+          if (isMessageSearchOn == false)
+            MessageInput(
+              showCommandsButton: false,
+              key: _messageInputKey,
+              focusNode: _focusNode,
+              quotedMessage: _quotedMessage,
+              actions: [
+                GestureDetector(
+                  onTap: () => onLocationRequestPressed(),
+                  child: const Icon(
+                    Icons.location_history,
+                  ),
                 ),
-                child: const Padding(
-                  padding:
-                      EdgeInsets.only(left: 12, right: 8, top: 10, bottom: 10),
-                  child: Center(
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
+              ],
+              onQuotedMessageCleared: () {
+                setState(() => _quotedMessage = null);
+                _focusNode!.unfocus();
+              },
+              idleSendButton: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: RecordButton(
+                  recordingFinishedCallback: _recordingFinishedCallback,
+                ),
+              ),
+              preMessageSending: (message) {
+                Utils.playSound(R.sounds.sendMessage);
+                return message;
+              },
+              activeSendButton: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xff37dabc),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.only(
+                        left: 12, right: 8, top: 10, bottom: 10),
+                    child: Center(
+                      child: Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
+              attachmentThumbnailBuilders: {
+                'location': (context, attachment) => MapThumbnailWidget(
+                      lat: attachment.extraData['lat'] as double,
+                      long: attachment.extraData['long'] as double,
+                    )
+              },
             ),
-            attachmentThumbnailBuilders: {
-              'location': (context, attachment) => MapThumbnailWidget(
-                    lat: attachment.extraData['lat'] as double,
-                    long: attachment.extraData['long'] as double,
-                  )
-            },
-          ),
         ],
       ),
     );

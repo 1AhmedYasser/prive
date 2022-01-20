@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-class SearchTextField extends StatelessWidget {
+class SearchTextField extends StatefulWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final String hintText;
   final VoidCallback? onTap;
   final bool showCloseButton;
+  final bool autoFocus;
+  final bool closeOnSearch;
 
-  const SearchTextField({
-    Key? key,
-    required this.controller,
-    this.onChanged,
-    this.onTap,
-    this.hintText = 'Search',
-    this.showCloseButton = true,
-  }) : super(key: key);
+  const SearchTextField(
+      {Key? key,
+      required this.controller,
+      this.onChanged,
+      this.onTap,
+      this.hintText = 'Search',
+      this.showCloseButton = true,
+      this.closeOnSearch = true,
+      this.autoFocus = false})
+      : super(key: key);
+
+  @override
+  State<SearchTextField> createState() => _SearchTextFieldState();
+}
+
+class _SearchTextFieldState extends State<SearchTextField> {
+  FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +47,17 @@ class SearchTextField extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              onTap: onTap,
-              controller: controller,
-              onChanged: onChanged,
+              focusNode: _focusNode,
+              onTap: widget.onTap,
+              controller: widget.controller,
+              onChanged: widget.onChanged,
+              autofocus: widget.autoFocus,
+              textInputAction: TextInputAction.search,
+              onEditingComplete: () {
+                if (widget.closeOnSearch) {
+                  _focusNode.unfocus();
+                }
+              },
               decoration: InputDecoration(
                 prefixText: '    ',
                 prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
@@ -47,7 +66,7 @@ class SearchTextField extends StatelessWidget {
                   size: 23,
                   color: Colors.grey,
                 ),
-                hintText: hintText,
+                hintText: widget.hintText,
                 hintStyle: StreamChatTheme.of(context).textTheme.body.copyWith(
                     color: StreamChatTheme.of(context)
                         .colorTheme
@@ -61,7 +80,7 @@ class SearchTextField extends StatelessWidget {
               ),
             ),
           ),
-          if (showCloseButton)
+          if (widget.showCloseButton)
             Material(
               color: Colors.transparent,
               child: IconButton(
@@ -71,11 +90,11 @@ class SearchTextField extends StatelessWidget {
                 ),
                 splashRadius: 24,
                 onPressed: () {
-                  if (controller!.text.isNotEmpty) {
+                  if (widget.controller!.text.isNotEmpty) {
                     Future.microtask(
                       () => [
-                        controller!.clear(),
-                        if (onChanged != null) onChanged!(''),
+                        widget.controller!.clear(),
+                        if (widget.onChanged != null) widget.onChanged!(''),
                       ],
                     );
                   }
