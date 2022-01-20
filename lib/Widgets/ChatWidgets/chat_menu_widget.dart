@@ -20,7 +20,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   List<String> chatMoreMenuTitles = [
     "Search",
     "Clear History",
-    "Mute Notifications",
+    "Mute",
     "Delete Chat"
   ];
   List<String> chatMoreMenuIcons = [
@@ -52,7 +52,11 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
               }
             }
             break;
-          case "Mute Notifications":
+          case "Mute":
+            widget.channel.mute();
+            break;
+          case "UnMute":
+            widget.channel.unmute();
             break;
           case "Delete Chat":
             _showDeleteChatDialog();
@@ -68,6 +72,19 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       dropdownItemHeight: 30,
       dropdownItemGap: 10,
       labelIconGap: 15,
+      onOpen: (open) {
+        if (widget.channel.isMuted) {
+          setState(() {
+            chatMoreMenuTitles[2] = "UnMute";
+            fillMenu();
+          });
+        } else {
+          setState(() {
+            chatMoreMenuTitles[2] = "Mute";
+            fillMenu();
+          });
+        }
+      },
       dropdownItemTopGap: 0,
       resultIcon: SizedBox(
         width: 21,
@@ -109,6 +126,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   }
 
   void fillMenu() {
+    chatMoreMenu.clear();
     for (var i = 0; i < chatMoreMenuTitles.length; i++) {
       chatMoreMenu.add({
         'label': chatMoreMenuTitles[i],
