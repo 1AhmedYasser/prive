@@ -5,9 +5,11 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ChatMenuWidget extends StatefulWidget {
   final Channel channel;
+  final Function(int) onOptionSelected;
 
   const ChatMenuWidget({
     required this.channel,
+    required this.onOptionSelected,
     Key? key,
   }) : super(key: key);
 
@@ -40,10 +42,12 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   Widget build(BuildContext context) {
     return CoolDropdown(
       dropdownList: chatMoreMenu,
+      isAnimation: false,
       dropdownItemPadding: EdgeInsets.zero,
       onChange: (dropdownItem) {
         switch (dropdownItem['value']) {
           case "Search":
+            widget.onOptionSelected(1);
             break;
           case "Clear History":
             for (Message message in widget.channel.state?.messages ?? []) {

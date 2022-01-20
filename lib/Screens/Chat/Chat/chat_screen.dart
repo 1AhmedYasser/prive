@@ -22,6 +22,7 @@ import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -63,6 +64,8 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isMessageSelectionOn = false;
   List<Message> selectedMessages = [];
   int randomNumber = Random().nextInt(3);
+  bool isMessageSearchOn = false;
+  TextEditingController _messageSearchController = TextEditingController();
 
   @override
   void initState() {
@@ -108,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
           ),
-          title: !isMessageSelectionOn
+          title: !isMessageSelectionOn && !isMessageSearchOn
               ? Row(
                   children: [
                     GestureDetector(
@@ -221,21 +224,35 @@ class _ChatScreenState extends State<ChatScreen> {
                     )
                   ],
                 )
-              : selectedMessages.isNotEmpty
+              : isMessageSearchOn == true
                   ? Row(
                       children: [
-                        Text(
-                          "${selectedMessages.length}",
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 17),
+                        Expanded(
+                          child: SearchTextField(
+                            controller: _messageSearchController,
+                            showCloseButton:
+                                _messageSearchController.text.isNotEmpty
+                                    ? true
+                                    : false,
+                          ),
                         ),
                       ],
                     )
-                  : const Text(
-                      "Select Messages",
-                      style: TextStyle(color: Colors.black, fontSize: 17),
-                    ),
-          actions: !isMessageSelectionOn
+                  : selectedMessages.isNotEmpty
+                      ? Row(
+                          children: [
+                            Text(
+                              "${selectedMessages.length}",
+                              style: const TextStyle(
+                                  color: Colors.black, fontSize: 17),
+                            ),
+                          ],
+                        )
+                      : const Text(
+                          "Select Messages",
+                          style: TextStyle(color: Colors.black, fontSize: 17),
+                        ),
+          actions: isMessageSelectionOn == false && isMessageSearchOn == false
               ? [
                   GestureDetector(
                     onTap: () {
@@ -289,78 +306,108 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 20),
                   ChatMenuWidget(
                     channel: widget.channel,
+                    onOptionSelected: (option) {
+                      if (option == 1) {
+                        setState(() {
+                          isMessageSearchOn = true;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(width: 20),
                 ]
-              : [
-                  GestureDetector(
-                    child: Icon(
-                      Icons.ios_share,
-                      color: selectedMessages.isEmpty
-                          ? Colors.grey.withOpacity(0.4)
-                          : const Color(0xff7a8fa6),
-                    ),
-                    onTap: () {
-                      if (selectedMessages.isNotEmpty) {
-                        String shareText = "";
-                        for (var message in selectedMessages) {
-                          shareText +=
-                              "${message.user?.name}, [${DateFormat('MMM dd, yyyy').format(message.createdAt.toLocal())} at ${DateFormat('hh:mm a').format(message.createdAt.toLocal())}]\n${message.text}\n\n";
-                        }
-                        Share.share(shareText);
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 25),
-                  GestureDetector(
-                    child: Image.asset(
-                      R.images.forwardIcon,
-                      color: selectedMessages.isEmpty
-                          ? Colors.grey.withOpacity(0.4)
-                          : null,
-                      width: 20.5,
-                    ),
-                    onTap: () {
-                      if (selectedMessages.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ForwardScreen(
-                              selectedMessages: selectedMessages,
+              : isMessageSearchOn
+                  ? [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isMessageSearchOn = false;
+                                });
+                              },
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor),
+                              ),
                             ),
-                          ),
-                        ).then((value) {
-                          setState(() {
-                            selectedMessages.clear();
-                            isMessageSelectionOn = false;
-                          });
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 30),
-                  GestureDetector(
-                    child: Image.asset(
-                      R.images.deleteChatImage,
-                      color: selectedMessages.isEmpty
-                          ? Colors.grey.withOpacity(0.4)
-                          : null,
-                      width: 16.5,
-                    ),
-                    onTap: () {
-                      if (selectedMessages.isNotEmpty) {
-                        for (var message in selectedMessages) {
-                          widget.channel.deleteMessage(message);
-                        }
-                        setState(() {
-                          selectedMessages.clear();
-                          isMessageSelectionOn = false;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 25),
-                ],
+                          ],
+                        ),
+                      )
+                    ]
+                  : [
+                      GestureDetector(
+                        child: Icon(
+                          Icons.ios_share,
+                          color: selectedMessages.isEmpty
+                              ? Colors.grey.withOpacity(0.4)
+                              : const Color(0xff7a8fa6),
+                        ),
+                        onTap: () {
+                          if (selectedMessages.isNotEmpty) {
+                            String shareText = "";
+                            for (var message in selectedMessages) {
+                              shareText +=
+                                  "${message.user?.name}, [${DateFormat('MMM dd, yyyy').format(message.createdAt.toLocal())} at ${DateFormat('hh:mm a').format(message.createdAt.toLocal())}]\n${message.text}\n\n";
+                            }
+                            Share.share(shareText);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 25),
+                      GestureDetector(
+                        child: Image.asset(
+                          R.images.forwardIcon,
+                          color: selectedMessages.isEmpty
+                              ? Colors.grey.withOpacity(0.4)
+                              : null,
+                          width: 20.5,
+                        ),
+                        onTap: () {
+                          if (selectedMessages.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ForwardScreen(
+                                  selectedMessages: selectedMessages,
+                                ),
+                              ),
+                            ).then((value) {
+                              setState(() {
+                                selectedMessages.clear();
+                                isMessageSelectionOn = false;
+                              });
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 30),
+                      GestureDetector(
+                        child: Image.asset(
+                          R.images.deleteChatImage,
+                          color: selectedMessages.isEmpty
+                              ? Colors.grey.withOpacity(0.4)
+                              : null,
+                          width: 16.5,
+                        ),
+                        onTap: () {
+                          if (selectedMessages.isNotEmpty) {
+                            for (var message in selectedMessages) {
+                              widget.channel.deleteMessage(message);
+                            }
+                            setState(() {
+                              selectedMessages.clear();
+                              isMessageSelectionOn = false;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 25),
+                    ],
         ),
       ),
       body: Column(

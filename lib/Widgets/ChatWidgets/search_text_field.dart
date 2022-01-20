@@ -42,16 +42,10 @@ class SearchTextField extends StatelessWidget {
               decoration: InputDecoration(
                 prefixText: '    ',
                 prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 8,
-                    right: 8,
-                  ),
-                  child: StreamSvgIcon.search(
-                    color:
-                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                    size: 24,
-                  ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  size: 23,
+                  color: Colors.grey,
                 ),
                 hintText: hintText,
                 hintStyle: StreamChatTheme.of(context).textTheme.body.copyWith(
