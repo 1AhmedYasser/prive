@@ -17,6 +17,8 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends State<ContactsScreen> {
   List<Contact> _contacts = [];
   bool _permissionDenied = false;
+  List<Contact> phoneContacts = [];
+  List<String> phoneNumbers = [];
 
   @override
   void initState() {
@@ -34,9 +36,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: _contacts.isNotEmpty
           ? UsersBloc(
               child: UserListView(
+                pullToRefresh: false,
                 filter: Filter.and([
                   Filter.notEqual("id", context.currentUser!.id),
                   Filter.notEqual("role", "admin"),
+                  Filter.in_('phone', phoneNumbers),
                 ]),
                 sort: const [
                   SortOption(
@@ -74,11 +78,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   Future _fetchContacts() async {
+    phoneContacts.clear();
+    phoneNumbers.clear();
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
     } else {
-      final contacts = await FlutterContacts.getContacts();
-      setState(() => _contacts = contacts);
+      phoneContacts = await FlutterContacts.getContacts(withProperties: true);
+      for (var contact in phoneContacts) {
+        for (var phone in contact.phones) {
+          phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+        }
+      }
+      setState(() => _contacts = phoneContacts);
     }
   }
 }

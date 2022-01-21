@@ -234,8 +234,20 @@ class _ChatScreenState extends State<ChatScreen> {
                             controller: _messageSearchController,
                             autoFocus: true,
                             closeOnSearch: false,
-                            onChanged: (keyword) {
-                              setState(() {});
+                            onChanged: (keyword) async {
+                              if (keyword.isNotEmpty) {
+                                SearchMessagesResponse messages =
+                                    await channel.search(query: keyword);
+
+                                if (messages.results.isNotEmpty) {
+                                  messages.results.forEach((element) {
+                                    print(element.message.text);
+                                  });
+                                }
+
+                                // messages.results
+                                // setState(() {});
+                              }
                             },
                             showCloseButton:
                                 _messageSearchController.text.isNotEmpty
@@ -582,7 +594,7 @@ class _ChatScreenState extends State<ChatScreen> {
           if (isMessageSearchOn)
             Container(
               height: 50,
-              color: const Color(0xffd0d4da).withOpacity(0.9),
+              color: const Color(0xffd0d4da).withOpacity(0.7),
               child: Row(
                 children: [
                   Padding(

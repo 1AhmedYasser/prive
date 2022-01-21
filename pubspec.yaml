@@ -58,6 +58,7 @@ dependencies:
   cool_dropdown: ^1.4.1
   blur: ^3.0.0
   community_material_icon: ^5.9.55
+  phone_number: ^0.12.0+1
 
   # Utils
   supercharged: ^2.1.1
