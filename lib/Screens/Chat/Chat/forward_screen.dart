@@ -59,13 +59,13 @@ class _ForwardScreenState extends State<ForwardScreen> {
       ),
       body: Column(
         children: [
-          SearchTextField(
-            controller: searchController,
-            showCloseButton: searchController.text.isNotEmpty ? true : false,
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
+          // SearchTextField(
+          //   controller: searchController,
+          //   showCloseButton: searchController.text.isNotEmpty ? true : false,
+          //   onChanged: (value) {
+          //     setState(() {});
+          //   },
+          // ),
           Expanded(
             child: ChannelsBloc(
               child: ChannelListView(

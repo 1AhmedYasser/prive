@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
@@ -15,9 +14,8 @@ class ContactsScreen extends StatefulWidget {
 }
 
 class _ContactsScreenState extends State<ContactsScreen> {
-  List<Contact> _contacts = [];
   bool _permissionDenied = false;
-  List<Contact> phoneContacts = [];
+  var phoneContacts = [];
   List<String> phoneNumbers = [];
 
   @override
@@ -33,7 +31,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: const PriveAppBar(title: "New Message"),
       ),
-      body: _contacts.isNotEmpty
+      body: phoneContacts.isNotEmpty
           ? UsersBloc(
               child: UserListView(
                 pullToRefresh: false,
@@ -89,7 +87,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
         }
       }
-      setState(() => _contacts = phoneContacts);
+      setState(() {});
     }
   }
 }

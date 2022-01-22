@@ -26,6 +26,7 @@ import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:stream_chat_flutter/scrollable_positioned_list/src/scrollable_positioned_list.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -64,10 +65,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
   bool isMessageSelectionOn = false;
   List<Message> selectedMessages = [];
+  List<Message> searchedMessages = [];
+  int selectedSearchIndex = 0;
   int randomNumber = Random().nextInt(3);
   bool isMessageSearchOn = false;
   final TextEditingController _messageSearchController =
       TextEditingController();
+  ItemScrollController scrollController = ItemScrollController();
 
   @override
   void initState() {
@@ -235,18 +239,34 @@ class _ChatScreenState extends State<ChatScreen> {
                             autoFocus: true,
                             closeOnSearch: false,
                             onChanged: (keyword) async {
+                              searchedMessages.clear();
                               if (keyword.isNotEmpty) {
-                                SearchMessagesResponse messages =
+                                SearchMessagesResponse response =
                                     await channel.search(query: keyword);
-
-                                if (messages.results.isNotEmpty) {
-                                  messages.results.forEach((element) {
-                                    print(element.message.text);
-                                  });
+                                for (var value in response.results) {
+                                  searchedMessages.add(value.message);
                                 }
-
-                                // messages.results
+                                setState(() {});
+                                //   searchedMessages = channel.state?.messages
+                                //           .where((element) =>
+                                //               element.text
+                                //                   ?.toLowerCase()
+                                //                   .contains(
+                                //                       keyword.toLowerCase()) ??
+                                //               false)
+                                //           .toList() ??
+                                //       [];
+                                // }
                                 // setState(() {});
+                                // if (searchedMessages.isNotEmpty) {
+                                //   int index = channel.state!.messages
+                                //       .indexOf(searchedMessages[0]);
+                                //   scrollController.scrollTo(
+                                //     index: index,
+                                //     curve: Curves.bounceInOut,
+                                //     duration: const Duration(milliseconds: 300),
+                                //   );
+                                // }
                               }
                             },
                             showCloseButton:
@@ -328,6 +348,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     onOptionSelected: (option) {
                       if (option == 1) {
                         setState(() {
+                          _messageSearchController.text = "";
                           isMessageSearchOn = true;
                         });
                       }
@@ -473,7 +494,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                       ),
                       child: MessageListView(
-                        highlightInitialMessage: false,
+                        scrollController: scrollController,
                         dateDividerBuilder: (date) {
                           return SizedBox(
                             height: 60,
@@ -612,6 +633,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         ? Theme.of(context).primaryColorDark
                         : Colors.grey.shade400,
                   ),
+                  if (searchedMessages.isNotEmpty) const SizedBox(width: 40),
+                  if (searchedMessages.isNotEmpty)
+                    Text(
+                      "1 of ${searchedMessages.length} Matches",
+                      style:
+                          TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                    )
                 ],
               ),
             ),
