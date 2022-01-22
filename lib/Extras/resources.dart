@@ -72,6 +72,7 @@ class Images {
   String newSecretChatImage = "$path/new_secret_chat_image.png";
   String closeCall = "$path/close_call.png";
   String forwardIcon = "$path/forward_icon.png";
+  String noInternetImage = "$path/no_internet_image.png";
 }
 
 class Animations {
@@ -104,6 +105,7 @@ class SharedPref {
   String userImage = "user_image";
   String facebookId = "facebook_Id";
   String googleId = "google_Id";
+  String internetAlert = "internet_alert";
   String chosenChatBackground = "chosen_chat_background";
   String isChosenChatBackgroundAFile = "is_chosen_chat_background_a_file";
 }

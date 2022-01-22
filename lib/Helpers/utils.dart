@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
@@ -226,6 +227,31 @@ class Utils {
   static Future<String?> getString(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
+  }
+
+  static Future<void> showNoInternetConnection(BuildContext context) async {
+    return showDialog(
+      barrierColor: Colors.white,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                side: BorderSide(color: Colors.white, width: 1.0)),
+            content: EmptyStateWidget(
+              image: R.images.noInternetImage,
+              title: "No Internet Connection".tr(),
+              description: "Please check your connection or try again".tr(),
+              onButtonPressed: () {
+                Utils.saveBool(R.pref.internetAlert, false);
+                Navigator.pop(context);
+              },
+              buttonText: "Try Again".tr(),
+            ));
+      },
+    );
   }
 
   static String getLatestMessageDate(DateTime data) {
