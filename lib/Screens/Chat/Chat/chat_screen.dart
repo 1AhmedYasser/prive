@@ -466,41 +466,44 @@ class _ChatScreenState extends State<ChatScreen> {
                                   fit: BoxFit.fill,
                                 ),
                         ),
-                        child: Center(
-                          child: IgnorePointer(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width / 1.8,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .primaryColorDark
-                                    .withOpacity(0.65),
-                                borderRadius: BorderRadius.circular(17),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Text(
-                                      "No Messages Yet!",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18,
+                        child: isMessageSearchOn
+                            ? const SizedBox.shrink()
+                            : Center(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 1.8,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .primaryColorDark
+                                          .withOpacity(0.65),
+                                      borderRadius: BorderRadius.circular(17),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "No Messages Yet!",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          SizedBox(
+                                            width: 120,
+                                            height: 120,
+                                            child: _buildLottieAnimation(),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(height: 20),
-                                    SizedBox(
-                                      width: 120,
-                                      height: 120,
-                                      child: _buildLottieAnimation(),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
                       );
                     },
                     errorBuilder: (context, error) => Container(),
