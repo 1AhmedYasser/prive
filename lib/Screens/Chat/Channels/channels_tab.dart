@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
@@ -49,12 +50,10 @@ class _ChannelsTabState extends State<ChannelsTab>
         separatorBuilder: (context, index) => const SizedBox.shrink(),
         emptyBuilder: (context) =>
             ChannelsEmptyState(animationController: _animationController),
-        errorBuilder: (context, error) => Center(
-          child: Text(
-            'Error: $error',
-            textAlign: TextAlign.center,
-          ),
-        ),
+        errorBuilder: (context, widget) {
+          Utils.checkForInternetConnection(context);
+          return const SizedBox.shrink();
+        },
         loadingBuilder: (context) => const UltraLoadingIndicator(),
         onChannelTap: (channel, w) {
           Navigator.of(context).push(

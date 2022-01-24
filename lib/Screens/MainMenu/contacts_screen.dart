@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
@@ -20,6 +21,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   void initState() {
+    Utils.checkForInternetConnection(context);
     _fetchContacts();
     super.initState();
   }
@@ -49,6 +51,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 limit: 25,
                 onUserTap: (user, widget) {
                   createChannel(context, user);
+                },
+                errorBuilder: (context, widget) {
+                  return const SizedBox.shrink();
                 },
                 loadingBuilder: (context) => const UltraLoadingIndicator(),
               ),

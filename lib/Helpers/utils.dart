@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
@@ -227,6 +228,12 @@ class Utils {
   static Future<String?> getString(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
+  }
+
+  static void checkForInternetConnection(BuildContext context) async {
+    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+      Utils.showNoInternetConnection(context);
+    }
   }
 
   static Future<void> showNoInternetConnection(BuildContext context) async {
