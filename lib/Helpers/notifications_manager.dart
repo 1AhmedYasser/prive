@@ -263,6 +263,7 @@ class NotificationsManager {
     }
 
     if (type != "call") {
+      print(message.from);
       if (Platform.isAndroid == true) {
         var androidDetails = const AndroidNotificationDetails("id", "channel",
             channelDescription: "description",
