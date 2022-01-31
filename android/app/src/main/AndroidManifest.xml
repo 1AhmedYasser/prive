@@ -30,6 +30,11 @@
 
     <application
         android:name="androidx.multidex.MultiDexApplication"
+        android:networkSecurityConfig="@xml/sec"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="false"
+        android:fullBackupOnly="false"
         android:icon="@mipmap/launcher_icon"
         android:label="Prive">
         <meta-data

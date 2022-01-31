@@ -8,9 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:uuid/uuid.dart';
 
 import 'Utils.dart';
@@ -20,6 +21,7 @@ class NotificationsManager {
   static late BuildContext notificationsContext;
   static final FlutterCallkeep _callKeep = FlutterCallkeep();
   static bool _callKeepInitiated = false;
+  static RemoteMessage? storedBackgroundMessage;
   static Map<String, dynamic> callKeepSetupMap = {
     'ios': {
       'appName': 'CallKeepDemo',
@@ -50,9 +52,9 @@ class NotificationsManager {
 
   static void getToken() {
     FirebaseMessaging.instance.getToken().then((token) async {
-      StreamChat.of(notificationsContext)
+      stream.StreamChat.of(notificationsContext)
           .client
-          .addDevice(token ?? "", PushProvider.firebase);
+          .addDevice(token ?? "", stream.PushProvider.firebase);
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
@@ -92,8 +94,8 @@ class NotificationsManager {
     if (initialMessage != null) {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
-      Channel? channel;
-      final channels = await StreamChatCore.of(notificationsContext)
+      stream.Channel? channel;
+      final channels = await stream.StreamChatCore.of(notificationsContext)
           .client
           .queryChannels()
           .last;
@@ -115,8 +117,8 @@ class NotificationsManager {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       Map<String, dynamic> channelData =
           Map<String, dynamic>.from(json.decode(message.data["channel"]));
-      Channel? channel;
-      StreamChatCore.of(notificationsContext)
+      stream.Channel? channel;
+      stream.StreamChatCore.of(notificationsContext)
           .client
           .state
           .channels
@@ -134,72 +136,134 @@ class NotificationsManager {
   }
 
   static Future<dynamic> onSelectNotification(String? notification) async {
+    print("hi nnnnnnnnnn ${storedBackgroundMessage?.data}");
+    if (storedBackgroundMessage?.data.isNotEmpty ?? false) {
+      final client = stream.StreamChatClient(R.constants.streamKey);
+      await client.connectUser(
+        stream.User(
+          id: await Utils.getString(R.pref.userId) ?? "",
+          extraData: {
+            'name': await Utils.getString(R.pref.userName),
+            'image': await Utils.getString(R.pref.userImage),
+            'phone': await Utils.getString(R.pref.userPhone),
+          },
+        ),
+        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
+      );
+
+      stream.Channel? channel;
+      stream.StreamChatCore.of(notificationsContext)
+          .client
+          .state
+          .channels
+          .forEach((key, value) {
+        if (value.id == storedBackgroundMessage?.data['channel_id']) {
+          channel = value;
+        }
+      });
+      if (channel != null) {
+        Navigator.of(notificationsContext).push(
+          ChatScreen.routeWithChannel(channel!),
+        );
+      }
+    } else {
+      print("no");
+    }
     // When Selecting the notification
   }
 
   static Future<void> firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
-    var payload = message.data;
-    String type = payload['type'];
-    if (type == "call") {
-      var callerId = payload['caller_id'] as String;
-      var channelName = payload['channel_name'] as String;
-      var uuid = payload['uuid'] as String;
-      var hasVideo = payload['has_video'] == "true";
+      RemoteMessage backgroundMessage) async {
+    storedBackgroundMessage = backgroundMessage;
+    print("hhhh  ${storedBackgroundMessage?.data}");
+    if (backgroundMessage.data.isNotEmpty) {
+      // final data = message.data;
+      final messageId = backgroundMessage.data['message_id'];
+      // final channelId = data['channel_id'];
+      // final channelType = data['channel_type'];
+      // final cid = '$channelType:$channelId';
+      //
+      final client = stream.StreamChatClient(R.constants.streamKey);
+      await client.connectUser(
+        stream.User(
+          id: await Utils.getString(R.pref.userId) ?? "",
+          extraData: {
+            'name': await Utils.getString(R.pref.userName),
+            'image': await Utils.getString(R.pref.userImage),
+            'phone': await Utils.getString(R.pref.userPhone),
+          },
+        ),
+        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
+      );
 
-      final callUUID = const Uuid().v4();
-      _callKeep.on(CallKeepPerformAnswerCallAction(),
-          (CallKeepPerformAnswerCallAction event) {
-        Navigator.of(notificationsContext).push(
-          PageRouteBuilder(
-            pageBuilder: (BuildContext context, _, __) {
-              return CallScreen(
-                channelName: channelName,
-                isJoining: true,
-              );
-            },
-            transitionsBuilder:
-                (_, Animation<double> animation, __, Widget child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
+      final stream.Message message =
+          await client.getMessage(messageId).then((res) => res.message);
+      initializeNotifications();
+      await _showLocalNotification(
+          title: message.user?.name ?? "", body: message.text ?? "");
+    } else {
+      var payload = backgroundMessage.data;
+      String type = payload['type'];
+      if (type == "call") {
+        var callerId = payload['caller_id'] as String;
+        var channelName = payload['channel_name'] as String;
+        var uuid = payload['uuid'] as String;
+        var hasVideo = payload['has_video'] == "true";
 
-        // print(
-        //     'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
-        // Timer(const Duration(seconds: 1), () {
-        //   print(
-        //       '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
-        //   _callKeep.setCurrentCallActive(callUUID);
-        // });
-        //_callKeep.endCall(event.callUUID);
-      });
+        final callUUID = const Uuid().v4();
+        _callKeep.on(CallKeepPerformAnswerCallAction(),
+            (CallKeepPerformAnswerCallAction event) {
+          Navigator.of(notificationsContext).push(
+            PageRouteBuilder(
+              pageBuilder: (BuildContext context, _, __) {
+                return CallScreen(
+                  channelName: channelName,
+                  isJoining: true,
+                );
+              },
+              transitionsBuilder:
+                  (_, Animation<double> animation, __, Widget child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+            ),
+          );
 
-      _callKeep.on(CallKeepPerformEndCallAction(),
-          (CallKeepPerformEndCallAction event) {
-        print(
-            'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
-      });
-      if (!_callKeepInitiated) {
-        if (Platform.isAndroid) {
-          final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-          if (hasPhoneAccount == false) {
-            await _callKeep.hasDefaultPhoneAccount(
-                notificationsContext, callKeepSetupMap);
+          // print(
+          //     'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callUUID}');
+          // Timer(const Duration(seconds: 1), () {
+          //   print(
+          //       '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
+          //   _callKeep.setCurrentCallActive(callUUID);
+          // });
+          //_callKeep.endCall(event.callUUID);
+        });
+
+        _callKeep.on(CallKeepPerformEndCallAction(),
+            (CallKeepPerformEndCallAction event) {
+          print(
+              'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+        });
+        if (!_callKeepInitiated) {
+          if (Platform.isAndroid) {
+            final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+            if (hasPhoneAccount == false) {
+              await _callKeep.hasDefaultPhoneAccount(
+                  notificationsContext, callKeepSetupMap);
+            }
           }
+          _callKeep.setup(notificationsContext, callKeepSetupMap,
+              backgroundMode: true);
+          _callKeepInitiated = true;
         }
-        _callKeep.setup(notificationsContext, callKeepSetupMap,
-            backgroundMode: true);
-        _callKeepInitiated = true;
-      }
 
-      print('backgroundMessage: displayIncomingCall ($callerId)');
-      _callKeep.displayIncomingCall(callUUID, callerId,
-          localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
-      _callKeep.backToForeground();
+        print('backgroundMessage: displayIncomingCall ($callerId)');
+        _callKeep.displayIncomingCall(callUUID, callerId,
+            localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
+        _callKeep.backToForeground();
+      }
     }
     return;
   }
@@ -221,7 +285,6 @@ class NotificationsManager {
     print(message.data);
     var payload = message.data;
     var type = payload['type'] as String;
-    print("type $type");
     if (type == "call") {
       var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
@@ -263,29 +326,42 @@ class NotificationsManager {
     }
 
     if (type != "call") {
-      print(message.from);
-      if (Platform.isAndroid == true) {
-        var androidDetails = const AndroidNotificationDetails("id", "channel",
-            channelDescription: "description",
-            priority: Priority.high,
-            importance: Importance.max,
-            icon: "appicon");
-        await notificationPlugin.show(0, notification.title, notification.body,
-            NotificationDetails(android: androidDetails));
+      if (type == "message.new") {
+        print("New Message");
       } else {
-        await notificationPlugin.show(
-          0,
-          notification.title,
-          notification.body,
-          const NotificationDetails(
-            iOS: IOSNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            ),
-          ),
-        );
+        await _showLocalNotification(notification: notification);
       }
+    }
+  }
+
+  static Future<void> _showLocalNotification(
+      {BaseNotification? notification,
+      String title = "",
+      String body = ""}) async {
+    if (Platform.isAndroid == true) {
+      var androidDetails = const AndroidNotificationDetails("id", "channel",
+          channelDescription: "description",
+          priority: Priority.high,
+          importance: Importance.max,
+          icon: "launcher_icon");
+      await notificationPlugin.show(
+          0,
+          notification?.title ?? title,
+          notification?.body ?? body,
+          NotificationDetails(android: androidDetails));
+    } else {
+      await notificationPlugin.show(
+        0,
+        notification?.title ?? title,
+        notification?.body ?? body,
+        const NotificationDetails(
+          iOS: IOSNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+      );
     }
   }
 }
