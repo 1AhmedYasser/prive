@@ -169,7 +169,6 @@ class NotificationsManager {
     } else {
       print("no");
     }
-    // When Selecting the notification
   }
 
   static Future<void> firebaseMessagingBackgroundHandler(

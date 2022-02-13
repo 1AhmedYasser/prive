@@ -58,6 +58,8 @@ dependencies:
   cool_dropdown: ^1.4.1
   blur: ^3.0.0
   community_material_icon: ^5.9.55
+  country_dial_code: ^1.1.2
+  phone_numbers_parser: ^4.2.0
 
   # Utils
   supercharged: ^2.1.1

@@ -1,3 +1,4 @@
+import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -6,6 +7,7 @@ import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({Key? key}) : super(key: key);
@@ -18,11 +20,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
   bool _permissionDenied = false;
   var phoneContacts = [];
   List<String> phoneNumbers = [];
+  String? deviceCountryCode =
+      WidgetsBinding.instance?.window.locale.countryCode;
+  CountryDialCode? deviceDialCode;
 
   @override
   void initState() {
     Utils.checkForInternetConnection(context);
     _fetchContacts();
+    deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     super.initState();
   }
 
@@ -89,7 +95,16 @@ class _ContactsScreenState extends State<ContactsScreen> {
       phoneContacts = await FlutterContacts.getContacts(withProperties: true);
       for (var contact in phoneContacts) {
         for (var phone in contact.phones) {
-          phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+          try {
+            PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
+            phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+          } catch (e) {
+            String dialCode = deviceDialCode?.dialCode == "+20"
+                ? "+2"
+                : deviceDialCode?.dialCode ?? "";
+            phoneNumbers
+                .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+          }
         }
       }
       setState(() {});
