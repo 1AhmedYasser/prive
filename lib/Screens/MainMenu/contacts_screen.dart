@@ -116,7 +116,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
         for (var phone in contact.phones) {
           try {
             PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
-            phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+            if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
+                phone.number.trim().replaceAll(" ", "").startsWith("010") ||
+                phone.number.trim().replaceAll(" ", "").startsWith("012")) {
+              String dialCode = deviceDialCode?.dialCode == "+20"
+                  ? "+2"
+                  : deviceDialCode?.dialCode ?? "";
+              phoneNumbers
+                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            } else {
+              phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+            }
           } catch (e) {
             String dialCode = deviceDialCode?.dialCode == "+20"
                 ? "+2"
