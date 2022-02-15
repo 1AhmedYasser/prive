@@ -9,7 +9,6 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChannelsListWidget extends StatefulWidget {
   final List<Channel> channels;
-
   const ChannelsListWidget({Key? key, required this.channels})
       : super(key: key);
 

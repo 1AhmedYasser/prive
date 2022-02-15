@@ -54,7 +54,9 @@ class _ImportantTabState extends State<ImportantTab>
             channels.where((element) => element.lastMessageAt != null).toList();
         return channels.isEmpty
             ? ChannelsEmptyState(animationController: _animationController)
-            : ChannelsListWidget(channels: channels);
+            : ChannelsListWidget(
+                channels: channels,
+              );
       },
     );
   }

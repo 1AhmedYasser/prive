@@ -65,7 +65,9 @@ class _ChannelsTabState extends State<ChannelsTab>
               .where((channel) => channel.state?.messages.isNotEmpty ?? false)
               .toList();
           return channels.isNotEmpty
-              ? ChannelsListWidget(channels: channels)
+              ? ChannelsListWidget(
+                  channels: channels,
+                )
               : ChannelsEmptyState(animationController: _animationController);
         },
       ),

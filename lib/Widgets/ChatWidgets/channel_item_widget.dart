@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:stream_chat_flutter/src/extension.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:collection/collection.dart';
@@ -46,12 +47,72 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Expanded(
-                          child: ChannelName(
-                            textStyle: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18.5,
-                            ),
+                        Expanded(
+                          child: BetterStreamBuilder<String>(
+                            stream: widget.channel.nameStream,
+                            initialData: widget.channel.name,
+                            builder: (context, channelName) {
+                              print("Name $channelName");
+                              return Text(
+                                channelName,
+                                style: const TextStyle(color: Colors.black),
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
+                            noDataBuilder: (context) {
+                              TextStyle textStyle = const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              );
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  var channelName =
+                                      context.translations.noTitleText;
+                                  final otherMembers =
+                                      widget.channel.state!.members.where(
+                                    (member) =>
+                                        member.userId !=
+                                        context.currentUser?.id,
+                                  );
+
+                                  if (otherMembers.isNotEmpty) {
+                                    if (otherMembers.length == 1) {
+                                      final user = otherMembers.first.user;
+                                      if (user != null) {
+                                        channelName = user.name;
+                                      }
+                                    } else {
+                                      final maxWidth = constraints.maxWidth;
+                                      final maxChars =
+                                          maxWidth / (textStyle.fontSize ?? 1);
+                                      var currentChars = 0;
+                                      final currentMembers = <Member>[];
+                                      otherMembers.forEach((element) {
+                                        final newLength = currentChars +
+                                            (element.user?.name.length ?? 0);
+                                        if (newLength < maxChars) {
+                                          currentChars = newLength;
+                                          currentMembers.add(element);
+                                        }
+                                      });
+
+                                      final exceedingMembers =
+                                          otherMembers.length -
+                                              currentMembers.length;
+                                      channelName =
+                                          '${currentMembers.map((e) => e.user?.name).join(', ')} '
+                                          '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
+                                    }
+                                  }
+
+                                  return Text(
+                                    channelName,
+                                    style: textStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
                         if (!widget.isForward)

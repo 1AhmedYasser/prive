@@ -53,7 +53,9 @@ class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {
             channels.where((element) => element.lastMessageAt != null).toList();
         return channels.isEmpty
             ? ChannelsEmptyState(animationController: _animationController)
-            : ChannelsListWidget(channels: channels);
+            : ChannelsListWidget(
+                channels: channels,
+              );
       },
     );
   }
