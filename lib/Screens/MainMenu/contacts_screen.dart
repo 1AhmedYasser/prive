@@ -1,6 +1,7 @@
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
@@ -28,8 +29,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
   void initState() {
     Utils.checkForInternetConnection(context);
     _fetchContacts();
+
+    getCountry();
+    if (deviceCountryCode?.isEmpty == true) {
+      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+    }
+
     deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     super.initState();
+  }
+
+  void getCountry() async {
+    deviceCountryCode = await FlutterSimCountryCode.simCountryCode;
   }
 
   @override

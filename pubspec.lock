@@ -558,7 +558,7 @@ packages:
     source: hosted
     version: "4.0.0"
   flutter_sim_country_code:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_sim_country_code
       url: "https://pub.dartlang.org"
