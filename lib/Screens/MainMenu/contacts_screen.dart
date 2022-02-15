@@ -31,16 +31,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
     _fetchContacts();
 
     getCountry();
+
+    super.initState();
+  }
+
+  void getCountry() async {
+    deviceCountryCode =
+        (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
     if (deviceCountryCode?.isEmpty == true) {
       deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
     }
 
     deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    super.initState();
-  }
-
-  void getCountry() async {
-    deviceCountryCode = await FlutterSimCountryCode.simCountryCode;
   }
 
   @override
