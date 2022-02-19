@@ -83,6 +83,7 @@ dependencies:
       path: packages/stream_chat_flutter
       url: https://github.com/1AhmedYasser/stream-chat-flutter.git
       ref: develop
+  stream_chat_persistence: ^3.1.0
 
   # Agora
   agora_rtc_engine: ^4.0.7

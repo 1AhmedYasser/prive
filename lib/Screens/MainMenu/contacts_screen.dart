@@ -28,7 +28,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   void initState() {
     Utils.checkForInternetConnection(context);
-    _fetchContacts();
+    //_fetchContacts();
 
     getCountry();
 
@@ -58,32 +58,56 @@ class _ContactsScreenState extends State<ContactsScreen> {
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: const PriveAppBar(title: "New Message"),
       ),
-      body: phoneContacts.isNotEmpty
-          ? UsersBloc(
-              child: UserListView(
-                pullToRefresh: false,
-                filter: Filter.and([
-                  Filter.notEqual("id", context.currentUser!.id),
-                  Filter.notEqual("role", "admin"),
-                  Filter.in_('phone', phoneNumbers),
-                ]),
-                sort: const [
-                  SortOption(
-                    'name',
-                    direction: 1,
-                  ),
-                ],
-                limit: 25,
-                onUserTap: (user, widget) {
-                  createChannel(context, user);
-                },
-                errorBuilder: (context, widget) {
-                  return const SizedBox.shrink();
-                },
-                loadingBuilder: (context) => const UltraLoadingIndicator(),
-              ),
-            )
-          : const UltraLoadingIndicator(),
+      body: UsersBloc(
+        child: UserListView(
+          pullToRefresh: false,
+          filter: Filter.and([
+            Filter.notEqual("id", context.currentUser!.id),
+            Filter.notEqual("role", "admin"),
+            //Filter.in_('phone', phoneNumbers),
+          ]),
+          sort: const [
+            SortOption(
+              'name',
+              direction: 1,
+            ),
+          ],
+          limit: 25,
+          onUserTap: (user, widget) {
+            createChannel(context, user);
+          },
+          errorBuilder: (context, widget) {
+            return const SizedBox.shrink();
+          },
+          loadingBuilder: (context) => const UltraLoadingIndicator(),
+        ),
+      ),
+      // body: phoneContacts.isNotEmpty
+      //     ? UsersBloc(
+      //         child: UserListView(
+      //           pullToRefresh: false,
+      //           filter: Filter.and([
+      //             Filter.notEqual("id", context.currentUser!.id),
+      //             Filter.notEqual("role", "admin"),
+      //             //Filter.in_('phone', phoneNumbers),
+      //           ]),
+      //           sort: const [
+      //             SortOption(
+      //               'name',
+      //               direction: 1,
+      //             ),
+      //           ],
+      //           limit: 25,
+      //           onUserTap: (user, widget) {
+      //             createChannel(context, user);
+      //           },
+      //           errorBuilder: (context, widget) {
+      //             return const SizedBox.shrink();
+      //           },
+      //           loadingBuilder: (context) => const UltraLoadingIndicator(),
+      //         ),
+      //       )
+      //     : const UltraLoadingIndicator(),
     );
   }
 

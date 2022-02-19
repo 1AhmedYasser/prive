@@ -12,6 +12,7 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
+import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:uuid/uuid.dart';
 
 import 'Utils.dart';
@@ -176,13 +177,14 @@ class NotificationsManager {
     storedBackgroundMessage = backgroundMessage;
     print("hhhh  ${storedBackgroundMessage?.data}");
     if (backgroundMessage.data.isNotEmpty) {
-      // final data = message.data;
       final messageId = backgroundMessage.data['message_id'];
-      // final channelId = data['channel_id'];
-      // final channelType = data['channel_type'];
-      // final cid = '$channelType:$channelId';
-      //
+      final channelId = backgroundMessage.data['channel_id'];
+      final channelType = backgroundMessage.data['channel_type'];
+      final cid = '$channelType$channelId';
       final client = stream.StreamChatClient(R.constants.streamKey);
+      final persistenceClient = StreamChatPersistenceClient();
+      await persistenceClient
+          .connect(await Utils.getString(R.pref.userId) ?? "");
       await client.connectUser(
         stream.User(
           id: await Utils.getString(R.pref.userId) ?? "",
@@ -197,6 +199,9 @@ class NotificationsManager {
 
       final stream.Message message =
           await client.getMessage(messageId).then((res) => res.message);
+
+      await persistenceClient.updateMessages(cid, [message]);
+      persistenceClient.disconnect();
       initializeNotifications();
       await _showLocalNotification(
           title: message.user?.name ?? "", body: message.text ?? "");
