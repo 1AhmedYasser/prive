@@ -182,9 +182,9 @@ class NotificationsManager {
       final channelType = backgroundMessage.data['channel_type'];
       final cid = '$channelType$channelId';
       final client = stream.StreamChatClient(R.constants.streamKey);
-      final persistenceClient = StreamChatPersistenceClient();
-      await persistenceClient
-          .connect(await Utils.getString(R.pref.userId) ?? "");
+      // final persistenceClient = StreamChatPersistenceClient();
+      // await persistenceClient
+      //     .connect(await Utils.getString(R.pref.userId) ?? "");
       await client.connectUser(
         stream.User(
           id: await Utils.getString(R.pref.userId) ?? "",
@@ -200,8 +200,8 @@ class NotificationsManager {
       final stream.Message message =
           await client.getMessage(messageId).then((res) => res.message);
 
-      await persistenceClient.updateMessages(cid, [message]);
-      persistenceClient.disconnect();
+      // await persistenceClient.updateMessages(cid, [message]);
+      // persistenceClient.disconnect();
       initializeNotifications();
       await _showLocalNotification(
           title: message.user?.name ?? "", body: message.text ?? "");

@@ -1,5 +1,4 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:agora_uikit/agora_uikit.dart';
 import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _CallScreenState extends State<CallScreen> {
   final player = AudioPlayer();
   CancelToken cancelToken = CancelToken();
   String channelName = const Uuid().v4();
-  AgoraClient? client;
+  // AgoraClient? client;
   RtcEngine? engine;
   List<String> users = [];
   String usersToCall = "";
@@ -76,22 +75,23 @@ class _CallScreenState extends State<CallScreen> {
         elevation: 0,
       ),
       extendBodyBehindAppBar: true,
-      body: client != null
-          ? Stack(
-              children: [
-                AgoraVideoViewer(
-                  videoRenderMode: VideoRenderMode.FILL,
-                  client: client!,
-                ),
-                AgoraVideoButtons(
-                  client: client!,
-                ),
-              ],
-            )
-          : widget.isJoining
-              ? const UltraLoadingIndicator()
-              : buildCallingState(),
     );
+    //   body: client != null
+    //       ? Stack(
+    //           children: [
+    //             AgoraVideoViewer(
+    //               videoRenderMode: VideoRenderMode.FILL,
+    //               client: client!,
+    //             ),
+    //             AgoraVideoButtons(
+    //               client: client!,
+    //             ),
+    //           ],
+    //         )
+    //       : widget.isJoining
+    //           ? const UltraLoadingIndicator()
+    //           : buildCallingState(),
+    // );
   }
 
   SizedBox buildCallingState() {
@@ -192,35 +192,35 @@ class _CallScreenState extends State<CallScreen> {
     ).then((response) async {
       if (response != null) {
         PriveCall tokenResponse = response;
-        client = AgoraClient(
-          agoraConnectionData: AgoraConnectionData(
-              appId: "666a21c863d9431da1ee9651748608fb",
-              channelName: channelName,
-              tempToken: tokenResponse.data,
-              uid: int.parse(await Utils.getString(R.pref.userId) ?? "0")),
-          enabledPermission: [
-            Permission.camera,
-            Permission.microphone,
-          ],
-          agoraEventHandlers: AgoraEventHandlers(
-            joinChannelSuccess: (String channel, int uid, int elapsed) {
-              print('joinChannelSuccess $channel $uid');
-            },
-            userJoined: (int uid, int elapsed) {
-              print('userJoined $uid');
-            },
-            userOffline: (int uid, UserOfflineReason reason) {
-              print('userOffline $uid');
-            },
-            onError: (error) {
-              // if (error.index == 15) {
-              //   leaveChannel();
-              // }
-              print("error ${error.index}");
-              print("error $error");
-            },
-          ),
-        );
+        // client = AgoraClient(
+        //   agoraConnectionData: AgoraConnectionData(
+        //       appId: "666a21c863d9431da1ee9651748608fb",
+        //       channelName: channelName,
+        //       tempToken: tokenResponse.data,
+        //       uid: int.parse(await Utils.getString(R.pref.userId) ?? "0")),
+        //   enabledPermission: [
+        //     Permission.camera,
+        //     Permission.microphone,
+        //   ],
+        //   agoraEventHandlers: AgoraEventHandlers(
+        //     joinChannelSuccess: (String channel, int uid, int elapsed) {
+        //       print('joinChannelSuccess $channel $uid');
+        //     },
+        //     userJoined: (int uid, int elapsed) {
+        //       print('userJoined $uid');
+        //     },
+        //     userOffline: (int uid, UserOfflineReason reason) {
+        //       print('userOffline $uid');
+        //     },
+        //     onError: (error) {
+        //       // if (error.index == 15) {
+        //       //   leaveChannel();
+        //       // }
+        //       print("error ${error.index}");
+        //       print("error $error");
+        //     },
+        //   ),
+        // );
         initAgora();
         setState(() {});
       }
@@ -233,7 +233,7 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   void initAgora() async {
-    await client!.initialize();
+    // await client!.initialize();
   }
 
   void _joinChannel() {
@@ -243,10 +243,10 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void dispose() {
     player.dispose();
-    if (client != null) {
-      client?.sessionController.endCall();
-      client?.sessionController.dispose();
-    }
+    // if (client != null) {
+    //   client?.sessionController.endCall();
+    //   client?.sessionController.dispose();
+    // }
     super.dispose();
   }
 }

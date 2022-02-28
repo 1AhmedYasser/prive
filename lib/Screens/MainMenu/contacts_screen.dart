@@ -1,7 +1,10 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:lottie/lottie.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
@@ -28,7 +31,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   void initState() {
     Utils.checkForInternetConnection(context);
-    //_fetchContacts();
+    _fetchContacts();
 
     getCountry();
 
@@ -58,56 +61,79 @@ class _ContactsScreenState extends State<ContactsScreen> {
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: const PriveAppBar(title: "New Message"),
       ),
-      body: UsersBloc(
-        child: UserListView(
-          pullToRefresh: false,
-          filter: Filter.and([
-            Filter.notEqual("id", context.currentUser!.id),
-            Filter.notEqual("role", "admin"),
-            //Filter.in_('phone', phoneNumbers),
-          ]),
-          sort: const [
-            SortOption(
-              'name',
-              direction: 1,
-            ),
-          ],
-          limit: 25,
-          onUserTap: (user, widget) {
-            createChannel(context, user);
-          },
-          errorBuilder: (context, widget) {
-            return const SizedBox.shrink();
-          },
-          loadingBuilder: (context) => const UltraLoadingIndicator(),
-        ),
-      ),
-      // body: phoneContacts.isNotEmpty
-      //     ? UsersBloc(
-      //         child: UserListView(
-      //           pullToRefresh: false,
-      //           filter: Filter.and([
-      //             Filter.notEqual("id", context.currentUser!.id),
-      //             Filter.notEqual("role", "admin"),
-      //             //Filter.in_('phone', phoneNumbers),
-      //           ]),
-      //           sort: const [
-      //             SortOption(
-      //               'name',
-      //               direction: 1,
-      //             ),
-      //           ],
-      //           limit: 25,
-      //           onUserTap: (user, widget) {
-      //             createChannel(context, user);
-      //           },
-      //           errorBuilder: (context, widget) {
-      //             return const SizedBox.shrink();
-      //           },
-      //           loadingBuilder: (context) => const UltraLoadingIndicator(),
-      //         ),
-      //       )
-      //     : const UltraLoadingIndicator(),
+      body: phoneContacts.isNotEmpty
+          ? UsersBloc(
+              child: UserListView(
+                pullToRefresh: false,
+                filter: Filter.and([
+                  Filter.notEqual("id", context.currentUser!.id),
+                  Filter.notEqual("role", "admin"),
+                  //Filter.in_('phone', phoneNumbers),
+                ]),
+                sort: const [
+                  SortOption(
+                    'name',
+                    direction: 1,
+                  ),
+                ],
+                limit: 25,
+                onUserTap: (user, widget) {
+                  createChannel(context, user);
+                },
+                errorBuilder: (context, widget) {
+                  return const SizedBox.shrink();
+                },
+                loadingBuilder: (context) => const UltraLoadingIndicator(),
+              ),
+            )
+          : _permissionDenied == false
+              ? const UltraLoadingIndicator()
+              : SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 100),
+                      SizedBox(
+                        height: 200,
+                        child: Lottie.asset(
+                          R.animations.contactsPermission,
+                          repeat: false,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Contacts Permission is needed\nTo view your contacts",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => AppSettings.openAppSettings(),
+                        child: const Text(
+                          "Go To Settings",
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor,
+                          elevation: 0,
+                          minimumSize: Size(
+                            MediaQuery.of(context).size.width / 2.5,
+                            50,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
     );
   }
 

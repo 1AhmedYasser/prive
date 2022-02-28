@@ -83,6 +83,7 @@ class Animations {
   String chatHello3 = "$path/ChatHello3.json";
   String chatHello4 = "$path/ChatHello4.json";
   String chatHello5 = "$path/ChatHello5.json";
+  String contactsPermission = "$path/contacts_permission.json";
 }
 
 class Sounds {
@@ -111,7 +112,7 @@ class SharedPref {
 }
 
 class Constants {
-  String streamKey = 'tpa47knkfuyq';
+  String streamKey = 'zrq5d3ddtxp5';
 }
 
 class Routes {
