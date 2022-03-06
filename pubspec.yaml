@@ -61,6 +61,8 @@ dependencies:
   country_dial_code: ^1.1.2
   phone_numbers_parser: ^4.2.0
   flutter_sim_country_code: ^0.1.2
+  draggable_widget: ^2.0.0
+  flip_card: ^0.6.0
 
   # Utils
   supercharged: ^2.1.1

@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:callkeep/callkeep.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
+import 'package:prive/Widgets/AppWidgets/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:uuid/uuid.dart';
@@ -137,7 +140,6 @@ class NotificationsManager {
   }
 
   static Future<dynamic> onSelectNotification(String? notification) async {
-    print("hi nnnnnnnnnn ${storedBackgroundMessage?.data}");
     if (storedBackgroundMessage?.data.isNotEmpty ?? false) {
       final client = stream.StreamChatClient(R.constants.streamKey);
       await client.connectUser(
@@ -278,14 +280,6 @@ class NotificationsManager {
       body: message.notification?.body ?? "",
     );
 
-    if (Platform.isAndroid) {
-      final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
-      if (hasPhoneAccount == false) {
-        await _callKeep.hasDefaultPhoneAccount(
-            notificationsContext, callKeepSetupMap);
-      }
-    }
-
     print(message.data);
     var payload = message.data;
     var type = payload['type'] as String;
@@ -295,38 +289,15 @@ class NotificationsManager {
       var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == "true";
       final callUUID = const Uuid().v4();
-      _callKeep.displayIncomingCall(callUUID, callerId,
-          localizedCallerName: "Incoming Call ...",
-          hasVideo: hasVideo,
-          handleType: "number");
-
-      _callKeep.on(CallKeepPerformAnswerCallAction(),
-          (CallKeepPerformAnswerCallAction event) {
-        // Timer(const Duration(seconds: 1), () {
-        //   _callKeep.setCurrentCallActive(callUUID);
-        // });
-        //_callKeep.endCall(event.callUUID);
-        Navigator.of(notificationsContext).push(
-          PageRouteBuilder(
-            pageBuilder: (BuildContext context, _, __) {
-              return CallScreen(
-                channelName: channelName,
-                isJoining: true,
-              );
-            },
-            transitionsBuilder:
-                (_, Animation<double> animation, __, Widget child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
-      });
-
-      _callKeep.on(CallKeepPerformEndCallAction(),
-          (CallKeepPerformEndCallAction event) {});
+      BotToast.cleanAll();
+      BotToast.showAnimationWidget(
+          toastBuilder: (context) {
+            return CallingWidget(
+              channelName: channelName,
+              context: notificationsContext,
+            );
+          },
+          animationDuration: const Duration(milliseconds: 0));
     }
 
     if (type != "call") {

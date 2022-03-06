@@ -73,6 +73,10 @@ class Images {
   String closeCall = "$path/close_call.png";
   String forwardIcon = "$path/forward_icon.png";
   String noInternetImage = "$path/no_internet_image.png";
+  String volume = "$path/volume.png";
+  String cameraSwitch = "$path/camera_switch.png";
+  String acceptCall = "$path/accept_call.png";
+  String declineCall = "$path/decline_call.png";
 }
 
 class Animations {
@@ -83,6 +87,16 @@ class Animations {
   String chatHello3 = "$path/ChatHello3.json";
   String chatHello4 = "$path/ChatHello4.json";
   String chatHello5 = "$path/ChatHello5.json";
+  String chatHello6 = "$path/ChatHello6.json";
+  String chatHello7 = "$path/ChatHello7.json";
+  String chatHello8 = "$path/ChatHello8.json";
+  String chatHello9 = "$path/ChatHello9.json";
+  String chatHello10 = "$path/ChatHello10.json";
+  String chatHello11 = "$path/ChatHello11.json";
+  String chatHello12 = "$path/ChatHello12.json";
+  String chatHello13 = "$path/ChatHello13.json";
+  String chatHello14 = "$path/ChatHello14.json";
+  String chatHello15 = "$path/ChatHello15.json";
   String contactsPermission = "$path/contacts_permission.json";
 }
 
