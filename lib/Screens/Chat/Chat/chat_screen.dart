@@ -66,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
   int selectedSearchIndex = 0;
   Message? initialMessage;
   late Channel channel;
-  int randomNumber = Random().nextInt(3);
+  int randomNumber = Random().nextInt(15);
   bool isMessageSearchOn = false;
   final TextEditingController _messageSearchController =
       TextEditingController();
@@ -734,6 +734,30 @@ class _ChatScreenState extends State<ChatScreen> {
         return Lottie.asset(R.animations.chatHello2);
       case 2:
         return Lottie.asset(R.animations.chatHello3);
+      case 3:
+        return Lottie.asset(R.animations.chatHello4);
+      case 4:
+        return Lottie.asset(R.animations.chatHello5);
+      case 5:
+        return Lottie.asset(R.animations.chatHello6);
+      case 6:
+        return Lottie.asset(R.animations.chatHello7);
+      case 7:
+        return Lottie.asset(R.animations.chatHello8);
+      case 8:
+        return Lottie.asset(R.animations.chatHello9);
+      case 9:
+        return Lottie.asset(R.animations.chatHello10);
+      case 10:
+        return Lottie.asset(R.animations.chatHello11);
+      case 11:
+        return Lottie.asset(R.animations.chatHello12);
+      case 12:
+        return Lottie.asset(R.animations.chatHello13);
+      case 13:
+        return Lottie.asset(R.animations.chatHello14);
+      case 14:
+        return Lottie.asset(R.animations.chatHello15);
       default:
         return Lottie.asset(R.animations.chatHello1);
     }
