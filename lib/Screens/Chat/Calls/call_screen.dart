@@ -368,8 +368,11 @@ class _CallScreenState extends State<CallScreen> {
               icon: Image.asset(
                 R.images.closeCall,
               ),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
+                await ref.update({
+                  await Utils.getString(R.pref.userId) ?? "": "Ended",
+                });
               },
             ),
           )
@@ -409,7 +412,9 @@ class _CallScreenState extends State<CallScreen> {
         "channelName": channelName,
         "caller_name":
             "${await Utils.getString(R.pref.userFirstName)} ${await Utils.getString(R.pref.userLastName)}",
-        "ids": ids
+        "ids": ids,
+        "has_video": true,
+        //"caller_image": "ss"
       }),
       showLoadingIndicator: false,
       showError: false,

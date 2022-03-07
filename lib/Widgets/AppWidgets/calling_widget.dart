@@ -24,12 +24,29 @@ class CallingWidget extends StatefulWidget {
 class _CallingWidgetState extends State<CallingWidget> {
   final player = AudioPlayer();
   Timer? timer;
+  StreamSubscription? listener;
+  late DatabaseReference ref;
 
   @override
   void initState() {
     _setupRingingTone();
     timer = Timer.periodic(
         const Duration(seconds: 5), (Timer t) => _setupRingingTone());
+    ref = FirebaseDatabase.instance.ref("Calls/${widget.channelName}");
+    listener = ref.onValue.listen((DatabaseEvent event) async {
+      Map<dynamic, dynamic> data =
+          event.snapshot.value as Map<dynamic, dynamic>;
+      data.remove(await Utils.getString(R.pref.userId));
+      int endedUsers = 0;
+      data.forEach((key, value) {
+        if (value == "Ended") {
+          endedUsers++;
+        }
+      });
+      if (endedUsers == data.length) {
+        BotToast.cleanAll();
+      }
+    });
     super.initState();
   }
 
@@ -201,6 +218,9 @@ class _CallingWidgetState extends State<CallingWidget> {
 
   @override
   void dispose() {
+    if (listener != null) {
+      listener?.cancel();
+    }
     player.dispose();
     timer?.cancel();
     super.dispose();
