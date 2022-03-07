@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +57,9 @@ class _CallScreenState extends State<CallScreen> {
   bool isMuted = false;
   bool isVideoOn = true;
   late FlipCardController _flipController;
+  RtcStats? _stats;
+  late DatabaseReference ref;
+  StreamSubscription? listener;
 
   @override
   void initState() {
@@ -85,7 +90,7 @@ class _CallScreenState extends State<CallScreen> {
         .replaceAll(" ", "")
         .trim();
 
-    _makeACall(ids: usersToCall);
+    _makeACall(ids: usersToCall, users: users);
   }
 
   @override
@@ -95,6 +100,15 @@ class _CallScreenState extends State<CallScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        title: (_stats != null)
+            ? Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  formatTime(_stats?.duration ?? 0),
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              )
+            : null,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 30),
@@ -122,8 +136,6 @@ class _CallScreenState extends State<CallScreen> {
         ],
       ),
       extendBodyBehindAppBar: true,
-      // body:
-      //     buildCallingState(title: "Connecting ...") //_buildSingleVideoCall()
       body: isCalling == false && _remoteUid != null
           ? _buildSingleVideoCall()
           : widget.isJoining
@@ -366,7 +378,28 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-  _makeACall({String ids = ""}) async {
+  _makeACall({String ids = "", List<String> users = const []}) async {
+    ref = FirebaseDatabase.instance.ref("Calls/$channelName");
+    Map<String, String> callUsers = {};
+    callUsers[await Utils.getString(R.pref.userId) ?? ""] = "In Call";
+    for (var element in users) {
+      callUsers[element] = "Waiting";
+    }
+    await ref.set(callUsers);
+    listener = ref.onValue.listen((DatabaseEvent event) async {
+      Map<dynamic, dynamic> data =
+          event.snapshot.value as Map<dynamic, dynamic>;
+      data.remove(await Utils.getString(R.pref.userId));
+      int endedUsers = 0;
+      data.forEach((key, value) {
+        if (value == "Ended") {
+          endedUsers++;
+        }
+      });
+      if (endedUsers == data.length) {
+        Navigator.pop(context);
+      }
+    });
     UltraNetwork.request(
       context,
       makeACall,
@@ -398,7 +431,7 @@ class _CallScreenState extends State<CallScreen> {
     await [Permission.camera, Permission.microphone].request();
 
     engine = await RtcEngine.createWithContext(
-        RtcEngineContext("666a21c863d9431da1ee9651748608fb"));
+        RtcEngineContext(R.constants.agoraAppId));
 
     engine?.setEventHandler(RtcEngineEventHandler(
         joinChannelSuccess: (String channel, int uid, int elapsed) {
@@ -418,6 +451,9 @@ class _CallScreenState extends State<CallScreen> {
       Navigator.pop(context);
     }, remoteVideoStateChanged: (uid, state, reason, time) {
       print("$uid ${state.name} ${state.index}");
+    }, rtcStats: (stats) {
+      _stats = stats;
+      setState(() {});
     }));
 
     await engine?.enableVideo();
@@ -448,8 +484,15 @@ class _CallScreenState extends State<CallScreen> {
     }
   }
 
+  String formatTime(int seconds) {
+    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  }
+
   @override
   void dispose() {
+    if (listener != null) {
+      listener?.cancel();
+    }
     player.dispose();
     timer?.cancel();
     engine?.destroy();

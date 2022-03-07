@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../Extras/resources.dart';
+import '../../Helpers/Utils.dart';
 import '../../Screens/Chat/Calls/call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
@@ -91,7 +93,10 @@ class _CallingWidgetState extends State<CallingWidget> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        DatabaseReference ref = FirebaseDatabase.instance
+                            .ref("Calls/${widget.channelName}");
+
                         BotToast.cleanAll();
                         Navigator.of(widget.context).push(
                           PageRouteBuilder(
@@ -114,6 +119,9 @@ class _CallingWidgetState extends State<CallingWidget> {
                             },
                           ),
                         );
+                        await ref.update({
+                          await Utils.getString(R.pref.userId) ?? "": "In Call",
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.transparent,
@@ -142,7 +150,13 @@ class _CallingWidgetState extends State<CallingWidget> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        DatabaseReference ref = FirebaseDatabase.instance
+                            .ref("Calls/${widget.channelName}");
+
+                        await ref.update({
+                          await Utils.getString(R.pref.userId) ?? "": "Ended",
+                        });
                         BotToast.cleanAll();
                       },
                       style: ElevatedButton.styleFrom(
