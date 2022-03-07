@@ -448,12 +448,15 @@ class _CallScreenState extends State<CallScreen> {
         isCalling = false;
         _remoteUid = uid;
       });
-    }, userOffline: (int uid, UserOfflineReason reason) {
+    }, userOffline: (int uid, UserOfflineReason reason) async {
       print('userOffline $uid');
       setState(() {
         _remoteUid = null;
       });
       Navigator.pop(context);
+      await ref.update({
+        await Utils.getString(R.pref.userId) ?? "": "Ended",
+      });
     }, remoteVideoStateChanged: (uid, state, reason, time) {
       print("$uid ${state.name} ${state.index}");
     }, rtcStats: (stats) {
@@ -495,6 +498,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
+    endCall();
     if (listener != null) {
       listener?.cancel();
     }
@@ -502,5 +506,11 @@ class _CallScreenState extends State<CallScreen> {
     timer?.cancel();
     engine?.destroy();
     super.dispose();
+  }
+
+  void endCall() async {
+    ref.update({
+      await Utils.getString(R.pref.userId) ?? "": "Ended",
+    });
   }
 }

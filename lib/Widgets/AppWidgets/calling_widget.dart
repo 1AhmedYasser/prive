@@ -45,6 +45,9 @@ class _CallingWidgetState extends State<CallingWidget> {
       });
       if (endedUsers == data.length) {
         BotToast.cleanAll();
+        await ref.update({
+          await Utils.getString(R.pref.userId) ?? "": "Ended",
+        });
       }
     });
     super.initState();
