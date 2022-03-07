@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../Extras/resources.dart';
@@ -12,9 +13,17 @@ import '../../Screens/Chat/Calls/call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
   final String channelName;
+  final String callerName;
+  final String callerImage;
+  final bool isVideoCall;
   final BuildContext context;
   const CallingWidget(
-      {Key? key, required this.channelName, required this.context})
+      {Key? key,
+      required this.channelName,
+      required this.context,
+      this.callerName = "Incoming Call",
+      required this.isVideoCall,
+      this.callerImage = ""})
       : super(key: key);
 
   @override
@@ -77,8 +86,8 @@ class _CallingWidgetState extends State<CallingWidget> {
                       child: SizedBox(
                         width: 60,
                         height: 60,
-                        child: Image.network(
-                          "https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=243",
+                        child: CachedImage(
+                          url: widget.callerImage,
                         ),
                       ),
                     ),
@@ -86,9 +95,9 @@ class _CallingWidgetState extends State<CallingWidget> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Ahmed Yasser",
-                          style: TextStyle(
+                        Text(
+                          widget.callerName,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 17,
@@ -96,7 +105,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "Voice Call",
+                          widget.isVideoCall ? "Video Call" : "Voice Call",
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w600,

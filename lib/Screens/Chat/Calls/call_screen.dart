@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
+import 'package:callkeep/callkeep.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -29,13 +30,15 @@ class CallScreen extends StatefulWidget {
   final Channel? channel;
   final bool isJoining;
   final String channelName;
+  final FlutterCallkeep? callKeep;
 
-  const CallScreen({
-    Key? key,
-    this.channel,
-    this.isJoining = false,
-    this.channelName = "",
-  }) : super(key: key);
+  const CallScreen(
+      {Key? key,
+      this.channel,
+      this.isJoining = false,
+      this.channelName = "",
+      this.callKeep})
+      : super(key: key);
 
   @override
   _CallScreenState createState() => _CallScreenState();
@@ -264,6 +267,9 @@ class _CallScreenState extends State<CallScreen> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () {
+                  if (widget.callKeep != null) {
+                    widget.callKeep?.endAllCalls();
+                  }
                   Navigator.pop(context);
                 },
                 child: SizedBox(
@@ -369,6 +375,9 @@ class _CallScreenState extends State<CallScreen> {
                 R.images.closeCall,
               ),
               onPressed: () async {
+                if (widget.callKeep != null) {
+                  widget.callKeep?.endAllCalls();
+                }
                 Navigator.pop(context);
                 await ref.update({
                   await Utils.getString(R.pref.userId) ?? "": "Ended",
@@ -400,6 +409,9 @@ class _CallScreenState extends State<CallScreen> {
         }
       });
       if (endedUsers == data.length) {
+        if (widget.callKeep != null) {
+          widget.callKeep?.endAllCalls();
+        }
         Navigator.pop(context);
       }
     });
@@ -453,6 +465,9 @@ class _CallScreenState extends State<CallScreen> {
       setState(() {
         _remoteUid = null;
       });
+      if (widget.callKeep != null) {
+        widget.callKeep?.endAllCalls();
+      }
       Navigator.pop(context);
       await ref.update({
         await Utils.getString(R.pref.userId) ?? "": "Ended",

@@ -120,6 +120,7 @@ class NotificationsManager {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print(message.data);
       Map<String, dynamic> channelData =
           Map<String, dynamic>.from(json.decode(message.data["channel"]));
       stream.Channel? channel;
@@ -178,8 +179,8 @@ class NotificationsManager {
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage backgroundMessage) async {
     storedBackgroundMessage = backgroundMessage;
-    print("hhhh  ${storedBackgroundMessage?.data}");
-    if (backgroundMessage.data.isNotEmpty) {
+    if (backgroundMessage.data['type'] != null &&
+        backgroundMessage.data['type'] != "call") {
       final messageId = backgroundMessage.data['message_id'];
       final channelId = backgroundMessage.data['channel_id'];
       final channelType = backgroundMessage.data['channel_type'];
@@ -216,6 +217,7 @@ class NotificationsManager {
         var channelName = payload['channel_name'] as String;
         var uuid = payload['uuid'] as String;
         var hasVideo = payload['has_video'] == "true";
+        var callerName = payload['caller_name'] as String;
 
         final callUUID = const Uuid().v4();
         _callKeep.on(CallKeepPerformAnswerCallAction(),
@@ -226,6 +228,7 @@ class NotificationsManager {
                 return CallScreen(
                   channelName: channelName,
                   isJoining: true,
+                  callKeep: _callKeep,
                 );
               },
               transitionsBuilder:
@@ -272,8 +275,11 @@ class NotificationsManager {
 
         print('backgroundMessage: displayIncomingCall ($callerId)');
         _callKeep.displayIncomingCall(callUUID, callerId,
-            localizedCallerName: "Incoming Call ...", hasVideo: hasVideo);
+            localizedCallerName:
+                callerName.isEmpty ? "Incoming Call" : callerName,
+            hasVideo: hasVideo);
         _callKeep.backToForeground();
+        //_callKeep.endAllCalls()
       }
     }
     return;
@@ -291,6 +297,8 @@ class NotificationsManager {
     if (type == "call") {
       var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
+      var callerName = payload['caller_name'] as String;
+      var callerImage = payload['caller_image'] as String;
       var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == "true";
       final callUUID = const Uuid().v4();
@@ -300,6 +308,9 @@ class NotificationsManager {
             return CallingWidget(
               channelName: channelName,
               context: notificationsContext,
+              callerName: callerName,
+              callerImage: callerImage,
+              isVideoCall: hasVideo,
             );
           },
           animationDuration: const Duration(milliseconds: 0));
