@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:callkeep/callkeep.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -248,9 +249,13 @@ class NotificationsManager {
         });
 
         _callKeep.on(CallKeepPerformEndCallAction(),
-            (CallKeepPerformEndCallAction event) {
-          print(
-              'backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+            (CallKeepPerformEndCallAction event) async {
+          DatabaseReference ref =
+              FirebaseDatabase.instance.ref("Calls/$channelName");
+
+          await ref.update({
+            await Utils.getString(R.pref.userId) ?? "": "Ended",
+          });
         });
         if (!_callKeepInitiated) {
           if (Platform.isAndroid) {
