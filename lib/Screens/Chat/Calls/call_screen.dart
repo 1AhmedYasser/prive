@@ -412,7 +412,6 @@ class _CallScreenState extends State<CallScreen> {
         if (widget.callKeep != null) {
           widget.callKeep?.endAllCalls();
         }
-        Navigator.pop(context);
       }
     });
     UltraNetwork.request(

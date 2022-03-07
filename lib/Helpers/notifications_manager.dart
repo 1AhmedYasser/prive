@@ -298,7 +298,7 @@ class NotificationsManager {
       var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
       var callerName = payload['caller_name'] as String;
-      var callerImage = payload['caller_image'] as String;
+      var callerImage = payload['caller_image'] as String?;
       var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == "true";
       final callUUID = const Uuid().v4();
@@ -309,7 +309,7 @@ class NotificationsManager {
               channelName: channelName,
               context: notificationsContext,
               callerName: callerName,
-              callerImage: callerImage,
+              callerImage: callerImage ?? "",
               isVideoCall: hasVideo,
             );
           },
