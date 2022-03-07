@@ -133,6 +133,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                               return CallScreen(
                                 channelName: widget.channelName,
                                 isJoining: true,
+                                isVideo: widget.isVideoCall,
                                 channel: Channel(
                                     StreamChatCore.of(widget.context).client,
                                     "messaging",

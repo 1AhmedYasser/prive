@@ -228,6 +228,7 @@ class NotificationsManager {
                 return CallScreen(
                   channelName: channelName,
                   isJoining: true,
+                  isVideo: hasVideo,
                   callKeep: _callKeep,
                 );
               },

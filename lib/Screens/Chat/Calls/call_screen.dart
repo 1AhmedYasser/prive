@@ -30,6 +30,7 @@ class CallScreen extends StatefulWidget {
   final Channel? channel;
   final bool isJoining;
   final String channelName;
+  final bool isVideo;
   final FlutterCallkeep? callKeep;
 
   const CallScreen(
@@ -37,6 +38,7 @@ class CallScreen extends StatefulWidget {
       this.channel,
       this.isJoining = false,
       this.channelName = "",
+      required this.isVideo,
       this.callKeep})
       : super(key: key);
 
@@ -140,7 +142,9 @@ class _CallScreenState extends State<CallScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: isCalling == false && _remoteUid != null
-          ? _buildSingleVideoCall()
+          ? widget.isVideo
+              ? _buildSingleVideoCall()
+              : buildCallingState(inCall: true)
           : widget.isJoining
               ? const UltraLoadingIndicator()
               : buildCallingState(),
@@ -304,7 +308,7 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-  SizedBox buildCallingState({String title = ""}) {
+  SizedBox buildCallingState({String title = "", bool inCall = false}) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -353,7 +357,13 @@ class _CallScreenState extends State<CallScreen> {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  title.isEmpty ? "Calling ..." : title,
+                  isCalling == false
+                      ? title.isEmpty
+                          ? "Calling ..."
+                          : title
+                      : widget.isVideo
+                          ? ""
+                          : formatTime(_stats?.duration ?? 0),
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
@@ -424,7 +434,7 @@ class _CallScreenState extends State<CallScreen> {
         "caller_name":
             "${await Utils.getString(R.pref.userFirstName)} ${await Utils.getString(R.pref.userLastName)}",
         "ids": ids,
-        "has_video": true,
+        "has_video": widget.isVideo,
         //"caller_image": "ss"
       }),
       showLoadingIndicator: false,
@@ -478,7 +488,13 @@ class _CallScreenState extends State<CallScreen> {
       setState(() {});
     }));
 
-    await engine?.enableVideo();
+    if (widget.isVideo == true) {
+      await engine?.enableVideo();
+    } else {
+      setState(() {
+        isVideoOn = false;
+      });
+    }
     await engine?.joinChannel(token, channelName, null,
         int.parse(await Utils.getString(R.pref.userId) ?? "0"));
   }

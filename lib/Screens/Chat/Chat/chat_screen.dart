@@ -284,6 +284,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           pageBuilder: (BuildContext context, _, __) {
                             return CallScreen(
                               channel: channel,
+                              isVideo: true,
                             );
                           },
                           transitionsBuilder: (_, Animation<double> animation,
@@ -309,6 +310,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           pageBuilder: (BuildContext context, _, __) {
                             return CallScreen(
                               channel: channel,
+                              isVideo: false,
                             );
                           },
                           transitionsBuilder: (_, Animation<double> animation,
