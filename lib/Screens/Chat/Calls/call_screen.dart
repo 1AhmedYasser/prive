@@ -288,34 +288,35 @@ class _CallScreenState extends State<CallScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  setState(() {
-                    isVideoOn = !isVideoOn;
-                  });
-                  if (isVideoOn) {
-                    engine?.enableVideo();
-                  } else {
-                    engine?.disableVideo();
-                  }
-                },
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  child: Icon(
-                    isVideoOn ? Icons.videocam : Icons.videocam_off,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    color: Colors.grey.withOpacity(0.7),
+              if (isVideo)
+                InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    setState(() {
+                      isVideoOn = !isVideoOn;
+                    });
+                    if (isVideoOn) {
+                      engine?.enableVideo();
+                    } else {
+                      engine?.disableVideo();
+                    }
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    child: Icon(
+                      isVideoOn ? Icons.videocam : Icons.videocam_off,
+                      size: 28,
+                      color: Colors.white,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(23),
+                      color: Colors.grey.withOpacity(0.7),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 15),
+              if (isVideo) const SizedBox(width: 15),
               InkWell(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
