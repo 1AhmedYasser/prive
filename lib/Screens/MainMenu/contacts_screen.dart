@@ -68,7 +68,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 filter: Filter.and([
                   Filter.notEqual("id", context.currentUser!.id),
                   Filter.notEqual("role", "admin"),
-                  //Filter.in_('phone', phoneNumbers),
+                  Filter.in_('phone', phoneNumbers),
                 ]),
                 sort: const [
                   SortOption(
