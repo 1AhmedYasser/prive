@@ -19,6 +19,7 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Call/prive_call.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
@@ -28,18 +29,22 @@ import '../../../UltraNetwork/ultra_loading_indicator.dart';
 
 class CallScreen extends StatefulWidget {
   final Channel? channel;
-  final bool isJoining;
+  bool isJoining;
   final String channelName;
   final bool isVideo;
+  final String callImage;
+  final String callName;
   final FlutterCallkeep? callKeep;
 
-  const CallScreen(
+  CallScreen(
       {Key? key,
       this.channel,
       this.isJoining = false,
       this.channelName = "",
       required this.isVideo,
-      this.callKeep})
+      this.callImage = "",
+      this.callKeep,
+      this.callName = ""})
       : super(key: key);
 
   @override
@@ -65,12 +70,16 @@ class _CallScreenState extends State<CallScreen> {
   RtcStats? _stats;
   late DatabaseReference ref;
   StreamSubscription? listener;
+  bool callEnded = false;
+  bool isSpeakerOn = false;
 
   @override
   void initState() {
     _flipController = FlipCardController();
     if (widget.isJoining == true) {
       channelName = widget.channelName;
+      isCalling = false;
+      setState(() {});
       _joinChannel();
     } else {
       _setupRingingTone();
@@ -105,7 +114,7 @@ class _CallScreenState extends State<CallScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: (_stats != null)
+        title: (_stats != null && widget.isVideo)
             ? Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -115,77 +124,163 @@ class _CallScreenState extends State<CallScreen> {
               )
             : null,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  volumeOn = !volumeOn;
-                  engine?.setEnableSpeakerphone(volumeOn);
-                });
-              },
-              child: volumeOn
-                  ? ImageIcon(
-                      AssetImage(
-                        R.images.volume,
+          if (widget.isVideo)
+            Padding(
+              padding: const EdgeInsets.only(right: 30),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    volumeOn = !volumeOn;
+                    engine?.setEnableSpeakerphone(volumeOn);
+                  });
+                },
+                child: volumeOn
+                    ? ImageIcon(
+                        AssetImage(
+                          R.images.volume,
+                        ),
+                        size: 25,
+                      )
+                    : const Icon(
+                        FontAwesomeIcons.volumeMute,
+                        color: Colors.white,
+                        size: 25,
                       ),
-                      size: 25,
-                    )
-                  : const Icon(
-                      FontAwesomeIcons.volumeMute,
-                      color: Colors.white,
-                      size: 25,
-                    ),
+              ),
             ),
-          ),
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: isCalling == false && _remoteUid != null
-          ? widget.isVideo
-              ? _buildSingleVideoCall()
-              : buildCallingState(inCall: true)
-          : widget.isJoining
-              ? const UltraLoadingIndicator()
-              : buildCallingState(),
+      body: isCalling == false
+          ? widget.isJoining == false
+              ? widget.isVideo
+                  ? _remoteUid != null
+                      ? _buildSingleCall(isVideo: true)
+                      : buildCallingState(title: "Connecting ...")
+                  : _remoteUid != null
+                      ? _buildSingleCall()
+                      : buildCallingState(title: "Connecting ...")
+              : buildCallingState(title: "Connecting ...")
+          : buildCallingState(title: "Calling ..."),
     );
   }
 
-  Stack _buildSingleVideoCall() {
+  Stack _buildSingleCall({bool isVideo = false}) {
     return Stack(
       children: [
-        Container(
-          color: Colors.black,
-          child: Center(
-            child: _renderRemoteVideo(),
+        if (isVideo)
+          Container(
+            color: Colors.black,
+            child: Center(
+              child: _renderRemoteVideo(),
+            ),
           ),
-        ),
-        DraggableWidget(
-          bottomMargin: 60,
-          intialVisibility: true,
-          horizontalSpace: 20,
-          verticalSpace: 100,
-          shadowBorderRadius: 20,
-          normalShadow: const BoxShadow(
-            color: Colors.transparent,
-            offset: Offset(0, 0),
-            blurRadius: 2,
+        if (isVideo == false)
+          if (widget.channel != null)
+            Positioned.fill(
+              child: Blur(
+                blur: 12,
+                blurColor: Colors.black,
+                child: Center(
+                  child: ChannelAvatar(
+                    borderRadius: BorderRadius.circular(0),
+                    channel: widget.channel,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width,
+                      maxHeight: MediaQuery.of(context).size.height,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        if (widget.channel == null && isVideo == false)
+          Positioned.fill(
+            child: Blur(
+              blur: 12,
+              blurColor: Colors.black,
+              child: Center(
+                  child: ClipRRect(
+                borderRadius: BorderRadius.circular(0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: CachedImage(
+                    url: widget.callImage,
+                  ),
+                ),
+              )),
+            ),
           ),
-          child: _buildLocalView(),
-          // child: FlipCard(
-          //   flipOnTouch: false,
-          //   controller: _flipController,
-          //   direction: FlipDirection.HORIZONTAL,
-          //   onFlip: () {
-          //     setState(() {});
-          //   },
-          //   fill: Fill.none,
-          //   front: _buildLocalView(),
-          //   back: _buildLocalView(),
-          // ),
-          initialPosition: AnchoringPosition.topRight,
-          dragController: remoteDragController,
-        ),
+        if (isVideo == false)
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.channel != null)
+                  ChannelAvatar(
+                    borderRadius: BorderRadius.circular(50),
+                    channel: widget.channel,
+                    constraints: const BoxConstraints(
+                      maxWidth: 100,
+                      maxHeight: 100,
+                    ),
+                  ),
+                if (widget.channel == null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CachedImage(
+                        url: widget.callImage,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                Text(
+                  widget.channel != null
+                      ? StreamManager.getChannelName(
+                          widget.channel!,
+                          context.currentUser!,
+                        )
+                      : widget.callName,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  formatTime(_stats?.duration ?? 0),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+        if (isVideo)
+          DraggableWidget(
+            bottomMargin: 60,
+            intialVisibility: true,
+            horizontalSpace: 20,
+            verticalSpace: 100,
+            shadowBorderRadius: 20,
+            normalShadow: const BoxShadow(
+              color: Colors.transparent,
+              offset: Offset(0, 0),
+              blurRadius: 2,
+            ),
+            child: _buildLocalView(),
+            initialPosition: AnchoringPosition.topRight,
+            dragController: remoteDragController,
+          ),
         Positioned(
           bottom: 50,
           right: 20,
@@ -245,27 +340,61 @@ class _CallScreenState extends State<CallScreen> {
                 ),
               ),
               const SizedBox(width: 15),
-              Container(
-                width: 60,
-                height: 60,
-                child: Padding(
-                  padding: const EdgeInsets.all(6),
-                  child: IconButton(
-                    iconSize: 30,
-                    icon: Image.asset(
-                      R.images.cameraSwitch,
+              if (isVideo == false)
+                InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    setState(() {
+                      isSpeakerOn = !isSpeakerOn;
+                      engine?.setEnableSpeakerphone(isSpeakerOn);
+                    });
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: isSpeakerOn
+                          ? const Icon(
+                              FontAwesomeIcons.volumeUp,
+                              color: Colors.white,
+                              size: 25,
+                            )
+                          : const Icon(
+                              FontAwesomeIcons.volumeDown,
+                              color: Colors.white,
+                              size: 25,
+                            ),
                     ),
-                    onPressed: () {
-                      //_flipController.toggleCard();
-                      engine?.switchCamera();
-                    },
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(23),
+                      color: Colors.grey.withOpacity(0.7),
+                    ),
                   ),
                 ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(23),
-                  color: Colors.grey.withOpacity(0.7),
+              if (isVideo)
+                Container(
+                  width: 60,
+                  height: 60,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: IconButton(
+                      iconSize: 30,
+                      icon: Image.asset(
+                        R.images.cameraSwitch,
+                      ),
+                      onPressed: () {
+                        //_flipController.toggleCard();
+                        engine?.switchCamera();
+                      },
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(23),
+                    color: Colors.grey.withOpacity(0.7),
+                  ),
                 ),
-              ),
               const SizedBox(width: 15),
               InkWell(
                 splashColor: Colors.transparent,
@@ -308,46 +437,79 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-  SizedBox buildCallingState({String title = "", bool inCall = false}) {
+  SizedBox buildCallingState({String title = ""}) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: Stack(
         children: [
-          Positioned.fill(
-            child: Blur(
-              blur: 12,
-              blurColor: Colors.black,
-              child: Center(
-                child: ChannelAvatar(
-                  borderRadius: BorderRadius.circular(0),
-                  channel: widget.channel,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width,
-                    maxHeight: MediaQuery.of(context).size.height,
+          if (widget.channel != null)
+            Positioned.fill(
+              child: Blur(
+                blur: 12,
+                blurColor: Colors.black,
+                child: Center(
+                  child: ChannelAvatar(
+                    borderRadius: BorderRadius.circular(0),
+                    channel: widget.channel,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width,
+                      maxHeight: MediaQuery.of(context).size.height,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          if (widget.channel == null)
+            Positioned.fill(
+              child: Blur(
+                blur: 12,
+                blurColor: Colors.black,
+                child: Center(
+                    child: ClipRRect(
+                  borderRadius: BorderRadius.circular(0),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: CachedImage(
+                      url: widget.callImage,
+                    ),
+                  ),
+                )),
+              ),
+            ),
           Positioned.fill(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ChannelAvatar(
-                  borderRadius: BorderRadius.circular(50),
-                  channel: widget.channel,
-                  constraints: const BoxConstraints(
-                    maxWidth: 100,
-                    maxHeight: 100,
+                if (widget.channel != null)
+                  ChannelAvatar(
+                    borderRadius: BorderRadius.circular(50),
+                    channel: widget.channel,
+                    constraints: const BoxConstraints(
+                      maxWidth: 100,
+                      maxHeight: 100,
+                    ),
                   ),
-                ),
+                if (widget.channel == null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CachedImage(
+                        url: widget.callImage,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 Text(
-                  StreamManager.getChannelName(
-                    widget.channel!,
-                    context.currentUser!,
-                  ),
+                  widget.channel != null
+                      ? StreamManager.getChannelName(
+                          widget.channel!,
+                          context.currentUser!,
+                        )
+                      : widget.callName,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 21,
@@ -357,13 +519,7 @@ class _CallScreenState extends State<CallScreen> {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  isCalling == false
-                      ? title.isEmpty
-                          ? "Calling ..."
-                          : title
-                      : widget.isVideo
-                          ? ""
-                          : formatTime(_stats?.duration ?? 0),
+                  title.isNotEmpty ? title : formatTime(_stats?.duration ?? 0),
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
@@ -407,20 +563,27 @@ class _CallScreenState extends State<CallScreen> {
     for (var element in users) {
       callUsers[element] = "Waiting";
     }
-    await ref.set(callUsers);
+    if (widget.isJoining == false) await ref.set(callUsers);
     listener = ref.onValue.listen((DatabaseEvent event) async {
       Map<dynamic, dynamic> data =
           event.snapshot.value as Map<dynamic, dynamic>;
       data.remove(await Utils.getString(R.pref.userId));
-      int endedUsers = 0;
-      data.forEach((key, value) {
-        if (value == "Ended") {
-          endedUsers++;
-        }
-      });
-      if (endedUsers == data.length) {
-        if (widget.callKeep != null) {
-          widget.callKeep?.endAllCalls();
+      print(data);
+      if (data.isNotEmpty) {
+        int endedUsers = 0;
+        data.forEach((key, value) {
+          if (value == "Ended") {
+            endedUsers++;
+          }
+        });
+        if (endedUsers == data.length) {
+          if (widget.callKeep != null) {
+            widget.callKeep?.endAllCalls();
+          }
+          if (callEnded == false) {
+            Navigator.pop(context);
+            callEnded = true;
+          }
         }
       }
     });
@@ -435,7 +598,6 @@ class _CallScreenState extends State<CallScreen> {
             "${await Utils.getString(R.pref.userFirstName)} ${await Utils.getString(R.pref.userLastName)}",
         "ids": ids,
         "has_video": widget.isVideo,
-        //"caller_image": "ss"
       }),
       showLoadingIndicator: false,
       showError: false,
@@ -462,6 +624,9 @@ class _CallScreenState extends State<CallScreen> {
     engine?.setEventHandler(RtcEngineEventHandler(
         joinChannelSuccess: (String channel, int uid, int elapsed) {
       print('joinChannelSuccess $channel $uid');
+      // if (widget.isJoining) {
+      //   widget.isJoining = false;
+      // }
     }, userJoined: (int uid, int elapsed) {
       print('userJoined $uid');
       timer?.cancel();
@@ -477,7 +642,10 @@ class _CallScreenState extends State<CallScreen> {
       if (widget.callKeep != null) {
         widget.callKeep?.endAllCalls();
       }
-      Navigator.pop(context);
+      if (callEnded == false) {
+        Navigator.pop(context);
+        callEnded = true;
+      }
       await ref.update({
         await Utils.getString(R.pref.userId) ?? "": "Ended",
       });
@@ -490,6 +658,9 @@ class _CallScreenState extends State<CallScreen> {
 
     if (widget.isVideo == true) {
       await engine?.enableVideo();
+      setState(() {
+        isVideoOn = true;
+      });
     } else {
       setState(() {
         isVideoOn = false;
@@ -497,6 +668,12 @@ class _CallScreenState extends State<CallScreen> {
     }
     await engine?.joinChannel(token, channelName, null,
         int.parse(await Utils.getString(R.pref.userId) ?? "0"));
+
+    if (widget.isJoining) {
+      setState(() {
+        widget.isJoining = false;
+      });
+    }
   }
 
   void _joinChannel() {

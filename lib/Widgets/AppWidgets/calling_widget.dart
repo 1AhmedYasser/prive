@@ -134,10 +134,8 @@ class _CallingWidgetState extends State<CallingWidget> {
                                 channelName: widget.channelName,
                                 isJoining: true,
                                 isVideo: widget.isVideoCall,
-                                channel: Channel(
-                                    StreamChatCore.of(widget.context).client,
-                                    "messaging",
-                                    widget.channelName),
+                                callImage: widget.callerImage,
+                                callName: widget.callerName,
                               );
                             },
                             transitionsBuilder: (_, Animation<double> animation,

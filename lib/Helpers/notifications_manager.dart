@@ -218,6 +218,7 @@ class NotificationsManager {
         var uuid = payload['uuid'] as String;
         var hasVideo = payload['has_video'] == "true";
         var callerName = payload['caller_name'] as String;
+        var callerImage = payload['caller_image'] as String;
 
         final callUUID = const Uuid().v4();
         _callKeep.on(CallKeepPerformAnswerCallAction(),
@@ -230,6 +231,8 @@ class NotificationsManager {
                   isJoining: true,
                   isVideo: hasVideo,
                   callKeep: _callKeep,
+                  callName: callerName,
+                  callImage: callerImage,
                 );
               },
               transitionsBuilder:
