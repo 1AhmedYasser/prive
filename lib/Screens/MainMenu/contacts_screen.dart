@@ -31,9 +31,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   void initState() {
     Utils.checkForInternetConnection(context);
-    _fetchContacts();
-
     getCountry();
+    _fetchContacts();
 
     super.initState();
   }
