@@ -91,7 +91,7 @@ dependencies:
 
   # Agora
   agora_rtc_engine: ^5.0.0
-  callkeep: ^0.3.2
+  flutter_callkit_incoming: ^1.0.1+5
 
   # Maps
   location: ^4.3.0

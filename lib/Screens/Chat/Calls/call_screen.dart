@@ -3,13 +3,13 @@ import 'dart:convert';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
-import 'package:callkeep/callkeep.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -34,7 +34,6 @@ class CallScreen extends StatefulWidget {
   final bool isVideo;
   final String callImage;
   final String callName;
-  final FlutterCallkeep? callKeep;
 
   CallScreen(
       {Key? key,
@@ -43,7 +42,6 @@ class CallScreen extends StatefulWidget {
       this.channelName = "",
       required this.isVideo,
       this.callImage = "",
-      this.callKeep,
       this.callName = ""})
       : super(key: key);
 
@@ -401,9 +399,7 @@ class _CallScreenState extends State<CallScreen> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () {
-                  if (widget.callKeep != null) {
-                    widget.callKeep?.endAllCalls();
-                  }
+                  FlutterCallkitIncoming.endAllCalls();
                   Navigator.pop(context);
                 },
                 child: SizedBox(
@@ -542,9 +538,9 @@ class _CallScreenState extends State<CallScreen> {
                 R.images.closeCall,
               ),
               onPressed: () async {
-                if (widget.callKeep != null) {
-                  widget.callKeep?.endAllCalls();
-                }
+                // if (widget.callKeep != null) {
+                //   widget.callKeep?.endAllCalls();
+                // }
                 Navigator.pop(context);
                 await ref.update({
                   await Utils.getString(R.pref.userId) ?? "": "Ended",
@@ -578,9 +574,7 @@ class _CallScreenState extends State<CallScreen> {
           }
         });
         if (endedUsers == data.length) {
-          if (widget.callKeep != null) {
-            widget.callKeep?.endAllCalls();
-          }
+          FlutterCallkitIncoming.endAllCalls();
           if (callEnded == false) {
             Navigator.pop(context);
             callEnded = true;
@@ -640,9 +634,8 @@ class _CallScreenState extends State<CallScreen> {
       setState(() {
         _remoteUid = null;
       });
-      if (widget.callKeep != null) {
-        widget.callKeep?.endAllCalls();
-      }
+
+      FlutterCallkitIncoming.endAllCalls();
       if (callEnded == false) {
         Navigator.pop(context);
         callEnded = true;

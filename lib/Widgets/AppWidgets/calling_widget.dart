@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -54,6 +55,7 @@ class _CallingWidgetState extends State<CallingWidget> {
       });
       if (endedUsers == data.length) {
         BotToast.cleanAll();
+        FlutterCallkitIncoming.endAllCalls();
         await ref.update({
           await Utils.getString(R.pref.userId) ?? "": "Ended",
         });
@@ -179,6 +181,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
+                        FlutterCallkitIncoming.endAllCalls();
                         DatabaseReference ref = FirebaseDatabase.instance
                             .ref("Calls/${widget.channelName}");
 
