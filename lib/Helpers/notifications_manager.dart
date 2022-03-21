@@ -378,7 +378,7 @@ class NotificationsManager {
   }
 
   static checkForCurrentCalls() async {
-    String activeCalls = await FlutterCallkitIncoming.activeCalls();
+    var activeCalls = await FlutterCallkitIncoming.activeCalls();
     if (activeCalls.isNotEmpty) {
       print('initCurrentCall: $activeCalls');
       List<dynamic> calls = json.decode(activeCalls);
