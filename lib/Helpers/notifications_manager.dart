@@ -74,7 +74,7 @@ class NotificationsManager {
 
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
-
+    print("do you have initial message $initialMessage");
     if (initialMessage != null) {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
@@ -85,7 +85,7 @@ class NotificationsManager {
           .last;
 
       for (var value in channels) {
-        if (value.id == channelData['id']) {
+        if (value.id == initialMessage.data['channel_id']) {
           channel = value;
         }
       }
@@ -99,6 +99,7 @@ class NotificationsManager {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("2 hiiiis");
       print(message.data);
       Map<String, dynamic> channelData =
           Map<String, dynamic>.from(json.decode(message.data["channel"]));
@@ -108,7 +109,7 @@ class NotificationsManager {
           .state
           .channels
           .forEach((key, value) {
-        if (value.id == channelData['id']) {
+        if (value.id == message.data['channel_id']) {
           channel = value;
         }
       });
@@ -121,35 +122,53 @@ class NotificationsManager {
   }
 
   static Future<dynamic> onSelectNotification(String? notification) async {
-    if (storedBackgroundMessage?.data.isNotEmpty ?? false) {
-      final client = stream.StreamChatClient(R.constants.streamKey);
-      await client.connectUser(
-        stream.User(
-          id: await Utils.getString(R.pref.userId) ?? "",
-          extraData: {
-            'name': await Utils.getString(R.pref.userName),
-            'image': await Utils.getString(R.pref.userImage),
-            'phone': await Utils.getString(R.pref.userPhone),
-          },
-        ),
-        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
-      );
-
+    print("Tapped Notification1 ${notification}");
+    Map selectedNotification = json.decode(notification ?? "");
+    if (selectedNotification.isNotEmpty) {
       stream.Channel? channel;
       stream.StreamChatCore.of(notificationsContext)
           .client
           .state
           .channels
           .forEach((key, value) {
-        if (value.id == storedBackgroundMessage?.data['channel_id']) {
+        if (value.id == selectedNotification['channel_id']) {
           channel = value;
         }
       });
+      print("Channnel $channel");
       if (channel != null) {
         Navigator.of(notificationsContext).push(
           ChatScreen.routeWithChannel(channel!),
         );
       }
+      // final client = stream.StreamChatClient(R.constants.streamKey);
+      // await client.connectUser(
+      //   stream.User(
+      //     id: await Utils.getString(R.pref.userId) ?? "",
+      //     extraData: {
+      //       'name': await Utils.getString(R.pref.userName),
+      //       'image': await Utils.getString(R.pref.userImage),
+      //       'phone': await Utils.getString(R.pref.userPhone),
+      //     },
+      //   ),
+      //   client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
+      // );
+      //
+      // stream.Channel? channel;
+      // stream.StreamChatCore.of(notificationsContext)
+      //     .client
+      //     .state
+      //     .channels
+      //     .forEach((key, value) {
+      //   if (value.id == storedBackgroundMessage?.data['channel_id']) {
+      //     channel = value;
+      //   }
+      // });
+      // if (channel != null) {
+      //   Navigator.of(notificationsContext).push(
+      //     ChatScreen.routeWithChannel(channel!),
+      //   );
+      // }
     } else {
       print("no");
     }
@@ -183,7 +202,9 @@ class NotificationsManager {
 
       initializeNotifications();
       await _showLocalNotification(
-          title: message.user?.name ?? "", body: message.text ?? "");
+          title: message.user?.name ?? "",
+          body: message.text ?? "",
+          payload: json.encode(backgroundMessage.data).toString());
     } else {
       var payload = backgroundMessage.data;
       String type = payload['type'];
@@ -254,16 +275,17 @@ class NotificationsManager {
       final callUUID = const Uuid().v4();
       BotToast.cleanAll();
       BotToast.showAnimationWidget(
-          toastBuilder: (context) {
-            return CallingWidget(
-              channelName: channelName,
-              context: notificationsContext,
-              callerName: callerName,
-              callerImage: callerImage ?? "",
-              isVideoCall: hasVideo,
-            );
-          },
-          animationDuration: const Duration(milliseconds: 0));
+        toastBuilder: (context) {
+          return CallingWidget(
+            channelName: channelName,
+            context: notificationsContext,
+            callerName: callerName,
+            callerImage: callerImage ?? "",
+            isVideoCall: hasVideo,
+          );
+        },
+        animationDuration: const Duration(milliseconds: 0),
+      );
     }
 
     if (type != "call") {
@@ -278,7 +300,8 @@ class NotificationsManager {
   static Future<void> _showLocalNotification(
       {BaseNotification? notification,
       String title = "",
-      String body = ""}) async {
+      String body = "",
+      String payload = ""}) async {
     if (Platform.isAndroid == true) {
       var androidDetails = const AndroidNotificationDetails("id", "channel",
           channelDescription: "description",
@@ -289,20 +312,21 @@ class NotificationsManager {
           0,
           notification?.title ?? title,
           notification?.body ?? body,
-          NotificationDetails(android: androidDetails));
+          NotificationDetails(android: androidDetails),
+          payload: payload);
     } else {
       await notificationPlugin.show(
-        0,
-        notification?.title ?? title,
-        notification?.body ?? body,
-        const NotificationDetails(
-          iOS: IOSNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
+          0,
+          notification?.title ?? title,
+          notification?.body ?? body,
+          const NotificationDetails(
+            iOS: IOSNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
           ),
-        ),
-      );
+          payload: payload);
     }
   }
 
@@ -312,11 +336,8 @@ class NotificationsManager {
         print("Eveeeent $event");
         switch (event!.name) {
           case CallEvent.ACTION_CALL_INCOMING:
-            // TODO: received an incoming call
             break;
           case CallEvent.ACTION_CALL_START:
-            // TODO: started an outgoing call
-            // TODO: show screen calling in Flutter
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
             Navigator.of(notificationsContext).push(

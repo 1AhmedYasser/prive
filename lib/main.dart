@@ -19,6 +19,7 @@ import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'Extras/resources.dart';
 import 'Screens/Auth/login_screen.dart';
 import 'Screens/Home/channels_screen.dart';
@@ -30,7 +31,12 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   EasyLocalization.logger.enableBuildModes = [];
   await Firebase.initializeApp();
+  // final chatPersistentClient = StreamChatPersistenceClient(
+  //   logLevel: Level.INFO,
+  //   connectionMode: ConnectionMode.regular,
+  // );
   final client = StreamChatClient(R.constants.streamKey);
+  // client.chatPersistenceClient = chatPersistentClient;
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
