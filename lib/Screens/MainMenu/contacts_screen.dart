@@ -3,6 +3,7 @@ import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -67,75 +68,86 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: phoneContacts.isNotEmpty
           ? RefreshIndicator(
               onRefresh: () => Future.sync(() => _fetchContacts()),
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      createChannel(context, users[index]);
-                    },
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 10, bottom: 0),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: SizedBox(
-                                  height: 50,
-                                  width: 50,
-                                  child: CachedImage(
-                                    url: users[index].image ?? "",
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 13),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+              child: AnimationLimiter(
+                child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      child: SlideAnimation(
+                        horizontalOffset: 50.0,
+                        child: FadeInAnimation(
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () {
+                              createChannel(context, users[index]);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 10, bottom: 0),
+                              child: Column(
                                 children: [
-                                  Text(
-                                    users[index].name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(50),
+                                        child: SizedBox(
+                                          height: 50,
+                                          width: 50,
+                                          child: CachedImage(
+                                            url: users[index].image ?? "",
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 13),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            users[index].name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 3),
+                                          Text(
+                                            users[index].online
+                                                ? "Online"
+                                                : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                    users[index].lastActive ??
+                                                        DateTime.now(),
+                                                  )}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: users[index].online
+                                                  ? Colors.green
+                                                  : Colors.grey,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    users[index].online
-                                        ? "Online"
-                                        : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
-                                            users[index].lastActive ??
-                                                DateTime.now(),
-                                          )}",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: users[index].online
-                                          ? Colors.green
-                                          : Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                  ),
+                                  const SizedBox(height: 10),
                                 ],
-                              )
-                            ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return Divider(
-                    height: 0,
-                    color: Colors.grey.shade300,
-                  );
-                },
-                itemCount: users.length,
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      height: 0,
+                      color: Colors.grey.shade300,
+                    );
+                  },
+                  itemCount: users.length,
+                ),
               ),
             )
           : _permissionDenied == false
