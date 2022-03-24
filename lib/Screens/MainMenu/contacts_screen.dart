@@ -17,6 +17,8 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'package:intl/intl.dart';
 
+import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
+
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({Key? key}) : super(key: key);
 
@@ -24,7 +26,8 @@ class ContactsScreen extends StatefulWidget {
   _ContactsScreenState createState() => _ContactsScreenState();
 }
 
-class _ContactsScreenState extends State<ContactsScreen> {
+class _ContactsScreenState extends State<ContactsScreen>
+    with TickerProviderStateMixin {
   bool _permissionDenied = false;
   var phoneContacts = [];
   List<String> phoneNumbers = [];
@@ -32,9 +35,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
       WidgetsBinding.instance?.window.locale.countryCode;
   CountryDialCode? deviceDialCode;
   List<User> users = [];
+  late final AnimationController _animationController;
 
   @override
   void initState() {
+    _animationController = AnimationController(vsync: this);
     Utils.checkForInternetConnection(context);
     getCountry();
     _fetchContacts();
@@ -66,90 +71,98 @@ class _ContactsScreenState extends State<ContactsScreen> {
         child: const PriveAppBar(title: "New Message"),
       ),
       body: phoneContacts.isNotEmpty
-          ? RefreshIndicator(
-              onRefresh: () => Future.sync(() => _fetchContacts()),
-              child: AnimationLimiter(
-                child: ListView.separated(
-                  itemBuilder: (context, index) {
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      child: SlideAnimation(
-                        horizontalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: InkWell(
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () {
-                              createChannel(context, users[index]);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 10, right: 10, bottom: 0),
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 10),
-                                  Row(
+          ? users.isNotEmpty
+              ? RefreshIndicator(
+                  onRefresh: () => Future.sync(() => _fetchContacts()),
+                  child: AnimationLimiter(
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        return AnimationConfiguration.staggeredList(
+                          position: index,
+                          child: SlideAnimation(
+                            horizontalOffset: 50.0,
+                            child: FadeInAnimation(
+                              child: InkWell(
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () {
+                                  createChannel(context, users[index]);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, bottom: 0),
+                                  child: Column(
                                     children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: SizedBox(
-                                          height: 50,
-                                          width: 50,
-                                          child: CachedImage(
-                                            url: users[index].image ?? "",
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 13),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      const SizedBox(height: 10),
+                                      Row(
                                         children: [
-                                          Text(
-                                            users[index].name,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w500,
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            child: SizedBox(
+                                              height: 50,
+                                              width: 50,
+                                              child: CachedImage(
+                                                url: users[index].image ?? "",
+                                              ),
                                             ),
                                           ),
-                                          const SizedBox(height: 3),
-                                          Text(
-                                            users[index].online
-                                                ? "Online"
-                                                : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
-                                                    users[index].lastActive ??
-                                                        DateTime.now(),
-                                                  )}",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: users[index].online
-                                                  ? Colors.green
-                                                  : Colors.grey,
-                                              fontSize: 13,
-                                            ),
-                                          ),
+                                          const SizedBox(width: 13),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                users[index].name,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 3),
+                                              Text(
+                                                users[index].online
+                                                    ? "Online"
+                                                    : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                        users[index]
+                                                                .lastActive ??
+                                                            DateTime.now(),
+                                                      )}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color: users[index].online
+                                                      ? Colors.green
+                                                      : Colors.grey,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ],
+                                          )
                                         ],
-                                      )
+                                      ),
+                                      const SizedBox(height: 10),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return Divider(
-                      height: 0,
-                      color: Colors.grey.shade300,
-                    );
-                  },
-                  itemCount: users.length,
-                ),
-              ),
-            )
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          height: 0,
+                          color: Colors.grey.shade300,
+                        );
+                      },
+                      itemCount: users.length,
+                    ),
+                  ),
+                )
+              : ChannelsEmptyState(
+                  animationController: _animationController,
+                  title: "No Contacts Found",
+                  message: "",
+                )
           : _permissionDenied == false
               ? const UltraLoadingIndicator()
               : SizedBox(
@@ -275,6 +288,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         }
       }
 
+      users.clear();
       setState(() {});
     }
   }

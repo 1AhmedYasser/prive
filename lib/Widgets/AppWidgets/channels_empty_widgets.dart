@@ -4,11 +4,13 @@ import 'package:prive/Extras/resources.dart';
 
 class ChannelsEmptyState extends StatelessWidget {
   final String title;
+  final String message;
 
   const ChannelsEmptyState(
       {Key? key,
       required AnimationController animationController,
-      this.title = "No Messages Yet"})
+      this.title = "No Messages Yet",
+      this.message = "Start Chatting With Your Friends Right Now"})
       : _animationController = animationController,
         super(key: key);
 
@@ -40,12 +42,12 @@ class ChannelsEmptyState extends StatelessWidget {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 15),
-          const Padding(
-            padding: EdgeInsets.only(left: 20, right: 20),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20),
             child: Text(
-              "Start Chatting With Your Friends Right Now",
+              message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             ),
           )
         ],
