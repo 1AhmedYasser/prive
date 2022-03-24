@@ -288,7 +288,6 @@ class _ContactsScreenState extends State<ContactsScreen>
         }
       }
 
-      users.clear();
       setState(() {});
     }
   }
