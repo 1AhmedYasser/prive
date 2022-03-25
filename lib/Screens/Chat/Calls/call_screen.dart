@@ -64,6 +64,7 @@ class _CallScreenState extends State<CallScreen> {
   bool volumeOn = true;
   bool isMuted = false;
   bool isVideoOn = true;
+  bool isRemoteVideoOn = true;
   late FlipCardController _flipController;
   RtcStats? _stats;
   late DatabaseReference ref;
@@ -112,7 +113,7 @@ class _CallScreenState extends State<CallScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: (_stats != null && widget.isVideo)
+        title: (_stats != null && widget.isVideo && isRemoteVideoOn)
             ? Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -263,7 +264,7 @@ class _CallScreenState extends State<CallScreen> {
               ],
             ),
           ),
-        if (isVideo)
+        if (isVideo && isVideoOn)
           DraggableWidget(
             bottomMargin: 60,
             intialVisibility: true,
@@ -295,9 +296,9 @@ class _CallScreenState extends State<CallScreen> {
                       isVideoOn = !isVideoOn;
                     });
                     if (isVideoOn) {
-                      engine?.enableVideo();
+                      engine?.enableLocalVideo(true);
                     } else {
-                      engine?.disableVideo();
+                      engine?.enableLocalVideo(false);
                     }
                   },
                   child: Container(
@@ -434,7 +435,7 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-  SizedBox buildCallingState({String title = ""}) {
+  SizedBox buildCallingState({String title = "", bool isRemoteVideoOn = true}) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -528,26 +529,25 @@ class _CallScreenState extends State<CallScreen> {
               ],
             ),
           ),
-          Positioned(
-            bottom: MediaQuery.of(context).size.height / 8,
-            left: 0,
-            right: 0,
-            child: IconButton(
-              iconSize: 60,
-              icon: Image.asset(
-                R.images.closeCall,
+          if (isRemoteVideoOn)
+            Positioned(
+              bottom: MediaQuery.of(context).size.height / 8,
+              left: 0,
+              right: 0,
+              child: IconButton(
+                iconSize: 60,
+                icon: Image.asset(
+                  R.images.closeCall,
+                ),
+                onPressed: () async {
+                  FlutterCallkitIncoming.endAllCalls();
+                  Navigator.pop(context);
+                  await ref.update({
+                    await Utils.getString(R.pref.userId) ?? "": "Ended",
+                  });
+                },
               ),
-              onPressed: () async {
-                // if (widget.callKeep != null) {
-                //   widget.callKeep?.endAllCalls();
-                // }
-                Navigator.pop(context);
-                await ref.update({
-                  await Utils.getString(R.pref.userId) ?? "": "Ended",
-                });
-              },
-            ),
-          )
+            )
         ],
       ),
     );
@@ -644,7 +644,15 @@ class _CallScreenState extends State<CallScreen> {
         await Utils.getString(R.pref.userId) ?? "": "Ended",
       });
     }, remoteVideoStateChanged: (uid, state, reason, time) {
-      print("$uid ${state.name} ${state.index}");
+      if (state.index == 0) {
+        setState(() {
+          isRemoteVideoOn = false;
+        });
+      } else {
+        setState(() {
+          isRemoteVideoOn = true;
+        });
+      }
     }, rtcStats: (stats) {
       _stats = stats;
       setState(() {});
@@ -683,13 +691,13 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   Widget _renderRemoteVideo() {
-    if (_remoteUid != null) {
+    if (_remoteUid != null && isRemoteVideoOn) {
       return rtc_remote_view.SurfaceView(
         uid: _remoteUid ?? 0,
         channelId: "",
       );
     } else {
-      return const SizedBox.shrink();
+      return buildCallingState(isRemoteVideoOn: false);
     }
   }
 
