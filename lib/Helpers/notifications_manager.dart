@@ -72,6 +72,35 @@ class NotificationsManager {
       _firebaseMessagingHandler(message);
     });
 
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+        await notificationPlugin.getNotificationAppLaunchDetails();
+    final didNotificationLaunchApp =
+        notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
+    if (didNotificationLaunchApp) {
+      Map selectedNotification =
+          json.decode(notificationAppLaunchDetails?.payload ?? "");
+      print(selectedNotification['channel_id']);
+      if (selectedNotification.isNotEmpty) {
+        stream.Channel? channel;
+        var channels = await stream.StreamChatCore.of(notificationsContext)
+            .client
+            .queryChannels()
+            .last;
+
+        for (var currentChannel in channels) {
+          if (currentChannel.id == selectedNotification['channel_id']) {
+            channel = currentChannel;
+          }
+        }
+
+        if (channel != null) {
+          Navigator.of(notificationsContext).push(
+            ChatScreen.routeWithChannel(channel),
+          );
+        }
+      }
+    }
+
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     print("do you have initial message $initialMessage");
@@ -99,8 +128,6 @@ class NotificationsManager {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("2 hiiiis");
-      print(message.data);
       Map<String, dynamic> channelData =
           Map<String, dynamic>.from(json.decode(message.data["channel"]));
       stream.Channel? channel;
@@ -122,7 +149,6 @@ class NotificationsManager {
   }
 
   static Future<dynamic> onSelectNotification(String? notification) async {
-    print("Tapped Notification1 ${notification}");
     Map selectedNotification = json.decode(notification ?? "");
     if (selectedNotification.isNotEmpty) {
       stream.Channel? channel;
@@ -135,40 +161,11 @@ class NotificationsManager {
           channel = value;
         }
       });
-      print("Channnel $channel");
       if (channel != null) {
         Navigator.of(notificationsContext).push(
           ChatScreen.routeWithChannel(channel!),
         );
       }
-      // final client = stream.StreamChatClient(R.constants.streamKey);
-      // await client.connectUser(
-      //   stream.User(
-      //     id: await Utils.getString(R.pref.userId) ?? "",
-      //     extraData: {
-      //       'name': await Utils.getString(R.pref.userName),
-      //       'image': await Utils.getString(R.pref.userImage),
-      //       'phone': await Utils.getString(R.pref.userPhone),
-      //     },
-      //   ),
-      //   client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
-      // );
-      //
-      // stream.Channel? channel;
-      // stream.StreamChatCore.of(notificationsContext)
-      //     .client
-      //     .state
-      //     .channels
-      //     .forEach((key, value) {
-      //   if (value.id == storedBackgroundMessage?.data['channel_id']) {
-      //     channel = value;
-      //   }
-      // });
-      // if (channel != null) {
-      //   Navigator.of(notificationsContext).push(
-      //     ChatScreen.routeWithChannel(channel!),
-      //   );
-      // }
     } else {
       print("no");
     }
