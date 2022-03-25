@@ -5,7 +5,6 @@ import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Screens/Chat/Chat/group_info_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/channel_item_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChannelsListWidget extends StatefulWidget {
   final List<Channel> channels;

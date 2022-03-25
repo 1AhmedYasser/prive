@@ -103,7 +103,7 @@ class Animations {
 class Sounds {
   static String path = "assets/sounds";
   String calling = "$path/calling.mp3";
-  String incomingCall = "$path/ringtone_default.mp3";
+  String incomingCall = "$path/incoming_call.mp3";
   String sendMessage = "$path/send_message.mp3";
 }
 

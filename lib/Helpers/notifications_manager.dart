@@ -225,8 +225,7 @@ class NotificationsManager {
           'android': <String, dynamic>{
             'isCustomNotification': false,
             'isShowLogo': false,
-            'ringtonePath':
-                "/android/app/src/main/res/raw/ringtone_default.mp3",
+            'ringtonePath': "system_ringtone_default",
             'backgroundColor': '#1293a8',
             // 'backgroundUrl': 'https://i.pravatar.cc/500',
             // 'actionColor': '#4CAF50'
