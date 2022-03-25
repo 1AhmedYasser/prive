@@ -40,39 +40,41 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                       ChatScreen.routeWithChannel(widget.channels[index],
                           isChannel: widget.isChannel)),
                   onLongPress: () {
-                    Channel channel = widget.channels[index];
-                    if (channel.memberCount == 2 && channel.isDistinct) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StreamChannel(
-                            channel: channel,
-                            child: ChatInfoScreen(
-                              messageTheme:
-                                  StreamChatTheme.of(context).ownMessageTheme,
-                              user: channel.state!.members
-                                  .where((m) =>
-                                      m.userId !=
-                                      channel.client.state.currentUser!.id)
-                                  .first
-                                  .user,
+                    if (!widget.isChannel) {
+                      Channel channel = widget.channels[index];
+                      if (channel.memberCount == 2 && channel.isDistinct) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StreamChannel(
+                              channel: channel,
+                              child: ChatInfoScreen(
+                                messageTheme:
+                                    StreamChatTheme.of(context).ownMessageTheme,
+                                user: channel.state!.members
+                                    .where((m) =>
+                                        m.userId !=
+                                        channel.client.state.currentUser!.id)
+                                    .first
+                                    .user,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StreamChannel(
-                            channel: channel,
-                            child: GroupInfoScreen(
-                              messageTheme:
-                                  StreamChatTheme.of(context).ownMessageTheme,
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StreamChannel(
+                              channel: channel,
+                              child: GroupInfoScreen(
+                                messageTheme:
+                                    StreamChatTheme.of(context).ownMessageTheme,
+                              ),
                             ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     }
                   },
                   child: ChannelItemWidget(
