@@ -226,7 +226,7 @@ class _CallingWidgetState extends State<CallingWidget> {
   }
 
   void _setupRingingTone() async {
-    await player.setAsset(R.sounds.calling);
+    await player.setAsset(R.sounds.incomingCall);
     player.play();
   }
 

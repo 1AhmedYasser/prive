@@ -33,17 +33,21 @@ import 'group_info_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final Channel channel;
+  final bool isChannel;
 
-  static Route routeWithChannel(Channel channel) => MaterialPageRoute(
+  static Route routeWithChannel(Channel channel, {bool isChannel = false}) =>
+      MaterialPageRoute(
         builder: (context) => StreamChannel(
           channel: channel,
           child: ChatScreen(
             channel: channel,
+            isChannel: isChannel,
           ),
         ),
       );
 
-  const ChatScreen({Key? key, required this.channel}) : super(key: key);
+  const ChatScreen({Key? key, required this.channel, this.isChannel = false})
+      : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -121,47 +125,49 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        var channel = StreamChannel.of(context).channel;
+                        if (widget.isChannel == false) {
+                          var channel = StreamChannel.of(context).channel;
 
-                        if (channel.memberCount == 2 && channel.isDistinct) {
-                          final currentUser =
-                              StreamChat.of(context).currentUser;
-                          final otherUser =
-                              channel.state!.members.firstWhereOrNull(
-                            (element) => element.user!.id != currentUser!.id,
-                          );
-                          if (otherUser != null) {
-                            final pop = await Navigator.push(
+                          if (channel.memberCount == 2 && channel.isDistinct) {
+                            final currentUser =
+                                StreamChat.of(context).currentUser;
+                            final otherUser =
+                                channel.state!.members.firstWhereOrNull(
+                              (element) => element.user!.id != currentUser!.id,
+                            );
+                            if (otherUser != null) {
+                              final pop = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StreamChannel(
+                                    child: ChatInfoScreen(
+                                      messageTheme: StreamChatTheme.of(context)
+                                          .ownMessageTheme,
+                                      user: otherUser.user,
+                                    ),
+                                    channel: channel,
+                                  ),
+                                ),
+                              );
+
+                              if (pop == true) {
+                                Navigator.pop(context);
+                              }
+                            }
+                          } else {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => StreamChannel(
-                                  child: ChatInfoScreen(
+                                  child: GroupInfoScreen(
                                     messageTheme: StreamChatTheme.of(context)
                                         .ownMessageTheme,
-                                    user: otherUser.user,
                                   ),
                                   channel: channel,
                                 ),
                               ),
                             );
-
-                            if (pop == true) {
-                              Navigator.pop(context);
-                            }
                           }
-                        } else {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => StreamChannel(
-                                child: GroupInfoScreen(
-                                  messageTheme: StreamChatTheme.of(context)
-                                      .ownMessageTheme,
-                                ),
-                                channel: channel,
-                              ),
-                            ),
-                          );
                         }
                       },
                       child: ChannelAvatar(
@@ -277,69 +283,72 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
           actions: isMessageSelectionOn == false && isMessageSearchOn == false
               ? [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          pageBuilder: (BuildContext context, _, __) {
-                            return CallScreen(
-                              channel: channel,
-                              isVideo: true,
-                            );
-                          },
-                          transitionsBuilder: (_, Animation<double> animation,
-                              __, Widget child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    child: Image.asset(
-                      R.images.videoCallImage,
-                      width: 25,
+                  if (widget.isChannel == false)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (BuildContext context, _, __) {
+                              return CallScreen(
+                                channel: channel,
+                                isVideo: true,
+                              );
+                            },
+                            transitionsBuilder: (_, Animation<double> animation,
+                                __, Widget child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Image.asset(
+                        R.images.videoCallImage,
+                        width: 25,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          pageBuilder: (BuildContext context, _, __) {
-                            return CallScreen(
-                              channel: channel,
-                              isVideo: false,
-                            );
-                          },
-                          transitionsBuilder: (_, Animation<double> animation,
-                              __, Widget child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    child: Image.asset(
-                      R.images.voiceCallImage,
-                      width: 22,
+                  if (widget.isChannel == false)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder: (BuildContext context, _, __) {
+                              return CallScreen(
+                                channel: channel,
+                                isVideo: false,
+                              );
+                            },
+                            transitionsBuilder: (_, Animation<double> animation,
+                                __, Widget child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Image.asset(
+                        R.images.voiceCallImage,
+                        width: 22,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 20),
-                  ChatMenuWidget(
-                    channel: widget.channel,
-                    onOptionSelected: (option) {
-                      if (option == 1) {
-                        setState(() {
-                          _messageSearchController.text = "";
-                          isMessageSearchOn = true;
-                        });
-                      }
-                    },
-                  ),
+                  if (widget.isChannel == false)
+                    ChatMenuWidget(
+                      channel: widget.channel,
+                      onOptionSelected: (option) {
+                        if (option == 1) {
+                          setState(() {
+                            _messageSearchController.text = "";
+                            isMessageSearchOn = true;
+                          });
+                        }
+                      },
+                    ),
                   const SizedBox(width: 20),
                 ]
               : isMessageSearchOn
@@ -824,6 +833,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ],
+          );
+        } else if (message.user?.id != context.currentUser?.id) {
+          return Text(
+            message.user?.name ?? "",
+            style: const TextStyle(fontSize: 11),
           );
         } else {
           return const SizedBox.shrink();

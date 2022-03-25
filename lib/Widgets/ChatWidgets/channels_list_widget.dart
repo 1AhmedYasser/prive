@@ -9,7 +9,9 @@ import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChannelsListWidget extends StatefulWidget {
   final List<Channel> channels;
-  const ChannelsListWidget({Key? key, required this.channels})
+  final bool isChannel;
+  const ChannelsListWidget(
+      {Key? key, required this.channels, this.isChannel = false})
       : super(key: key);
 
   @override
@@ -35,7 +37,8 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () => Navigator.of(context).push(
-                      ChatScreen.routeWithChannel(widget.channels[index])),
+                      ChatScreen.routeWithChannel(widget.channels[index],
+                          isChannel: widget.isChannel)),
                   onLongPress: () {
                     Channel channel = widget.channels[index];
                     if (channel.memberCount == 2 && channel.isDistinct) {

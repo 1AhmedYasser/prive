@@ -11,9 +11,11 @@ class ChannelItemWidget extends StatefulWidget {
   final Channel channel;
   final bool isForward;
 
-  const ChannelItemWidget(
-      {Key? key, required this.channel, this.isForward = false})
-      : super(key: key);
+  const ChannelItemWidget({
+    Key? key,
+    required this.channel,
+    this.isForward = false,
+  }) : super(key: key);
 
   @override
   _ChannelItemWidgetState createState() => _ChannelItemWidgetState();

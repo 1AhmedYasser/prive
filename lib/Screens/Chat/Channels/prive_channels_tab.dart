@@ -5,14 +5,14 @@ import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
-class ImportantTab extends StatefulWidget {
-  const ImportantTab({Key? key}) : super(key: key);
+class PriveChannelsTab extends StatefulWidget {
+  const PriveChannelsTab({Key? key}) : super(key: key);
 
   @override
-  _ImportantTabState createState() => _ImportantTabState();
+  _PriveChannelsTabState createState() => _PriveChannelsTabState();
 }
 
-class _ImportantTabState extends State<ImportantTab>
+class _PriveChannelsTabState extends State<PriveChannelsTab>
     with TickerProviderStateMixin {
   final channelListController = ChannelListController();
   late final AnimationController _animationController;
@@ -30,13 +30,7 @@ class _ImportantTabState extends State<ImportantTab>
       filter: Filter.and(
         [
           Filter.equal('type', 'messaging'),
-          Filter.in_(
-            'members',
-            [
-              StreamChatCore.of(context).currentUser!.id,
-            ],
-          ),
-          Filter.equal('is_important', true),
+          Filter.equal('channel_type', 'Public_Channels'),
         ],
       ),
       emptyBuilder: (context) =>
@@ -50,12 +44,11 @@ class _ImportantTabState extends State<ImportantTab>
       ) =>
           const UltraLoadingIndicator(),
       listBuilder: (context, channels) {
-        channels =
-            channels.where((element) => element.lastMessageAt != null).toList();
         return channels.isEmpty
             ? ChannelsEmptyState(animationController: _animationController)
             : ChannelsListWidget(
                 channels: channels,
+                isChannel: true,
               );
       },
     );

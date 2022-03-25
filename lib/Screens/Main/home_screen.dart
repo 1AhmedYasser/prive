@@ -9,6 +9,7 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
