@@ -834,7 +834,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ],
           );
-        } else if (message.user?.id != context.currentUser?.id) {
+        } else if (message.user?.id != context.currentUser?.id &&
+            widget.isChannel) {
           return Text(
             message.user?.name ?? "",
             style: const TextStyle(fontSize: 11),
