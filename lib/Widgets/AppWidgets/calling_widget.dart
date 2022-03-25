@@ -36,6 +36,7 @@ class _CallingWidgetState extends State<CallingWidget> {
   Timer? timer;
   StreamSubscription? listener;
   late DatabaseReference ref;
+  late DatabaseReference usersRef;
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _CallingWidgetState extends State<CallingWidget> {
     timer = Timer.periodic(
         const Duration(seconds: 5), (Timer t) => _setupRingingTone());
     ref = FirebaseDatabase.instance.ref("Calls/${widget.channelName}");
+    usersRef = FirebaseDatabase.instance.ref("Users");
     listener = ref.onValue.listen((DatabaseEvent event) async {
       Map<dynamic, dynamic> data =
           event.snapshot.value as Map<dynamic, dynamic>;
@@ -57,6 +59,9 @@ class _CallingWidgetState extends State<CallingWidget> {
         BotToast.cleanAll();
         FlutterCallkitIncoming.endAllCalls();
         await ref.update({
+          await Utils.getString(R.pref.userId) ?? "": "Ended",
+        });
+        await usersRef.update({
           await Utils.getString(R.pref.userId) ?? "": "Ended",
         });
       }
@@ -184,8 +189,13 @@ class _CallingWidgetState extends State<CallingWidget> {
                         FlutterCallkitIncoming.endAllCalls();
                         DatabaseReference ref = FirebaseDatabase.instance
                             .ref("Calls/${widget.channelName}");
+                        DatabaseReference usersRef =
+                            FirebaseDatabase.instance.ref("Users");
 
                         await ref.update({
+                          await Utils.getString(R.pref.userId) ?? "": "Ended",
+                        });
+                        await usersRef.update({
                           await Utils.getString(R.pref.userId) ?? "": "Ended",
                         });
                         BotToast.cleanAll();

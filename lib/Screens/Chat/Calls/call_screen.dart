@@ -68,6 +68,7 @@ class _CallScreenState extends State<CallScreen> {
   late FlipCardController _flipController;
   RtcStats? _stats;
   late DatabaseReference ref;
+  late DatabaseReference userRef;
   StreamSubscription? listener;
   bool callEnded = false;
   bool isSpeakerOn = false;
@@ -545,6 +546,9 @@ class _CallScreenState extends State<CallScreen> {
                   await ref.update({
                     await Utils.getString(R.pref.userId) ?? "": "Ended",
                   });
+                  await userRef.update({
+                    await Utils.getString(R.pref.userId) ?? "": "Ended",
+                  });
                 },
               ),
             )
@@ -555,12 +559,14 @@ class _CallScreenState extends State<CallScreen> {
 
   _makeACall({String ids = "", List<String> users = const []}) async {
     ref = FirebaseDatabase.instance.ref("Calls/$channelName");
+    userRef = FirebaseDatabase.instance.ref("Users");
     Map<String, String> callUsers = {};
     callUsers[await Utils.getString(R.pref.userId) ?? ""] = "In Call";
     for (var element in users) {
       callUsers[element] = "Waiting";
     }
     if (widget.isJoining == false) await ref.set(callUsers);
+    userRef.update({await Utils.getString(R.pref.userId) ?? "": "In Call"});
     listener = ref.onValue.listen((DatabaseEvent event) async {
       Map<dynamic, dynamic> data =
           event.snapshot.value as Map<dynamic, dynamic>;
@@ -643,6 +649,9 @@ class _CallScreenState extends State<CallScreen> {
       await ref.update({
         await Utils.getString(R.pref.userId) ?? "": "Ended",
       });
+      await userRef.update({
+        await Utils.getString(R.pref.userId) ?? "": "Ended",
+      });
     }, remoteVideoStateChanged: (uid, state, reason, time) {
       if (state.index == 0) {
         setState(() {
@@ -719,6 +728,9 @@ class _CallScreenState extends State<CallScreen> {
 
   void endCall() async {
     ref.update({
+      await Utils.getString(R.pref.userId) ?? "": "Ended",
+    });
+    userRef.update({
       await Utils.getString(R.pref.userId) ?? "": "Ended",
     });
   }

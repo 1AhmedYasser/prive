@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -74,11 +75,16 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isMessageSearchOn = false;
   final TextEditingController _messageSearchController =
       TextEditingController();
+  Member? otherMember;
 
   @override
   void initState() {
     super.initState();
+
     channel = StreamChannel.of(context).channel;
+    otherMember = widget.channel.state?.members
+        .where((element) => element.userId != context.currentUser?.id)
+        .firstOrNull;
     Utils.checkForInternetConnection(context);
     _focusNode = FocusNode();
     _getChatBackground();
@@ -312,24 +318,69 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 20),
                   if (widget.isChannel == false)
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            pageBuilder: (BuildContext context, _, __) {
-                              return CallScreen(
-                                channel: channel,
-                                isVideo: false,
-                              );
-                            },
-                            transitionsBuilder: (_, Animation<double> animation,
-                                __, Widget child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
+                      onTap: () async {
+                        final ref = FirebaseDatabase.instance
+                            .ref('Users/${otherMember?.userId}');
+                        final snapshot = await ref.get();
+                        if (snapshot.exists) {
+                          print(snapshot.value as String);
+                          if (snapshot.value as String == "Ended") {
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (BuildContext context, _, __) {
+                                  return CallScreen(
+                                    channel: channel,
+                                    isVideo: false,
+                                  );
+                                },
+                                transitionsBuilder: (_,
+                                    Animation<double> animation,
+                                    __,
+                                    Widget child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (_) => CupertinoAlertDialog(
+                                title: const Text("Prive"),
+                                content: Text(
+                                    "${otherMember?.user?.name ?? "Member"} is on another call"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text("Ok"),
+                                    onPressed: () => Navigator.pop(context),
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                        } else {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (BuildContext context, _, __) {
+                                return CallScreen(
+                                  channel: channel,
+                                  isVideo: false,
+                                );
+                              },
+                              transitionsBuilder: (_,
+                                  Animation<double> animation,
+                                  __,
+                                  Widget child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        }
                       },
                       child: Image.asset(
                         R.images.voiceCallImage,

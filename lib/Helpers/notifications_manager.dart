@@ -367,8 +367,11 @@ class NotificationsManager {
             await Firebase.initializeApp();
             DatabaseReference ref = FirebaseDatabase.instance.ref(
                 "Calls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
-
+            DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
             ref.update({
+              await Utils.getString(R.pref.userId) ?? "": "Ended",
+            });
+            usersRef.update({
               await Utils.getString(R.pref.userId) ?? "": "Ended",
             });
             break;
