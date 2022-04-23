@@ -77,6 +77,7 @@ class Images {
   String cameraSwitch = "$path/camera_switch.png";
   String acceptCall = "$path/accept_call.png";
   String declineCall = "$path/decline_call.png";
+  String chatRoomsIcons = "$path/chat_rooms_icons.png";
 }
 
 class Animations {
@@ -127,7 +128,7 @@ class SharedPref {
 }
 
 class Constants {
-  String streamKey = 'zrq5d3ddtxp5';
+  String streamKey = 'ymyds4cvwdx6';
   String agoraAppId = "666a21c863d9431da1ee9651748608fb";
 }
 

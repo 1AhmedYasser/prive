@@ -9,6 +9,7 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
+import 'package:quiver/iterables.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
@@ -28,6 +29,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
   TextEditingController groupNameController = TextEditingController();
 
   String _userNameQuery = '';
+  List<User> users = [];
 
   final _selectedUsers = <User>{};
 
@@ -480,6 +482,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
   }
 
   Future _fetchContacts() async {
+    users.clear();
     phoneContacts.clear();
     phoneNumbers.clear();
     if (!await FlutterContacts.requestPermission(readonly: true)) {
@@ -496,8 +499,13 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
               String dialCode = deviceDialCode?.dialCode == "+20"
                   ? "+2"
                   : deviceDialCode?.dialCode ?? "";
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+                phoneNumbers.add(
+                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+              } else {
+                phoneNumbers
+                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              }
             } else {
               phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
             }
@@ -505,12 +513,41 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
             String dialCode = deviceDialCode?.dialCode == "+20"
                 ? "+2"
                 : deviceDialCode?.dialCode ?? "";
-            phoneNumbers
-                .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+
+            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+              phoneNumbers.add(
+                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+            } else {
+              phoneNumbers
+                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            }
           }
         }
       }
-      print(phoneNumbers);
+
+      // Handling Filters
+      List<List<String>> dividedPhoneNumbers = [];
+      dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
+      for (var phoneNumbers in dividedPhoneNumbers) {
+        QueryUsersResponse usersResponse =
+            await StreamChatCore.of(context).client.queryUsers(
+          filter: Filter.and([
+            Filter.notEqual("id", context.currentUser!.id),
+            Filter.notEqual("role", "admin"),
+            Filter.in_("phone", phoneNumbers)
+          ]),
+          sort: const [
+            SortOption(
+              'name',
+              direction: 1,
+            ),
+          ],
+        );
+        for (var user in usersResponse.users) {
+          users.add(user);
+        }
+      }
+
       setState(() {});
     }
   }

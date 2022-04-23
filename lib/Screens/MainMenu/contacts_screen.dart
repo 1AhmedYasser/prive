@@ -250,8 +250,13 @@ class _ContactsScreenState extends State<ContactsScreen>
               String dialCode = deviceDialCode?.dialCode == "+20"
                   ? "+2"
                   : deviceDialCode?.dialCode ?? "";
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+                phoneNumbers.add(
+                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+              } else {
+                phoneNumbers
+                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              }
             } else {
               phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
             }
@@ -259,8 +264,14 @@ class _ContactsScreenState extends State<ContactsScreen>
             String dialCode = deviceDialCode?.dialCode == "+20"
                 ? "+2"
                 : deviceDialCode?.dialCode ?? "";
-            phoneNumbers
-                .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+
+            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+              phoneNumbers.add(
+                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+            } else {
+              phoneNumbers
+                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            }
           }
         }
       }

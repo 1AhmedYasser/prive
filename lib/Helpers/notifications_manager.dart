@@ -220,14 +220,16 @@ class NotificationsManager {
           'nameCaller': callerName,
           'appName': 'Prive',
           'avatar': callerImage,
+          'handle': hasVideo ? "Video Call" : "Voice Call",
           'extra': <String, dynamic>{'channelName': channelName},
           'type': hasVideo ? 1 : 0,
           'android': <String, dynamic>{
             'isCustomNotification': false,
             'isShowLogo': false,
-            'ringtonePath': "system_ringtone_default",
+            'ringtonePath': "ringtone_default",
             'backgroundColor': '#1293a8',
-            // 'backgroundUrl': 'https://i.pravatar.cc/500',
+            'backgroundUrl':
+                'https://fv9-3.failiem.lv/thumb_show.php?i=yxvrrm7mr&view',
             // 'actionColor': '#4CAF50'
           },
           'ios': <String, dynamic>{
@@ -328,13 +330,14 @@ class NotificationsManager {
   }
 
   static Future<void> listenToCalls() async {
+    print("Contxeeext $notificationsContext");
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
-        print("Eveeeent $event");
         switch (event!.name) {
           case CallEvent.ACTION_CALL_INCOMING:
             break;
           case CallEvent.ACTION_CALL_START:
+            print("hi");
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
             Navigator.of(notificationsContext).push(
