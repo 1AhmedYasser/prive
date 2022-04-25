@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Screens/MainMenu/contacts_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 
 class MoreScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _MoreScreenState extends State<MoreScreen> {
         preferredSize: const Size.fromHeight(35),
         child: AppBar(
           backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
           elevation: 0,
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarBrightness: Brightness.light,
@@ -40,14 +42,21 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
               ),
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 27, right: 27, bottom: 30),
-                  child: Text(
-                    "More",
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w600,
-                    ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 15, right: 27, bottom: 30),
+                  child: Row(
+                    children: const [
+                      BackButton(),
+                      SizedBox(width: 8),
+                      Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 OptionRowWidget(
@@ -68,7 +77,16 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: R.images.contactsImage,
                   title: "Contacts",
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ContactsScreen(
+                          title: "Contacts",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 OptionRowWidget(
                   image: R.images.peopleNearbyImage,

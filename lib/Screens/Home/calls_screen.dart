@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -11,6 +16,7 @@ class CallsScreen extends StatefulWidget {
 class _CallsScreenState extends State<CallsScreen>
     with TickerProviderStateMixin {
   late final AnimationController _animationController;
+  int currentTab = 0;
 
   @override
   void initState() {
@@ -21,11 +27,163 @@ class _CallsScreenState extends State<CallsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ChannelsEmptyState(
-          animationController: _animationController,
-          title: "No Calls Yet",
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(35),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.light,
+          ),
         ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimationLimiter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: AnimationConfiguration.toStaggeredList(
+                duration: const Duration(milliseconds: 375),
+                childAnimationBuilder: (widget) => SlideAnimation(
+                  horizontalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: widget,
+                  ),
+                ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Calls",
+                          style: TextStyle(
+                            fontSize: 34,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15, bottom: 15),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 200,
+                        child: CupertinoSlidingSegmentedControl(
+                          groupValue: currentTab,
+                          children: const <int, Widget>{
+                            0: Text('All'),
+                            1: Text('Missed'),
+                          },
+                          onValueChanged: (value) {
+                            setState(() {
+                              currentTab = value as int;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 30),
+                    child: SearchTextField(
+                      controller: TextEditingController(),
+                      showCloseButton: false,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: AnimationLimiter(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      horizontalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 10, bottom: 5, top: 5),
+                              child: SizedBox(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: const CachedImage(
+                                    url:
+                                        "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                  ),
+                                ),
+                                height: 50,
+                                width: 50,
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Ahmed Yasser",
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        index % 2 == 0
+                                            ? R.images.outgoingCall
+                                            : R.images.missedCall,
+                                        width: 17,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        index % 2 == 0 ? "Outgoing" : "Missed",
+                                        style: TextStyle(
+                                          color: index % 2 == 0
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            Text(
+                              "30/12/2020",
+                              style: TextStyle(
+                                color: index % 2 == 0
+                                    ? Colors.grey.shade600
+                                    : Colors.red,
+                              ),
+                            ),
+                            const SizedBox(width: 25),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+                itemCount: 20,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

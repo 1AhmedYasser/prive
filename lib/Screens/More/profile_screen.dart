@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Screens/More/more_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "dart:io";
 
@@ -193,6 +194,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
+                        minimumSize:
+                            Size(MediaQuery.of(context).size.width, 55),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MoreScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColorDark,
                         minimumSize:
                             Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,

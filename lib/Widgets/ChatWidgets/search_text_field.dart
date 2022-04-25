@@ -9,6 +9,7 @@ class SearchTextField extends StatefulWidget {
   final bool showCloseButton;
   final bool autoFocus;
   final bool closeOnSearch;
+  final bool isFilled;
 
   const SearchTextField(
       {Key? key,
@@ -18,6 +19,7 @@ class SearchTextField extends StatefulWidget {
       this.hintText = 'Search',
       this.showCloseButton = true,
       this.closeOnSearch = true,
+      this.isFilled = false,
       this.autoFocus = false})
       : super(key: key);
 
@@ -59,6 +61,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
                 }
               },
               decoration: InputDecoration(
+                filled: widget.isFilled,
                 prefixText: '    ',
                 prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
                 prefixIcon: const Icon(

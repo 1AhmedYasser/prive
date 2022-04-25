@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
 
-class ChatRoomsScreen extends StatefulWidget {
-  const ChatRoomsScreen({Key? key}) : super(key: key);
+class RoomsScreen extends StatefulWidget {
+  const RoomsScreen({Key? key}) : super(key: key);
 
   @override
-  _ChatRoomsScreenState createState() => _ChatRoomsScreenState();
+  _RoomsScreenState createState() => _RoomsScreenState();
 }
 
-class _ChatRoomsScreenState extends State<ChatRoomsScreen>
+class _RoomsScreenState extends State<RoomsScreen>
     with TickerProviderStateMixin {
   late final AnimationController _animationController;
 

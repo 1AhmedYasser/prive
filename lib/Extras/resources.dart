@@ -78,6 +78,9 @@ class Images {
   String acceptCall = "$path/accept_call.png";
   String declineCall = "$path/decline_call.png";
   String chatRoomsIcons = "$path/chat_rooms_icons.png";
+  String missedCall = "$path/missed_call.png";
+  String outgoingCall = "$path/outgoing_call.png";
+  String storiesTabImage = "$path/stories_tab_image.png";
 }
 
 class Animations {

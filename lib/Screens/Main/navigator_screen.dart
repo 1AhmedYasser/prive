@@ -1,18 +1,13 @@
-import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
-import 'package:prive/Screens/Home/chat_rooms_screen.dart';
-import 'package:prive/Screens/Home/more_screen.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:prive/Screens/Home/rooms_screen.dart';
+import 'package:prive/Screens/Home/stories_screen.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -49,8 +44,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           TabItem(
             icon: Container(),
           ),
-          _buildTab("Chat Rooms", R.images.micTabImage, 3),
-          _buildTab("More", R.images.moreTabImage, 4),
+          _buildTab("Rooms", R.images.micTabImage, 3),
+          _buildTab("Stories", R.images.storiesTabImage, 4),
         ],
         initialActiveIndex: 2,
         onTap: (int i) => _onTabTapped(i),
@@ -83,9 +78,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       case 1:
         return const CallsScreen();
       case 3:
-        return const ChatRoomsScreen();
+        return const RoomsScreen();
       case 4:
-        return const MoreScreen();
+        return const StoriesScreen();
       default:
         return const ChannelsScreen();
     }
@@ -176,7 +171,7 @@ class _ChipBuilder extends ChipBuilder {
       case 3:
         return R.images.micTabImage;
       case 4:
-        return R.images.moreTabImage;
+        return R.images.storiesTabImage;
       default:
         return R.images.chatTabImage;
     }
@@ -191,9 +186,9 @@ class _ChipBuilder extends ChipBuilder {
       case 2:
         return "";
       case 3:
-        return "Chat Rooms";
+        return "Rooms";
       case 4:
-        return "More";
+        return "Stories";
       default:
         return "Chat";
     }

@@ -20,7 +20,9 @@ import 'package:intl/intl.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 
 class ContactsScreen extends StatefulWidget {
-  const ContactsScreen({Key? key}) : super(key: key);
+  final String title;
+  const ContactsScreen({Key? key, this.title = "New Message"})
+      : super(key: key);
 
   @override
   _ContactsScreenState createState() => _ContactsScreenState();
@@ -68,7 +70,7 @@ class _ContactsScreenState extends State<ContactsScreen>
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "New Message"),
+        child: PriveAppBar(title: widget.title),
       ),
       body: phoneContacts.isNotEmpty
           ? users.isNotEmpty
