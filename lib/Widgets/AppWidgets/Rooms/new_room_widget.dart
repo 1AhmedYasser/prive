@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:intl/intl.dart';
+import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 
 class NewRoomWidget extends StatefulWidget {
   const NewRoomWidget({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
   final _formKey = GlobalKey<FormState>();
   DateTime? selectedDateTime;
   List<bool> isSelected = [true, false];
+  TextEditingController topicNameController = TextEditingController();
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               ),
               const SizedBox(height: 15),
               TextFormField(
+                controller: topicNameController,
                 keyboardType: TextInputType.text,
                 cursorColor: const Color(0xff777777),
                 decoration: InputDecoration(
@@ -207,7 +210,15 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                       if (selectedRoom == 0) {
                         Navigator.pop(context);
                       } else {
-                        print("Choose People");
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PeopleChooserScreen(
+                              roomName: topicNameController.text,
+                            ),
+                          ),
+                        );
                       }
                     }
                   },

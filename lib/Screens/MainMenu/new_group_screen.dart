@@ -64,14 +64,6 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
   }
 
   @override
-  void dispose() {
-    _controller?.clear();
-    _controller?.removeListener(_userNameListener);
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
@@ -132,41 +124,6 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
           ),
         ],
       ),
-      // appBar: AppBar(
-      //   elevation: 1,
-      //   backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
-      //   leading: const StreamBackButton(),
-      //   title: Text(
-      //     "New Group",
-      //     style: TextStyle(
-      //       color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-      //       fontSize: 16,
-      //     ),
-      //   ),
-      //   centerTitle: true,
-      //   actions: [
-      //     if (_selectedUsers.isNotEmpty)
-      //       IconButton(
-      //         icon: StreamSvgIcon.arrowRight(
-      //           color: StreamChatTheme.of(context).colorTheme.accentPrimary,
-      //         ),
-      //         onPressed: () async {
-      //           // final updatedList = await Navigator.pushNamed(
-      //           //   context,
-      //           //   Routes.NEW_GROUP_CHAT_DETAILS,
-      //           //   arguments: _selectedUsers.toList(growable: false),
-      //           // );
-      //           // if (updatedList != null) {
-      //           //   setState(() {
-      //           //     _selectedUsers
-      //           //       ..clear()
-      //           //       ..addAll(updatedList as Iterable<User>);
-      //           //   });
-      //           // }
-      //         },
-      //       )
-      //   ],
-      // ),
       body: ConnectionStatusBuilder(
         statusBuilder: (context, status) {
           String statusString = '';
@@ -301,7 +258,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
                     ),
                   SliverPersistentHeader(
                     pinned: true,
-                    delegate: _HeaderDelegate(
+                    delegate: HeaderDelegate(
                       height: 32,
                       child: Container(
                         width: double.maxFinite,
@@ -551,13 +508,21 @@ class _NewGroupScreenState extends State<NewGroupScreen> {
       setState(() {});
     }
   }
+
+  @override
+  void dispose() {
+    _controller?.clear();
+    _controller?.removeListener(_userNameListener);
+    _controller?.dispose();
+    super.dispose();
+  }
 }
 
-class _HeaderDelegate extends SliverPersistentHeaderDelegate {
+class HeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final double height;
 
-  const _HeaderDelegate({
+  const HeaderDelegate({
     required this.child,
     required this.height,
   });
@@ -578,5 +543,5 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => height;
 
   @override
-  bool shouldRebuild(_HeaderDelegate oldDelegate) => true;
+  bool shouldRebuild(HeaderDelegate oldDelegate) => true;
 }
