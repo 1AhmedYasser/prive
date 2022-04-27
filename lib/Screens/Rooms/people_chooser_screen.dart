@@ -7,7 +7,6 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:quiver/iterables.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
