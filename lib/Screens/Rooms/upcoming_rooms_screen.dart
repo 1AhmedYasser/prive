@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Extras/resources.dart';
-
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class UpComingRoomsScreen extends StatefulWidget {
