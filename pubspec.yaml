@@ -63,7 +63,7 @@ dependencies:
   flutter_sim_country_code: ^0.1.2
   draggable_widget: ^2.0.0
   flip_card: ^0.6.0
-  flutter_cupertino_date_picker_fork: ^1.0.6
+  flutter_swipe_action_cell: ^2.2.0
 
   # Utils
   supercharged: ^2.1.1

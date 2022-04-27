@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
+import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -17,6 +19,9 @@ class _CallsScreenState extends State<CallsScreen>
     with TickerProviderStateMixin {
   late final AnimationController _animationController;
   int currentTab = 0;
+  bool isEditing = false;
+  SwipeActionController controller = SwipeActionController();
+  List<String> calls = ["", "", "", "", "", "", "", "", "", "", ""];
 
   @override
   void initState() {
@@ -57,14 +62,51 @@ class _CallsScreenState extends State<CallsScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "Calls",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w600,
+                      children: [
+                        const Expanded(
+                          child: SizedBox(
+                            height: 48,
+                            child: Text(
+                              "Calls",
+                              style: TextStyle(
+                                fontSize: 34,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
+                        if (isEditing)
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isEditing = false;
+                                calls.clear();
+                              });
+                            },
+                            child: Text(
+                              "Clear All",
+                              style: TextStyle(
+                                fontSize: 17,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                            ),
+                          ),
+                        if (calls.isNotEmpty)
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                isEditing = !isEditing;
+                                controller.closeAllOpenCell();
+                              });
+                            },
+                            child: Text(
+                              isEditing ? "Done" : "Edit",
+                              style: TextStyle(
+                                fontSize: 17,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                            ),
+                          )
                       ],
                     ),
                   ),
@@ -103,7 +145,7 @@ class _CallsScreenState extends State<CallsScreen>
           ),
           Expanded(
             child: AnimationLimiter(
-              child: ListView.separated(
+              child: ListView.builder(
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return AnimationConfiguration.staggeredList(
@@ -112,74 +154,122 @@ class _CallsScreenState extends State<CallsScreen>
                     child: SlideAnimation(
                       horizontalOffset: 50.0,
                       child: FadeInAnimation(
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, right: 10, bottom: 5, top: 5),
-                              child: SizedBox(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: const CachedImage(
-                                    url:
-                                        "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
-                                  ),
-                                ),
-                                height: 50,
-                                width: 50,
+                        child: SwipeActionCell(
+                          controller: controller,
+                          index: index,
+                          key: ValueKey(calls[index]),
+                          trailingActions: [
+                            SwipeAction(
+                              content: Image.asset(
+                                R.images.deleteChatImage,
+                                width: 15,
+                                color: Colors.red,
                               ),
+                              color: Colors.transparent,
+                              onTap: (handler) async {
+                                await handler(true);
+                                setState(() {
+                                  calls.removeAt(index);
+                                });
+                              },
                             ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                          child: Column(
+                            children: [
+                              Row(
                                 children: [
-                                  const Text(
-                                    "Ahmed Yasser",
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.black,
+                                  if (isEditing) const SizedBox(width: 15),
+                                  if (isEditing)
+                                    CupertinoButton(
+                                      padding: EdgeInsets.zero,
+                                      minSize: 0,
+                                      child: Icon(
+                                        CupertinoIcons.minus_circle_fill,
+                                        color: CupertinoColors.systemRed
+                                            .resolveFrom(context),
+                                      ),
+                                      onPressed: () {
+                                        controller.openCellAt(
+                                          index: index,
+                                          trailing: true,
+                                        );
+                                      },
+                                    ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: isEditing ? 15 : 25,
+                                        right: 10,
+                                        bottom: 5,
+                                        top: 5),
+                                    child: SizedBox(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(30),
+                                        child: const CachedImage(
+                                          url:
+                                              "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                        ),
+                                      ),
+                                      height: 50,
+                                      width: 50,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        index % 2 == 0
-                                            ? R.images.outgoingCall
-                                            : R.images.missedCall,
-                                        width: 17,
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        index % 2 == 0 ? "Outgoing" : "Missed",
-                                        style: TextStyle(
-                                          color: index % 2 == 0
-                                              ? Colors.green
-                                              : Colors.red,
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Ahmed Yasser",
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      )
-                                    ],
-                                  )
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              index % 2 == 0
+                                                  ? R.images.outgoingCall
+                                                  : R.images.missedCall,
+                                              width: 17,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              index % 2 == 0
+                                                  ? "Outgoing"
+                                                  : "Missed",
+                                              style: TextStyle(
+                                                color: index % 2 == 0
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    "30/12/2020",
+                                    style: TextStyle(
+                                      color: index % 2 == 0
+                                          ? Colors.grey.shade600
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 25),
                                 ],
                               ),
-                            ),
-                            Text(
-                              "30/12/2020",
-                              style: TextStyle(
-                                color: index % 2 == 0
-                                    ? Colors.grey.shade600
-                                    : Colors.red,
-                              ),
-                            ),
-                            const SizedBox(width: 25),
-                          ],
+                              const Divider(height: 15)
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => const Divider(),
-                itemCount: 20,
+                itemCount: calls.length,
               ),
             ),
           ),

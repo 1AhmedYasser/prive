@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:intl/intl.dart';
