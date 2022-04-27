@@ -531,6 +531,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.2"
+  flutter_cupertino_date_picker_fork:
+    dependency: "direct main"
+    description:
+      name: flutter_cupertino_date_picker_fork
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.6"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -720,7 +727,7 @@ packages:
       name: grouped_list
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.0"
   html:
     dependency: transitive
     description:
@@ -958,7 +965,7 @@ packages:
       name: modal_bottom_sheet
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   mutex:
     dependency: transitive
     description:

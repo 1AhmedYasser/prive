@@ -81,6 +81,10 @@ class Images {
   String missedCall = "$path/missed_call.png";
   String outgoingCall = "$path/outgoing_call.png";
   String storiesTabImage = "$path/stories_tab_image.png";
+  String publicRoom = "$path/public_room.png";
+  String closedRoom = "$path/closed_room.png";
+  String clockImage = "$path/clock_image.png";
+  String calendarImage = "$path/calendar_image.png";
 }
 
 class Animations {
