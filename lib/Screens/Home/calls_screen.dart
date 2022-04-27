@@ -178,9 +178,13 @@ class _CallsScreenState extends State<CallsScreen>
                             children: [
                               Row(
                                 children: [
-                                  if (isEditing) const SizedBox(width: 15),
-                                  if (isEditing)
-                                    CupertinoButton(
+                                  Visibility(
+                                    child: const SizedBox(width: 15),
+                                    visible: isEditing,
+                                  ),
+                                  Visibility(
+                                    visible: isEditing,
+                                    child: CupertinoButton(
                                       padding: EdgeInsets.zero,
                                       minSize: 0,
                                       child: Icon(
@@ -195,6 +199,7 @@ class _CallsScreenState extends State<CallsScreen>
                                         );
                                       },
                                     ),
+                                  ),
                                   Padding(
                                     padding: EdgeInsets.only(
                                         left: isEditing ? 15 : 25,
