@@ -87,6 +87,8 @@ class Images {
   String calendarImage = "$path/calendar_image.png";
   String roomNotifications = "$path/room_notifications.png";
   String roomNotificationsOn = "$path/room_notifications_on.png";
+  String roomMic = "$path/room_mic.png";
+  String roomLeave = "$path/room_leave.png";
 }
 
 class Animations {

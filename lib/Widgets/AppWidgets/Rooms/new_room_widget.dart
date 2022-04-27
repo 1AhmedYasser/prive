@@ -215,7 +215,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => PeopleChooserScreen(
-                              roomName: topicNameController.text,
+                              roomName: topicNameController.text.trim(),
                             ),
                           ),
                         );

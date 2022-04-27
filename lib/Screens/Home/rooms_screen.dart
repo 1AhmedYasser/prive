@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Screens/Rooms/upcoming_rooms_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/new_room_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -151,51 +152,63 @@ class _RoomsScreenState extends State<RoomsScreen>
                     child: SlideAnimation(
                       horizontalOffset: 50.0,
                       child: FadeInAnimation(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20, bottom: 20, top: 10),
-                          child: Container(
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(17),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 20, top: 20, right: 20),
-                                  child: Text(
-                                    "Discussing the best places in KSA",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15.5,
-                                      fontWeight: FontWeight.w500,
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RoomScreen(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, bottom: 20, top: 10),
+                            child: Container(
+                              height: 150,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(17),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 20, top: 20, right: 20),
+                                    child: Text(
+                                      "Discussing the best places in KSA",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15.5,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 20,
-                                    top: 15,
-                                    right: 20,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      buildSpeaker(),
-                                      const SizedBox(width: 10),
-                                      buildSpeaker(),
-                                      const SizedBox(width: 10),
-                                      buildSpeaker(),
-                                      const SizedBox(width: 10),
-                                      buildInfo("7", "speakers"),
-                                      const SizedBox(width: 10),
-                                      buildInfo("7", "listeners")
-                                    ],
-                                  ),
-                                )
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 20,
+                                      top: 15,
+                                      right: 20,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        buildSpeaker(),
+                                        const SizedBox(width: 10),
+                                        buildSpeaker(),
+                                        const SizedBox(width: 10),
+                                        buildSpeaker(),
+                                        const SizedBox(width: 10),
+                                        buildInfo("7", "speakers"),
+                                        const SizedBox(width: 10),
+                                        buildInfo("7", "listeners")
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
