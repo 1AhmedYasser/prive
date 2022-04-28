@@ -1526,6 +1526,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.0"
+  transition_plus:
+    dependency: "direct main"
+    description:
+      name: transition_plus
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.12"
   typed_data:
     dependency: transitive
     description:

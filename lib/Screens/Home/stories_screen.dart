@@ -10,6 +10,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Stories/my_stories_screen.dart';
 import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
+import 'package:prive/Screens/Stories/text_story_editor_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -18,6 +19,7 @@ import 'package:quiver/iterables.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:transition_plus/transition_plus.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
@@ -214,22 +216,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       ],
                     ),
                     const Expanded(child: SizedBox()),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color: Colors.grey.shade300,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          size: 25,
-                          color: Theme.of(context).primaryColorDark,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 20),
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        print("Open Camera");
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
@@ -238,9 +230,40 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(8),
                           child: Icon(
-                            Icons.edit,
-                            size: 24,
+                            Icons.camera_alt_rounded,
+                            size: 25,
                             color: Theme.of(context).primaryColorDark,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 20),
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          print("Open Editor");
+                          Navigator.push(
+                            context,
+                            ScaleTransition1(
+                              page: const TextStoryEditorScreen(),
+                              type: ScaleTrasitionTypes.bottom,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: Colors.grey.shade300,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.edit,
+                              size: 24,
+                              color: Theme.of(context).primaryColorDark,
+                            ),
                           ),
                         ),
                       ),

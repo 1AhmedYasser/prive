@@ -79,6 +79,7 @@ dependencies:
   flutter_contacts: ^1.1.2
   app_settings: ^4.1.1
   quiver: ^3.0.1+1
+  transition_plus: 0.0.12
 
   # Firebase
   firebase_core: ^1.10.6
