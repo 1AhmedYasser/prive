@@ -30,9 +30,12 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
     return Form(
       key: _formKey,
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(25),
+            topLeft: Radius.circular(25),
+          ),
         ),
         child: Padding(
           padding:

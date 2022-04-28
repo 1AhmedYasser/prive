@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 
@@ -239,7 +240,16 @@ class _RoomScreenState extends State<RoomScreen> {
               badgeColor: Theme.of(context).primaryColorDark,
               child: FloatingActionButton(
                 elevation: 1,
-                onPressed: () {},
+                onPressed: () {
+                  showMaterialModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => SingleChildScrollView(
+                      controller: ModalScrollController.of(context),
+                      child: const RaisedHandsWidget(),
+                    ),
+                  );
+                },
                 child: Image.asset(
                   R.images.raiseHandIcon,
                 ),
