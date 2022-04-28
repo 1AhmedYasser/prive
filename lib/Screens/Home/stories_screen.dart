@@ -112,7 +112,6 @@ class _StoriesScreenState extends State<StoriesScreen> {
             highlightColor: Colors.transparent,
             onTap: () {
               if (myStories.isNotEmpty) {
-                print("Open My Stories");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -120,7 +119,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       myStories: myStories,
                     ),
                   ),
-                );
+                ).then((value) {
+                  setState(() {});
+                });
               } else {
                 print("Add New Story");
               }
@@ -415,6 +416,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
     phoneNumbers.clear();
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
+      BotToast.cleanAll();
     } else {
       phoneContacts = await FlutterContacts.getContacts(withProperties: true);
       for (var contact in phoneContacts) {

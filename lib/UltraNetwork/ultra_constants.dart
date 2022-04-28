@@ -1,5 +1,6 @@
 import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Models/Call/prive_call.dart';
+import 'package:prive/Models/Common/status_response.dart';
 import 'package:prive/Models/Stories/stories.dart';
 import 'package:prive/UltraNetwork/ultra_helpers.dart';
 import 'package:prive/UltraNetwork/ultra_request.dart';
@@ -20,3 +21,5 @@ final makeACall = UltraRequest(
 // Stories
 final getStories =
     UltraRequest("${baseUrl}GetStories.php", UMethods.post, Stories());
+final deleteStory =
+    UltraRequest("${baseUrl}DeleteStory.php", UMethods.post, StatusResponse());
