@@ -25,6 +25,7 @@ class StoriesScreen extends StatefulWidget {
 class _StoriesScreenState extends State<StoriesScreen> {
   List<StoriesData> stories = [];
   List<List<StoriesData>> usersStories = [];
+  List<StoriesData> myStories = [];
   CancelToken cancelToken = CancelToken();
 
   @override
@@ -83,86 +84,103 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 60, bottom: 20),
-            child: Container(
-              height: 90,
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(60),
-                            child: CachedImage(
-                              url: context.currentUserImage ?? "",
+          InkWell(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: () {
+              if (myStories.isNotEmpty) {
+                print("Open My Stories");
+              } else {
+                print("Add New Story");
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 60, bottom: 20),
+              child: Container(
+                height: 90,
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          DashedCircle(
+                            child: Padding(
+                              padding: const EdgeInsets.all(3),
+                              child: SizedBox(
+                                width: 70,
+                                height: 70,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(60),
+                                  child: CachedImage(
+                                    url: context.currentUserImage ?? "",
+                                  ),
+                                ),
+                              ),
                             ),
+                            dashes: myStories.length,
+                            gapSize: myStories.isNotEmpty
+                                ? myStories.length == 1
+                                    ? 0
+                                    : 3
+                                : 0,
+                            color: Colors.grey.shade400.withOpacity(0.8),
+                          ),
+                          if (myStories.isEmpty)
+                            Positioned(
+                              bottom: 0,
+                              right: -1,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(90),
+                                ),
+                                child: Icon(
+                                  Icons.add_circle,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "My Story",
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: -1,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(90),
-                            ),
-                            child: Icon(
-                              Icons.add_circle,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          myStories.isEmpty
+                              ? "Add to my story"
+                              : time_ago.format(
+                                  DateFormat("yyyy-MM-dd HH:mm:ss", "en")
+                                      .parse(
+                                          myStories.last.createdAtStory ??
+                                              DateTime.now().toString(),
+                                          true)
+                                      .toLocal(),
+                                ),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade600,
                           ),
-                        )
+                        ),
                       ],
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "My Story",
-                        style: TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Text(
-                        "Add to my story",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Expanded(child: SizedBox()),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.grey.shade300,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Icons.camera_alt_rounded,
-                        size: 25,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 20),
-                    child: Container(
+                    const Expanded(child: SizedBox()),
+                    Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
                         color: Colors.grey.shade300,
@@ -170,14 +188,31 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: Icon(
-                          Icons.edit,
-                          size: 24,
+                          Icons.camera_alt_rounded,
+                          size: 25,
                           color: Theme.of(context).primaryColorDark,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.grey.shade300,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            Icons.edit,
+                            size: 24,
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -357,7 +392,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
             Map<String?, List<StoriesData>> usersGrouped =
                 groupBy(stories, (StoriesData obj) => obj.userID);
             usersGrouped.forEach((key, value) {
-              usersStories.add(value);
+              if (key != context.currentUser?.id) {
+                usersStories.add(value);
+              } else {
+                myStories = value;
+              }
             });
           });
         }
