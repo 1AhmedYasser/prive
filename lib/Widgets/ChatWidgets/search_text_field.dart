@@ -9,6 +9,7 @@ class SearchTextField extends StatefulWidget {
   final bool showCloseButton;
   final bool autoFocus;
   final bool closeOnSearch;
+  final double borderRadius;
   final bool isFilled;
 
   const SearchTextField(
@@ -20,6 +21,7 @@ class SearchTextField extends StatefulWidget {
       this.showCloseButton = true,
       this.closeOnSearch = true,
       this.isFilled = false,
+      this.borderRadius = 24,
       this.autoFocus = false})
       : super(key: key);
 
@@ -39,7 +41,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
         border: Border.all(
           color: StreamChatTheme.of(context).colorTheme.borders,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(widget.borderRadius),
       ),
       margin: const EdgeInsets.symmetric(
         vertical: 8,
@@ -64,17 +66,15 @@ class _SearchTextFieldState extends State<SearchTextField> {
                 filled: widget.isFilled,
                 prefixText: '    ',
                 prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  size: 23,
-                  color: Colors.grey,
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.only(left: 16),
+                  child: Icon(
+                    Icons.search,
+                    size: 23,
+                    color: Colors.grey,
+                  ),
                 ),
                 hintText: widget.hintText,
-                hintStyle: StreamChatTheme.of(context).textTheme.body.copyWith(
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(.5)),
                 contentPadding: const EdgeInsets.all(0),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,

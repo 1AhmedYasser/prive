@@ -2,7 +2,9 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -162,7 +164,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           }),
                     ),
                   ),
-                  buildRoomSectionInfo("Listeners", "25"),
+                  buildRoomSectionInfo("Listeners", "25", withInvite: true),
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 20, bottom: 30),
@@ -225,7 +227,7 @@ class _RoomScreenState extends State<RoomScreen> {
             ),
           ),
           Positioned(
-            bottom: 60,
+            bottom: 55,
             right: 30,
             child: Badge(
               badgeContent: const Text(
@@ -249,7 +251,8 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Padding buildRoomSectionInfo(String title, String value) {
+  Padding buildRoomSectionInfo(String title, String value,
+      {bool withInvite = false}) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 14, right: 20),
       child: Row(
@@ -270,7 +273,28 @@ class _RoomScreenState extends State<RoomScreen> {
               fontSize: 15.5,
               fontWeight: FontWeight.w400,
             ),
-          )
+          ),
+          if (withInvite) const Expanded(child: SizedBox()),
+          if (withInvite)
+            GestureDetector(
+              onTap: () {
+                showMaterialModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => SingleChildScrollView(
+                    controller: ModalScrollController.of(context),
+                    child: const RoomInvitationWidget(),
+                  ),
+                );
+              },
+              child: Text(
+                "+ Invite",
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 16.5,
+                ),
+              ),
+            )
         ],
       ),
     );
