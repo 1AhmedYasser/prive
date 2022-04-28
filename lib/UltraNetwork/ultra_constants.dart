@@ -23,3 +23,5 @@ final getStories =
     UltraRequest("${baseUrl}GetStories.php", UMethods.post, Stories());
 final deleteStory =
     UltraRequest("${baseUrl}DeleteStory.php", UMethods.post, StatusResponse());
+final addStory = UltraRequest(
+    "${baseUrl}AddStoryUserAPI.php", UMethods.post, StatusResponse());

@@ -42,10 +42,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
   String? deviceCountryCode =
       WidgetsBinding.instance?.window.locale.countryCode;
   CountryDialCode? deviceDialCode;
-  bool _permissionDenied = false;
+  bool permissionDenied = false;
   var phoneContacts = [];
   List<String> phoneNumbers = [];
   List<User> users = [];
+  List<String> usersPhoneNumbers = [];
 
   @override
   void initState() {
@@ -243,14 +244,20 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () {
-                          print("Open Editor");
                           Navigator.push(
                             context,
                             ScaleTransition1(
-                              page: const TextStoryEditorScreen(),
-                              type: ScaleTrasitionTypes.bottom,
+                              page: const TextStoryEditorScreen(
+                                backgroundColor: Colors.purple,
+                              ),
+                              type: ScaleTrasitionTypes.center,
                             ),
-                          );
+                          ).then((value) {
+                            stories.clear();
+                            usersStories.clear();
+                            myStories.clear();
+                            _getStories(usersPhoneNumbers.join(","));
+                          });
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -438,7 +445,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
     phoneContacts.clear();
     phoneNumbers.clear();
     if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
+      setState(() => permissionDenied = true);
       BotToast.cleanAll();
     } else {
       phoneContacts = await FlutterContacts.getContacts(withProperties: true);
@@ -500,7 +507,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
           users.add(user);
         }
       }
-      List<String> usersPhoneNumbers = users
+      usersPhoneNumbers = users
           .map(
             (e) => e.extraData['phone'] as String,
           )
