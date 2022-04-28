@@ -89,6 +89,7 @@ class Images {
   String roomNotificationsOn = "$path/room_notifications_on.png";
   String roomMic = "$path/room_mic.png";
   String roomLeave = "$path/room_leave.png";
+  String raiseHandIcon = "$path/raise_hand_icon.png";
 }
 
 class Animations {

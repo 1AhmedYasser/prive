@@ -1,9 +1,9 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
-
-import '../../Widgets/AppWidgets/prive_appbar.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class RoomScreen extends StatefulWidget {
   const RoomScreen({Key? key}) : super(key: key);
@@ -83,48 +83,194 @@ class _RoomScreenState extends State<RoomScreen> {
           ],
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 20, top: 18, right: 20),
-            child: Text(
-              "Discussing the best places in KSA",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
+          Positioned.fill(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20, top: 18, right: 20),
+                    child: Text(
+                      "Discussing the best places in KSA",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+                    child: Divider(),
+                  ),
+                  buildRoomSectionInfo("Speakers", "3"),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 20, right: 20, top: 20),
+                    child: MediaQuery.removePadding(
+                      context: context,
+                      removeBottom: true,
+                      removeTop: true,
+                      child: GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 1 / 1.4,
+                            crossAxisSpacing: 10,
+                          ),
+                          itemCount: 1,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: const CachedImage(
+                                    url:
+                                        "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 20,
+                                      child: Icon(
+                                        FontAwesomeIcons.microphone,
+                                        color: Color(0xff7a8fa6),
+                                        size: 15,
+                                      ),
+                                    ),
+                                    SizedBox(width: 3),
+                                    Expanded(
+                                      child: Text(
+                                        "Ahmed",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                        maxLines: 1,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            );
+                          }),
+                    ),
+                  ),
+                  buildRoomSectionInfo("Listeners", "25"),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 20, bottom: 30),
+                    child: MediaQuery.removePadding(
+                      context: context,
+                      removeBottom: true,
+                      removeTop: true,
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1 / 1.4,
+                          crossAxisSpacing: 10,
+                        ),
+                        itemCount: 3,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(30),
+                                child: const CachedImage(
+                                  url:
+                                      "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Row(
+                                children: const [
+                                  SizedBox(
+                                    width: 20,
+                                    child: Icon(
+                                      FontAwesomeIcons.microphoneSlash,
+                                      color: Colors.red,
+                                      size: 15,
+                                    ),
+                                  ),
+                                  SizedBox(width: 3),
+                                  Expanded(
+                                    child: Text(
+                                      "Ahmed",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                      maxLines: 1,
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20, top: 10, right: 20),
-            child: Divider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 14, right: 20),
-            child: Row(
-              children: const [
-                Text(
-                  "Speakers",
-                  style: TextStyle(
-                    color: Color(0xff7a8fa6),
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w400,
-                  ),
+          Positioned(
+            bottom: 60,
+            right: 30,
+            child: Badge(
+              badgeContent: const Text(
+                '3',
+                style: TextStyle(color: Colors.white),
+              ),
+              position: BadgePosition.topEnd(end: -4),
+              padding: const EdgeInsets.all(7),
+              badgeColor: Theme.of(context).primaryColorDark,
+              child: FloatingActionButton(
+                elevation: 1,
+                onPressed: () {},
+                child: Image.asset(
+                  R.images.raiseHandIcon,
                 ),
-                SizedBox(width: 10),
-                Text(
-                  "3",
-                  style: TextStyle(
-                    color: Color(0xff7a8fa6),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                )
-              ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Padding buildRoomSectionInfo(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 14, right: 20),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xff7a8fa6),
+              fontSize: 16.5,
+              fontWeight: FontWeight.w400,
             ),
           ),
+          const SizedBox(width: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Color(0xff7a8fa6),
+              fontSize: 15.5,
+              fontWeight: FontWeight.w400,
+            ),
+          )
         ],
       ),
     );

@@ -64,6 +64,7 @@ dependencies:
   draggable_widget: ^2.0.0
   flip_card: ^0.6.0
   flutter_swipe_action_cell: ^2.2.0
+  badges: ^2.0.2
 
   # Utils
   supercharged: ^2.1.1
