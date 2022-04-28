@@ -1,19 +1,29 @@
+import 'package:bot_toast/bot_toast.dart';
+import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dashed_circle/dashed_circle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Screens/Stories/my_stories_screen.dart';
 import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
+import 'package:quiver/iterables.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+
+import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -27,11 +37,24 @@ class _StoriesScreenState extends State<StoriesScreen> {
   List<List<StoriesData>> usersStories = [];
   List<StoriesData> myStories = [];
   CancelToken cancelToken = CancelToken();
+  String? deviceCountryCode =
+      WidgetsBinding.instance?.window.locale.countryCode;
+  CountryDialCode? deviceDialCode;
+  bool _permissionDenied = false;
+  var phoneContacts = [];
+  List<String> phoneNumbers = [];
+  List<User> users = [];
 
   @override
   void initState() {
     time_ago.setLocaleMessages('en', time_ago.EnMessages());
-    _getStories();
+    BotToast.showAnimationWidget(
+      toastBuilder: (context) {
+        return const IgnorePointer(child: UltraLoadingIndicator());
+      },
+      animationDuration: const Duration(milliseconds: 0),
+    );
+    _getPriveContacts();
     super.initState();
   }
 
@@ -90,6 +113,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
             onTap: () {
               if (myStories.isNotEmpty) {
                 print("Open My Stories");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyStoriesScreen(
+                      myStories: myStories,
+                    ),
+                  ),
+                );
               } else {
                 print("Add New Story");
               }
@@ -115,7 +146,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
                                   child: CachedImage(
-                                    url: context.currentUserImage ?? "",
+                                    url: myStories.isEmpty
+                                        ? context.currentUserImage ?? ""
+                                        : myStories.lastOrNull?.content ?? "",
                                   ),
                                 ),
                               ),
@@ -216,13 +249,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, top: 10, bottom: 20),
-            child: Text(
-              "Recent Updates",
-              style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+          if (stories.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 10, bottom: 20),
+              child: Text(
+                "Recent Updates",
+                style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
+              ),
             ),
-          ),
           Expanded(
             child: MediaQuery.removePadding(
               context: context,
@@ -302,7 +336,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                               BorderRadius.circular(60),
                                           child: CachedImage(
                                             url: usersStories[index][0]
-                                                    .userPhoto ??
+                                                    .content ??
                                                 "",
                                           ),
                                         ),
@@ -375,15 +409,110 @@ class _StoriesScreenState extends State<StoriesScreen> {
     );
   }
 
-  void _getStories() {
+  Future _getPriveContacts() async {
+    getCountry();
+    phoneContacts.clear();
+    phoneNumbers.clear();
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
+      setState(() => _permissionDenied = true);
+    } else {
+      phoneContacts = await FlutterContacts.getContacts(withProperties: true);
+      for (var contact in phoneContacts) {
+        for (var phone in contact.phones) {
+          try {
+            PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
+            if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
+                phone.number.trim().replaceAll(" ", "").startsWith("010") ||
+                phone.number.trim().replaceAll(" ", "").startsWith("012")) {
+              String dialCode = deviceDialCode?.dialCode == "+20"
+                  ? "+2"
+                  : deviceDialCode?.dialCode ?? "";
+              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+                phoneNumbers.add(
+                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+              } else {
+                phoneNumbers
+                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              }
+            } else {
+              phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+            }
+          } catch (e) {
+            String dialCode = deviceDialCode?.dialCode == "+20"
+                ? "+2"
+                : deviceDialCode?.dialCode ?? "";
+
+            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+              phoneNumbers.add(
+                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+            } else {
+              phoneNumbers
+                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            }
+          }
+        }
+      }
+
+      // Handling Filters
+      List<List<String>> dividedPhoneNumbers = [];
+      dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
+      for (var phoneNumbers in dividedPhoneNumbers) {
+        QueryUsersResponse usersResponse =
+            await StreamChatCore.of(context).client.queryUsers(
+          filter: Filter.and([
+            Filter.notEqual("id", context.currentUser!.id),
+            Filter.notEqual("role", "admin"),
+            Filter.in_("phone", phoneNumbers)
+          ]),
+          sort: const [
+            SortOption(
+              'name',
+              direction: 1,
+            ),
+          ],
+        );
+        for (var user in usersResponse.users) {
+          users.add(user);
+        }
+      }
+      List<String> usersPhoneNumbers = users
+          .map(
+            (e) => e.extraData['phone'] as String,
+          )
+          .toList();
+      usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
+      _getStories(usersPhoneNumbers.join(","));
+    }
+  }
+
+  void getCountry() async {
+    try {
+      deviceCountryCode =
+          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
+      if (deviceCountryCode?.isEmpty == true) {
+        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      }
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+    } catch (e) {
+      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+    }
+  }
+
+  void _getStories(String phoneNumbers) {
     UltraNetwork.request(
       context,
       getStories,
+      showLoadingIndicator: false,
+      showError: false,
       formData: FormData.fromMap(
-        {"Contats": "+201159050530,+201015070284,+201156161108"},
+        {"Contats": phoneNumbers},
       ),
       cancelToken: cancelToken,
     ).then((value) {
+      BotToast.removeAll();
       if (value != null) {
         Stories storiesResponse = value;
         if (storiesResponse.success == true) {
