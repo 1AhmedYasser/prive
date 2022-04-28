@@ -5,6 +5,8 @@ import 'package:prive/Extras/resources.dart';
 import 'package:intl/intl.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 
+import '../../../Screens/Rooms/room_screen.dart';
+
 class NewRoomWidget extends StatefulWidget {
   const NewRoomWidget({Key? key}) : super(key: key);
 
@@ -212,6 +214,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                     if (_formKey.currentState!.validate()) {
                       if (selectedRoom == 0) {
                         Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RoomScreen(
+                              isNewRoomCreation: true,
+                            ),
+                          ),
+                        );
                       } else {
                         Navigator.pop(context);
                         Navigator.push(

@@ -7,9 +7,12 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class RoomScreen extends StatefulWidget {
-  const RoomScreen({Key? key}) : super(key: key);
+  final bool isNewRoomCreation;
+  const RoomScreen({Key? key, this.isNewRoomCreation = false})
+      : super(key: key);
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -17,75 +20,115 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   bool isMyMicOn = true;
+  bool isNewRoomCreation = false;
+
+  @override
+  void initState() {
+    isNewRoomCreation = widget.isNewRoomCreation;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: AppBar(
-          backgroundColor: Colors.grey.shade100,
-          elevation: 0,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.light,
-          ),
-          leading: const BackButton(
-            color: Color(0xff7a8fa6),
-          ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isMyMicOn = !isMyMicOn;
-                });
-              },
-              child: SizedBox(
-                width: 30,
-                child: Icon(
-                  isMyMicOn
-                      ? FontAwesomeIcons.microphone
-                      : FontAwesomeIcons.microphoneSlash,
-                  color: isMyMicOn ? const Color(0xff7a8fa6) : Colors.red,
-                  size: 24,
+      appBar: !isNewRoomCreation
+          ? PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 60),
+              child: AppBar(
+                backgroundColor: Colors.grey.shade100,
+                elevation: 0,
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarBrightness: Brightness.light,
                 ),
+                leading: const BackButton(
+                  color: Color(0xff7a8fa6),
+                ),
+                actions: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isMyMicOn = !isMyMicOn;
+                      });
+                    },
+                    child: SizedBox(
+                      width: 30,
+                      child: Icon(
+                        isMyMicOn
+                            ? FontAwesomeIcons.microphone
+                            : FontAwesomeIcons.microphoneSlash,
+                        color: isMyMicOn ? const Color(0xff7a8fa6) : Colors.red,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 20, left: 15, top: 10, bottom: 10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            R.images.roomLeave,
+                            width: 16,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          const Text(
+                            "Leave",
+                            style: TextStyle(fontSize: 16, color: Colors.red),
+                          ),
+                        ],
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.transparent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  right: 20, left: 15, top: 10, bottom: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+            )
+          : PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 100),
+              child: Container(
+                height: 150,
+                color: const Color(0xff5856d6),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      R.images.roomLeave,
-                      width: 16,
-                      color: Colors.red,
+                    const Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 25, right: 50, top: 30),
+                        child: Text(
+                          "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                      ),
                     ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text(
-                      "Leave",
-                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    IconButton(
+                      padding: const EdgeInsets.only(right: 30),
+                      icon: StreamSvgIcon.closeSmall(
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isNewRoomCreation = false;
+                        });
+                      },
                     ),
                   ],
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: Colors.red),
-                  ),
-                ),
               ),
             ),
-          ],
-        ),
-      ),
       body: Stack(
         children: [
           Positioned.fill(
