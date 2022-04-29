@@ -300,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     phoneNumberController.text = await Utils.getString(R.pref.userPhone) ?? "";
   }
 
-  Future getImage(ImageSource source) async {
+  Future getImage(ImageSource source, bool isVideo) async {
     Navigator.of(context).pop();
     final pickedFile = await imagePicker.pickImage(source: source);
 

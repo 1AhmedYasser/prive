@@ -13,7 +13,8 @@ class Utils {
   static final player = AudioPlayer();
 
   static Future<void> showImagePickerSelector(
-      BuildContext context, Function getImage) async {
+      BuildContext context, Function getImage,
+      {String title = "Pick an Image", bool withVideo = false}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -24,7 +25,7 @@ class Utils {
               side: BorderSide(color: Colors.white, width: 1.0)),
           title: Center(
             child: Text(
-              "Pick an Image".tr(),
+              title.tr(),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -61,7 +62,7 @@ class Utils {
                     ],
                   ),
                   onTap: () {
-                    getImage(ImageSource.gallery);
+                    getImage(ImageSource.gallery, false);
                   },
                 ),
                 const SizedBox(
@@ -76,7 +77,7 @@ class Utils {
                   child: Row(
                     children: [
                       const Icon(
-                        Icons.camera_alt,
+                        Icons.camera_alt_rounded,
                         color: Colors.black,
                       ),
                       const SizedBox(
@@ -93,9 +94,44 @@ class Utils {
                     ],
                   ),
                   onTap: () {
-                    getImage(ImageSource.camera);
+                    getImage(ImageSource.camera, false);
                   },
                 ),
+                if (withVideo)
+                  const SizedBox(
+                    height: 7,
+                  ),
+                if (withVideo) const Divider(),
+                if (withVideo)
+                  const SizedBox(
+                    height: 7,
+                  ),
+                if (withVideo)
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.videocam,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Video".tr(),
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      getImage(ImageSource.camera, true);
+                    },
+                  ),
                 const SizedBox(
                   height: 30,
                 ),

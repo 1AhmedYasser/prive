@@ -11,12 +11,14 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../Extras/resources.dart';
 import '../../Models/Stories/stories.dart';
 import "package:collection/collection.dart";
-
+import 'package:path_provider/path_provider.dart';
 import '../../UltraNetwork/ultra_constants.dart';
 import '../../Widgets/Common/cached_image.dart';
+import 'dart:io';
 
 //ignore: must_be_immutable
 class MyStoriesScreen extends StatefulWidget {
@@ -86,6 +88,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
+                  if (widget.myStories[index].type == "Videos") {
+                    getVideoThumb(widget.myStories[index].content ?? "", index);
+                  }
                   return SwipeActionCell(
                     controller: controller,
                     index: index,
@@ -203,11 +208,22 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(60),
-                                            child: CachedImage(
-                                              url: widget.myStories[index]
-                                                      .content ??
-                                                  "",
-                                            ),
+                                            child: widget.myStories[index]
+                                                        .type ==
+                                                    "Photos"
+                                                ? CachedImage(
+                                                    url: widget.myStories[index]
+                                                            .content ??
+                                                        "",
+                                                  )
+                                                : Image.file(
+                                                    File(
+                                                      widget.myStories[index]
+                                                              .content ??
+                                                          "",
+                                                    ),
+                                                    fit: BoxFit.fill,
+                                                  ),
                                           ),
                                         ),
                                       ),
@@ -285,6 +301,24 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
         ),
       ),
     );
+  }
+
+  void getVideoThumb(String url, int index) {
+    String thumb = "";
+    getTemporaryDirectory().then((dir) {
+      print("dir $dir");
+      VideoThumbnail.thumbnailFile(
+        video: url,
+        thumbnailPath: dir.path,
+        quality: 50,
+      ).then((value) {
+        print(value);
+        thumb = value ?? "";
+        setState(() {
+          widget.myStories[index].content = thumb;
+        });
+      });
+    });
   }
 
   void _deleteStory(String storyId) {

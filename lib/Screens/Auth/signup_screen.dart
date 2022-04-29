@@ -380,7 +380,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Future getImage(ImageSource source) async {
+  Future getImage(ImageSource source, bool isVideo) async {
     Navigator.of(context).pop();
     final pickedFile = await imagePicker.pickImage(source: source);
 

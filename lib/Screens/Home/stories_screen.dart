@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Stories/my_stories_screen.dart';
 import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
@@ -20,11 +21,12 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
+import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
-
+import 'dart:io';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class StoriesScreen extends StatefulWidget {
@@ -47,6 +49,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
   List<String> phoneNumbers = [];
   List<User> users = [];
   List<String> usersPhoneNumbers = [];
+  late File capturedImage = File("");
+  final imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -126,7 +130,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
                   setState(() {});
                 });
               } else {
-                print("Add New Story");
+                Utils.showImagePickerSelector(context, getImage,
+                    title: "Choose Story Type", withVideo: true);
               }
             },
             child: Padding(
@@ -221,7 +226,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
-                        print("Open Camera");
+                        Utils.showImagePickerSelector(context, getImage,
+                            title: "Choose Story Type", withVideo: true);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -334,6 +340,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 closeOnSwipeDown: true,
                                 passedStories: passedStories,
                                 usersStories: usersStories,
+                                passedStoriesInitialIndex: index,
                               );
                             },
                             transitionsBuilder: (_, Animation<double> animation,
@@ -562,6 +569,47 @@ class _StoriesScreenState extends State<StoriesScreen> {
           });
         }
       }
+    });
+  }
+
+  Future getImage(ImageSource source, bool isVideo) async {
+    Navigator.of(context).pop();
+    XFile? pickedFile;
+    if (isVideo == false) {
+      pickedFile =
+          await imagePicker.pickImage(source: source, imageQuality: 50);
+    } else {
+      pickedFile = await imagePicker.pickVideo(
+        source: source,
+        maxDuration: const Duration(seconds: 30),
+      );
+    }
+
+    if (pickedFile != null) {
+      capturedImage = File(pickedFile.path);
+      _addStory(isVideo);
+    }
+  }
+
+  void _addStory(bool isVideo) async {
+    UltraNetwork.request(
+      context,
+      addStory,
+      showError: false,
+      formData: FormData.fromMap({
+        "UserID": context.currentUser?.id,
+        "Type": isVideo ? "Videos" : "Photos",
+        "Content": await MultipartFile.fromFile(
+          capturedImage.path,
+          filename: "mp4",
+        ),
+      }),
+      cancelToken: cancelToken,
+    ).then((value) {
+      stories.clear();
+      usersStories.clear();
+      myStories.clear();
+      _getStories(usersPhoneNumbers.join(","));
     });
   }
 }

@@ -210,7 +210,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 
-  Future getImage(ImageSource source) async {
+  Future getImage(ImageSource source, bool isVideo) async {
     Navigator.of(context).pop();
     final pickedFile = await imagePicker.pickImage(source: source);
 
