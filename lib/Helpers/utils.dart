@@ -253,7 +253,7 @@ class Utils {
       formData: FormData.fromMap(
         {
           "SenderID": senderId,
-          "ReceiverID": senderId,
+          "ReceiverID": receiverID,
           "CallType": isVideo ? "Video" : "Voice",
         },
       ),

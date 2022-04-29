@@ -553,7 +553,7 @@ class _CallScreenState extends State<CallScreen> {
                   Utils.logAnswerOrCancelCall(
                       context,
                       context.currentUser?.id ?? "",
-                      "CANCELLED",
+                      "END",
                       formatTime(_stats?.duration ?? 0));
                 },
               ),
