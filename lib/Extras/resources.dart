@@ -111,6 +111,7 @@ class Animations {
   String chatHello14 = "$path/ChatHello14.json";
   String chatHello15 = "$path/ChatHello15.json";
   String contactsPermission = "$path/contacts_permission.json";
+  String callLog = "$path/CallLog.json";
 }
 
 class Sounds {

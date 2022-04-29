@@ -20,6 +20,14 @@ final makeACall = UltraRequest(
     PriveCall());
 final getCallLogs =
     UltraRequest("${baseUrl}GetAllCalles.php", UMethods.post, CallLogs());
+final addCall = UltraRequest(
+    "${baseUrl}AddCallUserAPI.php", UMethods.post, StatusResponse());
+final answerOrCancelCall = UltraRequest(
+    "${baseUrl}AnswerOrCancelCall.php", UMethods.post, StatusResponse());
+final deleteOneCall = UltraRequest(
+    "${baseUrl}DeleteOneCall.php", UMethods.post, StatusResponse());
+final deleteAllCalls = UltraRequest(
+    "${baseUrl}DeleteAllCalls.php", UMethods.post, StatusResponse());
 
 // Stories
 final getStories =
