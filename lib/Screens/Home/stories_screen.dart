@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -16,7 +15,6 @@ import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
-import 'package:quiver/iterables.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -27,7 +25,6 @@ import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'dart:io';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 import 'package:path_provider/path_provider.dart';
@@ -66,7 +63,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
       },
       animationDuration: const Duration(milliseconds: 0),
     );
-    _getPriveContacts();
+    _getContacts();
     super.initState();
   }
 
@@ -445,9 +442,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                                     File(
                                                       usersThumbnails.length -
                                                                   1 <
-                                                              usersStories
-                                                                      .length -
-                                                                  1
+                                                              index
                                                           ? ""
                                                           : usersThumbnails[
                                                                       index]
@@ -457,11 +452,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                                   ),
                                                   fadeOutDuration:
                                                       const Duration(
-                                                    milliseconds: 0,
+                                                    milliseconds: 100,
                                                   ),
                                                   fadeInDuration:
                                                       const Duration(
-                                                    milliseconds: 0,
+                                                    milliseconds: 100,
                                                   ),
                                                   fit: BoxFit.fill,
                                                 ),
@@ -535,73 +530,13 @@ class _StoriesScreenState extends State<StoriesScreen> {
     );
   }
 
-  Future _getPriveContacts() async {
-    getCountry();
-    phoneContacts.clear();
-    phoneNumbers.clear();
+  _getContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => permissionDenied = true);
-      BotToast.cleanAll();
+      // TODO: Handle Permission Denied
     } else {
-      phoneContacts = await FlutterContacts.getContacts(withProperties: true);
-      for (var contact in phoneContacts) {
-        for (var phone in contact.phones) {
-          try {
-            PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
-            if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("010") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("012")) {
-              String dialCode = deviceDialCode?.dialCode == "+20"
-                  ? "+2"
-                  : deviceDialCode?.dialCode ?? "";
-              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-                phoneNumbers.add(
-                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-              } else {
-                phoneNumbers
-                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-              }
-            } else {
-              phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
-            }
-          } catch (e) {
-            String dialCode = deviceDialCode?.dialCode == "+20"
-                ? "+2"
-                : deviceDialCode?.dialCode ?? "";
-
-            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-              phoneNumbers.add(
-                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-            } else {
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-            }
-          }
-        }
-      }
-
-      // Handling Filters
-      List<List<String>> dividedPhoneNumbers = [];
-      dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
-      for (var phoneNumbers in dividedPhoneNumbers) {
-        QueryUsersResponse usersResponse =
-            await StreamChatCore.of(context).client.queryUsers(
-          filter: Filter.and([
-            Filter.notEqual("id", context.currentUser!.id),
-            Filter.notEqual("role", "admin"),
-            Filter.in_("phone", phoneNumbers)
-          ]),
-          sort: const [
-            SortOption(
-              'name',
-              direction: 1,
-            ),
-          ],
-        );
-        for (var user in usersResponse.users) {
-          users.add(user);
-        }
-      }
+      List contacts = await Utils.fetchContacts(context);
+      users = contacts.first;
+      phoneContacts = contacts[1];
       usersPhoneNumbers = users
           .map(
             (e) => e.extraData['phone'] as String,
@@ -609,22 +544,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
           .toList();
       usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
       _getStories(usersPhoneNumbers.join(","));
-    }
-  }
-
-  void getCountry() async {
-    try {
-      deviceCountryCode =
-          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
-      if (deviceCountryCode?.isEmpty == true) {
-        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      }
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    } catch (e) {
-      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+      setState(() {});
     }
   }
 

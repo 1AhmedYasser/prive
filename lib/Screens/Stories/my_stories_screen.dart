@@ -251,11 +251,11 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                                     ),
                                                     fadeOutDuration:
                                                         const Duration(
-                                                      milliseconds: 0,
+                                                      milliseconds: 100,
                                                     ),
                                                     fadeInDuration:
                                                         const Duration(
-                                                      milliseconds: 0,
+                                                      milliseconds: 100,
                                                     ),
                                                     fit: BoxFit.fill,
                                                   ),
