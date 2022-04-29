@@ -97,6 +97,8 @@ class _CallsScreenState extends State<CallsScreen>
                                 setState(() {
                                   isEditing = false;
                                   callLogs.clear();
+                                  allCalls.clear();
+                                  missedCalls.clear();
                                 });
                                 _deleteAllCalls();
                               },
