@@ -225,22 +225,28 @@ class _RoomsScreenState extends State<RoomsScreen>
   }
 
   Widget buildSpeaker() {
-    return Column(
-      children: [
-        SizedBox(
-          width: 60,
-          height: 60,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: const CachedImage(
-              url:
-                  "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+    return Expanded(
+      child: Column(
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: 10,
+              minWidth: 10,
+              maxHeight: 60,
+              maxWidth: 60,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: const CachedImage(
+                url:
+                    "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 5),
-        const Text("Ahmed")
-      ],
+          const SizedBox(height: 5),
+          const Text("Ahmed")
+        ],
+      ),
     );
   }
 
