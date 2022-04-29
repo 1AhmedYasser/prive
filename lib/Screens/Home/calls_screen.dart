@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,8 +7,13 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:collection/collection.dart';
+import '../../Models/Call/call_logs.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -22,10 +29,13 @@ class _CallsScreenState extends State<CallsScreen>
   bool isEditing = false;
   SwipeActionController controller = SwipeActionController();
   List<String> calls = ["", "", "", "", "", "", "", "", "", "", ""];
+  List<CallLogsData> callLogs = [];
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
     _animationController = AnimationController(vsync: this);
+    _getCallLogs();
     super.initState();
   }
 
@@ -209,9 +219,19 @@ class _CallsScreenState extends State<CallsScreen>
                                     child: SizedBox(
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(30),
-                                        child: const CachedImage(
-                                          url:
-                                              "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                        child: CachedImage(
+                                          url: callLogs[index].senderID ==
+                                                  context.currentUser?.id
+                                              ? callLogs[index]
+                                                      .receiver
+                                                      ?.firstOrNull
+                                                      ?.userPhoto ??
+                                                  ""
+                                              : callLogs[index]
+                                                      .sender
+                                                      ?.firstOrNull
+                                                      ?.userPhoto ??
+                                                  "",
                                         ),
                                       ),
                                       height: 50,
@@ -223,9 +243,12 @@ class _CallsScreenState extends State<CallsScreen>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          "Ahmed Yasser",
-                                          style: TextStyle(
+                                        Text(
+                                          callLogs[index].senderID ==
+                                                  context.currentUser?.id
+                                              ? "${callLogs[index].receiver?.firstOrNull?.userFirstName ?? ""} ${callLogs[index].receiver?.firstOrNull?.userLastName ?? ""}"
+                                              : "${callLogs[index].sender?.firstOrNull?.userFirstName ?? ""} ${callLogs[index].sender?.firstOrNull?.userLastName ?? ""}",
+                                          style: const TextStyle(
                                             fontSize: 17,
                                             color: Colors.black,
                                           ),
@@ -256,7 +279,12 @@ class _CallsScreenState extends State<CallsScreen>
                                     ),
                                   ),
                                   Text(
-                                    "30/12/2020",
+                                    DateFormat('dd/MM/yyyy').format(
+                                      DateTime.parse(
+                                        callLogs[index].createdAtCalls ??
+                                            DateTime.now().toString(),
+                                      ),
+                                    ),
                                     style: TextStyle(
                                       color: index % 2 == 0
                                           ? Colors.grey.shade600
@@ -274,13 +302,33 @@ class _CallsScreenState extends State<CallsScreen>
                     ),
                   );
                 },
-                itemCount: calls.length,
+                itemCount: callLogs.length,
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _getCallLogs() {
+    UltraNetwork.request(
+      context,
+      getCallLogs,
+      formData: FormData.fromMap({
+        "UserID": context.currentUser?.id,
+      }),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        CallLogs logsResponse = value;
+        if (logsResponse.success == true) {
+          setState(() {
+            callLogs = logsResponse.data ?? [];
+          });
+        }
+      }
+    });
   }
 
   @override

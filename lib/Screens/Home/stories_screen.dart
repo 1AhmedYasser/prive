@@ -21,6 +21,7 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
+import 'package:transparent_image/transparent_image.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
@@ -154,11 +155,45 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 height: 70,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
-                                  child: CachedImage(
-                                    url: myStories.isEmpty
-                                        ? context.currentUserImage ?? ""
-                                        : myStories.lastOrNull?.content ?? "",
-                                  ),
+                                  child: myStories.isNotEmpty
+                                      ? myStories.lastOrNull?.type == "Photos"
+                                          ? CachedImage(
+                                              url: myStories
+                                                      .lastOrNull?.content ??
+                                                  "",
+                                            )
+                                          : FadeInImage(
+                                              placeholder: MemoryImage(
+                                                kTransparentImage,
+                                              ),
+                                              imageErrorBuilder:
+                                                  (context, ob, stackTrace) =>
+                                                      Container(
+                                                color: const Color(0xffeeeeee),
+                                              ),
+                                              placeholderErrorBuilder:
+                                                  (context, ob, stackTrace) =>
+                                                      Container(
+                                                color: const Color(0xffeeeeee),
+                                              ),
+                                              image: FileImage(
+                                                File(
+                                                  myStories.lastOrNull
+                                                          ?.content ??
+                                                      "",
+                                                ),
+                                              ),
+                                              fadeOutDuration: const Duration(
+                                                milliseconds: 0,
+                                              ),
+                                              fadeInDuration: const Duration(
+                                                milliseconds: 0,
+                                              ),
+                                              fit: BoxFit.fill,
+                                            )
+                                      : CachedImage(
+                                          url: context.currentUserImage ?? "",
+                                        ),
                                 ),
                               ),
                             ),

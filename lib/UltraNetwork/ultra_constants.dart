@@ -1,4 +1,5 @@
 import 'package:prive/Models/Auth/login.dart';
+import 'package:prive/Models/Call/call_logs.dart';
 import 'package:prive/Models/Call/prive_call.dart';
 import 'package:prive/Models/Common/status_response.dart';
 import 'package:prive/Models/Stories/stories.dart';
@@ -17,6 +18,8 @@ final makeACall = UltraRequest(
     "${baseUrl}Tools-master/DynamicKey/AgoraDynamicKey/php/sample/RtcTokenBuilderSample.php",
     UMethods.post,
     PriveCall());
+final getCallLogs =
+    UltraRequest("${baseUrl}GetAllCalles.php", UMethods.post, CallLogs());
 
 // Stories
 final getStories =

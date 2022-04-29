@@ -11,6 +11,7 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../Extras/resources.dart';
 import '../../Models/Stories/stories.dart';
@@ -88,9 +89,10 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  if (widget.myStories[index].type == "Videos") {
-                    getVideoThumb(widget.myStories[index].content ?? "", index);
-                  }
+                  // if (widget.myStories[index].type == "Videos") {
+                  //   getVideoThumb(widget.myStories[index].content ?? "", index,
+                  //       videoThumb);
+                  // }
                   return SwipeActionCell(
                     controller: controller,
                     index: index,
@@ -198,7 +200,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 20, right: 20),
+                                      left: 20,
+                                      right: 20,
+                                    ),
                                     child: DashedCircle(
                                       child: Padding(
                                         padding: const EdgeInsets.all(3),
@@ -216,11 +220,37 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                                             .content ??
                                                         "",
                                                   )
-                                                : Image.file(
-                                                    File(
-                                                      widget.myStories[index]
-                                                              .content ??
-                                                          "",
+                                                : FadeInImage(
+                                                    placeholder: MemoryImage(
+                                                      kTransparentImage,
+                                                    ),
+                                                    imageErrorBuilder: (context,
+                                                            ob, stackTrace) =>
+                                                        Container(
+                                                      color: const Color(
+                                                          0xffeeeeee),
+                                                    ),
+                                                    placeholderErrorBuilder:
+                                                        (context, ob,
+                                                                stackTrace) =>
+                                                            Container(
+                                                      color: const Color(
+                                                          0xffeeeeee),
+                                                    ),
+                                                    image: FileImage(
+                                                      File(
+                                                        widget.myStories[index]
+                                                                .content ??
+                                                            "",
+                                                      ),
+                                                    ),
+                                                    fadeOutDuration:
+                                                        const Duration(
+                                                      milliseconds: 0,
+                                                    ),
+                                                    fadeInDuration:
+                                                        const Duration(
+                                                      milliseconds: 0,
                                                     ),
                                                     fit: BoxFit.fill,
                                                   ),
@@ -303,19 +333,17 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
     );
   }
 
-  void getVideoThumb(String url, int index) {
+  void getVideoThumb(String url, int index, String videoThumb) {
     String thumb = "";
     getTemporaryDirectory().then((dir) {
-      print("dir $dir");
       VideoThumbnail.thumbnailFile(
         video: url,
         thumbnailPath: dir.path,
         quality: 50,
       ).then((value) {
-        print(value);
         thumb = value ?? "";
         setState(() {
-          widget.myStories[index].content = thumb;
+          videoThumb = thumb;
         });
       });
     });
