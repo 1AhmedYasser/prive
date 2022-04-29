@@ -26,31 +26,13 @@ class _NewGroupScreenState extends State<NewGroupScreen>
     with TickerProviderStateMixin {
   TextEditingController? _controller;
   TextEditingController groupNameController = TextEditingController();
-
-  String _userNameQuery = '';
-
   final _selectedUsers = <User>{};
-
-  bool _isSearchActive = false;
-
   Timer? _debounce;
   bool _permissionDenied = false;
   List<Contact> phoneContacts = [];
   List<User> users = [];
   List<User> allUsers = [];
   late final AnimationController _animationController;
-
-  void _userNameListener() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
-      if (mounted) {
-        setState(() {
-          _userNameQuery = _controller!.text;
-          _isSearchActive = _userNameQuery.isNotEmpty;
-        });
-      }
-    });
-  }
 
   @override
   void initState() {
@@ -289,8 +271,8 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                             horizontal: 8,
                           ),
                           child: Text(
-                            _isSearchActive
-                                ? 'Matches For "$_userNameQuery"'
+                            _controller?.text.isNotEmpty == true
+                                ? 'Matches For "${_controller?.text.trim()}"'
                                 : "On the platform",
                             style: TextStyle(
                               color: StreamChatTheme.of(context)
@@ -496,6 +478,15 @@ class _NewGroupScreenState extends State<NewGroupScreen>
       phoneContacts = contacts[1];
       setState(() {});
     }
+  }
+
+  void _userNameListener() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 0), () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override

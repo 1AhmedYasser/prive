@@ -1,21 +1,19 @@
 import 'dart:async';
 import 'package:app_settings/app_settings.dart';
-import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
-import 'package:quiver/iterables.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart';
-
 import '../../Extras/resources.dart';
+import '../../Helpers/Utils.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
+import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
+import '../../Widgets/Common/cached_image.dart';
 import '../MainMenu/new_group_screen.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
@@ -26,40 +24,22 @@ class PeopleChooserScreen extends StatefulWidget {
   State<PeopleChooserScreen> createState() => _PeopleChooserScreenState();
 }
 
-class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
+class _PeopleChooserScreenState extends State<PeopleChooserScreen>
+    with TickerProviderStateMixin {
   TextEditingController? _controller;
-
-  String _userNameQuery = '';
-  List<User> users = [];
-
   final _selectedUsers = <User>{};
-
-  bool _isSearchActive = false;
-
-  Timer? _debounce;
   bool _permissionDenied = false;
-  var phoneContacts = [];
-  List<String> phoneNumbers = [];
-  String? deviceCountryCode =
-      WidgetsBinding.instance?.window.locale.countryCode;
-  CountryDialCode? deviceDialCode;
-
-  void _userNameListener() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
-      if (mounted) {
-        setState(() {
-          _userNameQuery = _controller!.text;
-          _isSearchActive = _userNameQuery.isNotEmpty;
-        });
-      }
-    });
-  }
+  Timer? _debounce;
+  List<Contact> phoneContacts = [];
+  List<User> users = [];
+  List<User> allUsers = [];
+  late final AnimationController _animationController;
 
   @override
   void initState() {
-    _fetchContacts();
     super.initState();
+    _animationController = AnimationController(vsync: this);
+    _getContacts();
     _controller = TextEditingController()..addListener(_userNameListener);
   }
 
@@ -159,6 +139,25 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
                         controller: _controller,
                         hintText: "Search",
                         showCloseButton: false,
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            setState(() {
+                              users = allUsers;
+                            });
+                          } else {
+                            setState(() {
+                              users = allUsers
+                                  .where(
+                                    (element) => element.name
+                                        .toLowerCase()
+                                        .contains(
+                                            _controller?.text.toLowerCase() ??
+                                                ""),
+                                  )
+                                  .toList();
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -178,8 +177,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
                             horizontal: 8,
                           ),
                           child: Text(
-                            _isSearchActive
-                                ? 'Matches For "$_userNameQuery"'
+                            _controller?.text.isNotEmpty == true
+                                ? 'Matches For "${_controller?.text.trim()}"'
                                 : "Start The Room With",
                             style: TextStyle(
                               color: StreamChatTheme.of(context)
@@ -194,83 +193,131 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
                 ];
               },
               body: phoneContacts.isNotEmpty
-                  ? GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onPanDown: (_) => FocusScope.of(context).unfocus(),
-                      child: UsersBloc(
-                        child: UserListView(
-                          selectedUsers: _selectedUsers,
-                          pullToRefresh: false,
-                          filter: Filter.and([
-                            if (_userNameQuery.isNotEmpty)
-                              Filter.autoComplete('name', _userNameQuery),
-                            Filter.notEqual("id", context.currentUser!.id),
-                            Filter.notEqual("role", "admin"),
-                            Filter.in_('phone', phoneNumbers),
-                          ]),
-                          onUserTap: (user, _) {
-                            if (!_selectedUsers.contains(user)) {
-                              setState(() {
-                                _selectedUsers.add(user);
-                              });
-                            } else {
-                              setState(() {
-                                _selectedUsers.remove(user);
-                              });
-                            }
-                          },
-                          limit: 25,
-                          sort: const [
-                            SortOption(
-                              'name',
-                              direction: 1,
-                            ),
-                          ],
-                          emptyBuilder: (_) {
-                            return LayoutBuilder(
-                              builder: (context, viewportConstraints) {
-                                return SingleChildScrollView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight: viewportConstraints.maxHeight,
-                                    ),
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(24),
-                                            child: StreamSvgIcon.search(
-                                              size: 96,
-                                              color: StreamChatTheme.of(context)
-                                                  .colorTheme
-                                                  .textLowEmphasis,
-                                            ),
+                  ? users.isNotEmpty
+                      ? RefreshIndicator(
+                          onRefresh: () => Future.sync(() => _getContacts()),
+                          child: AnimationLimiter(
+                            child: ListView.separated(
+                              itemBuilder: (context, index) {
+                                return AnimationConfiguration.staggeredList(
+                                  position: index,
+                                  child: SlideAnimation(
+                                    horizontalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () {
+                                          setState(() {
+                                            if (_selectedUsers
+                                                .contains(users[index])) {
+                                              _selectedUsers
+                                                  .remove(users[index]);
+                                            } else {
+                                              _selectedUsers.add(users[index]);
+                                            }
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 10, bottom: 0),
+                                          child: Column(
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    child: SizedBox(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: CachedImage(
+                                                        url: users[index]
+                                                                .image ??
+                                                            "",
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 13),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        users[index].name,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 3),
+                                                      Text(
+                                                        users[index].online
+                                                            ? "Online"
+                                                            : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                                users[index]
+                                                                        .lastActive ??
+                                                                    DateTime
+                                                                        .now(),
+                                                              )}",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: users[index]
+                                                                  .online
+                                                              ? Colors.green
+                                                              : Colors.grey,
+                                                          fontSize: 13,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  if (_selectedUsers
+                                                      .contains(users[index]))
+                                                    const Expanded(
+                                                      child: SizedBox(),
+                                                    ),
+                                                  if (_selectedUsers
+                                                      .contains(users[index]))
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 20),
+                                                      child: Icon(
+                                                        Icons.check_circle,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                      ),
+                                                    )
+                                                ],
+                                              ),
+                                              const SizedBox(height: 10),
+                                            ],
                                           ),
-                                          Text(
-                                            "No Matching Contact",
-                                            style: StreamChatTheme.of(context)
-                                                .textTheme
-                                                .footnote
-                                                .copyWith(
-                                                  color: StreamChatTheme.of(
-                                                          context)
-                                                      .colorTheme
-                                                      .textLowEmphasis,
-                                                ),
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 );
                               },
-                            );
-                          },
-                        ),
-                      ),
-                    )
+                              separatorBuilder: (context, index) {
+                                return Divider(
+                                  height: 0,
+                                  color: Colors.grey.shade300,
+                                );
+                              },
+                              itemCount: users.length,
+                            ),
+                          ),
+                        )
+                      : ChannelsEmptyState(
+                          animationController: _animationController,
+                          title: "No Contacts Found",
+                          message: "",
+                        )
                   : _permissionDenied == false
                       ? const UltraLoadingIndicator()
                       : SizedBox(
@@ -327,98 +374,30 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
     );
   }
 
-  Future _fetchContacts() async {
-    getCountry();
-    users.clear();
-    phoneContacts.clear();
-    phoneNumbers.clear();
+  _getContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
     } else {
-      phoneContacts = await FlutterContacts.getContacts(withProperties: true);
-      for (var contact in phoneContacts) {
-        for (var phone in contact.phones) {
-          try {
-            PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
-            if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("010") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("012")) {
-              String dialCode = deviceDialCode?.dialCode == "+20"
-                  ? "+2"
-                  : deviceDialCode?.dialCode ?? "";
-              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-                phoneNumbers.add(
-                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-              } else {
-                phoneNumbers
-                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-              }
-            } else {
-              phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
-            }
-          } catch (e) {
-            String dialCode = deviceDialCode?.dialCode == "+20"
-                ? "+2"
-                : deviceDialCode?.dialCode ?? "";
-
-            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-              phoneNumbers.add(
-                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-            } else {
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-            }
-          }
-        }
-      }
-
-      // Handling Filters
-      List<List<String>> dividedPhoneNumbers = [];
-      dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
-      for (var phoneNumbers in dividedPhoneNumbers) {
-        QueryUsersResponse usersResponse =
-            await StreamChatCore.of(context).client.queryUsers(
-          filter: Filter.and([
-            Filter.notEqual("id", context.currentUser!.id),
-            Filter.notEqual("role", "admin"),
-            Filter.in_("phone", phoneNumbers)
-          ]),
-          sort: const [
-            SortOption(
-              'name',
-              direction: 1,
-            ),
-          ],
-        );
-        for (var user in usersResponse.users) {
-          users.add(user);
-        }
-      }
-
+      List contacts = await Utils.fetchContacts(context);
+      users = contacts.first;
+      allUsers = users;
+      phoneContacts = contacts[1];
       setState(() {});
     }
   }
 
-  void getCountry() async {
-    try {
-      deviceCountryCode =
-          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
-      if (deviceCountryCode?.isEmpty == true) {
-        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+  void _userNameListener() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 0), () {
+      if (mounted) {
+        setState(() {});
       }
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    } catch (e) {
-      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    }
+    });
   }
 
   @override
   void dispose() {
     _controller?.clear();
-    _controller?.removeListener(_userNameListener);
     _controller?.dispose();
     super.dispose();
   }
