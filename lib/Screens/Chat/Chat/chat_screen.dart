@@ -291,24 +291,81 @@ class _ChatScreenState extends State<ChatScreen> {
               ? [
                   if (widget.isChannel == false)
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            pageBuilder: (BuildContext context, _, __) {
-                              return CallScreen(
-                                channel: channel,
-                                isVideo: true,
-                              );
-                            },
-                            transitionsBuilder: (_, Animation<double> animation,
-                                __, Widget child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
+                      onTap: () async {
+                        final ref = FirebaseDatabase.instance
+                            .ref('Users/${otherMember?.userId}');
+                        final snapshot = await ref.get();
+                        if (snapshot.exists) {
+                          print(snapshot.value as String);
+                          if (snapshot.value as String == "Ended") {
+                            Utils.logCallStart(
+                              context,
+                              context.currentUser?.id ?? "",
+                              otherMember?.userId ?? "",
+                              true,
+                            );
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (BuildContext context, _, __) {
+                                  return CallScreen(
+                                    channel: channel,
+                                    isVideo: true,
+                                  );
+                                },
+                                transitionsBuilder: (_,
+                                    Animation<double> animation,
+                                    __,
+                                    Widget child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (_) => CupertinoAlertDialog(
+                                title: const Text("Prive"),
+                                content: Text(
+                                    "${otherMember?.user?.name ?? "Member"} is on another call"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text("Ok"),
+                                    onPressed: () => Navigator.pop(context),
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                        } else {
+                          Utils.logCallStart(
+                            context,
+                            context.currentUser?.id ?? "",
+                            otherMember?.userId ?? "",
+                            true,
+                          );
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (BuildContext context, _, __) {
+                                return CallScreen(
+                                  channel: channel,
+                                  isVideo: true,
+                                );
+                              },
+                              transitionsBuilder: (_,
+                                  Animation<double> animation,
+                                  __,
+                                  Widget child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        }
                       },
                       child: Image.asset(
                         R.images.videoCallImage,
@@ -325,6 +382,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         if (snapshot.exists) {
                           print(snapshot.value as String);
                           if (snapshot.value as String == "Ended") {
+                            Utils.logCallStart(
+                              context,
+                              context.currentUser?.id ?? "",
+                              otherMember?.userId ?? "",
+                              false,
+                            );
                             Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (BuildContext context, _, __) {
@@ -361,6 +424,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             );
                           }
                         } else {
+                          Utils.logCallStart(
+                            context,
+                            context.currentUser?.id ?? "",
+                            otherMember?.userId ?? "",
+                            false,
+                          );
                           Navigator.of(context).push(
                             PageRouteBuilder(
                               pageBuilder: (BuildContext context, _, __) {

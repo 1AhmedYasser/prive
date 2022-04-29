@@ -1,13 +1,17 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../UltraNetwork/ultra_network.dart';
 
 class Utils {
   static final player = AudioPlayer();
@@ -232,6 +236,50 @@ class Utils {
           ),
         );
       }),
+    );
+  }
+
+  static void logCallStart(
+    BuildContext context,
+    String senderId,
+    String receiverID,
+    bool isVideo,
+  ) {
+    UltraNetwork.request(
+      context,
+      addCall,
+      showLoadingIndicator: false,
+      showError: false,
+      formData: FormData.fromMap(
+        {
+          "SenderID": senderId,
+          "ReceiverID": senderId,
+          "CallType": isVideo ? "Video" : "Voice",
+        },
+      ),
+      cancelToken: CancelToken(),
+    );
+  }
+
+  static void logAnswerOrCancelCall(
+    BuildContext context,
+    String receiverID,
+    String callStatus,
+    String duration,
+  ) {
+    UltraNetwork.request(
+      context,
+      answerOrCancelCall,
+      showLoadingIndicator: false,
+      showError: false,
+      formData: FormData.fromMap(
+        {
+          "ReceiverID": receiverID,
+          "CallStatues": callStatus,
+          "Duration": duration,
+        },
+      ),
+      cancelToken: CancelToken(),
     );
   }
 
