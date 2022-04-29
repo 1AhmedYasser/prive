@@ -398,6 +398,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
   @override
   void dispose() {
     _controller?.clear();
+    _controller?.removeListener(_userNameListener);
     _controller?.dispose();
     super.dispose();
   }
