@@ -22,6 +22,7 @@ import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
@@ -29,6 +30,7 @@ import 'package:intl/intl.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'dart:io';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
+import 'package:path_provider/path_provider.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -52,6 +54,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
   List<String> usersPhoneNumbers = [];
   late File capturedImage = File("");
   final imagePicker = ImagePicker();
+  List<String> myThumbnails = [];
+  List<List<String>> usersThumbnails = [];
 
   @override
   void initState() {
@@ -128,6 +132,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     ),
                   ),
                 ).then((value) {
+                  generateMyVideoThumbs();
                   setState(() {});
                 });
               } else {
@@ -178,9 +183,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                               ),
                                               image: FileImage(
                                                 File(
-                                                  myStories.lastOrNull
-                                                          ?.content ??
-                                                      "",
+                                                  myThumbnails.length - 1 <
+                                                          myStories.length - 1
+                                                      ? ""
+                                                      : myThumbnails[
+                                                          myStories.length - 1],
                                                 ),
                                               ),
                                               fadeOutDuration: const Duration(
@@ -321,7 +328,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ),
             ),
           ),
-          if (stories.isNotEmpty)
+          if (usersStories.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 10, bottom: 20),
               child: Text(
@@ -407,11 +414,57 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(60),
-                                          child: CachedImage(
-                                            url: usersStories[index][0]
-                                                    .content ??
-                                                "",
-                                          ),
+                                          child: usersStories[index]
+                                                      .firstOrNull
+                                                      ?.type ==
+                                                  "Photos"
+                                              ? CachedImage(
+                                                  url: usersStories[index]
+                                                          .firstOrNull
+                                                          ?.content ??
+                                                      "",
+                                                )
+                                              : FadeInImage(
+                                                  placeholder: MemoryImage(
+                                                    kTransparentImage,
+                                                  ),
+                                                  imageErrorBuilder: (context,
+                                                          ob, stackTrace) =>
+                                                      Container(
+                                                    color:
+                                                        const Color(0xffeeeeee),
+                                                  ),
+                                                  placeholderErrorBuilder:
+                                                      (context, ob,
+                                                              stackTrace) =>
+                                                          Container(
+                                                    color:
+                                                        const Color(0xffeeeeee),
+                                                  ),
+                                                  image: FileImage(
+                                                    File(
+                                                      usersThumbnails.length -
+                                                                  1 <
+                                                              usersStories
+                                                                      .length -
+                                                                  1
+                                                          ? ""
+                                                          : usersThumbnails[
+                                                                      index]
+                                                                  .firstOrNull ??
+                                                              "",
+                                                    ),
+                                                  ),
+                                                  fadeOutDuration:
+                                                      const Duration(
+                                                    milliseconds: 0,
+                                                  ),
+                                                  fadeInDuration:
+                                                      const Duration(
+                                                    milliseconds: 0,
+                                                  ),
+                                                  fit: BoxFit.fill,
+                                                ),
                                         ),
                                       ),
                                     ),
@@ -428,7 +481,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "${usersStories[index][0].userFirstName?.trim() ?? ""} ${usersStories[index][0].userLastName?.trim() ?? ""}",
+                                        "${usersStories[index].firstOrNull?.userFirstName?.trim() ?? ""} ${usersStories[index].firstOrNull?.userLastName?.trim() ?? ""}",
                                         style: const TextStyle(
                                           fontSize: 19,
                                           fontWeight: FontWeight.w600,
@@ -597,14 +650,53 @@ class _StoriesScreenState extends State<StoriesScreen> {
             usersGrouped.forEach((key, value) {
               if (key != context.currentUser?.id) {
                 usersStories.add(value);
+                generateUsersVideosThumbs();
               } else {
                 myStories = value;
+                generateMyVideoThumbs();
               }
             });
           });
         }
       }
     });
+  }
+
+  Future<String> getVideoThumb(String url) async {
+    return await VideoThumbnail.thumbnailFile(
+          video: url,
+          thumbnailPath: (await getTemporaryDirectory()).path,
+          quality: 50,
+        ) ??
+        "";
+  }
+
+  void generateMyVideoThumbs() async {
+    myThumbnails.clear();
+    for (var element in myStories) {
+      if (element.type == "Photos") {
+        myThumbnails.add(element.content ?? "");
+      } else {
+        myThumbnails.add(await getVideoThumb(element.content ?? ""));
+      }
+    }
+    setState(() {});
+  }
+
+  void generateUsersVideosThumbs() async {
+    usersThumbnails.clear();
+    for (var stories in usersStories) {
+      List<String> thumbs = [];
+      for (var story in stories) {
+        if (story.type == "Photos") {
+          thumbs.add(story.content ?? "");
+        } else {
+          thumbs.add(await getVideoThumb(story.content ?? ""));
+        }
+      }
+      usersThumbnails.add(thumbs);
+    }
+    setState(() {});
   }
 
   Future getImage(ImageSource source, bool isVideo) async {

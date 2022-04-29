@@ -34,6 +34,13 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
   SwipeActionController controller = SwipeActionController();
   bool isEditing = false;
   CancelToken cancelToken = CancelToken();
+  List<String> thumbnails = [];
+
+  @override
+  void initState() {
+    generateVideoThumbs();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,10 +96,6 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  // if (widget.myStories[index].type == "Videos") {
-                  //   getVideoThumb(widget.myStories[index].content ?? "", index,
-                  //       videoThumb);
-                  // }
                   return SwipeActionCell(
                     controller: controller,
                     index: index,
@@ -110,6 +113,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                           _deleteStory(widget.myStories[index].stotyID ?? "");
                           setState(() {
                             widget.myStories.removeAt(index);
+                            thumbnails.removeAt(index);
                           });
                           if (widget.myStories.isEmpty) {
                             Navigator.pop(context);
@@ -239,9 +243,10 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                                     ),
                                                     image: FileImage(
                                                       File(
-                                                        widget.myStories[index]
-                                                                .content ??
-                                                            "",
+                                                        thumbnails.length - 1 <
+                                                                index
+                                                            ? ""
+                                                            : thumbnails[index],
                                                       ),
                                                     ),
                                                     fadeOutDuration:
@@ -333,20 +338,24 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
     );
   }
 
-  void getVideoThumb(String url, int index, String videoThumb) {
-    String thumb = "";
-    getTemporaryDirectory().then((dir) {
-      VideoThumbnail.thumbnailFile(
-        video: url,
-        thumbnailPath: dir.path,
-        quality: 50,
-      ).then((value) {
-        thumb = value ?? "";
-        setState(() {
-          videoThumb = thumb;
-        });
-      });
-    });
+  Future<String> getVideoThumb(String url) async {
+    return await VideoThumbnail.thumbnailFile(
+          video: url,
+          thumbnailPath: (await getTemporaryDirectory()).path,
+          quality: 50,
+        ) ??
+        "";
+  }
+
+  void generateVideoThumbs() async {
+    for (var element in widget.myStories) {
+      if (element.type == "Photos") {
+        thumbnails.add(element.content ?? "");
+      } else {
+        thumbnails.add(await getVideoThumb(element.content ?? ""));
+      }
+    }
+    setState(() {});
   }
 
   void _deleteStory(String storyId) {
