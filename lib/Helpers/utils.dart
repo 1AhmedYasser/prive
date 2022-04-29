@@ -1,16 +1,21 @@
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
+import 'package:quiver/iterables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import '../UltraNetwork/ultra_network.dart';
 
 class Utils {
@@ -395,6 +400,93 @@ class Utils {
       }
     }
     return lastSeen;
+  }
+
+  static Future<List> fetchContacts(BuildContext context) async {
+    CountryDialCode deviceDialCode = await _getCountry();
+    List<User> users = [];
+    List<Contact> phoneContacts = [];
+    List<String> phoneNumbers = [];
+    phoneContacts = await FlutterContacts.getContacts(withProperties: true);
+    for (var contact in phoneContacts) {
+      for (var phone in contact.phones) {
+        try {
+          PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
+          if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
+              phone.number.trim().replaceAll(" ", "").startsWith("010") ||
+              phone.number.trim().replaceAll(" ", "").startsWith("012")) {
+            String dialCode = deviceDialCode.dialCode == "+20"
+                ? "+2"
+                : deviceDialCode.dialCode;
+            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+              phoneNumbers.add(
+                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+            } else {
+              phoneNumbers
+                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            }
+          } else {
+            phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+          }
+        } catch (e) {
+          String dialCode =
+              deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
+
+          if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+            phoneNumbers.add(
+                "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+          } else {
+            phoneNumbers
+                .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+          }
+        }
+      }
+    }
+
+    // Handling Filters
+    List<List<String>> dividedPhoneNumbers = [];
+    dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
+    for (var phoneNumbers in dividedPhoneNumbers) {
+      QueryUsersResponse usersResponse =
+          await StreamChatCore.of(context).client.queryUsers(
+        filter: Filter.and([
+          Filter.notEqual("id", context.currentUser!.id),
+          Filter.notEqual("role", "admin"),
+          Filter.in_("phone", phoneNumbers)
+        ]),
+        sort: const [
+          SortOption(
+            'name',
+            direction: 1,
+          ),
+        ],
+      );
+      for (var user in usersResponse.users) {
+        users.add(user);
+      }
+    }
+
+    return [users, phoneContacts];
+  }
+
+  static Future<CountryDialCode> _getCountry() async {
+    String? deviceCountryCode =
+        WidgetsBinding.instance?.window.locale.countryCode;
+    CountryDialCode? deviceDialCode;
+    try {
+      deviceCountryCode =
+          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
+      if (deviceCountryCode.isEmpty == true) {
+        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      }
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+    } catch (e) {
+      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+    }
+    return deviceDialCode;
   }
 }
 

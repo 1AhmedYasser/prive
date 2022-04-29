@@ -1,20 +1,15 @@
 import 'package:app_settings/app_settings.dart';
-import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:quiver/iterables.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'package:intl/intl.dart';
 
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
@@ -31,11 +26,7 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends State<ContactsScreen>
     with TickerProviderStateMixin {
   bool _permissionDenied = false;
-  var phoneContacts = [];
-  List<String> phoneNumbers = [];
-  String? deviceCountryCode =
-      WidgetsBinding.instance?.window.locale.countryCode;
-  CountryDialCode? deviceDialCode;
+  List<Contact> phoneContacts = [];
   List<User> users = [];
   late final AnimationController _animationController;
 
@@ -43,26 +34,8 @@ class _ContactsScreenState extends State<ContactsScreen>
   void initState() {
     _animationController = AnimationController(vsync: this);
     Utils.checkForInternetConnection(context);
-    getCountry();
-    _fetchContacts();
-
+    _getContacts();
     super.initState();
-  }
-
-  void getCountry() async {
-    try {
-      deviceCountryCode =
-          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
-      if (deviceCountryCode?.isEmpty == true) {
-        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      }
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    } catch (e) {
-      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    }
   }
 
   @override
@@ -75,7 +48,7 @@ class _ContactsScreenState extends State<ContactsScreen>
       body: phoneContacts.isNotEmpty
           ? users.isNotEmpty
               ? RefreshIndicator(
-                  onRefresh: () => Future.sync(() => _fetchContacts()),
+                  onRefresh: () => Future.sync(() => _getContacts()),
                   child: AnimationLimiter(
                     child: ListView.separated(
                       itemBuilder: (context, index) {
@@ -234,73 +207,13 @@ class _ContactsScreenState extends State<ContactsScreen>
     );
   }
 
-  Future _fetchContacts() async {
-    users.clear();
-    phoneContacts.clear();
-    phoneNumbers.clear();
+  _getContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
     } else {
-      phoneContacts = await FlutterContacts.getContacts(withProperties: true);
-      for (var contact in phoneContacts) {
-        for (var phone in contact.phones) {
-          try {
-            PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
-            if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("010") ||
-                phone.number.trim().replaceAll(" ", "").startsWith("012")) {
-              String dialCode = deviceDialCode?.dialCode == "+20"
-                  ? "+2"
-                  : deviceDialCode?.dialCode ?? "";
-              if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-                phoneNumbers.add(
-                    "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-              } else {
-                phoneNumbers
-                    .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-              }
-            } else {
-              phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
-            }
-          } catch (e) {
-            String dialCode = deviceDialCode?.dialCode == "+20"
-                ? "+2"
-                : deviceDialCode?.dialCode ?? "";
-
-            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-              phoneNumbers.add(
-                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
-            } else {
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
-            }
-          }
-        }
-      }
-
-      // Handling Filters
-      List<List<String>> dividedPhoneNumbers = [];
-      dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
-      for (var phoneNumbers in dividedPhoneNumbers) {
-        QueryUsersResponse usersResponse =
-            await StreamChatCore.of(context).client.queryUsers(
-          filter: Filter.and([
-            Filter.notEqual("id", context.currentUser!.id),
-            Filter.notEqual("role", "admin"),
-            Filter.in_("phone", phoneNumbers)
-          ]),
-          sort: const [
-            SortOption(
-              'name',
-              direction: 1,
-            ),
-          ],
-        );
-        for (var user in usersResponse.users) {
-          users.add(user);
-        }
-      }
-
+      List contacts = await Utils.fetchContacts(context);
+      users = contacts.first;
+      phoneContacts = contacts[1];
       setState(() {});
     }
   }

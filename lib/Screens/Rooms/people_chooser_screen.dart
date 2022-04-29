@@ -58,7 +58,6 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
 
   @override
   void initState() {
-    getCountry();
     _fetchContacts();
     super.initState();
     _controller = TextEditingController()..addListener(_userNameListener);
@@ -328,23 +327,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
     );
   }
 
-  void getCountry() async {
-    try {
-      deviceCountryCode =
-          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
-      if (deviceCountryCode?.isEmpty == true) {
-        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      }
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    } catch (e) {
-      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
-    }
-  }
-
   Future _fetchContacts() async {
+    getCountry();
     users.clear();
     phoneContacts.clear();
     phoneNumbers.clear();
@@ -412,6 +396,22 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> {
       }
 
       setState(() {});
+    }
+  }
+
+  void getCountry() async {
+    try {
+      deviceCountryCode =
+          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
+      if (deviceCountryCode?.isEmpty == true) {
+        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      }
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+    } catch (e) {
+      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      deviceDialCode =
+          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     }
   }
 

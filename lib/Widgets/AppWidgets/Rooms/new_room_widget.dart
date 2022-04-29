@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:intl/intl.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
-
+import 'package:prive/Helpers/stream_manager.dart';
 import '../../../Screens/Rooms/room_screen.dart';
 
 class NewRoomWidget extends StatefulWidget {
@@ -15,7 +15,7 @@ class NewRoomWidget extends StatefulWidget {
 }
 
 class _NewRoomWidgetState extends State<NewRoomWidget> {
-  int selectedRoom = 0;
+  int selectedRoomType = 0;
   final _formKey = GlobalKey<FormState>();
   DateTime? selectedDateTime;
   List<bool> isSelected = [true, false];
@@ -121,14 +121,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   "Start A Public Room Open For Every One In Your Contacts",
                   0, () {
                 setState(() {
-                  selectedRoom = 0;
+                  selectedRoomType = 0;
                 });
               }),
               const SizedBox(height: 15),
               buildRoomType(R.images.closedRoom, "Closed",
                   "Start A Private Room With These People", 1, () {
                 setState(() {
-                  selectedRoom = 1;
+                  selectedRoomType = 1;
                 });
               }),
               Padding(
@@ -212,16 +212,19 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      if (selectedRoom == 0) {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RoomScreen(
-                              isNewRoomCreation: true,
-                            ),
-                          ),
-                        );
+                      if (selectedRoomType == 0) {
+                        print("Room Topic ${topicNameController.text}");
+                        print(
+                            "Room Owner ${context.currentUser?.id} ${context.currentUser?.name} ${context.currentUser?.image}");
+                        // Navigator.pop(context);
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const RoomScreen(
+                        //       isNewRoomCreation: true,
+                        //     ),
+                        //   ),
+                        // );
                       } else {
                         Navigator.pop(context);
                         Navigator.push(
@@ -236,7 +239,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                     }
                   },
                   child: Text(
-                    selectedRoom == 0 ? "Start Room" : "Choose People",
+                    selectedRoomType == 0 ? "Start Room" : "Choose People",
                     style: const TextStyle(fontSize: 18),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -432,7 +435,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
           ),
           Icon(
             FontAwesomeIcons.check,
-            color: selectedRoom == type ? Colors.green : Colors.transparent,
+            color: selectedRoomType == type ? Colors.green : Colors.transparent,
           )
         ],
       ),
