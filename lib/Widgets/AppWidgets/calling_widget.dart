@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
@@ -187,6 +187,8 @@ class _CallingWidgetState extends State<CallingWidget> {
                     child: ElevatedButton(
                       onPressed: () async {
                         FlutterCallkitIncoming.endAllCalls();
+                        Utils.logAnswerOrCancelCall(context,
+                            context.currentUser?.id ?? "", "CANCELLED", "0");
                         DatabaseReference ref = FirebaseDatabase.instance
                             .ref("Calls/${widget.channelName}");
                         DatabaseReference usersRef =

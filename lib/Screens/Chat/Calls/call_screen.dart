@@ -398,6 +398,11 @@ class _CallScreenState extends State<CallScreen> {
                 highlightColor: Colors.transparent,
                 onTap: () {
                   FlutterCallkitIncoming.endAllCalls();
+                  Utils.logAnswerOrCancelCall(
+                      context,
+                      context.currentUser?.id ?? "",
+                      "END",
+                      formatTime(_stats?.duration ?? 0));
                   Navigator.pop(context);
                 },
                 child: SizedBox(
@@ -545,6 +550,11 @@ class _CallScreenState extends State<CallScreen> {
                   await userRef.update({
                     await Utils.getString(R.pref.userId) ?? "": "Ended",
                   });
+                  Utils.logAnswerOrCancelCall(
+                      context,
+                      context.currentUser?.id ?? "",
+                      "CANCELLED",
+                      formatTime(_stats?.duration ?? 0));
                 },
               ),
             )

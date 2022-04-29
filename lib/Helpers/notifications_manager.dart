@@ -17,7 +17,7 @@ import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/AppWidgets/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:uuid/uuid.dart';
-
+import 'package:prive/Helpers/stream_manager.dart';
 import 'Utils.dart';
 
 class NotificationsManager {
@@ -377,6 +377,8 @@ class NotificationsManager {
             usersRef.update({
               await Utils.getString(R.pref.userId) ?? "": "Ended",
             });
+            Utils.logAnswerOrCancelCall(notificationsContext,
+                notificationsContext.currentUser?.id ?? "", "CANCELLED", "0");
             break;
           case CallEvent.ACTION_CALL_ENDED:
             break;
