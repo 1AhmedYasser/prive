@@ -333,7 +333,6 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
     databaseReference.once().then((event) {
       getUpcomingRooms();
       onAddListener = databaseReference.onChildAdded.listen((event) {
-        print("added");
         if (isFirstOpen == false) {
           getUpcomingRooms();
         }
@@ -341,11 +340,9 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
       isFirstOpen = false;
     });
     onChangeListener = databaseReference.onChildChanged.listen((event) {
-      print("changed");
       getUpcomingRooms();
     });
     onRemoveListener = databaseReference.onChildRemoved.listen((event) {
-      print("removed");
       getUpcomingRooms();
     });
   }
