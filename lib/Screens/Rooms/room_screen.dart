@@ -40,8 +40,11 @@ class _RoomScreenState extends State<RoomScreen> {
                 systemOverlayStyle: const SystemUiOverlayStyle(
                   statusBarBrightness: Brightness.light,
                 ),
-                leading: const BackButton(
-                  color: Color(0xff7a8fa6),
+                leading: BackButton(
+                  color: const Color(0xff7a8fa6),
+                  onPressed: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
                 ),
                 actions: [
                   GestureDetector(

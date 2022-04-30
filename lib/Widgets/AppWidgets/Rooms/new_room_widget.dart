@@ -1,10 +1,18 @@
+import 'dart:convert';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:intl/intl.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:uuid/uuid.dart';
+import '../../../Helpers/Utils.dart';
 import '../../../Screens/Rooms/room_screen.dart';
 
 class NewRoomWidget extends StatefulWidget {
@@ -19,11 +27,13 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
   final _formKey = GlobalKey<FormState>();
   DateTime? selectedDateTime;
   List<bool> isSelected = [true, false];
+  List<User> users = [];
   TextEditingController topicNameController = TextEditingController();
 
   @override
   void initState() {
     selectedDateTime = DateTime.now();
+    _getContacts();
     super.initState();
   }
 
@@ -210,21 +220,75 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               Padding(
                 padding: const EdgeInsets.only(top: 20, bottom: 10),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      RoomUser owner = RoomUser(
+                        id: context.currentUser?.id ?? "",
+                        name: context.currentUser?.name ?? "",
+                        image: context.currentUser?.image ?? "",
+                        isOwner: true,
+                        isSpeaker: true,
+                        isListener: false,
+                        phone:
+                            context.currentUser?.extraData['phone'] as String,
+                        isHandRaised: false,
+                        isMicOn: true,
+                      );
+
+                      Map<String, Map<String, dynamic>> roomContacts = {};
+                      for (var user in users) {
+                        roomContacts[user.id] = RoomUser(
+                          id: user.id,
+                          name: user.name,
+                          image: user.image,
+                          isOwner: false,
+                          isSpeaker: false,
+                          isListener: true,
+                          phone: user.extraData["phone"] as String,
+                          isHandRaised: false,
+                          isMicOn: false,
+                        ).toJson();
+                      }
                       if (selectedRoomType == 0) {
-                        print("Room Topic ${topicNameController.text}");
-                        print(
-                            "Room Owner ${context.currentUser?.id} ${context.currentUser?.name} ${context.currentUser?.image}");
-                        // Navigator.pop(context);
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const RoomScreen(
-                        //       isNewRoomCreation: true,
-                        //     ),
-                        //   ),
-                        // );
+                        if (isSelected.first == false) {
+                          if (selectedDateTime?.isBefore(DateTime.now()) ==
+                              true) {
+                            selectedDateTime = DateTime.now();
+                          }
+                          Navigator.pop(context);
+                          DatabaseReference ref = FirebaseDatabase.instance.ref(
+                              "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(selectedDateTime ?? DateTime.now()).toString()}");
+                          await ref.set({
+                            "topic": topicNameController.text,
+                            "owner": owner.toJson(),
+                            "speakers": {owner.id: owner.toJson()},
+                            "listeners": {},
+                            "room_contacts": roomContacts,
+                            "raised_hands": {},
+                            "date_time": selectedDateTime.toString()
+                          });
+                        } else {
+                          DatabaseReference ref = FirebaseDatabase.instance
+                              .ref("rooms/${context.currentUser?.id ?? ""}");
+                          await ref.set({
+                            "topic": topicNameController.text,
+                            "owner": owner.toJson(),
+                            "speakers": {owner.id: owner.toJson()},
+                            "listeners": {},
+                            "room_contacts": roomContacts,
+                            "raised_hands": {}
+                          });
+
+                          // Navigator.pop(context);
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const RoomScreen(
+                          //       isNewRoomCreation: true,
+                          //     ),
+                          //   ),
+                          // );
+                        }
                       } else {
                         Navigator.pop(context);
                         Navigator.push(
@@ -232,6 +296,9 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           MaterialPageRoute(
                             builder: (context) => PeopleChooserScreen(
                               roomName: topicNameController.text.trim(),
+                              isNow: isSelected.first,
+                              selectedDateTime:
+                                  selectedDateTime ?? DateTime.now(),
                             ),
                           ),
                         );
@@ -239,7 +306,11 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                     }
                   },
                   child: Text(
-                    selectedRoomType == 0 ? "Start Room" : "Choose People",
+                    selectedRoomType == 0
+                        ? isSelected.first
+                            ? "Start Room"
+                            : "Schedule Room"
+                        : "Choose People",
                     style: const TextStyle(fontSize: 18),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -440,5 +511,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
         ],
       ),
     );
+  }
+
+  _getContacts() async {
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
+      // TODO: Permission Needed
+    } else {
+      List contacts = await Utils.fetchContacts(context);
+      users = contacts.first;
+    }
   }
 }

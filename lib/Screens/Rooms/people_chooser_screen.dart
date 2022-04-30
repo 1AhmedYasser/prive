@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:app_settings/app_settings.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -11,14 +12,20 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
+import '../../Models/Rooms/room_user.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../Widgets/Common/cached_image.dart';
 import '../MainMenu/new_group_screen.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
   final String roomName;
-  const PeopleChooserScreen({Key? key, this.roomName = ""}) : super(key: key);
+  final bool isNow;
+  final DateTime? selectedDateTime;
+  const PeopleChooserScreen(
+      {Key? key, this.roomName = "", this.isNow = true, this.selectedDateTime})
+      : super(key: key);
 
   @override
   State<PeopleChooserScreen> createState() => _PeopleChooserScreenState();
@@ -75,14 +82,69 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                   ? Theme.of(context).primaryColor
                   : Colors.grey,
               onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RoomScreen(
-                      isNewRoomCreation: true,
-                    ),
-                  ),
+                RoomUser owner = RoomUser(
+                  id: context.currentUser?.id ?? "",
+                  name: context.currentUser?.name ?? "",
+                  image: context.currentUser?.image ?? "",
+                  isOwner: true,
+                  isSpeaker: true,
+                  isListener: false,
+                  phone: context.currentUser?.extraData['phone'] as String,
+                  isHandRaised: false,
+                  isMicOn: true,
                 );
+
+                Map<String, Map<String, dynamic>> roomContacts = {};
+                for (var user in _selectedUsers) {
+                  roomContacts[user.id] = RoomUser(
+                    id: user.id,
+                    name: user.name,
+                    image: user.image,
+                    isOwner: false,
+                    isSpeaker: false,
+                    isListener: true,
+                    phone: user.extraData["phone"] as String,
+                    isHandRaised: false,
+                    isMicOn: false,
+                  ).toJson();
+                }
+                if (widget.isNow) {
+                  DatabaseReference ref = FirebaseDatabase.instance
+                      .ref("rooms/${context.currentUser?.id ?? ""}");
+                  await ref.set({
+                    "topic": widget.roomName,
+                    "owner": owner.toJson(),
+                    "speakers": {owner.id: owner.toJson()},
+                    "listeners": {},
+                    "room_contacts": roomContacts,
+                    "raised_hands": {}
+                  });
+                } else {
+                  DateTime? dateTime = widget.selectedDateTime;
+                  if (dateTime?.isBefore(DateTime.now()) == true) {
+                    dateTime = DateTime.now();
+                  }
+                  Navigator.pop(context);
+                  DatabaseReference ref = FirebaseDatabase.instance.ref(
+                      "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(dateTime ?? DateTime.now()).toString()}");
+                  await ref.set({
+                    "topic": widget.roomName,
+                    "owner": owner.toJson(),
+                    "speakers": {owner.id: owner.toJson()},
+                    "listeners": {},
+                    "room_contacts": roomContacts,
+                    "raised_hands": {},
+                    "date_time": dateTime.toString()
+                  });
+                }
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const RoomScreen(
+                //       isNewRoomCreation: true,
+                //     ),
+                //   ),
+                // );
               },
             ),
           ),
