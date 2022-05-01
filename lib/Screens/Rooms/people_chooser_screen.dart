@@ -12,6 +12,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
+import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
@@ -108,6 +109,9 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     isMicOn: false,
                   ).toJson();
                 }
+                String roomId = DateFormat('yyyyMMddhhmmmss')
+                    .format(widget.selectedDateTime ?? DateTime.now())
+                    .toString();
                 if (widget.isNow) {
                   DatabaseReference ref = FirebaseDatabase.instance
                       .ref("rooms/${context.currentUser?.id ?? ""}");
@@ -117,8 +121,27 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     "speakers": {owner.id: owner.toJson()},
                     "listeners": {},
                     "room_contacts": roomContacts,
-                    "raised_hands": {}
+                    "raised_hands": {},
+                    "roomId": roomId
                   });
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RoomScreen(
+                        isNewRoomCreation: true,
+                        room: Room(
+                          roomId: roomId,
+                          topic: widget.roomName,
+                          owner: owner,
+                          speakers: [owner],
+                          listeners: [],
+                          roomContacts: [],
+                          raisedHands: [],
+                        ),
+                      ),
+                    ),
+                  );
                 } else {
                   DateTime? dateTime = widget.selectedDateTime;
                   if (dateTime?.isBefore(DateTime.now()) == true) {
@@ -137,14 +160,6 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     "date_time": dateTime.toString()
                   });
                 }
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const RoomScreen(
-                //       isNewRoomCreation: true,
-                //     ),
-                //   ),
-                // );
               },
             ),
           ),
