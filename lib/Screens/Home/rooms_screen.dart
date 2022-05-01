@@ -148,15 +148,17 @@ class _RoomsScreenState extends State<RoomsScreen>
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const RoomScreen(
-                                            roomId: "",
+                                      if (roomsList[index].roomId?.isNotEmpty ==
+                                          true) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => RoomScreen(
+                                              room: roomsList[index],
+                                            ),
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      }
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
@@ -354,7 +356,6 @@ class _RoomsScreenState extends State<RoomsScreen>
   }
 
   void getRooms() async {
-    final databaseReference = FirebaseDatabase.instance.ref('rooms');
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
       Map<dynamic, dynamic>? roomsResponse =

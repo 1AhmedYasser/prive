@@ -90,6 +90,9 @@ class Images {
   String roomMic = "$path/room_mic.png";
   String roomLeave = "$path/room_leave.png";
   String raiseHandIcon = "$path/raise_hand_icon.png";
+  String alertErrorImage = "$path/alert_error_image.png";
+  String alertInfoImage = "$path/alert_info_image.png";
+  String alertSuccessImage = "$path/alert_success_image.png";
 }
 
 class Animations {

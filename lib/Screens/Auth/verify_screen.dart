@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -205,10 +204,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                         });
                       }
                     }).catchError((error) {
-                      showOkAlertDialog(
-                        context: context,
-                        title: "Prive",
-                        message: "You Entered An Invalid Code",
+                      Utils.showAlert(context,
+                              message: "You Entered An Invalid Code",
+                              alertImage: R.images.alertInfoImage)
+                          .then(
+                        (value) => Navigator.pop(context),
                       );
                     });
                   }

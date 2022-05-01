@@ -1,23 +1,26 @@
+import 'dart:async';
+
 import 'package:badges/badges.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import '../../Models/Rooms/room.dart';
+import '../../Models/Rooms/room_user.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
-  final String roomId;
-  final String topicName;
+  final Room room;
   const RoomScreen(
-      {Key? key,
-      this.isNewRoomCreation = false,
-      required this.roomId,
-      this.topicName = ""})
+      {Key? key, this.isNewRoomCreation = false, required this.room})
       : super(key: key);
 
   @override
@@ -27,161 +30,275 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> {
   bool isMyMicOn = true;
   bool isNewRoomCreation = false;
-  String topicName = "";
+  Room? room;
+  List<String> speakersIds = [];
+  StreamSubscription? onAddListener;
+  StreamSubscription? onChangeListener;
+  StreamSubscription? onDeleteListener;
+  bool showingInfo = false;
 
   @override
   void initState() {
-    print("Room id ${widget.roomId}");
     isNewRoomCreation = widget.isNewRoomCreation;
     setState(() {
-      topicName = widget.topicName;
+      room = widget.room;
     });
+    speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
+    _listenToFirebaseChanges();
+    if (room?.owner?.id != context.currentUser?.id) {
+      joinRoom();
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: !isNewRoomCreation
-          ? PreferredSize(
-              preferredSize: Size(MediaQuery.of(context).size.width, 68),
-              child: AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.grey.shade100,
-                elevation: 0,
-                systemOverlayStyle: const SystemUiOverlayStyle(
-                  statusBarBrightness: Brightness.light,
-                ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isMyMicOn = !isMyMicOn;
-                        });
-                      },
-                      child: SizedBox(
-                        width: 30,
-                        child: Icon(
-                          isMyMicOn
-                              ? FontAwesomeIcons.microphone
-                              : FontAwesomeIcons.microphoneSlash,
-                          color:
-                              isMyMicOn ? const Color(0xff7a8fa6) : Colors.red,
-                          size: 24,
-                        ),
-                      ),
-                    ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: !isNewRoomCreation
+            ? PreferredSize(
+                preferredSize: Size(MediaQuery.of(context).size.width, 68),
+                child: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.grey.shade100,
+                  elevation: 0,
+                  systemOverlayStyle: const SystemUiOverlayStyle(
+                    statusBarBrightness: Brightness.light,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right: 20, left: 15, top: 15, bottom: 5),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            R.images.roomLeave,
-                            width: 16,
-                            color: Colors.red,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Text(
-                            "Leave",
-                            style: TextStyle(fontSize: 16, color: Colors.red),
-                          ),
-                        ],
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.transparent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          side: const BorderSide(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : AppBar(
-              backgroundColor: const Color(0xff5856d6),
-              automaticallyImplyLeading: false,
-              elevation: 0,
-              bottom: PreferredSize(
-                preferredSize: Size(MediaQuery.of(context).size.width,
-                    MediaQuery.of(context).size.height / 20),
-                child: Container(
-                  color: const Color(0xff5856d6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Flexible(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: 25, right: 50, top: 30, bottom: 20),
-                          child: Text(
-                            "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                  actions: [
+                    if (speakersIds.contains(context.currentUser?.id ?? ""))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isMyMicOn = !isMyMicOn;
+                            });
+                            if (room?.owner?.id == context.currentUser?.id) {
+                              final ref = FirebaseDatabase.instance
+                                  .ref('rooms/${room?.owner?.id}/owner');
+                              ref.update({"isMicOn": isMyMicOn});
+                            }
+                            final ref = FirebaseDatabase.instance.ref(
+                                'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+                            ref.update({"isMicOn": isMyMicOn});
+                          },
+                          child: SizedBox(
+                            width: 30,
+                            child: Icon(
+                              isMyMicOn
+                                  ? FontAwesomeIcons.microphone
+                                  : FontAwesomeIcons.microphoneSlash,
+                              color: isMyMicOn
+                                  ? const Color(0xff7a8fa6)
+                                  : Colors.red,
+                              size: 24,
+                            ),
                           ),
                         ),
                       ),
-                      IconButton(
-                        padding: const EdgeInsets.only(right: 30),
-                        icon: StreamSvgIcon.closeSmall(
-                          color: Colors.white,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: 20, left: 15, top: 15, bottom: 5),
+                      child: ElevatedButton(
                         onPressed: () {
-                          setState(() {
-                            isNewRoomCreation = false;
-                          });
+                          leaveRoom();
                         },
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              R.images.roomLeave,
+                              width: 16,
+                              color: Colors.red,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Text(
+                              "Leave",
+                              style: TextStyle(fontSize: 16, color: Colors.red),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                        ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              )
+            : AppBar(
+                backgroundColor: const Color(0xff5856d6),
+                automaticallyImplyLeading: false,
+                elevation: 0,
+                bottom: PreferredSize(
+                  preferredSize: Size(MediaQuery.of(context).size.width,
+                      MediaQuery.of(context).size.height / 20),
+                  child: Container(
+                    color: const Color(0xff5856d6),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Flexible(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: 25, right: 50, top: 30, bottom: 20),
+                            child: Text(
+                              "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 15),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          padding: const EdgeInsets.only(right: 30),
+                          icon: StreamSvgIcon.closeSmall(
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isNewRoomCreation = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, top: 18, right: 20),
-                    child: Text(
-                      topicName,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 20, top: 18, right: 20),
+                      child: Text(
+                        room?.topic ?? "",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20, top: 10, right: 20),
-                    child: Divider(),
-                  ),
-                  buildRoomSectionInfo("Speakers", "3"),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 20, top: 20),
-                    child: MediaQuery.removePadding(
-                      context: context,
-                      removeBottom: true,
-                      removeTop: true,
-                      child: GridView.builder(
+                    const Padding(
+                      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+                      child: Divider(),
+                    ),
+                    buildRoomSectionInfo(
+                      "Speakers",
+                      "${room?.speakers?.length ?? "0"}",
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 20, right: 20, top: 20),
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeBottom: true,
+                        removeTop: true,
+                        child: GridView.builder(
+                            shrinkWrap: true,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 1 / 1.4,
+                              crossAxisSpacing: 10,
+                            ),
+                            itemCount: room?.speakers?.length ?? 0,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Column(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: SizedBox(
+                                          child: CachedImage(
+                                            url: room?.speakers?[index].image ??
+                                                "",
+                                          ),
+                                          height: 78,
+                                          width: 80,
+                                        ),
+                                      ),
+                                      if (room?.speakers?[index].isOwner ==
+                                          true)
+                                        const Positioned(
+                                          child: Icon(
+                                            Icons.star,
+                                            color: Colors.yellow,
+                                          ),
+                                          right: 8,
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        child: Icon(
+                                          room?.speakers?[index].isMicOn == true
+                                              ? FontAwesomeIcons.microphone
+                                              : FontAwesomeIcons
+                                                  .microphoneSlash,
+                                          color:
+                                              room?.speakers?[index].isMicOn ==
+                                                      true
+                                                  ? const Color(0xff7a8fa6)
+                                                  : Colors.red,
+                                          size: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Expanded(
+                                        child: Text(
+                                          (room?.speakers?[index].name
+                                                      ?.split(" ")
+                                                      .first ??
+                                                  "")
+                                              .trim(),
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              );
+                            }),
+                      ),
+                    ),
+                    buildRoomSectionInfo(
+                      "Listeners",
+                      "${room?.listeners?.length ?? "0"}",
+                      withInvite: true,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, top: 20, bottom: 30),
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeBottom: true,
+                        removeTop: true,
+                        child: GridView.builder(
                           shrinkWrap: true,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -190,45 +307,47 @@ class _RoomScreenState extends State<RoomScreen> {
                             childAspectRatio: 1 / 1.4,
                             crossAxisSpacing: 10,
                           ),
-                          itemCount: 1,
+                          itemCount: room?.listeners?.length ?? 0,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               children: [
-                                Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: const CachedImage(
-                                        url:
-                                            "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
-                                      ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(25),
+                                  child: SizedBox(
+                                    child: CachedImage(
+                                      url: room?.listeners?[index].image ?? "",
                                     ),
-                                    const Positioned(
-                                      child: Icon(
-                                        Icons.star,
-                                        color: Colors.yellow,
-                                      ),
-                                      right: 8,
-                                    ),
-                                  ],
+                                    height: 78,
+                                    width: 80,
+                                  ),
                                 ),
                                 const SizedBox(height: 3),
                                 Row(
-                                  children: const [
+                                  children: [
                                     SizedBox(
                                       width: 20,
                                       child: Icon(
-                                        FontAwesomeIcons.microphone,
-                                        color: Color(0xff7a8fa6),
+                                        room?.listeners?[index].isMicOn == true
+                                            ? FontAwesomeIcons.microphone
+                                            : FontAwesomeIcons.microphoneSlash,
+                                        color:
+                                            room?.listeners?[index].isMicOn ==
+                                                    true
+                                                ? const Color(0xff7a8fa6)
+                                                : Colors.red,
                                         size: 15,
                                       ),
                                     ),
-                                    SizedBox(width: 3),
+                                    const SizedBox(width: 3),
                                     Expanded(
                                       child: Text(
-                                        "Ahmed",
-                                        style: TextStyle(
+                                        (room?.listeners?[index].name
+                                                    ?.split(" ")
+                                                    .first ??
+                                                "")
+                                            .trim(),
+                                        style: const TextStyle(
                                           color: Colors.black,
                                         ),
                                         maxLines: 1,
@@ -238,101 +357,45 @@ class _RoomScreenState extends State<RoomScreen> {
                                 )
                               ],
                             );
-                          }),
-                    ),
-                  ),
-                  buildRoomSectionInfo("Listeners", "25", withInvite: true),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 20, bottom: 30),
-                    child: MediaQuery.removePadding(
-                      context: context,
-                      removeBottom: true,
-                      removeTop: true,
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1 / 1.4,
-                          crossAxisSpacing: 10,
+                          },
                         ),
-                        itemCount: 3,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: const CachedImage(
-                                  url:
-                                      "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                    child: Icon(
-                                      FontAwesomeIcons.microphoneSlash,
-                                      color: Colors.red,
-                                      size: 15,
-                                    ),
-                                  ),
-                                  SizedBox(width: 3),
-                                  Expanded(
-                                    child: Text(
-                                      "Ahmed",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                      maxLines: 1,
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          );
-                        },
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 55,
-            right: 30,
-            child: Badge(
-              badgeContent: const Text(
-                '3',
-                style: TextStyle(color: Colors.white),
-              ),
-              position: BadgePosition.topEnd(end: -4),
-              padding: const EdgeInsets.all(7),
-              badgeColor: Theme.of(context).primaryColorDark,
-              child: FloatingActionButton(
-                elevation: 1,
-                onPressed: () {
-                  showMaterialModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => SingleChildScrollView(
-                      controller: ModalScrollController.of(context),
-                      child: const RaisedHandsWidget(),
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  R.images.raiseHandIcon,
+                  ],
                 ),
               ),
             ),
-          )
-        ],
+            Positioned(
+              bottom: 55,
+              right: 30,
+              child: Badge(
+                badgeContent: const Text(
+                  '3',
+                  style: TextStyle(color: Colors.white),
+                ),
+                position: BadgePosition.topEnd(end: -4),
+                padding: const EdgeInsets.all(7),
+                badgeColor: Theme.of(context).primaryColorDark,
+                child: FloatingActionButton(
+                  elevation: 1,
+                  onPressed: () {
+                    showMaterialModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => SingleChildScrollView(
+                        controller: ModalScrollController.of(context),
+                        child: const RaisedHandsWidget(),
+                      ),
+                    );
+                  },
+                  child: Image.asset(
+                    R.images.raiseHandIcon,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -384,5 +447,205 @@ class _RoomScreenState extends State<RoomScreen> {
         ],
       ),
     );
+  }
+
+  void getRoom() async {
+    final databaseReference =
+        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic>? roomResponse =
+          (snapshot.value as Map<dynamic, dynamic>? ?? {})[room?.owner?.id];
+      String roomId = roomResponse?['roomId'];
+      String topic = roomResponse?['topic'];
+      RoomUser? owner = RoomUser(
+        id: roomResponse?['owner']['id'],
+        name: roomResponse?['owner']['name'],
+        image: roomResponse?['owner']['image'],
+        isOwner: roomResponse?['owner']['isOwner'],
+        isSpeaker: roomResponse?['owner']['isSpeaker'],
+        isListener: roomResponse?['owner']['isListener'],
+        phone: roomResponse?['owner']['phone'],
+        isHandRaised: roomResponse?['owner']['isHandRaised'],
+        isMicOn: roomResponse?['owner']['isMicOn'],
+      );
+
+      List<RoomUser>? speakers = [];
+      List<RoomUser>? listeners = [];
+      List<String>? contacts = [];
+      List<RoomUser>? raisedHands = [];
+
+      Map<dynamic, dynamic>? speakersList =
+          (roomResponse?['speakers'] as Map<dynamic, dynamic>?) ?? {};
+      speakersList.forEach((key, value) {
+        speakers.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+
+      Map<dynamic, dynamic>? listenersList =
+          (roomResponse?['listeners'] as Map<dynamic, dynamic>?) ?? {};
+      listenersList.forEach((key, value) {
+        listeners.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+
+      Map<dynamic, dynamic>? roomContacts =
+          (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+      roomContacts.forEach((key, value) {
+        contacts.add(key);
+      });
+
+      Map<dynamic, dynamic>? raisedHandsList =
+          (roomResponse?['raisedHands'] as Map<dynamic, dynamic>?) ?? {};
+      raisedHandsList.forEach((key, value) {
+        raisedHands.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+
+      room = Room(
+        roomId: roomId,
+        topic: topic,
+        owner: owner,
+        speakers: speakers,
+        listeners: listeners,
+        roomContacts: contacts,
+        raisedHands: raisedHands,
+      );
+      speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
+      setState(() {});
+    } else {
+      if (showingInfo == false) {
+        Utils.showAlert(context,
+                message: "The Room Has Ended",
+                alertImage: R.images.alertInfoImage)
+            .then(
+          (value) => Navigator.pop(context),
+        );
+      }
+      showingInfo = true;
+    }
+  }
+
+  void _listenToFirebaseChanges() {
+    final databaseReference =
+        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+    onAddListener = databaseReference.onChildAdded.listen((event) {
+      getRoom();
+    });
+    onChangeListener = databaseReference.onChildChanged.listen((event) {
+      getRoom();
+    });
+    onChangeListener = databaseReference.onChildRemoved.listen((event) {
+      getRoom();
+    });
+  }
+
+  void joinRoom() async {
+    final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic>? roomResponse =
+          (snapshot.value as Map<dynamic, dynamic>? ?? {})[room?.owner?.id];
+      List<RoomUser> contacts = [];
+      Map<dynamic, dynamic>? roomContactsList =
+          (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+      roomContactsList.forEach((key, value) {
+        contacts.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+      RoomUser currentUser = contacts
+          .firstWhere((contact) => contact.id == context.currentUser?.id);
+
+      if (currentUser.isSpeaker == true) {
+        ref.child('speakers/${context.currentUser?.id}').update({
+          "id": currentUser.id,
+          "name": currentUser.name,
+          "image": currentUser.image,
+          "isSpeaker": currentUser.isSpeaker,
+          "isListener": currentUser.isListener,
+          "phone": currentUser.phone,
+          "isHandRaised": currentUser.isHandRaised,
+          "isOwner": currentUser.isOwner,
+          "isMicOn": currentUser.isMicOn,
+        });
+      } else {
+        ref.child('listeners/${context.currentUser?.id}').update({
+          "id": currentUser.id,
+          "name": currentUser.name,
+          "image": currentUser.image,
+          "isSpeaker": currentUser.isSpeaker,
+          "isListener": currentUser.isListener,
+          "phone": currentUser.phone,
+          "isHandRaised": currentUser.isHandRaised,
+          "isOwner": currentUser.isOwner,
+          "isMicOn": currentUser.isMicOn,
+        });
+      }
+    }
+  }
+
+  void leaveRoom() {
+    final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+    if (room?.owner?.id == context.currentUser?.id) {
+      ref.remove();
+    } else if (speakersIds.contains(context.currentUser?.id)) {
+      ref.child('speakers/${context.currentUser?.id}').remove();
+    } else {
+      ref.child('listeners/${context.currentUser?.id}').remove();
+    }
+    Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    onAddListener?.cancel();
+    onChangeListener?.cancel();
+    onDeleteListener?.cancel();
+    super.dispose();
   }
 }

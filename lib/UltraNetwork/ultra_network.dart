@@ -1,12 +1,11 @@
 import 'dart:convert';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:dio/dio.dart';
+import '../Extras/resources.dart';
+import '../Helpers/utils.dart';
 import 'ultra_error.dart';
 import 'ultra_helpers.dart';
 import 'ultra_loading_indicator.dart';
@@ -60,59 +59,54 @@ class UltraNetwork with ChangeNotifier {
             },
             animationDuration: const Duration(milliseconds: 0));
       }
-      var response = await dio.request(
-        request.path,
-        queryParameters: parameters,
-        data: formData,
-        cancelToken: cancelToken,
-        onSendProgress: (rcv, total) {
-          uploadProgress = ((rcv / total) * 100).toStringAsFixed(0);
-          if (formData != null && formData.files.isNotEmpty) {
-            uploadFileName = formData.files[0].value.filename ?? "";
-            notifyListeners();
+      try {
+        var response = await dio.request(
+          request.path,
+          queryParameters: parameters,
+          data: formData,
+          cancelToken: cancelToken,
+          onSendProgress: (rcv, total) {
+            uploadProgress = ((rcv / total) * 100).toStringAsFixed(0);
+            if (formData != null && formData.files.isNotEmpty) {
+              uploadFileName = formData.files[0].value.filename ?? "";
+              notifyListeners();
+            }
+          },
+          options: Options(
+              headers: await UHeaders.getHeaders(context), method: "post"),
+        );
+        if (showLoadingIndicator) BotToast.removeAll();
+        if (response.statusCode! >= 200 && response.statusCode! < 400) {
+          if (decodeResponse) {
+            (isList)
+                ? request.model.fromJsonList(
+                    List<Map<String, dynamic>>.from(response.data),
+                  )
+                : request.model.fromJson(
+                    Map<String, dynamic>.from(
+                      (response.data is String)
+                          ? json.decode(response.data)
+                          : response.data,
+                    ),
+                  );
           }
-        },
-        options: Options(
-            headers: await UHeaders.getHeaders(context), method: "post"),
-      ).catchError((error) {
-        if (cancelToken.isCancelled) {
-          if (showLoadingIndicator) BotToast.removeAll();
-        } else {
-          print((error as DioError).response?.data);
+          print("Ultra Request ${request.path}");
+          print("Ultra Response ${response.data}");
+          return request.model;
+        }
+      } on DioError catch (error) {
+        if (showLoadingIndicator) BotToast.removeAll();
+        if (cancelToken.isCancelled == false) {
           if (showError) UltraError.handleError(context, error, onError);
         }
-      });
-
-      if (cancelToken.isCancelled == false) {
-        if (showLoadingIndicator) {
-          BotToast.removeAll();
-        }
-      }
-
-      if (response.statusCode! >= 200 && response.statusCode! < 400) {
-        if (decodeResponse) {
-          (isList)
-              ? request.model.fromJsonList(
-                  List<Map<String, dynamic>>.from(response.data),
-                )
-              : request.model.fromJson(
-                  Map<String, dynamic>.from(
-                    (response.data is String)
-                        ? json.decode(response.data)
-                        : response.data,
-                  ),
-                );
-        }
-        print("Ultra Request ${request.path}");
-        print("Ultra Response ${response.data}");
-        return request.model;
       }
     } else {
       if (showError) {
-        showOkAlertDialog(
-            context: context,
-            title: "Network Error",
-            message: "No Internet Connection");
+        bool? isAlertAlreadyOn = await Utils.getBool(R.pref.internetAlert);
+        if (isAlertAlreadyOn == false || isAlertAlreadyOn == null) {
+          Utils.showNoInternetConnection(context);
+          Utils.saveBool(R.pref.internetAlert, true);
+        }
       }
     }
   }

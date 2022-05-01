@@ -10,6 +10,7 @@ import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Models/Rooms/room.dart';
 import '../../../Screens/Rooms/room_screen.dart';
 
 class NewRoomWidget extends StatefulWidget {
@@ -286,8 +287,15 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                             MaterialPageRoute(
                               builder: (context) => RoomScreen(
                                 isNewRoomCreation: true,
-                                roomId: roomId,
-                                topicName: topicNameController.text,
+                                room: Room(
+                                  roomId: roomId,
+                                  topic: topicNameController.text,
+                                  owner: owner,
+                                  speakers: [owner],
+                                  listeners: [],
+                                  roomContacts: [],
+                                  raisedHands: [],
+                                ),
                               ),
                             ),
                           );

@@ -17,6 +17,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import '../UltraNetwork/ultra_network.dart';
+import '../Widgets/Common/alert_widget.dart';
 
 class Utils {
   static final player = AudioPlayer();
@@ -487,6 +488,39 @@ class Utils {
           CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     }
     return deviceDialCode;
+  }
+
+  static Future<void> showAlert(
+    BuildContext context, {
+    String alertImage = "",
+    String alertTitle = "Prive",
+    String message = "",
+    String okButtonText = "Ok",
+    String cancelButtonText = "Cancel",
+    Function? onOkButtonPressed,
+    bool withCancel = false,
+  }) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          elevation: 0,
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              side: BorderSide(color: Colors.transparent, width: 1.0)),
+          content: AlertWidget(
+            image: alertImage.isEmpty ? R.images.alertInfoImage : alertImage,
+            title: alertTitle.tr(),
+            description: message.tr(),
+            okButtonText: "Ok".tr(),
+            onOkButtonPressed: onOkButtonPressed,
+            withCancel: withCancel,
+          ),
+        );
+      },
+    );
   }
 
   // For Testing Purposes

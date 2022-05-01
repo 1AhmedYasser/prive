@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -203,11 +202,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       if (profileImage.path.isEmpty) {
-                        showOkAlertDialog(
-                          context: context,
-                          title: "Prive",
-                          message: "Please Choose An Image",
-                        );
+                        Utils.showAlert(context,
+                            message: "Please Choose An Image",
+                            alertImage: R.images.alertInfoImage);
                       } else {
                         if (loading == false) {
                           List<int> imageBytes =

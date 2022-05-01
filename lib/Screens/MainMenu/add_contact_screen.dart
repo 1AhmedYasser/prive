@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/contact.dart';
@@ -11,6 +10,8 @@ import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'dart:io';
 
 import 'package:prive/Widgets/Common/cached_image.dart';
+
+import '../../Extras/resources.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({Key? key}) : super(key: key);
@@ -117,11 +118,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               Phone(phoneNumberController.text),
                             ];
                           await newContact.insert();
-                          showOkAlertDialog(
-                            context: context,
-                            title: "Prive",
-                            message: "Contact Added Successfully",
-                          ).then((value) => Navigator.pop(context));
+                          Utils.showAlert(context,
+                                  message: "The Room Has Ended",
+                                  alertImage: R.images.alertSuccessImage)
+                              .then(
+                            (value) => Navigator.pop(context),
+                          );
                         }
                       },
                       child: const Text(

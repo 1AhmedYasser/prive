@@ -1,6 +1,9 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
+import '../Extras/resources.dart';
+import '../Helpers/utils.dart';
 
 class UltraError {
   static CancelToken cancelToken = CancelToken();
@@ -13,22 +16,21 @@ class UltraError {
           _showErrorMessage(context,
               "We Encountered an error, please try again or contact the admin");
           break;
-        case 404:
-          _showErrorMessage(context,
-              "We Encountered an error, please try again or contact the admin");
-          break;
         default:
+          _showErrorMessage(
+              context, jsonDecode(error.response?.data)['message']);
           break;
       }
     }
   }
 
   static void _showErrorMessage(BuildContext context, String message,
-      {String title = "Jibler"}) {
-    showOkAlertDialog(
-      context: context,
-      title: title,
+      {String title = "Prive"}) {
+    Utils.showAlert(
+      context,
       message: message,
+      alertTitle: title,
+      alertImage: R.images.alertErrorImage,
     );
   }
 }

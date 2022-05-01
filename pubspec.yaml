@@ -39,7 +39,6 @@ dependencies:
   image_picker: ^0.8.4+4
   intl_phone_field: ^2.1.0
   pin_code_fields: ^7.3.0
-  adaptive_dialog: ^1.2.0
   bot_toast: ^4.0.1
   flutter_staggered_animations: ^1.0.0
   modal_bottom_sheet: ^2.0.1
