@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,13 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Models/Rooms/room.dart';
+import '../../../UltraNetwork/ultra_constants.dart';
 import '../../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Common/cached_image.dart';
 import '../channels_empty_widgets.dart';
@@ -18,12 +22,14 @@ class RoomInvitationWidget extends StatefulWidget {
   final List<String> roomContacts;
   final bool isSpeaker;
   final String roomRef;
-  const RoomInvitationWidget({
-    Key? key,
-    this.roomContacts = const [],
-    this.isSpeaker = false,
-    required this.roomRef,
-  }) : super(key: key);
+  final Room? room;
+  const RoomInvitationWidget(
+      {Key? key,
+      this.roomContacts = const [],
+      this.isSpeaker = false,
+      required this.roomRef,
+      this.room})
+      : super(key: key);
 
   @override
   State<RoomInvitationWidget> createState() => _RoomInvitationWidgetState();
@@ -377,6 +383,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                       });
                     }
                     Navigator.pop(context);
+                    _sendInvitations();
                   },
                   child: const Text(
                     "Send Invitation",
@@ -396,6 +403,22 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
           );
         },
       ),
+    );
+  }
+
+  void _sendInvitations() {
+    UltraNetwork.request(
+      context,
+      sendInvitations,
+      showLoadingIndicator: false,
+      showError: false,
+      cancelToken: CancelToken(),
+      formData: FormData.fromMap({
+        "Ownername": widget.room?.owner?.name,
+        "Roomname": widget.room?.topic,
+        "IsSpeaker": widget.isSpeaker,
+        "UsersIds": _selectedUsers.map((e) => e.id).toList().join(","),
+      }),
     );
   }
 

@@ -1,20 +1,27 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:badges/badges.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import '../../Models/Call/prive_call.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
+import '../../UltraNetwork/ultra_network.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
@@ -37,6 +44,8 @@ class _RoomScreenState extends State<RoomScreen> {
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
   bool showingInfo = false;
+  RtcEngine? agoraEngine;
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
@@ -49,6 +58,8 @@ class _RoomScreenState extends State<RoomScreen> {
     _listenToFirebaseChanges();
     if (room?.owner?.id != context.currentUser?.id) {
       joinRoom();
+    } else {
+      initAgora(true);
     }
     super.initState();
   }
@@ -73,10 +84,17 @@ class _RoomScreenState extends State<RoomScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             setState(() {
                               isMyMicOn = !isMyMicOn;
                             });
+                            agoraEngine?.muteRemoteAudioStream(
+                                int.parse(
+                                    await Utils.getString(R.pref.userId) ??
+                                        "0"),
+                                !isMyMicOn);
+
+                            await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
                             if (room?.owner?.id == context.currentUser?.id) {
                               final ref = FirebaseDatabase.instance
                                   .ref('rooms/${room?.owner?.id}/owner');
@@ -399,6 +417,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           controller: ModalScrollController.of(context),
                           child: RaisedHandsWidget(
                             roomRef: 'rooms/${room?.owner?.id}',
+                            agoraEngine: agoraEngine,
                           ),
                         ),
                       );
@@ -489,6 +508,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     child: RoomInvitationWidget(
                       roomContacts: room?.roomContacts ?? [],
                       isSpeaker: isSpeaker,
+                      room: room,
                       roomRef: 'rooms/${room?.owner?.id}/room_contacts',
                     ),
                   ),
@@ -513,8 +533,14 @@ class _RoomScreenState extends State<RoomScreen> {
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
-      Map<dynamic, dynamic>? roomResponse =
-          (snapshot.value as Map<dynamic, dynamic>? ?? {})[room?.owner?.id];
+      Map<dynamic, dynamic>? roomResponse = {};
+      if (Platform.isIOS) {
+        roomResponse =
+            (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
+      } else {
+        roomResponse = (snapshot.value as Map<dynamic, dynamic>);
+      }
+
       String roomId = roomResponse?['roomId'];
       String topic = roomResponse?['topic'];
       RoomUser? owner = RoomUser(
@@ -672,6 +698,7 @@ class _RoomScreenState extends State<RoomScreen> {
           "isOwner": currentUser.isOwner,
           "isMicOn": currentUser.isMicOn,
         });
+        initAgora(true);
       } else {
         ref.child('listeners/${context.currentUser?.id}').update({
           "id": currentUser.id,
@@ -684,6 +711,7 @@ class _RoomScreenState extends State<RoomScreen> {
           "isOwner": currentUser.isOwner,
           "isMicOn": currentUser.isMicOn,
         });
+        initAgora(false);
       }
     }
   }
@@ -701,11 +729,53 @@ class _RoomScreenState extends State<RoomScreen> {
     Navigator.pop(context);
   }
 
+  Future<void> initAgora(bool isSpeaker) async {
+    print("agoraa");
+    UltraNetwork.request(
+      context,
+      roomToken,
+      cancelToken: cancelToken,
+      formData: FormData.fromMap({
+        "Uid": await Utils.getString(R.pref.userId),
+        "channelName": room?.roomId,
+      }),
+      showLoadingIndicator: false,
+      showError: false,
+    ).then((response) async {
+      if (response != null) {
+        PriveCall tokenResponse = response;
+        await [Permission.microphone].request();
+
+        agoraEngine = await RtcEngine.createWithContext(
+            RtcEngineContext(R.constants.agoraAppId));
+
+        await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
+        agoraEngine?.setEventHandler(RtcEngineEventHandler(
+          joinChannelSuccess: (String channel, int uid, int elapsed) {
+            print('joinChannelSuccess $channel $uid');
+          },
+          userJoined: (int uid, int elapsed) {
+            print('userJoined $uid');
+          },
+        ));
+        await agoraEngine?.setClientRole(
+            isSpeaker ? ClientRole.Broadcaster : ClientRole.Audience);
+        await agoraEngine?.joinChannel(
+            tokenResponse.data ?? "",
+            room?.roomId ?? "",
+            null,
+            int.parse(await Utils.getString(R.pref.userId) ?? "0"));
+        setState(() {});
+      }
+    });
+  }
+
   @override
   void dispose() {
     onAddListener?.cancel();
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
+    agoraEngine?.destroy();
     super.dispose();
   }
 }

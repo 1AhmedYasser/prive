@@ -205,11 +205,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       }
                     }).catchError((error) {
                       Utils.showAlert(context,
-                              message: "You Entered An Invalid Code",
-                              alertImage: R.images.alertInfoImage)
-                          .then(
-                        (value) => Navigator.pop(context),
-                      );
+                          message: "You Entered An Invalid Code",
+                          alertImage: R.images.alertInfoImage);
                     });
                   }
                 },

@@ -1,3 +1,4 @@
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,7 +8,9 @@ import '../../Common/cached_image.dart';
 
 class RaisedHandsWidget extends StatefulWidget {
   final String roomRef;
-  const RaisedHandsWidget({Key? key, required this.roomRef}) : super(key: key);
+  final RtcEngine? agoraEngine;
+  const RaisedHandsWidget({Key? key, required this.roomRef, this.agoraEngine})
+      : super(key: key);
 
   @override
   State<RaisedHandsWidget> createState() => _RaisedHandsWidgetState();
@@ -76,7 +79,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                               splashColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () {
-                                setState(() {
+                                setState(() async {
                                   if (raisedHands[index].isMicOn == true) {
                                     raisedHands[index].isMicOn = false;
                                     FirebaseDatabase.instance
@@ -87,6 +90,12 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                         .ref(
                                             "${widget.roomRef}/listeners/${raisedHands[index].id}")
                                         .update({"isMicOn": false});
+                                    widget.agoraEngine?.muteRemoteAudioStream(
+                                        int.parse(raisedHands[index].id ?? "0"),
+                                        false);
+
+                                    await widget.agoraEngine
+                                        ?.muteLocalAudioStream(false);
                                   } else {
                                     raisedHands[index].isMicOn = true;
                                     FirebaseDatabase.instance
@@ -97,6 +106,12 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                         .ref(
                                             "${widget.roomRef}/listeners/${raisedHands[index].id}")
                                         .update({"isMicOn": true});
+                                    widget.agoraEngine?.muteRemoteAudioStream(
+                                        int.parse(raisedHands[index].id ?? "0"),
+                                        true);
+
+                                    await widget.agoraEngine
+                                        ?.muteLocalAudioStream(true);
                                   }
                                 });
                               },

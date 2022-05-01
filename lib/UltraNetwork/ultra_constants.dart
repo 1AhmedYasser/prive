@@ -18,6 +18,12 @@ final makeACall = UltraRequest(
     "${baseUrl}Tools-master/DynamicKey/AgoraDynamicKey/php/sample/RtcTokenBuilderSample.php",
     UMethods.post,
     PriveCall());
+final roomToken = UltraRequest(
+    "${baseUrl}Tools-master/DynamicKey/AgoraDynamicKey/php/sample/AhmedToken.php",
+    UMethods.post,
+    PriveCall());
+final sendInvitations = UltraRequest(
+    "${baseUrl}SendInvitation.php", UMethods.post, StatusResponse());
 final getCallLogs =
     UltraRequest("${baseUrl}GetAllCalles.php", UMethods.post, CallLogs());
 final addCall = UltraRequest(
