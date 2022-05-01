@@ -663,8 +663,13 @@ class _RoomScreenState extends State<RoomScreen> {
     final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
     final snapshot = await ref.get();
     if (snapshot.exists) {
-      Map<dynamic, dynamic>? roomResponse =
-          (snapshot.value as Map<dynamic, dynamic>? ?? {})[room?.owner?.id];
+      Map<dynamic, dynamic>? roomResponse = {};
+      if (Platform.isIOS) {
+        roomResponse =
+            (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
+      } else {
+        roomResponse = (snapshot.value as Map<dynamic, dynamic>);
+      }
       List<RoomUser> contacts = [];
       Map<dynamic, dynamic>? roomContactsList =
           (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};

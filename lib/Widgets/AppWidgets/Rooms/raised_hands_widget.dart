@@ -78,42 +78,41 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                             child: InkWell(
                               splashColor: Colors.transparent,
                               highlightColor: Colors.transparent,
-                              onTap: () {
-                                setState(() async {
-                                  if (raisedHands[index].isMicOn == true) {
-                                    raisedHands[index].isMicOn = false;
-                                    FirebaseDatabase.instance
-                                        .ref(
-                                            "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                        .update({"isMicOn": false});
-                                    FirebaseDatabase.instance
-                                        .ref(
-                                            "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                        .update({"isMicOn": false});
-                                    widget.agoraEngine?.muteRemoteAudioStream(
-                                        int.parse(raisedHands[index].id ?? "0"),
-                                        false);
+                              onTap: () async {
+                                if (raisedHands[index].isMicOn == true) {
+                                  raisedHands[index].isMicOn = false;
+                                  FirebaseDatabase.instance
+                                      .ref(
+                                          "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                      .update({"isMicOn": false});
+                                  FirebaseDatabase.instance
+                                      .ref(
+                                          "${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                      .update({"isMicOn": false});
+                                  widget.agoraEngine?.muteRemoteAudioStream(
+                                      int.parse(raisedHands[index].id ?? "0"),
+                                      false);
 
-                                    await widget.agoraEngine
-                                        ?.muteLocalAudioStream(false);
-                                  } else {
-                                    raisedHands[index].isMicOn = true;
-                                    FirebaseDatabase.instance
-                                        .ref(
-                                            "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                        .update({"isMicOn": true});
-                                    FirebaseDatabase.instance
-                                        .ref(
-                                            "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                        .update({"isMicOn": true});
-                                    widget.agoraEngine?.muteRemoteAudioStream(
-                                        int.parse(raisedHands[index].id ?? "0"),
-                                        true);
+                                  await widget.agoraEngine
+                                      ?.muteLocalAudioStream(false);
+                                } else {
+                                  raisedHands[index].isMicOn = true;
+                                  FirebaseDatabase.instance
+                                      .ref(
+                                          "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                      .update({"isMicOn": true});
+                                  FirebaseDatabase.instance
+                                      .ref(
+                                          "${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                      .update({"isMicOn": true});
+                                  widget.agoraEngine?.muteRemoteAudioStream(
+                                      int.parse(raisedHands[index].id ?? "0"),
+                                      true);
 
-                                    await widget.agoraEngine
-                                        ?.muteLocalAudioStream(true);
-                                  }
-                                });
+                                  await widget.agoraEngine
+                                      ?.muteLocalAudioStream(true);
+                                }
+                                setState(() {});
                               },
                               child: Row(
                                 children: [
