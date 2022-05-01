@@ -38,70 +38,6 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
     super.initState();
   }
 
-  void getUpcomingRooms() async {
-    upcomingRoomsList.clear();
-    final snapshot = await databaseReference.get();
-    if (snapshot.exists) {
-      Map<dynamic, dynamic> upcomingRoomsResponse =
-          snapshot.value as Map<dynamic, dynamic>;
-      upcomingRoomsResponse.forEach((key, value) {
-        Map<dynamic, dynamic> upcomingRooms = value as Map<dynamic, dynamic>;
-        upcomingRooms.forEach((key, value) {
-          String roomId = key;
-          String topic = "";
-          RoomUser? owner;
-          List<String> contacts = [];
-          String dateTime = "";
-          topic = value['topic'];
-          dateTime = value['date_time'];
-          owner = RoomUser(
-            id: value['owner']['id'],
-            name: value['owner']['name'],
-            image: value['owner']['image'],
-            isOwner: value['owner']['isOwner'],
-            isSpeaker: value['owner']['isSpeaker'],
-            isListener: value['owner']['isListener'],
-            phone: value['owner']['phone'],
-            isHandRaised: value['owner']['isHandRaised'],
-            isMicOn: value['owner']['isMicOn'],
-          );
-          Map<dynamic, dynamic> roomContacts =
-              value['room_contacts'] as Map<dynamic, dynamic>;
-          roomContacts.forEach((key, value) {
-            contacts.add(key);
-          });
-          upcomingRoomsList.add(
-            UpcomingRoom(
-              roomId: roomId,
-              topic: topic,
-              owner: owner,
-              roomContacts: contacts,
-              time: dateTime,
-            ),
-          );
-        });
-      });
-      List<UpcomingRoom> myUpcomingRooms = upcomingRoomsList
-          .where((element) => element.owner?.id == context.currentUser?.id)
-          .toList();
-      myUpcomingRooms.addAll(upcomingRoomsList
-          .where((element) =>
-              element.owner?.id != context.currentUser?.id &&
-              element.roomContacts?.contains(context.currentUser?.id) == true)
-          .toList());
-
-      upcomingRoomsList = myUpcomingRooms;
-
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -345,6 +281,71 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
     onRemoveListener = databaseReference.onChildRemoved.listen((event) {
       getUpcomingRooms();
     });
+  }
+
+  void getUpcomingRooms() async {
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic> upcomingRoomsResponse =
+          snapshot.value as Map<dynamic, dynamic>? ?? {};
+      upcomingRoomsList.clear();
+      upcomingRoomsResponse.forEach((key, value) {
+        Map<dynamic, dynamic> upcomingRooms = value as Map<dynamic, dynamic>;
+        upcomingRooms.forEach((key, value) {
+          String roomId = key;
+          String topic = "";
+          RoomUser? owner;
+          List<String> contacts = [];
+          String dateTime = "";
+          topic = value['topic'];
+          dateTime = value['date_time'];
+          owner = RoomUser(
+            id: value['owner']['id'],
+            name: value['owner']['name'],
+            image: value['owner']['image'],
+            isOwner: value['owner']['isOwner'],
+            isSpeaker: value['owner']['isSpeaker'],
+            isListener: value['owner']['isListener'],
+            phone: value['owner']['phone'],
+            isHandRaised: value['owner']['isHandRaised'],
+            isMicOn: value['owner']['isMicOn'],
+          );
+          Map<dynamic, dynamic>? roomContacts =
+              (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+          roomContacts.forEach((key, value) {
+            contacts.add(key);
+          });
+          upcomingRoomsList.add(
+            UpcomingRoom(
+              roomId: roomId,
+              topic: topic,
+              owner: owner,
+              roomContacts: contacts,
+              time: dateTime,
+            ),
+          );
+        });
+      });
+      List<UpcomingRoom> myUpcomingRooms = upcomingRoomsList
+          .where((element) => element.owner?.id == context.currentUser?.id)
+          .toList();
+      myUpcomingRooms.addAll(upcomingRoomsList
+          .where((element) =>
+              element.owner?.id != context.currentUser?.id &&
+              element.roomContacts?.contains(context.currentUser?.id) == true)
+          .toList());
+
+      upcomingRoomsList = myUpcomingRooms;
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        upcomingRoomsList.clear();
+        isLoading = false;
+      });
+    }
   }
 
   @override

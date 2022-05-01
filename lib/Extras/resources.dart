@@ -113,6 +113,7 @@ class Animations {
   String contactsPermission = "$path/contacts_permission.json";
   String callLog = "$path/CallLog.json";
   String upcomingRooms = "$path/upcoming_rooms.json";
+  String noRooms = "$path/no_rooms.json";
 }
 
 class Sounds {

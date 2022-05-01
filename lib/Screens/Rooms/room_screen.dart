@@ -11,7 +11,13 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
-  const RoomScreen({Key? key, this.isNewRoomCreation = false})
+  final String roomId;
+  final String topicName;
+  const RoomScreen(
+      {Key? key,
+      this.isNewRoomCreation = false,
+      required this.roomId,
+      this.topicName = ""})
       : super(key: key);
 
   @override
@@ -21,10 +27,15 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> {
   bool isMyMicOn = true;
   bool isNewRoomCreation = false;
+  String topicName = "";
 
   @override
   void initState() {
+    print("Room id ${widget.roomId}");
     isNewRoomCreation = widget.isNewRoomCreation;
+    setState(() {
+      topicName = widget.topicName;
+    });
     super.initState();
   }
 
@@ -33,40 +44,39 @@ class _RoomScreenState extends State<RoomScreen> {
     return Scaffold(
       appBar: !isNewRoomCreation
           ? PreferredSize(
-              preferredSize: Size(MediaQuery.of(context).size.width, 60),
+              preferredSize: Size(MediaQuery.of(context).size.width, 68),
               child: AppBar(
+                automaticallyImplyLeading: false,
                 backgroundColor: Colors.grey.shade100,
                 elevation: 0,
                 systemOverlayStyle: const SystemUiOverlayStyle(
                   statusBarBrightness: Brightness.light,
                 ),
-                leading: BackButton(
-                  color: const Color(0xff7a8fa6),
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                ),
                 actions: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isMyMicOn = !isMyMicOn;
-                      });
-                    },
-                    child: SizedBox(
-                      width: 30,
-                      child: Icon(
-                        isMyMicOn
-                            ? FontAwesomeIcons.microphone
-                            : FontAwesomeIcons.microphoneSlash,
-                        color: isMyMicOn ? const Color(0xff7a8fa6) : Colors.red,
-                        size: 24,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isMyMicOn = !isMyMicOn;
+                        });
+                      },
+                      child: SizedBox(
+                        width: 30,
+                        child: Icon(
+                          isMyMicOn
+                              ? FontAwesomeIcons.microphone
+                              : FontAwesomeIcons.microphoneSlash,
+                          color:
+                              isMyMicOn ? const Color(0xff7a8fa6) : Colors.red,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
-                        right: 20, left: 15, top: 10, bottom: 10),
+                        right: 20, left: 15, top: 15, bottom: 5),
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
@@ -100,35 +110,43 @@ class _RoomScreenState extends State<RoomScreen> {
                 ],
               ),
             )
-          : PreferredSize(
-              preferredSize: Size(MediaQuery.of(context).size.width, 100),
-              child: Container(
-                height: 150,
-                color: const Color(0xff5856d6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Flexible(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 25, right: 50, top: 30),
-                        child: Text(
-                          "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
-                          style: TextStyle(color: Colors.white, fontSize: 15),
+          : AppBar(
+              backgroundColor: const Color(0xff5856d6),
+              automaticallyImplyLeading: false,
+              elevation: 0,
+              bottom: PreferredSize(
+                preferredSize: Size(MediaQuery.of(context).size.width,
+                    MediaQuery.of(context).size.height / 20),
+                child: Container(
+                  color: const Color(0xff5856d6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Flexible(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: 25, right: 50, top: 30, bottom: 20),
+                          child: Text(
+                            "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
+                            style: TextStyle(color: Colors.white, fontSize: 15),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      padding: const EdgeInsets.only(right: 30),
-                      icon: StreamSvgIcon.closeSmall(
-                        color: Colors.white,
+                      IconButton(
+                        padding: const EdgeInsets.only(right: 30),
+                        icon: StreamSvgIcon.closeSmall(
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isNewRoomCreation = false;
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        setState(() {
-                          isNewRoomCreation = false;
-                        });
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -139,11 +157,12 @@ class _RoomScreenState extends State<RoomScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20, top: 18, right: 20),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 20, top: 18, right: 20),
                     child: Text(
-                      "Discussing the best places in KSA",
-                      style: TextStyle(
+                      topicName,
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
@@ -176,12 +195,23 @@ class _RoomScreenState extends State<RoomScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: const CachedImage(
-                                    url:
-                                        "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
-                                  ),
+                                Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(25),
+                                      child: const CachedImage(
+                                        url:
+                                            "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
+                                      ),
+                                    ),
+                                    const Positioned(
+                                      child: Icon(
+                                        Icons.star,
+                                        color: Colors.yellow,
+                                      ),
+                                      right: 8,
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 3),
                                 Row(
@@ -234,7 +264,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           return Column(
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(25),
                                 child: const CachedImage(
                                   url:
                                       "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",

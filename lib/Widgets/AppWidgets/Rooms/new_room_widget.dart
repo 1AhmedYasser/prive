@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +9,6 @@ import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:uuid/uuid.dart';
 import '../../../Helpers/Utils.dart';
 import '../../../Screens/Rooms/room_screen.dart';
 
@@ -270,24 +267,30 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         } else {
                           DatabaseReference ref = FirebaseDatabase.instance
                               .ref("rooms/${context.currentUser?.id ?? ""}");
+                          String roomId = DateFormat('yyyyMMddhhmmmss')
+                              .format(selectedDateTime ?? DateTime.now())
+                              .toString();
                           await ref.set({
                             "topic": topicNameController.text,
                             "owner": owner.toJson(),
                             "speakers": {owner.id: owner.toJson()},
                             "listeners": {},
                             "room_contacts": roomContacts,
-                            "raised_hands": {}
+                            "raised_hands": {},
+                            "roomId": roomId
                           });
 
-                          // Navigator.pop(context);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const RoomScreen(
-                          //       isNewRoomCreation: true,
-                          //     ),
-                          //   ),
-                          // );
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RoomScreen(
+                                isNewRoomCreation: true,
+                                roomId: roomId,
+                                topicName: topicNameController.text,
+                              ),
+                            ),
+                          );
                         }
                       } else {
                         Navigator.pop(context);
