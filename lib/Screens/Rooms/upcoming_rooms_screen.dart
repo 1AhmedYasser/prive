@@ -118,7 +118,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                           height: 15,
                         ),
                         Text(
-                          "Your Upcoming Rooms\nWill Appear Here",
+                          "Upcoming Rooms\nWill Appear Here",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,

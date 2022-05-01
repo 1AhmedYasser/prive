@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:app_settings/app_settings.dart';
@@ -14,7 +15,15 @@ import '../../Common/cached_image.dart';
 import '../channels_empty_widgets.dart';
 
 class RoomInvitationWidget extends StatefulWidget {
-  const RoomInvitationWidget({Key? key}) : super(key: key);
+  final List<String> roomContacts;
+  final bool isSpeaker;
+  final String roomRef;
+  const RoomInvitationWidget({
+    Key? key,
+    this.roomContacts = const [],
+    this.isSpeaker = false,
+    required this.roomRef,
+  }) : super(key: key);
 
   @override
   State<RoomInvitationWidget> createState() => _RoomInvitationWidgetState();
@@ -81,14 +90,16 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
+                      Padding(
+                        padding: const EdgeInsets.only(
                             top: 30, left: 30, right: 30, bottom: 0),
                         child: Text(
-                          "Invite To The Room",
+                          widget.isSpeaker
+                              ? "Invite A Speaker"
+                              : "Invite People To The Room",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 23,
+                          style: const TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -351,6 +362,20 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                 left: 35,
                 child: ElevatedButton(
                   onPressed: () {
+                    final ref = FirebaseDatabase.instance.ref(widget.roomRef);
+                    for (var user in _selectedUsers) {
+                      ref.child(user.id).update({
+                        "id": user.id,
+                        "name": user.name,
+                        "image": user.image,
+                        "isSpeaker": widget.isSpeaker,
+                        "isListener": !widget.isSpeaker,
+                        "phone": user.extraData['phone'],
+                        "isHandRaised": false,
+                        "isOwner": false,
+                        "isMicOn": widget.isSpeaker,
+                      });
+                    }
                     Navigator.pop(context);
                   },
                   child: const Text(
@@ -380,6 +405,9 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
     } else {
       List contacts = await Utils.fetchContacts(context);
       users = contacts.first;
+      users = users
+          .where((user) => widget.roomContacts.contains(user.id) == false)
+          .toList();
       allUsers = users;
       phoneContacts = contacts[1];
       setState(() {});

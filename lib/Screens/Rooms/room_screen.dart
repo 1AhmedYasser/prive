@@ -32,6 +32,7 @@ class _RoomScreenState extends State<RoomScreen> {
   bool isNewRoomCreation = false;
   Room? room;
   List<String> speakersIds = [];
+  List<String> raisedHandsIds = [];
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
@@ -44,6 +45,7 @@ class _RoomScreenState extends State<RoomScreen> {
       room = widget.room;
     });
     speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
+    raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
     _listenToFirebaseChanges();
     if (room?.owner?.id != context.currentUser?.id) {
       joinRoom();
@@ -201,6 +203,10 @@ class _RoomScreenState extends State<RoomScreen> {
                     buildRoomSectionInfo(
                       "Speakers",
                       "${room?.speakers?.length ?? "0"}",
+                      true,
+                      withInvite: room?.owner?.id == context.currentUser?.id
+                          ? true
+                          : false,
                     ),
                     Padding(
                       padding:
@@ -289,6 +295,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     buildRoomSectionInfo(
                       "Listeners",
                       "${room?.listeners?.length ?? "0"}",
+                      false,
                       withInvite: true,
                     ),
                     Padding(
@@ -369,27 +376,74 @@ class _RoomScreenState extends State<RoomScreen> {
               bottom: 55,
               right: 30,
               child: Badge(
-                badgeContent: const Text(
-                  '3',
-                  style: TextStyle(color: Colors.white),
+                badgeContent: Text(
+                  "${room?.raisedHands?.length}",
+                  style: const TextStyle(color: Colors.white),
                 ),
+                showBadge: speakersIds.contains(context.currentUser?.id)
+                    ? room?.raisedHands?.isEmpty == true
+                        ? false
+                        : true
+                    : false,
                 position: BadgePosition.topEnd(end: -4),
                 padding: const EdgeInsets.all(7),
                 badgeColor: Theme.of(context).primaryColorDark,
                 child: FloatingActionButton(
                   elevation: 1,
-                  onPressed: () {
-                    showMaterialModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => SingleChildScrollView(
-                        controller: ModalScrollController.of(context),
-                        child: const RaisedHandsWidget(),
-                      ),
-                    );
+                  onPressed: () async {
+                    if (speakersIds.contains(context.currentUser?.id)) {
+                      showMaterialModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => SingleChildScrollView(
+                          controller: ModalScrollController.of(context),
+                          child: RaisedHandsWidget(
+                            roomRef: 'rooms/${room?.owner?.id}',
+                          ),
+                        ),
+                      );
+                    } else {
+                      if (raisedHandsIds.contains(context.currentUser?.id)) {
+                        FirebaseDatabase.instance
+                            .ref(
+                                'rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}')
+                            .remove();
+                      } else {
+                        final ref = FirebaseDatabase.instance
+                            .ref('rooms/${room?.owner?.id}');
+
+                        ref
+                            .child('raisedHands/${context.currentUser?.id}')
+                            .update({
+                          "id": context.currentUser?.id,
+                          "name": context.currentUser?.name,
+                          "image": context.currentUser?.image,
+                          "isSpeaker": false,
+                          "isListener": true,
+                          "phone": context.currentUser?.extraData['phone'],
+                          "isHandRaised": true,
+                          "isOwner": false,
+                          "isMicOn": false,
+                        });
+                      }
+                    }
                   },
-                  child: Image.asset(
-                    R.images.raiseHandIcon,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.asset(
+                      R.images.raiseHandIcon,
+                      color: speakersIds.contains(context.currentUser?.id)
+                          ? null
+                          : raisedHandsIds.contains(context.currentUser?.id)
+                              ? null
+                              : Colors.grey.shade300,
+                      colorBlendMode:
+                          speakersIds.contains(context.currentUser?.id)
+                              ? null
+                              : raisedHandsIds.contains(context.currentUser?.id)
+                                  ? null
+                                  : BlendMode.lighten,
+                    ),
                   ),
                 ),
               ),
@@ -400,7 +454,7 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Padding buildRoomSectionInfo(String title, String value,
+  Padding buildRoomSectionInfo(String title, String value, bool isSpeaker,
       {bool withInvite = false}) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 14, right: 20),
@@ -432,7 +486,11 @@ class _RoomScreenState extends State<RoomScreen> {
                   backgroundColor: Colors.transparent,
                   builder: (context) => SingleChildScrollView(
                     controller: ModalScrollController.of(context),
-                    child: const RoomInvitationWidget(),
+                    child: RoomInvitationWidget(
+                      roomContacts: room?.roomContacts ?? [],
+                      isSpeaker: isSpeaker,
+                      roomRef: 'rooms/${room?.owner?.id}/room_contacts',
+                    ),
                   ),
                 );
               },
@@ -546,6 +604,7 @@ class _RoomScreenState extends State<RoomScreen> {
         raisedHands: raisedHands,
       );
       speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
+      raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
       setState(() {});
     } else {
       if (showingInfo == false) {
@@ -637,6 +696,7 @@ class _RoomScreenState extends State<RoomScreen> {
       ref.child('speakers/${context.currentUser?.id}').remove();
     } else {
       ref.child('listeners/${context.currentUser?.id}').remove();
+      ref.child('raisedHands/${context.currentUser?.id}').remove();
     }
     Navigator.pop(context);
   }

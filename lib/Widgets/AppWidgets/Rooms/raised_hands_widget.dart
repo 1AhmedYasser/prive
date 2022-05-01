@@ -1,17 +1,27 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
 
 import '../../Common/cached_image.dart';
 
 class RaisedHandsWidget extends StatefulWidget {
-  const RaisedHandsWidget({Key? key}) : super(key: key);
+  final String roomRef;
+  const RaisedHandsWidget({Key? key, required this.roomRef}) : super(key: key);
 
   @override
   State<RaisedHandsWidget> createState() => _RaisedHandsWidgetState();
 }
 
 class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
-  List<bool> raisedHands = [true, false, true];
+  List<RoomUser> raisedHands = [];
+
+  @override
+  void initState() {
+    getRaisedHands();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,12 +36,12 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 30, left: 30, right: 30),
+          Padding(
+            padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
             child: Text(
-              "Raised Hands (4)",
+              "Raised Hands ${raisedHands.isNotEmpty ? "(${raisedHands.length})" : ""}",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 23,
                 fontWeight: FontWeight.w600,
               ),
@@ -40,93 +50,151 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
-              child: MediaQuery.removePadding(
-                context: context,
-                removeTop: true,
-                removeBottom: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: 3,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          setState(() {
-                            raisedHands[index] = !raisedHands[index];
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: const SizedBox(
-                                child: CachedImage(
-                                  url:
-                                      "https://cdnb.artstation.com/p/assets/images/images/032/393/609/large/anya-valeeva-annie-fan-art-2020.jpg?1606310067",
-                                ),
-                                height: 60,
-                                width: 60,
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            const Text(
-                              "Ahmed Yasser",
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Expanded(child: SizedBox()),
-                            SizedBox(
-                              width: 30,
-                              child: Icon(
-                                raisedHands[index]
-                                    ? FontAwesomeIcons.microphone
-                                    : FontAwesomeIcons.microphoneSlash,
-                                color: raisedHands[index]
-                                    ? const Color(0xff7a8fa6)
-                                    : Colors.red,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Icon(
-                                  raisedHands[index]
-                                      ? FontAwesomeIcons.check
-                                      : null,
-                                  color: Colors.white,
-                                  size: 12,
-                                ),
-                              ),
-                              decoration: BoxDecoration(
-                                color: raisedHands[index]
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: raisedHands[index]
-                                      ? Theme.of(context).primaryColor
-                                      : const Color(0xff7a8fa6),
-                                ),
-                              ),
-                            )
-                          ],
+              child: raisedHands.isEmpty
+                  ? const Center(
+                      child: Padding(
+                      padding: EdgeInsets.only(bottom: 50),
+                      child: Text(
+                        "No Raised Hands",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ))
+                  : MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      removeBottom: true,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: raisedHands.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () {
+                                setState(() {
+                                  if (raisedHands[index].isMicOn == true) {
+                                    raisedHands[index].isMicOn = false;
+                                    FirebaseDatabase.instance
+                                        .ref(
+                                            "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                        .update({"isMicOn": false});
+                                    FirebaseDatabase.instance
+                                        .ref(
+                                            "${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                        .update({"isMicOn": false});
+                                  } else {
+                                    raisedHands[index].isMicOn = true;
+                                    FirebaseDatabase.instance
+                                        .ref(
+                                            "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                        .update({"isMicOn": true});
+                                    FirebaseDatabase.instance
+                                        .ref(
+                                            "${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                        .update({"isMicOn": true});
+                                  }
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: SizedBox(
+                                      child: CachedImage(
+                                        url: raisedHands[index].image ?? "",
+                                      ),
+                                      height: 60,
+                                      width: 60,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Text(
+                                    raisedHands[index].name ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Expanded(child: SizedBox()),
+                                  SizedBox(
+                                    width: 30,
+                                    child: Icon(
+                                      raisedHands[index].isMicOn == true
+                                          ? FontAwesomeIcons.microphone
+                                          : FontAwesomeIcons.microphoneSlash,
+                                      color: raisedHands[index].isMicOn == true
+                                          ? const Color(0xff7a8fa6)
+                                          : Colors.red,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: Icon(
+                                        raisedHands[index].isMicOn == true
+                                            ? FontAwesomeIcons.check
+                                            : null,
+                                        color: Colors.white,
+                                        size: 12,
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: raisedHands[index].isMicOn == true
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color:
+                                            raisedHands[index].isMicOn == true
+                                                ? Theme.of(context).primaryColor
+                                                : const Color(0xff7a8fa6),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void getRaisedHands() async {
+    final ref = FirebaseDatabase.instance.ref("${widget.roomRef}/raisedHands");
+    final res = await ref.once();
+    if (res.snapshot.exists) {
+      print(res.snapshot.value);
+      Map<dynamic, dynamic>? response =
+          (res.snapshot.value as Map<dynamic, dynamic>? ?? {});
+      response.forEach((key, value) {
+        raisedHands.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+      setState(() {});
+    }
   }
 }
