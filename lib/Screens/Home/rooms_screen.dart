@@ -222,21 +222,12 @@ class _RoomsScreenState extends State<RoomsScreen>
                                                     buildSpeaker(
                                                         roomsList[index]
                                                             .speakers?[2]),
-                                                  if ((roomsList[index]
-                                                              .speakers
-                                                              ?.length ??
-                                                          0) >
-                                                      3)
-                                                    buildInfo(
-                                                        "${(roomsList[index].speakers?.length ?? 0) - 3}",
-                                                        "speakers"),
-                                                  if ((roomsList[index]
-                                                          .listeners
-                                                          ?.isNotEmpty ==
-                                                      true))
-                                                    buildInfo(
-                                                        "${roomsList[index].listeners?.length ?? 0}",
-                                                        "listeners")
+                                                  buildInfo(
+                                                      "${(roomsList[index].speakers?.length ?? 0) > 3 ? "+${((roomsList[index].speakers?.length ?? 0) - 3)}" : roomsList[index].speakers?.length ?? 0}",
+                                                      "speakers"),
+                                                  buildInfo(
+                                                      "${roomsList[index].listeners?.length ?? 0}",
+                                                      "listeners")
                                                 ],
                                               ),
                                             )
@@ -322,7 +313,7 @@ class _RoomsScreenState extends State<RoomsScreen>
       child: Column(
         children: [
           Text(
-            "+$value",
+            value,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -330,7 +321,9 @@ class _RoomsScreenState extends State<RoomsScreen>
           ),
           const SizedBox(height: 5),
           Text(
-            title,
+            int.parse(value) != 1
+                ? title
+                : title.substring(0, title.length - 1),
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w400,
