@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +20,14 @@ class RaisedHandsWidget extends StatefulWidget {
 
 class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
   List<RoomUser> raisedHands = [];
+  StreamSubscription? onAddListener;
+  StreamSubscription? onChangeListener;
+  StreamSubscription? onDeleteListener;
 
   @override
   void initState() {
-    getRaisedHands();
+    _listenToFirebaseChanges();
+    // getRaisedHands();
     super.initState();
   }
 
@@ -177,6 +183,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
   void getRaisedHands() async {
     final ref = FirebaseDatabase.instance.ref("${widget.roomRef}/raisedHands");
     final res = await ref.once();
+    raisedHands.clear();
     if (res.snapshot.exists) {
       print(res.snapshot.value);
       Map<dynamic, dynamic>? response =
@@ -197,6 +204,29 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
         );
       });
       setState(() {});
+    } else {
+      setState(() {});
     }
+  }
+
+  void _listenToFirebaseChanges() {
+    final ref = FirebaseDatabase.instance.ref("${widget.roomRef}/raisedHands");
+    onAddListener = ref.onChildAdded.listen((event) {
+      getRaisedHands();
+    });
+    onChangeListener = ref.onChildChanged.listen((event) {
+      getRaisedHands();
+    });
+    onChangeListener = ref.onChildRemoved.listen((event) {
+      getRaisedHands();
+    });
+  }
+
+  @override
+  void dispose() {
+    onAddListener?.cancel();
+    onChangeListener?.cancel();
+    onDeleteListener?.cancel();
+    super.dispose();
   }
 }

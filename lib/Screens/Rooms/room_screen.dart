@@ -745,7 +745,6 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   Future<void> initAgora(bool isSpeaker) async {
-    print("agoraa");
     UltraNetwork.request(
       context,
       roomToken,
