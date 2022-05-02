@@ -541,8 +541,8 @@ class _RoomScreenState extends State<RoomScreen> {
         roomResponse = (snapshot.value as Map<dynamic, dynamic>);
       }
 
-      String roomId = roomResponse?['roomId'];
-      String topic = roomResponse?['topic'];
+      String? roomId = roomResponse?['roomId'];
+      String? topic = roomResponse?['topic'];
       RoomUser? owner = RoomUser(
         id: roomResponse?['owner']['id'],
         name: roomResponse?['owner']['name'],

@@ -416,7 +416,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
       formData: FormData.fromMap({
         "Ownername": widget.room?.owner?.name,
         "Roomname": widget.room?.topic,
-        "IsSpeaker": widget.isSpeaker,
+        "IsSpeaker": widget.isSpeaker ? 1 : 0,
         "UsersIds": _selectedUsers.map((e) => e.id).toList().join(","),
       }),
     );
