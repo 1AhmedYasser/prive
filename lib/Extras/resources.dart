@@ -146,7 +146,7 @@ class SharedPref {
 }
 
 class Constants {
-  String streamKey = 'ymyds4cvwdx6';
+  String streamKey = '5agc7xsw7tyj';
   String agoraAppId = "666a21c863d9431da1ee9651748608fb";
 }
 
