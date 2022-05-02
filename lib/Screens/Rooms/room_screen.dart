@@ -631,6 +631,16 @@ class _RoomScreenState extends State<RoomScreen> {
       );
       speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
       raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
+
+      room?.listeners?.forEach((listener) {
+        if (listener.id == context.currentUser?.id) {
+          if (listener.isMicOn == true) {
+            agoraEngine?.setClientRole(ClientRole.Broadcaster);
+          } else {
+            agoraEngine?.setClientRole(ClientRole.Audience);
+          }
+        }
+      });
       setState(() {});
     } else {
       if (showingInfo == false) {

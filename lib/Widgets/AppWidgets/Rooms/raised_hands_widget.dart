@@ -89,12 +89,6 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                       .ref(
                                           "${widget.roomRef}/listeners/${raisedHands[index].id}")
                                       .update({"isMicOn": false});
-                                  widget.agoraEngine?.muteRemoteAudioStream(
-                                      int.parse(raisedHands[index].id ?? "0"),
-                                      false);
-
-                                  await widget.agoraEngine
-                                      ?.muteLocalAudioStream(false);
                                 } else {
                                   raisedHands[index].isMicOn = true;
                                   FirebaseDatabase.instance
@@ -105,12 +99,6 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                       .ref(
                                           "${widget.roomRef}/listeners/${raisedHands[index].id}")
                                       .update({"isMicOn": true});
-                                  widget.agoraEngine?.muteRemoteAudioStream(
-                                      int.parse(raisedHands[index].id ?? "0"),
-                                      true);
-
-                                  await widget.agoraEngine
-                                      ?.muteLocalAudioStream(true);
                                 }
                                 setState(() {});
                               },
