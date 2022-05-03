@@ -109,7 +109,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     isMicOn: false,
                   ).toJson();
                 }
-                String roomId = DateFormat('yyyyMMddhhmmmss')
+                String roomId = DateFormat('yyyyMMddhhmmmss', "en")
                     .format(widget.selectedDateTime ?? DateTime.now())
                     .toString();
                 if (widget.isNow) {

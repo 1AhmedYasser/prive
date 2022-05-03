@@ -153,7 +153,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
               child: Row(
                 children: [
                   Text(
-                    DateFormat("hh:mm a").format(
+                    DateFormat("hh:mm a", "en").format(
                       DateTime.parse(
                         upcomingRoomsList[index].time ??
                             DateTime.now().toString(),
@@ -167,7 +167,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    DateFormat("d MMM").format(
+                    DateFormat("d MMM", "en").format(
                       DateTime.parse(
                         upcomingRoomsList[index].time ??
                             DateTime.now().toString(),

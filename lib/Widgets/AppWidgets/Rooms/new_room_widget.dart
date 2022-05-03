@@ -268,7 +268,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         } else {
                           DatabaseReference ref = FirebaseDatabase.instance
                               .ref("rooms/${context.currentUser?.id ?? ""}");
-                          String roomId = DateFormat('yyyyMMddhhmmmss')
+                          String roomId = DateFormat('yyyyMMddhhmmmss', "en")
                               .format(selectedDateTime ?? DateTime.now())
                               .toString();
                           await ref.set({
