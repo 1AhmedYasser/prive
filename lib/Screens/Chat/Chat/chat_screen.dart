@@ -812,8 +812,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
                 onQuotedMessageCleared: () {
-                  setState(() => _quotedMessage = null);
-                  _focusNode!.unfocus();
+                  if (_quotedMessage != null) {
+                    setState(() => _quotedMessage = null);
+                  }
                 },
                 idleSendButton: Padding(
                   padding: const EdgeInsets.only(left: 10, right: 10),
