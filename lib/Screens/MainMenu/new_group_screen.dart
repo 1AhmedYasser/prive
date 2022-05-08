@@ -81,8 +81,6 @@ class _NewGroupScreenState extends State<NewGroupScreen>
               onPressed: () async {
                 if (groupNameController.text.isNotEmpty &&
                     _selectedUsers.isNotEmpty) {
-                  print("Start Group");
-
                   Map<String, String> usersColors = {};
                   usersColors[context.currentUser?.id ?? "0"] =
                       generateRandomColorHex();
