@@ -105,7 +105,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                         'is_archive': false,
                         'name_colors': usersColors
                       },
-                      id: generateRandomString(50),
+                      id: generateRandomString(60),
                     );
                     await channel.watch();
                     Navigator.of(context).push(
