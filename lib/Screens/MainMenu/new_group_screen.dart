@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +16,7 @@ import '../../Helpers/Utils.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../Widgets/Common/cached_image.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 class NewGroupScreen extends StatefulWidget {
   const NewGroupScreen({Key? key}) : super(key: key);
@@ -32,6 +35,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
   List<Contact> phoneContacts = [];
   List<User> users = [];
   List<User> allUsers = [];
+  final Random _random = Random();
   late final AnimationController _animationController;
 
   @override
@@ -77,19 +81,32 @@ class _NewGroupScreenState extends State<NewGroupScreen>
               onPressed: () async {
                 if (groupNameController.text.isNotEmpty &&
                     _selectedUsers.isNotEmpty) {
+                  print("Start Group");
+
+                  Map<String, String> usersColors = {};
+                  usersColors[context.currentUser?.id ?? "0"] =
+                      generateRandomColorHex();
+                  for (var user in _selectedUsers) {
+                    usersColors[user.id] = generateRandomColorHex();
+                  }
                   try {
                     final groupName = groupNameController.text;
                     final client = StreamChat.of(context).client;
-                    final channel = client.channel('messaging', extraData: {
-                      'members': [
-                        client.state.currentUser!.id,
-                        ..._selectedUsers.map((e) => e.id),
-                      ],
-                      'name': groupName,
-                      'channel_type': "Group",
-                      'is_important': false,
-                      'is_archive': false
-                    });
+                    final channel = client.channel(
+                      'messaging',
+                      extraData: {
+                        'members': [
+                          client.state.currentUser!.id,
+                          ..._selectedUsers.map((e) => e.id),
+                        ],
+                        'name': groupName,
+                        'channel_type': "Group",
+                        'is_important': false,
+                        'is_archive': false,
+                        'name_colors': usersColors
+                      },
+                      id: generateRandomString(50),
+                    );
                     await channel.watch();
                     Navigator.of(context).push(
                       ChatScreen.routeWithChannel(channel),
@@ -466,6 +483,23 @@ class _NewGroupScreenState extends State<NewGroupScreen>
         },
       ),
     );
+  }
+
+  String generateRandomColorHex() {
+    return Color.fromARGB(
+      _random.nextInt(256),
+      _random.nextInt(256),
+      _random.nextInt(256),
+      _random.nextInt(256),
+    ).value.toRadixString(16).substring(2);
+  }
+
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
   }
 
   _getContacts() async {

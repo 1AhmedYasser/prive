@@ -960,6 +960,18 @@ class _ChatScreenState extends State<ChatScreen> {
             message.user?.name ?? "",
             style: const TextStyle(fontSize: 11),
           );
+        } else if (channel.isGroup) {
+          Map<String, dynamic>? nameColors =
+              channel.extraData['name_colors'] as Map<String, dynamic>?;
+          return Text(
+            message.user?.name ?? "",
+            style: TextStyle(
+              fontSize: 11,
+              color: nameColors != null
+                  ? parseColor(nameColors[message.user?.id] as String)
+                  : Colors.black,
+            ),
+          );
         } else {
           return const SizedBox.shrink();
         }
@@ -1099,6 +1111,17 @@ class _ChatScreenState extends State<ChatScreen> {
     if (count > 0) {
       await StreamChannel.of(context).channel.markRead();
     }
+  }
+
+  Color parseColor(String color) {
+    String hex = color.replaceAll("#", "");
+    if (hex.isEmpty) hex = "ffffff";
+    if (hex.length == 3) {
+      hex =
+          '${hex.substring(0, 1)}${hex.substring(0, 1)}${hex.substring(1, 2)}${hex.substring(1, 2)}${hex.substring(2, 3)}${hex.substring(2, 3)}';
+    }
+    Color col = Color(int.parse(hex, radix: 16)).withOpacity(1.0);
+    return col;
   }
 
   Widget _buildConnectedTitleState(
