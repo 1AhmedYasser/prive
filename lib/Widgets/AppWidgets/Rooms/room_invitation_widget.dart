@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -423,17 +425,39 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
   }
 
   _getContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
-      List contacts = await Utils.fetchContacts(context);
-      users = contacts.first;
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
       users = users
           .where((user) => widget.roomContacts.contains(user.id) == false)
           .toList();
       allUsers = users;
-      phoneContacts = contacts[1];
+      phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
+    } else {
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        setState(() => _permissionDenied = true);
+      } else {
+        List contacts = await Utils.fetchContacts(context);
+        users = contacts.first;
+        users = users
+            .where((user) => widget.roomContacts.contains(user.id) == false)
+            .toList();
+        allUsers = users;
+        phoneContacts = contacts[1];
+        setState(() {});
+      }
     }
   }
 

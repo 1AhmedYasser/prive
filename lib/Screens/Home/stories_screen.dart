@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dashed_circle/dashed_circle.dart';
@@ -21,6 +23,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
@@ -531,12 +534,21 @@ class _StoriesScreenState extends State<StoriesScreen> {
   }
 
   _getContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      // TODO: Handle Permission Denied
-    } else {
-      List contacts = await Utils.fetchContacts(context);
-      users = contacts.first;
-      phoneContacts = contacts[1];
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      phoneContacts = users.isNotEmpty ? [Contact()] : [];
       usersPhoneNumbers = users
           .map(
             (e) => e.extraData['phone'] as String,
@@ -545,6 +557,23 @@ class _StoriesScreenState extends State<StoriesScreen> {
       usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
       _getStories(usersPhoneNumbers.join(","));
       setState(() {});
+    } else {
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        // TODO: Handle Permission Denied
+      } else {
+        List contacts = await Utils.fetchContacts(context);
+        users = contacts.first;
+        phoneContacts = contacts[1];
+        usersPhoneNumbers = users
+            .map(
+              (e) => e.extraData['phone'] as String,
+            )
+            .toList();
+        usersPhoneNumbers
+            .add(context.currentUser?.extraData['phone'] as String);
+        _getStories(usersPhoneNumbers.join(","));
+        setState(() {});
+      }
     }
   }
 

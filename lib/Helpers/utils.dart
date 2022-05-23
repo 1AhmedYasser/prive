@@ -172,7 +172,7 @@ class Utils {
       R.images.loadContactsListImage: "Load Contact List",
       R.images.newChannelImage: "New Channel",
       R.images.newGroupImage: "New Group",
-      // R.images.newCatalogImage: "New Catalog",
+      R.images.newCatalogImage: "New Catalog",
     };
     return showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(

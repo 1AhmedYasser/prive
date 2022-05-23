@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -452,14 +453,33 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
   }
 
   _getContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
-      List contacts = await Utils.fetchContacts(context);
-      users = contacts.first;
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
       allUsers = users;
-      phoneContacts = contacts[1];
+      phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
+    } else {
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        setState(() => _permissionDenied = true);
+      } else {
+        List contacts = await Utils.fetchContacts(context);
+        users = contacts.first;
+        allUsers = users;
+        phoneContacts = contacts[1];
+        setState(() {});
+      }
     }
   }
 

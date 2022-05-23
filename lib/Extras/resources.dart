@@ -143,6 +143,7 @@ class SharedPref {
   String internetAlert = "internet_alert";
   String chosenChatBackground = "chosen_chat_background";
   String isChosenChatBackgroundAFile = "is_chosen_chat_background_a_file";
+  String myContacts = "my_contacts";
 }
 
 class Constants {

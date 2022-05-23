@@ -330,7 +330,6 @@ class NotificationsManager {
   }
 
   static Future<void> listenToCalls() async {
-    print("Contxeeext $notificationsContext");
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         switch (event!.name) {

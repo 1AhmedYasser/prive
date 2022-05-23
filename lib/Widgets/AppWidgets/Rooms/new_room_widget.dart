@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -525,11 +527,28 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
   }
 
   _getContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      // TODO: Permission Needed
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      setState(() {});
     } else {
-      List contacts = await Utils.fetchContacts(context);
-      users = contacts.first;
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        // TODO: Permission Needed
+      } else {
+        List contacts = await Utils.fetchContacts(context);
+        users = contacts.first;
+      }
     }
   }
 }

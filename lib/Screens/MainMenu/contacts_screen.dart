@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -208,13 +210,31 @@ class _ContactsScreenState extends State<ContactsScreen>
   }
 
   _getContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
-      List contacts = await Utils.fetchContacts(context);
-      users = contacts.first;
-      phoneContacts = contacts[1];
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
+    } else {
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        setState(() => _permissionDenied = true);
+      } else {
+        List contacts = await Utils.fetchContacts(context);
+        users = contacts.first;
+        phoneContacts = contacts[1];
+        setState(() {});
+      }
     }
   }
 }

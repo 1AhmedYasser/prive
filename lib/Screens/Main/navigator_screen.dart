@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
@@ -8,6 +11,7 @@ import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/rooms_screen.dart';
 import 'package:prive/Screens/Home/stories_screen.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -22,6 +26,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   @override
   void initState() {
     NotificationsManager.setupNotifications(context);
+    loadContacts();
     super.initState();
   }
 
@@ -93,6 +98,16 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       });
     } else if (index == 2) {
       Utils.showMainMenu(context);
+    }
+  }
+
+  void loadContacts() async {
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
+    } else {
+      List contacts = await Utils.fetchContacts(context);
+      List<User> users = contacts.first;
+      String usersMap = jsonEncode(users);
+      Utils.saveString(R.pref.myContacts, usersMap);
     }
   }
 }
