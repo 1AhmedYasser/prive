@@ -93,6 +93,9 @@ class Images {
   String alertErrorImage = "$path/alert_error_image.png";
   String alertInfoImage = "$path/alert_info_image.png";
   String alertSuccessImage = "$path/alert_success_image.png";
+  String newCatalog = "$path/new_catalog.png";
+  String newCollectionsImage = "$path/new_collections_image.png";
+  String newProductCameraImage = "$path/new_product_camera_image.png";
 }
 
 class Animations {
