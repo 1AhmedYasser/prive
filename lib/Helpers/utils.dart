@@ -214,6 +214,7 @@ class Utils {
                         Navigator.pushNamed(context, R.routes.newGroupScreen);
                         break;
                       case 4:
+                        Navigator.pushNamed(context, R.routes.catalogScreen);
                         break;
                     }
                   },

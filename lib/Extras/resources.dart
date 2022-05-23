@@ -170,6 +170,7 @@ class Routes {
   String notificationsSoundsRoute = '/notificationsSounds_Screen';
   String addContactScreen = '/addContact_Screen';
   String newGroupScreen = '/newGroup_Screen';
+  String catalogScreen = '/catalog_Screen';
 }
 
 class R {
