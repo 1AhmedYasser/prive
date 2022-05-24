@@ -124,7 +124,7 @@ class _NewCatalogCollectionWidgetState
                   height: 85,
                   child: image.path.isEmpty
                       ? Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(19),
                           child: Image.asset(
                             R.images.newProductCameraImage,
                             fit: BoxFit.contain,

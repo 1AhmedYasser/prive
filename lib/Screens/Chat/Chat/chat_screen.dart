@@ -1305,17 +1305,20 @@ class _ChatScreenState extends State<ChatScreen> {
     final long = details.attachments.first.extraData['long'] as double;
     return InkWell(
       onTap: () {
-        startLocationTracking(details.id, details.attachments.first.id);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => GoogleMapsViewWidget(
-              onBack: cancelLocationSubscription,
-              message: details,
-              channelName: username,
-              channel: widget.channel,
+        Utils.openMapsSheet(context, lat, long, () {
+          Navigator.pop(context);
+          startLocationTracking(details.id, details.attachments.first.id);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => GoogleMapsViewWidget(
+                onBack: cancelLocationSubscription,
+                message: details,
+                channelName: username,
+                channel: widget.channel,
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
       child: wrapAttachmentWidget(
         context,

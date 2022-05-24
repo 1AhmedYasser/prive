@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
-
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class CatalogScreen extends StatefulWidget {

@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
@@ -17,6 +19,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import '../UltraNetwork/ultra_network.dart';
+import '../Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import '../Widgets/Common/alert_widget.dart';
 
 class Utils {
@@ -522,6 +525,77 @@ class Utils {
         );
       },
     );
+  }
+
+  static void openMapsSheet(
+      context, double lat, double long, Function priveChosen) async {
+    try {
+      final cords = Coords(lat, long);
+      final availableMaps = await MapLauncher.installedMaps;
+
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return SingleChildScrollView(
+            child: Container(
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  color: Colors.white),
+              child: Wrap(
+                children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(
+                        left: 20, top: 20, bottom: 10, right: 20),
+                    child: Text(
+                      "Open Via",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      priveChosen();
+                    },
+                    title: const Text("Prive"),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        R.images.logoImage,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                  for (var map in availableMaps)
+                    ListTile(
+                      onTap: () => map.showMarker(coords: cords, title: ""),
+                      title: Text(map.mapName),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SvgPicture.asset(
+                          map.icon,
+                          height: 30.0,
+                          width: 30.0,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(
+                    height: 90,
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   // For Testing Purposes

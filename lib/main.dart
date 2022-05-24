@@ -70,7 +70,7 @@ class Prive extends StatelessWidget {
       child: MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
-        locale: context.locale,
+        locale: const Locale("en"), //context.locale,
         theme: theme,
         debugShowCheckedModeBanner: false,
         builder: (context, child) {
