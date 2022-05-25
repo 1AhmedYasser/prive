@@ -97,24 +97,41 @@ class _CatalogScreenState extends State<CatalogScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20, bottom: 20, left: 18, right: 18),
-                  child: Row(children: [
-                    Image.asset(
-                      R.images.newCollectionGroupImage,
-                      fit: BoxFit.fill,
-                      width: 70,
-                    ),
-                    const SizedBox(width: 17),
-                    const Text(
-                      "Add New Catalog",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 17,
+                InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    showMaterialModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => SingleChildScrollView(
+                        controller: ModalScrollController.of(context),
+                        child: const NewCatalogCollectionWidget(
+                          title: "Create New Catalog",
+                          type: "Catalog",
+                        ),
                       ),
-                    ),
-                  ]),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 20, bottom: 20, left: 18, right: 18),
+                    child: Row(children: [
+                      Image.asset(
+                        R.images.newCollectionGroupImage,
+                        fit: BoxFit.fill,
+                        width: 70,
+                      ),
+                      const SizedBox(width: 17),
+                      const Text(
+                        "Add New Catalog",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                        ),
+                      ),
+                    ]),
+                  ),
                 ),
                 Expanded(
                   child: MediaQuery.removePadding(
