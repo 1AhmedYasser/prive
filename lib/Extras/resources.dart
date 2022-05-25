@@ -98,6 +98,7 @@ class Images {
   String newProductCameraImage = "$path/new_product_camera_image.png";
   String hiddenProduct = "$path/hidden_product.png";
   String newCollectionGroupImage = "$path/new_collection_group_image.png";
+  String collectionsImage = "$path/collectionsImage.png";
 }
 
 class Animations {
