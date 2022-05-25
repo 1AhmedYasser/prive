@@ -224,7 +224,7 @@ class _ContactsScreenState extends State<ContactsScreen>
         ));
       }
       users = myUsers;
-      phoneContacts = users.isNotEmpty ? [Contact()] : [];
+      phoneContacts = users.isNotEmpty ? [Contact()] : [Contact()];
       setState(() {});
     } else {
       if (!await FlutterContacts.requestPermission(readonly: true)) {

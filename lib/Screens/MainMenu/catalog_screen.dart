@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Screens/Catalogs/catalog_manager_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
@@ -116,21 +117,24 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(
                         top: 20, bottom: 20, left: 18, right: 18),
-                    child: Row(children: [
-                      Image.asset(
-                        R.images.newCollectionGroupImage,
-                        fit: BoxFit.fill,
-                        width: 70,
-                      ),
-                      const SizedBox(width: 17),
-                      const Text(
-                        "Add New Catalog",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          R.images.newCollectionGroupImage,
+                          fit: BoxFit.fill,
+                          width: 70,
                         ),
-                      ),
-                    ]),
+                        const SizedBox(width: 17),
+                        Text(
+                          "Add New Catalog",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 17,
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -148,20 +152,33 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             child: SlideAnimation(
                               horizontalOffset: 50,
                               child: FadeInAnimation(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: ListTile(
-                                    leading: Image.asset(
-                                      R.images.collectionsImage,
-                                      fit: BoxFit.fill,
-                                      height: 52,
-                                      width: 73,
-                                    ),
-                                    title: Text(
-                                      catalogs[index],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 17,
+                                child: InkWell(
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CatalogManagerScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    child: ListTile(
+                                      leading: Image.asset(
+                                        R.images.collectionsImage,
+                                        fit: BoxFit.fill,
+                                        height: 52,
+                                        width: 73,
+                                      ),
+                                      title: Text(
+                                        catalogs[index],
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 17,
+                                        ),
                                       ),
                                     ),
                                   ),

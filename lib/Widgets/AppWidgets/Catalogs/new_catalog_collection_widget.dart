@@ -9,7 +9,14 @@ import '../../../Helpers/Utils.dart';
 class NewCatalogCollectionWidget extends StatefulWidget {
   final String title;
   final String type;
-  const NewCatalogCollectionWidget({Key? key, this.title = "", this.type = ""})
+  final bool isCatalog;
+  final bool withImage;
+  const NewCatalogCollectionWidget(
+      {Key? key,
+      this.title = "",
+      this.type = "",
+      this.isCatalog = true,
+      this.withImage = true})
       : super(key: key);
 
   @override
@@ -103,55 +110,57 @@ class _NewCatalogCollectionWidgetState
                   return null;
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 25, bottom: 20),
-                child: Text(
-                  "Select a ${widget.type} Image (Optional)",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+              if (widget.withImage)
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 20),
+                  child: Text(
+                    "Select a ${widget.type} Image (Optional)",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  Utils.showImagePickerSelector(context, getImage);
-                },
-                child: Container(
-                  width: 85,
-                  height: 85,
-                  child: image.path.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(19),
-                          child: Image.asset(
-                            R.images.newProductCameraImage,
-                            fit: BoxFit.contain,
+              if (widget.withImage)
+                InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    Utils.showImagePickerSelector(context, getImage);
+                  },
+                  child: Container(
+                    width: 85,
+                    height: 85,
+                    child: image.path.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.all(19),
+                            child: Image.asset(
+                              R.images.newProductCameraImage,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.file(
+                              image,
+                              fit: BoxFit.fill,
+                            ),
                           ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.file(
-                            image,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade500.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade500.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.only(top: 30, bottom: 50),
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {}
                   },
-                  child: const Text(
-                    "Create Catalog",
-                    style: TextStyle(
+                  child: Text(
+                    "Create ${widget.type}",
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                     ),
