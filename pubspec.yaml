@@ -69,6 +69,7 @@ dependencies:
   flutter_carousel_slider: ^1.0.8
   google_fonts: ^2.3.2
   map_launcher: ^2.2.2
+  carousel_slider: ^4.1.1
   flutter_svg:
 
   # Utils

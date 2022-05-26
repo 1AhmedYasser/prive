@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 
 import '../../Extras/resources.dart';
 import '../../Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
+import 'collection_screen.dart';
 
 class CatalogManagerScreen extends StatefulWidget {
   const CatalogManagerScreen({Key? key}) : super(key: key);
@@ -116,111 +118,136 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
               (context, index) {
                 return Column(
                   children: [
-                    ListTile(
-                      title: const Text(
-                        'Italian',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: const Text(
-                        "9 Items",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      trailing: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "See All",
+                    InkWell(
+                      child: ListTile(
+                        title: const Text(
+                          'Italian',
                           style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).primaryColorDark,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          "9 Items",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        trailing: Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Text(
+                            "See All",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).primaryColorDark,
+                            ),
                           ),
                         ),
                       ),
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CollectionScreen(),
+                          ),
+                        );
+                      },
                     ),
                     MediaQuery.removePadding(
                       child: ListView.separated(
                         itemBuilder: (context, index) {
-                          return Row(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 13, right: 13),
-                                child: SizedBox(
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: const CachedImage(
-                                            url:
-                                                "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
-                                          ),
-                                        ),
-                                      ),
-                                      if (index % 2 != 0)
+                          return InkWell(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ProductDetailsScreen(),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 13, right: 13),
+                                  child: SizedBox(
+                                    child: Stack(
+                                      children: [
                                         Positioned.fill(
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(10),
-                                            child: Container(
-                                              color: Colors.black.withOpacity(
-                                                0.2,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(27),
-                                                child: Image.asset(
-                                                  R.images.hiddenProduct,
+                                            child: const CachedImage(
+                                              url:
+                                                  "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
+                                            ),
+                                          ),
+                                        ),
+                                        if (index % 2 != 0)
+                                          Positioned.fill(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Container(
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(27),
+                                                  child: Image.asset(
+                                                    R.images.hiddenProduct,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                                  width: 90,
-                                  height: 90,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    "Handmade Bag",
-                                    style: TextStyle(
-                                      fontSize: 16.5,
-                                      fontWeight: FontWeight.w600,
+                                      ],
                                     ),
+                                    width: 90,
+                                    height: 90,
                                   ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 3.5, bottom: 3.5),
-                                    child: Text(
-                                      "Awsome Hand Bag",
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: const [
+                                    Text(
+                                      "Handmade Bag",
+                                      style: TextStyle(
+                                        fontSize: 16.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 3.5, bottom: 3.5),
+                                      child: Text(
+                                        "Awsome Hand Bag",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xff5d5d63),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "60 SAR",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color(0xff5d5d63),
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    "60 SAR",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xff5d5d63),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                                  ],
+                                )
+                              ],
+                            ),
                           );
                         },
                         shrinkWrap: true,

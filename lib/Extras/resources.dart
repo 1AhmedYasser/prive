@@ -99,6 +99,8 @@ class Images {
   String hiddenProduct = "$path/hidden_product.png";
   String newCollectionGroupImage = "$path/new_collection_group_image.png";
   String collectionsImage = "$path/collectionsImage.png";
+  String forwardOutlined = "$path/forward_outlined.png";
+  String shareIcon = "$path/share_icon.png";
 }
 
 class Animations {
