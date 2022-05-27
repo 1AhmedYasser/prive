@@ -1,6 +1,9 @@
 import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Models/Call/call_logs.dart';
 import 'package:prive/Models/Call/prive_call.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/catalogProduct.dart';
+import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Models/Common/status_response.dart';
 import 'package:prive/Models/Stories/stories.dart';
 import 'package:prive/UltraNetwork/ultra_helpers.dart';
@@ -34,6 +37,32 @@ final deleteOneCall = UltraRequest(
     "${baseUrl}DeleteOneCall.php", UMethods.post, StatusResponse());
 final deleteAllCalls = UltraRequest(
     "${baseUrl}DeleteAllCalls.php", UMethods.post, StatusResponse());
+
+// Catalogs
+final addCatalog = UltraRequest(
+    "${baseUrl}AddCatalogAPI.php", UMethods.post, StatusResponse());
+final deleteCatalog = UltraRequest(
+    "${baseUrl}DeleteCatalogAPI.php", UMethods.post, StatusResponse());
+final getCatalogs =
+    UltraRequest("${baseUrl}GetCatalogAPI.php", UMethods.post, Catalog());
+final updateCatalog = UltraRequest(
+    "${baseUrl}UpdateCatalogAPI.php", UMethods.post, StatusResponse());
+final addCollection = UltraRequest(
+    "${baseUrl}AddCollectionAPI.php", UMethods.post, StatusResponse());
+final deleteCollection = UltraRequest(
+    "${baseUrl}DeleteCollectionAPI.php", UMethods.post, StatusResponse());
+final getCollections = UltraRequest(
+    "${baseUrl}GetCollectionsAPI.php", UMethods.post, Collection());
+final updateCollection = UltraRequest(
+    "${baseUrl}UpdateCollectionAPI.php", UMethods.post, StatusResponse());
+final addProduct =
+    UltraRequest("${baseUrl}AddItemAPI.php", UMethods.post, StatusResponse());
+final deleteProduct = UltraRequest(
+    "${baseUrl}DeleteItemAPI.php", UMethods.post, StatusResponse());
+final getProducts =
+    UltraRequest("${baseUrl}GetItems.php", UMethods.post, CatalogProduct());
+final updateProduct = UltraRequest(
+    "${baseUrl}UpdateItemAPI.php", UMethods.post, StatusResponse());
 
 // Stories
 final getStories =

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 
 import '../../Extras/resources.dart';
@@ -29,7 +30,14 @@ class _CollectionScreenState extends State<CollectionScreen> {
           InkWell(
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NewProductScreen(),
+                ),
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(
                   top: 20, bottom: 20, left: 18, right: 18),
