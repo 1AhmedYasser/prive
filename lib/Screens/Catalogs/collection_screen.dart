@@ -168,6 +168,20 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                 style: const TextStyle(fontSize: 0),
                                 onTap: (handler) async {
                                   await handler(false);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewProductScreen(
+                                        product: products[index],
+                                        collection: widget.collection,
+                                        isEdit: true,
+                                      ),
+                                    ),
+                                  ).then((value) {
+                                    if (value == true) {
+                                      _getProducts();
+                                    }
+                                  });
                                 },
                               ),
                             ],
@@ -207,12 +221,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                           builder: (context) =>
                                               ProductDetailsScreen(
                                             product: products[index],
+                                            collection: widget.collection,
                                           ),
                                         ),
                                       ).then((value) {
-                                        if (value == true) {
-                                          _getProducts();
-                                        }
+                                        _getProducts();
                                       });
                                     },
                                     child: Row(
@@ -239,7 +252,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                                         : Image.asset(
                                                             R.images
                                                                 .collectionsImage,
-                                                            fit: BoxFit.fill,
+                                                            fit: BoxFit.contain,
                                                           ),
                                                   ),
                                                 ),

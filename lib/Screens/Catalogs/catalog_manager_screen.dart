@@ -384,6 +384,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                               product:
                                                   collections[collectionIndex]
                                                       .products?[index],
+                                                  collection: collections[collectionIndex],
                                             ),
                                           ),
                                         ).then((value) {
@@ -405,14 +406,26 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10),
-                                                      child: CachedImage(
-                                                        url: collections[
-                                                                    collectionIndex]
-                                                                .products?[
-                                                                    index]
-                                                                .photo1 ??
-                                                            "",
-                                                      ),
+                                                      child: collections[
+                                                                      collectionIndex]
+                                                                  .products?[
+                                                                      index]
+                                                                  .photo1 !=
+                                                              "NONE"
+                                                          ? CachedImage(
+                                                              url: collections[
+                                                                          collectionIndex]
+                                                                      .products?[
+                                                                          index]
+                                                                      .photo1 ??
+                                                                  "",
+                                                            )
+                                                          : Image.asset(
+                                                              R.images
+                                                                  .collectionsImage,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            ),
                                                     ),
                                                   ),
                                                   // if (index % 2 != 0)

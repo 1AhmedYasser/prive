@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
@@ -13,11 +14,11 @@ import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class NewProductScreen extends StatefulWidget {
-  final CollectionData collection;
+  final CollectionData? collection;
   final CatalogProductData? product;
   final bool isEdit;
   const NewProductScreen(
-      {Key? key, required this.collection, this.product, this.isEdit = false})
+      {Key? key, this.collection, this.product, this.isEdit = false})
       : super(key: key);
 
   @override
@@ -34,6 +35,16 @@ class _NewProductScreenState extends State<NewProductScreen> {
   CancelToken cancelToken = CancelToken();
 
   @override
+  void initState() {
+    if (widget.product != null) {
+      productNameController.text = widget.product?.itemName ?? "";
+      priceController.text = widget.product?.price ?? "";
+      descriptionController.text = widget.product?.description ?? "";
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
@@ -44,93 +55,95 @@ class _NewProductScreenState extends State<NewProductScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 130,
-              child: ListView.builder(
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      if (index == 0) {
-                        Utils.showImagePickerSelector(context, getImage);
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          top: 15, left: index == 0 ? 25 : 0, right: 13),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: index == 0
-                              ? const Color(0xff7a8fa6)
-                              : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        width: 130,
-                        height: 50,
-                        child: index == 0
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: Image.asset(
-                                        R.images.newProductCameraImage,
-                                        width: 60,
-                                      ),
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 10, bottom: 15),
-                                    child: Text(
-                                      "Add Images",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  )
-                                ],
-                              )
-                            : productImages.length > index - 1
-                                ? Stack(
+            if (widget.isEdit == false)
+              SizedBox(
+                height: 130,
+                child: ListView.builder(
+                  itemCount: 4,
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        if (index == 0) {
+                          Utils.showImagePickerSelector(context, getImage);
+                        }
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            top: 15, left: index == 0 ? 25 : 0, right: 13),
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: index == 0
+                                  ? const Color(0xff7a8fa6)
+                                  : Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            width: 130,
+                            height: 50,
+                            child: index == 0
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Positioned.fill(
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.file(
-                                            productImages[index - 1],
-                                            fit: BoxFit.fill,
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 20),
+                                          child: Image.asset(
+                                            R.images.newProductCameraImage,
+                                            width: 60,
                                           ),
                                         ),
                                       ),
-                                      Positioned(
-                                        top: 5,
-                                        right: 7,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              productImages.removeAt(index - 1);
-                                            });
-                                          },
-                                          child: const Icon(
-                                            Icons.remove_circle_outlined,
-                                            color: Colors.red,
-                                          ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 10, bottom: 15),
+                                        child: Text(
+                                          "Add Images",
+                                          style: TextStyle(color: Colors.white),
                                         ),
                                       )
                                     ],
                                   )
-                                : const SizedBox(),
+                                : productImages.length > index - 1
+                                    ? Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.file(
+                                                productImages[index - 1],
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            right: 7,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  productImages
+                                                      .removeAt(index - 1);
+                                                });
+                                              },
+                                              child: const Icon(
+                                                Icons.remove_circle_outlined,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    : const SizedBox()),
                       ),
-                    ),
-                  );
-                },
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
+                    );
+                  },
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                ),
               ),
-            ),
             Padding(
               padding: const EdgeInsets.only(left: 25, right: 25, top: 35),
               child: Column(
@@ -162,14 +175,15 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         if (widget.isEdit) {
+                          _updateProduct();
                         } else {
                           _createProduct();
                         }
                       }
                     },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(
+                    child: Text(
+                      widget.isEdit ? "Edit" : "Save",
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
@@ -266,7 +280,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     Map<String, dynamic> parameters = {
       "UserID": context.currentUser?.id,
       "ItemName": productNameController.text,
-      "CollectionID": widget.collection.collectionID ?? "",
+      "CollectionID": widget.collection?.collectionID ?? "",
       "Price": priceController.text,
       "Description": descriptionController.text
     };
@@ -297,7 +311,32 @@ class _NewProductScreenState extends State<NewProductScreen> {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Added To ${widget.collection.collectionName}",
+          message: "Product Added To ${widget.collection?.collectionName}",
+        ).then((value) => Navigator.pop(context, true));
+      }
+    });
+  }
+
+  void _updateProduct() async {
+    Map<String, dynamic> parameters = {
+      "ItemID": widget.product?.itemID,
+      "ItemName": productNameController.text,
+      "Price": priceController.text,
+      "Description": descriptionController.text
+    };
+
+    UltraNetwork.request(
+      context,
+      updateProduct,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Utils.showAlert(
+          context,
+          message: "Product Updated Successfully",
         ).then((value) => Navigator.pop(context, true));
       }
     });
