@@ -6,7 +6,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 import '../../Extras/resources.dart';
 import '../../Models/Catalogs/catalog.dart';
 import '../../Models/Catalogs/collection.dart';
@@ -367,7 +366,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                             collections[collectionIndex],
                                       ),
                                     ),
-                                  );
+                                  ).then((value) => _getCollections());
                                 },
                               ),
                               MediaQuery.removePadding(
@@ -387,7 +386,11 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                       .products?[index],
                                             ),
                                           ),
-                                        );
+                                        ).then((value) {
+                                          if (value == true) {
+                                            _getCollections();
+                                          }
+                                        });
                                       },
                                       child: Row(
                                         children: [

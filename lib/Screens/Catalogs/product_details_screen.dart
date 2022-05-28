@@ -1,12 +1,16 @@
 import 'package:cool_dropdown/cool_dropdown.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Models/Catalogs/catalogProduct.dart';
+import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
+import 'dart:io';
 
 class ProductDetailsScreen extends StatefulWidget {
   final CatalogProductData? product;
@@ -25,6 +29,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     //"Hide",
     "Delete",
   ];
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
@@ -64,13 +69,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           color: Color(0xff7a8fa6),
         ),
         actions: [
-          GestureDetector(
-            onTap: () {},
-            child: Image.asset(
-              R.images.forwardOutlined,
-              width: 25,
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () {},
+          //   child: Image.asset(
+          //     R.images.forwardOutlined,
+          //     width: 25,
+          //   ),
+          // ),
           // Padding(
           //   padding: const EdgeInsets.only(left: 20, right: 20),
           //   child: GestureDetector(
@@ -96,7 +101,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     print("Hide Product");
                     break;
                   case "Delete":
-                    print("Delete Product");
+                    _deleteProduct();
                     break;
                   default:
                     break;
@@ -304,5 +309,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         'value': moreMenuTitles[i],
       });
     }
+  }
+
+  void _deleteProduct() {
+    UltraNetwork.request(
+      context,
+      deleteProduct,
+      formData: FormData.fromMap(
+        {"ItemID": widget.product?.itemID ?? ""},
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Navigator.pop(context, true);
+      }
+    });
   }
 }

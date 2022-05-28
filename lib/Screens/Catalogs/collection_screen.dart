@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
+import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
@@ -24,6 +28,8 @@ class CollectionScreen extends StatefulWidget {
 class _CollectionScreenState extends State<CollectionScreen> {
   CancelToken cancelToken = CancelToken();
   List<CatalogProductData> products = [];
+  bool isEditing = false;
+  SwipeActionController controller = SwipeActionController();
 
   @override
   void initState() {
@@ -36,7 +42,45 @@ class _CollectionScreenState extends State<CollectionScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Collection"),
+        child: AppBar(
+          backgroundColor: Colors.grey.shade100,
+          elevation: 0,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.light,
+          ),
+          leading: const BackButton(
+            color: Color(0xff7a8fa6),
+          ),
+          title: Text(
+            widget.collection.collectionName ?? "",
+            style: const TextStyle(
+              fontSize: 23,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          actions: [
+            if (products.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    isEditing = !isEditing;
+                    controller.closeAllOpenCell();
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Text(
+                    isEditing ? "Done" : "Edit",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                  ),
+                ),
+              )
+          ],
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +96,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     collection: widget.collection,
                   ),
                 ),
-              );
+              ).then((value) {
+                if (value == true) {
+                  _getProducts();
+                }
+              });
             },
             child: Padding(
               padding: const EdgeInsets.only(
@@ -92,104 +140,176 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       child: SlideAnimation(
                         horizontalOffset: 50,
                         child: FadeInAnimation(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailsScreen(
-                                      product: products[index],
-                                    ),
-                                  ),
-                                );
-                              },
+                          child: SwipeActionCell(
+                            controller: controller,
+                            index: index,
+                            key: ValueKey(products[index]),
+                            trailingActions: [
+                              SwipeAction(
+                                content: Image.asset(
+                                  R.images.deleteChatImage,
+                                  width: 15,
+                                  color: Colors.red,
+                                ),
+                                color: Colors.transparent,
+                                style: const TextStyle(fontSize: 0),
+                                onTap: (handler) async {
+                                  await handler(true);
+                                  _deleteProduct(products[index].itemID ?? "");
+                                  setState(() {
+                                    products.removeAt(index);
+                                  });
+                                },
+                              ),
+                              SwipeAction(
+                                content: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context).primaryColorDark,
+                                ),
+                                color: Colors.transparent,
+                                style: const TextStyle(fontSize: 0),
+                                onTap: (handler) async {
+                                  await handler(false);
+                                },
+                              ),
+                            ],
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
                               child: Row(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 13, right: 13),
-                                    child: SizedBox(
-                                      child: Stack(
-                                        children: [
-                                          Positioned.fill(
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: CachedImage(
-                                                url: products[index].photo1 ??
-                                                    "",
-                                              ),
-                                            ),
-                                          ),
-                                          // if (index % 2 != 0)
-                                          //   Positioned.fill(
-                                          //     child: ClipRRect(
-                                          //       borderRadius:
-                                          //           BorderRadius.circular(10),
-                                          //       child: Container(
-                                          //         color:
-                                          //             Colors.black.withOpacity(
-                                          //           0.2,
-                                          //         ),
-                                          //         child: Padding(
-                                          //           padding:
-                                          //               const EdgeInsets.all(
-                                          //                   27),
-                                          //           child: Image.asset(
-                                          //             R.images.hiddenProduct,
-                                          //           ),
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                        ],
+                                  Visibility(
+                                    child: const SizedBox(width: 15),
+                                    visible: isEditing,
+                                  ),
+                                  Visibility(
+                                    visible: isEditing,
+                                    child: CupertinoButton(
+                                      padding: EdgeInsets.zero,
+                                      minSize: 0,
+                                      child: Icon(
+                                        Icons.edit,
+                                        color:
+                                            Theme.of(context).primaryColorDark,
                                       ),
-                                      width: 90,
-                                      height: 90,
+                                      onPressed: () {
+                                        controller.openCellAt(
+                                          index: index,
+                                          trailing: true,
+                                        );
+                                      },
                                     ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        products[index].itemName ?? "",
-                                        style: const TextStyle(
-                                          fontSize: 16.5,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 3.5, bottom: 3.5, right: 39),
-                                        child: Text(
-                                          products[index].description ?? "",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xff5d5d63),
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductDetailsScreen(
+                                            product: products[index],
                                           ),
                                         ),
-                                      ),
-                                      Text(
-                                        products[index].price?.isNotEmpty ==
-                                                true
-                                            ? "${products[index].price} SAR"
-                                            : "",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff5d5d63),
+                                      ).then((value) {
+                                        if (value == true) {
+                                          _getProducts();
+                                        }
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 13, right: 13),
+                                          child: SizedBox(
+                                            child: Stack(
+                                              children: [
+                                                Positioned.fill(
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    child: CachedImage(
+                                                      url: products[index]
+                                                              .photo1 ??
+                                                          "",
+                                                    ),
+                                                  ),
+                                                ),
+                                                // if (index % 2 != 0)
+                                                //   Positioned.fill(
+                                                //     child: ClipRRect(
+                                                //       borderRadius:
+                                                //           BorderRadius.circular(10),
+                                                //       child: Container(
+                                                //         color:
+                                                //             Colors.black.withOpacity(
+                                                //           0.2,
+                                                //         ),
+                                                //         child: Padding(
+                                                //           padding:
+                                                //               const EdgeInsets.all(
+                                                //                   27),
+                                                //           child: Image.asset(
+                                                //             R.images.hiddenProduct,
+                                                //           ),
+                                                //         ),
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                              ],
+                                            ),
+                                            width: 90,
+                                            height: 90,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  )
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              products[index].itemName ?? "",
+                                              style: const TextStyle(
+                                                fontSize: 16.5,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 3.5,
+                                                  bottom: 3.5,
+                                                  right: 39),
+                                              child: Text(
+                                                products[index].description ??
+                                                    "",
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(0xff5d5d63),
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              products[index]
+                                                          .price
+                                                          ?.isNotEmpty ==
+                                                      true
+                                                  ? "${products[index].price} SAR"
+                                                  : "",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xff5d5d63),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -224,5 +344,16 @@ class _CollectionScreenState extends State<CollectionScreen> {
         });
       }
     });
+  }
+
+  void _deleteProduct(String productId) {
+    UltraNetwork.request(
+      context,
+      deleteProduct,
+      formData: FormData.fromMap(
+        {"ItemID": productId},
+      ),
+      cancelToken: cancelToken,
+    );
   }
 }

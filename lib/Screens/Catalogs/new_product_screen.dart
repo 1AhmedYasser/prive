@@ -2,14 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 
+import '../../Helpers/Utils.dart';
+import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class NewProductScreen extends StatefulWidget {
   final CollectionData collection;
-  const NewProductScreen({Key? key, required this.collection})
+  final CatalogProductData? product;
+  const NewProductScreen({Key? key, required this.collection, this.product})
       : super(key: key);
 
   @override
@@ -21,6 +25,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
   TextEditingController productNameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  final imagePicker = ImagePicker();
   List<File> productImages = [];
 
   @override
@@ -37,43 +42,83 @@ class _NewProductScreenState extends State<NewProductScreen> {
             SizedBox(
               height: 130,
               child: ListView.builder(
-                itemCount: 3,
+                itemCount: 4,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                        top: 15, left: index == 0 ? 25 : 0, right: 13),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: index == 0
-                            ? const Color(0xff7a8fa6)
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: 130,
-                      height: 50,
-                      child: index == 0
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: Image.asset(
-                                      R.images.newProductCameraImage,
-                                      width: 60,
+                  return InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      if (index == 0) {
+                        Utils.showImagePickerSelector(context, getImage);
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: 15, left: index == 0 ? 25 : 0, right: 13),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: index == 0
+                              ? const Color(0xff7a8fa6)
+                              : Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 130,
+                        height: 50,
+                        child: index == 0
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Image.asset(
+                                        R.images.newProductCameraImage,
+                                        width: 60,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 15),
-                                  child: Text(
-                                    "Add Images",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                )
-                              ],
-                            )
-                          : Container(),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 10, bottom: 15),
+                                    child: Text(
+                                      "Add Images",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : productImages.length > index - 1
+                                ? Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.file(
+                                            productImages[index - 1],
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 5,
+                                        right: 7,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              productImages.removeAt(index - 1);
+                                            });
+                                          },
+                                          child: const Icon(
+                                            Icons.remove_circle_outlined,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                : const SizedBox(),
+                      ),
                     ),
                   );
                 },
@@ -190,5 +235,20 @@ class _NewProductScreenState extends State<NewProductScreen> {
         return null;
       },
     );
+  }
+
+  Future getImage(ImageSource source, bool isVideo) async {
+    Navigator.of(context).pop();
+    final pickedFile = await imagePicker.pickImage(source: source);
+
+    setState(() {
+      if (pickedFile != null) {
+        if (productImages.length < 3) {
+          setState(() {
+            productImages.add(File(pickedFile.path));
+          });
+        }
+      }
+    });
   }
 }

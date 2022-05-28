@@ -69,11 +69,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     controller.closeAllOpenCell();
                   });
                 },
-                child: Text(
-                  isEditing ? "Done" : "Edit",
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: Theme.of(context).primaryColorDark,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Text(
+                    isEditing ? "Done" : "Edit",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
                   ),
                 ),
               )
