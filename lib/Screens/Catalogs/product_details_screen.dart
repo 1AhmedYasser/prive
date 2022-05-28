@@ -2,15 +2,13 @@ import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
+import '../../Helpers/Utils.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
-import 'dart:io';
 
 class ProductDetailsScreen extends StatefulWidget {
   final CatalogProductData? product;
@@ -321,7 +319,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       cancelToken: cancelToken,
     ).then((value) {
       if (value != null) {
-        Navigator.pop(context, true);
+        Utils.showAlert(
+          context,
+          message: "Product Deleted Successfully",
+        ).then((value) => Navigator.pop(context, true));
       }
     });
   }

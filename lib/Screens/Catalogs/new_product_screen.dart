@@ -1,19 +1,23 @@
 import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
-
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
+import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class NewProductScreen extends StatefulWidget {
   final CollectionData collection;
   final CatalogProductData? product;
-  const NewProductScreen({Key? key, required this.collection, this.product})
+  final bool isEdit;
+  const NewProductScreen(
+      {Key? key, required this.collection, this.product, this.isEdit = false})
       : super(key: key);
 
   @override
@@ -27,6 +31,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
   TextEditingController descriptionController = TextEditingController();
   final imagePicker = ImagePicker();
   List<File> productImages = [];
+  CancelToken cancelToken = CancelToken();
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +160,12 @@ class _NewProductScreenState extends State<NewProductScreen> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {}
+                      if (_formKey.currentState!.validate()) {
+                        if (widget.isEdit) {
+                        } else {
+                          _createProduct();
+                        }
+                      }
                     },
                     child: const Text(
                       "Save",
@@ -248,6 +258,47 @@ class _NewProductScreenState extends State<NewProductScreen> {
             productImages.add(File(pickedFile.path));
           });
         }
+      }
+    });
+  }
+
+  void _createProduct() async {
+    Map<String, dynamic> parameters = {
+      "UserID": context.currentUser?.id,
+      "ItemName": productNameController.text,
+      "CollectionID": widget.collection.collectionID ?? "",
+      "Price": priceController.text,
+      "Description": descriptionController.text
+    };
+
+    if (productImages.isNotEmpty) {
+      parameters["Photo1"] = await MultipartFile.fromFile(productImages[0].path,
+          filename: "Photo1");
+    }
+
+    if (productImages.length >= 2) {
+      parameters["Photo2"] = await MultipartFile.fromFile(productImages[1].path,
+          filename: "Photo2");
+    }
+
+    if (productImages.length >= 3) {
+      parameters["Photo3"] = await MultipartFile.fromFile(productImages[2].path,
+          filename: "Photo3");
+    }
+
+    UltraNetwork.request(
+      context,
+      addProduct,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Utils.showAlert(
+          context,
+          message: "Product Added To ${widget.collection.collectionName}",
+        ).then((value) => Navigator.pop(context, true));
       }
     });
   }

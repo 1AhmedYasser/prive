@@ -291,7 +291,6 @@ class _NewCatalogCollectionWidgetState
   }
 
   void _createCollection(String catalogId) async {
-    print(catalogId);
     Map<String, dynamic> parameters = {
       "UserID": context.currentUser?.id,
       "CatalogeID": catalogId,

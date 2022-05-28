@@ -9,11 +9,9 @@ import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-
 import '../../Extras/resources.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/AppWidgets/prive_appbar.dart';
 import '../../Widgets/Common/cached_image.dart';
 
 class CollectionScreen extends StatefulWidget {
@@ -230,11 +228,19 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
-                                                    child: CachedImage(
-                                                      url: products[index]
-                                                              .photo1 ??
-                                                          "",
-                                                    ),
+                                                    child: products[index]
+                                                                .photo1 !=
+                                                            "NONE"
+                                                        ? CachedImage(
+                                                            url: products[index]
+                                                                    .photo1 ??
+                                                                "",
+                                                          )
+                                                        : Image.asset(
+                                                            R.images
+                                                                .collectionsImage,
+                                                            fit: BoxFit.fill,
+                                                          ),
                                                   ),
                                                 ),
                                                 // if (index % 2 != 0)
@@ -350,6 +356,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
     UltraNetwork.request(
       context,
       deleteProduct,
+      showLoadingIndicator: false,
+      showError: false,
       formData: FormData.fromMap(
         {"ItemID": productId},
       ),
