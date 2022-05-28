@@ -26,6 +26,8 @@ class CatalogProductData {
   String? photo1;
   String? photo2;
   String? photo3;
+  String? description;
+  String? price;
 
   CatalogProductData.fromJson(Map<String, dynamic> json) {
     itemID = json['ItemID'] as String?;
@@ -35,5 +37,7 @@ class CatalogProductData {
     photo1 = json['Photo1'] as String?;
     photo2 = json['Photo2'] as String?;
     photo3 = json['Photo3'] as String?;
+    description = json['Description'] as String?;
+    price = json['Price'] as String?;
   }
 }

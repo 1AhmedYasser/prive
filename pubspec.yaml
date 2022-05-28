@@ -70,6 +70,7 @@ dependencies:
   google_fonts: ^2.3.2
   map_launcher: ^2.2.2
   carousel_slider: ^4.1.1
+  awesome_dialog: ^2.2.1
   flutter_svg:
 
   # Utils

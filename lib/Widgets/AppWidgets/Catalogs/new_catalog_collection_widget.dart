@@ -1,23 +1,36 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
-
+import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../UltraNetwork/ultra_network.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 class NewCatalogCollectionWidget extends StatefulWidget {
   final String title;
   final String type;
   final bool isCatalog;
   final bool withImage;
-  const NewCatalogCollectionWidget(
-      {Key? key,
-      this.title = "",
-      this.type = "",
-      this.isCatalog = true,
-      this.withImage = true})
-      : super(key: key);
+  final String? catalogId;
+  final CatalogData? catalog;
+  final CollectionData? collection;
+  final bool isEdit;
+  const NewCatalogCollectionWidget({
+    Key? key,
+    this.title = "",
+    this.type = "",
+    this.isCatalog = true,
+    this.withImage = true,
+    this.catalogId,
+    this.catalog,
+    this.collection,
+    this.isEdit = false,
+  }) : super(key: key);
 
   @override
   State<NewCatalogCollectionWidget> createState() =>
@@ -26,10 +39,21 @@ class NewCatalogCollectionWidget extends StatefulWidget {
 
 class _NewCatalogCollectionWidgetState
     extends State<NewCatalogCollectionWidget> {
-  TextEditingController catalogNameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late File image = File("");
   final imagePicker = ImagePicker();
+  CancelToken cancelToken = CancelToken();
+
+  @override
+  void initState() {
+    if (widget.catalog != null) {
+      nameController.text = widget.catalog?.catalogeName ?? "";
+    } else if (widget.collection != null) {
+      nameController.text = widget.collection?.collectionName ?? "";
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +91,7 @@ class _NewCatalogCollectionWidgetState
               ),
               const SizedBox(height: 20),
               TextFormField(
-                controller: catalogNameController,
+                controller: nameController,
                 keyboardType: TextInputType.text,
                 cursorColor: const Color(0xff777777),
                 decoration: InputDecoration(
@@ -132,15 +156,23 @@ class _NewCatalogCollectionWidgetState
                     width: 85,
                     height: 85,
                     child: image.path.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.all(19),
-                            child: Image.asset(
-                              R.images.newProductCameraImage,
-                              fit: BoxFit.contain,
-                            ),
-                          )
+                        ? widget.catalog?.catalogePhoto == "NONE" ||
+                                widget.catalog == null
+                            ? Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Image.asset(
+                                  R.images.newProductCameraImage,
+                                  fit: BoxFit.contain,
+                                ),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: CachedImage(
+                                  url: widget.catalog?.catalogePhoto ?? "",
+                                ),
+                              )
                         : ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(15),
                             child: Image.file(
                               image,
                               fit: BoxFit.fill,
@@ -156,10 +188,25 @@ class _NewCatalogCollectionWidgetState
                 padding: const EdgeInsets.only(top: 30, bottom: 50),
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
+                    if (_formKey.currentState!.validate()) {
+                      if (widget.isCatalog) {
+                        if (!widget.isEdit) {
+                          _createCatalog();
+                        } else {
+                          _updateCatalog(widget.catalog?.catalogeID ?? "");
+                        }
+                      } else {
+                        if (widget.isEdit) {
+                          _updateCollection(widget.catalogId ?? "",
+                              widget.collection?.collectionID ?? "");
+                        } else {
+                          _createCollection(widget.catalogId ?? "");
+                        }
+                      }
+                    }
                   },
                   child: Text(
-                    "Create ${widget.type}",
+                    "${widget.isEdit ? "Edit" : "Create"} ${widget.type}",
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
@@ -189,6 +236,108 @@ class _NewCatalogCollectionWidgetState
     setState(() {
       if (pickedFile != null) {
         image = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future<void> _createCatalog() async {
+    Map<String, dynamic> parameters = {
+      "UserID": context.currentUser?.id,
+      "CatalogeName": nameController.text
+    };
+
+    if (image.path.isNotEmpty) {
+      parameters["CatalogePhoto"] =
+          await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
+    }
+
+    UltraNetwork.request(
+      context,
+      addCatalog,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Navigator.pop(context, true);
+      }
+    });
+  }
+
+  Future<void> _updateCatalog(String catalogId) async {
+    Map<String, dynamic> parameters = {
+      "CatalogeID": catalogId,
+      "CatalogeName": nameController.text
+    };
+
+    if (image.path.isNotEmpty) {
+      parameters["CatalogePhoto"] =
+          await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
+    }
+
+    UltraNetwork.request(
+      context,
+      updateCatalog,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Navigator.pop(context, true);
+      }
+    });
+  }
+
+  void _createCollection(String catalogId) async {
+    print(catalogId);
+    Map<String, dynamic> parameters = {
+      "CatalogeID": catalogId,
+      "CollectionName": nameController.text
+    };
+
+    if (image.path.isNotEmpty) {
+      parameters["CollectionPhoto"] =
+          await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
+    }
+
+    UltraNetwork.request(
+      context,
+      addCollection,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Navigator.pop(context, true);
+      }
+    });
+  }
+
+  Future<void> _updateCollection(String catalogId, String collectionId) async {
+    Map<String, dynamic> parameters = {
+      "CatalogeID": catalogId,
+      "CollectionID": collectionId,
+      "CollectionName": nameController.text
+    };
+
+    if (image.path.isNotEmpty) {
+      parameters["CollectionPhoto"] =
+          await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
+    }
+
+    UltraNetwork.request(
+      context,
+      updateCollection,
+      formData: FormData.fromMap(
+        parameters,
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      if (value != null) {
+        Navigator.pop(context, true);
       }
     });
   }

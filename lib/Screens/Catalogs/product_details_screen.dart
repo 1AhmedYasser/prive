@@ -5,10 +5,12 @@ import 'package:prive/Extras/resources.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Widgets/Common/cached_image.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({Key? key}) : super(key: key);
+  final CatalogProductData? product;
+  const ProductDetailsScreen({Key? key, this.product}) : super(key: key);
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -20,7 +22,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   List<Map> moreMenu = [];
   List<String> moreMenuTitles = [
     "Edit",
-    "Hide",
+    //"Hide",
     "Delete",
   ];
 
@@ -32,21 +34,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   void getSlider() {
-    sliderWidgets.add(
-      _buildSliderContainer(
-          "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_22.jpg",
-          0),
-    );
-    sliderWidgets.add(
-      _buildSliderContainer(
-          "https://a-static.besthdwallpaper.com/blood-moon-splash-art-evelynn-splash-art-league-of-legends-lol-khalfia-2560x1600-66731_7.jpg",
-          1),
-    );
-    sliderWidgets.add(
-      _buildSliderContainer(
-          "https://i.pinimg.com/originals/4e/ea/bc/4eeabc78493dfbaf19dc8603454f4a2f.png",
-          2),
-    );
+    if (widget.product?.photo1 != null && widget.product?.photo1 != "NONE") {
+      sliderWidgets.add(
+        _buildSliderContainer(widget.product?.photo1 ?? "", 0),
+      );
+    }
+    if (widget.product?.photo2 != null && widget.product?.photo2 != "NONE") {
+      sliderWidgets.add(
+        _buildSliderContainer(widget.product?.photo2 ?? "", 0),
+      );
+    }
+    if (widget.product?.photo3 != null && widget.product?.photo3 != "NONE") {
+      sliderWidgets.add(
+        _buildSliderContainer(widget.product?.photo3 ?? "", 0),
+      );
+    }
   }
 
   @override
@@ -103,7 +105,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               resultHeight: 62,
               resultWidth: 30,
               dropdownWidth: 170,
-              dropdownHeight: 110,
+              dropdownHeight: 70, //110,
               dropdownItemHeight: 30,
               dropdownItemGap: 10,
               labelIconGap: 15,
@@ -198,18 +200,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Handmade Bag",
-                    style: TextStyle(
+                  Text(
+                    widget.product?.itemName ?? "",
+                    style: const TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
-                      "Awsome Hand Bag",
-                      style: TextStyle(
+                      widget.product?.description ?? "",
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
                         color: Color(0xff5d5d63),
@@ -217,7 +219,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    "60 SAR",
+                    widget.product?.price?.isEmpty == true
+                        ? ""
+                        : "${widget.product?.price ?? ""} SAR",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,

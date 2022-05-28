@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Extras/resources.dart';
 
+import '../../Models/Catalogs/collection.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 
 class NewProductScreen extends StatefulWidget {
-  const NewProductScreen({Key? key}) : super(key: key);
+  final CollectionData collection;
+  const NewProductScreen({Key? key, required this.collection})
+      : super(key: key);
 
   @override
   State<NewProductScreen> createState() => _NewProductScreenState();

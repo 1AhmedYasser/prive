@@ -1,277 +1,568 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-
+import 'package:prive/Helpers/stream_manager.dart';
 import '../../Extras/resources.dart';
+import '../../Models/Catalogs/catalog.dart';
+import '../../Models/Catalogs/collection.dart';
+import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
 import 'collection_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CatalogManagerScreen extends StatefulWidget {
-  const CatalogManagerScreen({Key? key}) : super(key: key);
+  final CatalogData catalog;
+  const CatalogManagerScreen({Key? key, required this.catalog})
+      : super(key: key);
 
   @override
   State<CatalogManagerScreen> createState() => _CatalogManagerScreenState();
 }
 
 class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
+  bool isLoading = true;
+  CancelToken cancelToken = CancelToken();
+  List<CollectionData> collections = [];
+
+  @override
+  void initState() {
+    _getCollections();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200.0,
-            floating: true,
-            pinned: true,
-            snap: true,
-            backgroundColor: Theme.of(context).primaryColorDark,
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.zero,
-              centerTitle: true,
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Flexible(
-                    flex: 3,
-                    child: Container(),
-                  ),
-                  const Flexible(
-                    flex: 1,
-                    child: Text(
-                      "Food",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: Container(),
-                  ),
-                ],
-              ),
-              background: ShaderMask(
-                shaderCallback: (rect) {
-                  return const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black38],
-                  ).createShader(
-                    Rect.fromLTRB(0, -140, rect.width, rect.height - 20),
-                  );
-                },
-                blendMode: BlendMode.darken,
-                child: const CachedImage(
-                  url:
-                      "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Annie_22.jpg",
+      appBar: collections.isEmpty && isLoading == false
+          ? PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 60),
+              child: AppBar(
+                backgroundColor: Colors.grey.shade100,
+                elevation: 0,
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarBrightness: Brightness.light,
                 ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: InkWell(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              onTap: () {
-                showMaterialModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => SingleChildScrollView(
-                    controller: ModalScrollController.of(context),
-                    child: const NewCatalogCollectionWidget(
-                      title: "Create New Catalog",
-                      type: "Catalog",
-                      withImage: false,
-                    ),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 20, bottom: 10, left: 13, right: 13),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      R.images.newCollectionGroupImage,
-                      fit: BoxFit.fill,
-                      width: 70,
-                    ),
-                    const SizedBox(width: 17),
-                    Text(
-                      "Add New Collection",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                    ),
-                  ],
+                leading: const BackButton(
+                  color: Color(0xff7a8fa6),
                 ),
+                title: const Text(
+                  "Catalog Manger",
+                  style: TextStyle(
+                    fontSize: 23,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ).tr(),
               ),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Column(
-                  children: [
-                    InkWell(
-                      child: ListTile(
-                        title: const Text(
-                          'Italian',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+            )
+          : null,
+      body: isLoading
+          ? const SizedBox.shrink()
+          : collections.isEmpty
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 80, bottom: 30),
+                        child: Image.asset(
+                          R.images.newCatalog,
+                          width: MediaQuery.of(context).size.width / 3,
                         ),
-                        subtitle: const Text(
-                          "9 Items",
+                      ),
+                      const Text(
+                        "Organize Your Catalog\nFor Better Sales",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 50, right: 50, top: 15),
+                        child: Text(
+                          "Create Collections To Make Your Item Easier To Find And Your Catalog More Interesting To Browse",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                            fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        trailing: Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: Text(
-                            "See All",
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 28, right: 28, top: 45),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              // isEditing = false;
+                              // controller.closeAllOpenCell();
+                            });
+                            showMaterialModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => SingleChildScrollView(
+                                controller: ModalScrollController.of(context),
+                                child: NewCatalogCollectionWidget(
+                                  title: "Create New Collection",
+                                  type: "Collection",
+                                  withImage: false,
+                                  catalogId: widget.catalog.catalogeID,
+                                  isCatalog: false,
+                                ),
+                              ),
+                            ).then((value) {
+                              if (value == true) {
+                                _getCollections();
+                              }
+                            });
+                          },
+                          child: const Text(
+                            "Create Collections",
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).primaryColorDark,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                            minimumSize:
+                                Size(MediaQuery.of(context).size.width, 55),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                         ),
                       ),
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CollectionScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    MediaQuery.removePadding(
-                      child: ListView.separated(
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ProductDetailsScreen(),
+                    ],
+                  ),
+                )
+              : CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      expandedHeight: 200.0,
+                      floating: true,
+                      pinned: true,
+                      snap: true,
+                      backgroundColor: Theme.of(context).primaryColorDark,
+                      elevation: 0,
+                      flexibleSpace: FlexibleSpaceBar(
+                        titlePadding: EdgeInsets.zero,
+                        centerTitle: true,
+                        title: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Flexible(
+                              flex: 3,
+                              child: Container(),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: Text(
+                                widget.catalog.catalogeName ?? "",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
                                 ),
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 13, right: 13),
-                                  child: SizedBox(
-                                    child: Stack(
+                              ),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: Container(),
+                            ),
+                          ],
+                        ),
+                        background: ShaderMask(
+                          shaderCallback: (rect) {
+                            return const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.transparent, Colors.black38],
+                            ).createShader(
+                              Rect.fromLTRB(
+                                  0, -140, rect.width, rect.height - 20),
+                            );
+                          },
+                          blendMode: BlendMode.darken,
+                          child: CachedImage(
+                            url: widget.catalog.catalogePhoto ?? "",
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          showMaterialModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => SingleChildScrollView(
+                              controller: ModalScrollController.of(context),
+                              child: NewCatalogCollectionWidget(
+                                title: "Create New Collection",
+                                type: "Collection",
+                                withImage: false,
+                                isCatalog: false,
+                                catalogId: widget.catalog.catalogeID,
+                              ),
+                            ),
+                          ).then((value) {
+                            if (value == true) {
+                              _getCollections();
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 20, bottom: 10, left: 13, right: 13),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                R.images.newCollectionGroupImage,
+                                fit: BoxFit.fill,
+                                width: 70,
+                              ),
+                              const SizedBox(width: 17),
+                              Text(
+                                "Add New Collection",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 17,
+                                  color: Theme.of(context).primaryColorDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, collectionIndex) {
+                          return Column(
+                            children: [
+                              InkWell(
+                                child: ListTile(
+                                  title: Text(
+                                    collections[collectionIndex]
+                                            .collectionName ??
+                                        "",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    collections[collectionIndex].itemsNum == "1"
+                                        ? "1 Item"
+                                        : "${collections[collectionIndex].itemsNum} Items",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  trailing: Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Positioned.fill(
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: const CachedImage(
-                                              url:
-                                                  "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
-                                            ),
+                                        GestureDetector(
+                                          child: Icon(
+                                            Icons.edit,
+                                            size: 20,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                          ),
+                                          onTap: () {
+                                            AwesomeDialog(
+                                                context: context,
+                                                animType: AnimType.SCALE,
+                                                dialogType:
+                                                    DialogType.NO_HEADER,
+                                                title:
+                                                    collections[collectionIndex]
+                                                            .collectionName ??
+                                                        "",
+                                                desc: 'Select Your Choice',
+                                                btnOkText: "Edit",
+                                                btnCancelText: "Delete",
+                                                btnOkColor: Theme.of(context)
+                                                    .primaryColor,
+                                                btnOkOnPress: () {
+                                                  showMaterialModalBottomSheet(
+                                                    context: context,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    builder: (context) =>
+                                                        SingleChildScrollView(
+                                                      controller:
+                                                          ModalScrollController
+                                                              .of(context),
+                                                      child:
+                                                          NewCatalogCollectionWidget(
+                                                        title:
+                                                            "Edit Collection",
+                                                        type: "Collection",
+                                                        withImage: false,
+                                                        isCatalog: false,
+                                                        isEdit: true,
+                                                        collection: collections[
+                                                            collectionIndex],
+                                                        catalogId: widget
+                                                            .catalog.catalogeID,
+                                                      ),
+                                                    ),
+                                                  ).then((value) {
+                                                    if (value == true) {
+                                                      _getCollections();
+                                                    }
+                                                  });
+                                                },
+                                                btnCancelOnPress: () {
+                                                  _removeCollection(collections[
+                                                              collectionIndex]
+                                                          .collectionID ??
+                                                      "");
+                                                  setState(() {
+                                                    collections.removeAt(
+                                                        collectionIndex);
+                                                  });
+                                                }).show();
+                                          },
+                                        ),
+                                        const SizedBox(width: 13),
+                                        Text(
+                                          "See All",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Theme.of(context)
+                                                .primaryColorDark,
                                           ),
                                         ),
-                                        if (index % 2 != 0)
-                                          Positioned.fill(
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: Container(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(27),
-                                                  child: Image.asset(
-                                                    R.images.hiddenProduct,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                       ],
                                     ),
-                                    width: 90,
-                                    height: 90,
                                   ),
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
-                                      "Handmade Bag",
-                                      style: TextStyle(
-                                        fontSize: 16.5,
-                                        fontWeight: FontWeight.w600,
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CollectionScreen(
+                                        collection:
+                                            collections[collectionIndex],
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 3.5, bottom: 3.5),
-                                      child: Text(
-                                        "Awsome Hand Bag",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xff5d5d63),
-                                        ),
+                                  );
+                                },
+                              ),
+                              MediaQuery.removePadding(
+                                child: ListView.separated(
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailsScreen(
+                                              product:
+                                                  collections[collectionIndex]
+                                                      .products?[index],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 13, right: 13),
+                                            child: SizedBox(
+                                              child: Stack(
+                                                children: [
+                                                  Positioned.fill(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: CachedImage(
+                                                        url: collections[
+                                                                    collectionIndex]
+                                                                .products?[
+                                                                    index]
+                                                                .photo1 ??
+                                                            "",
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // if (index % 2 != 0)
+                                                  //   Positioned.fill(
+                                                  //     child: ClipRRect(
+                                                  //       borderRadius:
+                                                  //           BorderRadius
+                                                  //               .circular(10),
+                                                  //       child: Container(
+                                                  //         color: Colors.black
+                                                  //             .withOpacity(
+                                                  //           0.2,
+                                                  //         ),
+                                                  //         child: Padding(
+                                                  //           padding:
+                                                  //               const EdgeInsets
+                                                  //                   .all(27),
+                                                  //           child: Image.asset(
+                                                  //             R.images
+                                                  //                 .hiddenProduct,
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //     ),
+                                                  //   ),
+                                                ],
+                                              ),
+                                              width: 90,
+                                              height: 90,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  collections[collectionIndex]
+                                                          .products?[index]
+                                                          .itemName ??
+                                                      "",
+                                                  style: const TextStyle(
+                                                    fontSize: 16.5,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 3.5,
+                                                          bottom: 3.5,
+                                                          right: 39),
+                                                  child: Text(
+                                                    collections[collectionIndex]
+                                                            .products?[index]
+                                                            .description ??
+                                                        "",
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color(0xff5d5d63),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  collections[collectionIndex]
+                                                              .products?[index]
+                                                              .price
+                                                              ?.isNotEmpty ==
+                                                          true
+                                                      ? "${collections[collectionIndex].products?[index].price} SAR"
+                                                      : "",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xff5d5d63),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    ),
-                                    Text(
-                                      "60 SAR",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff5d5d63),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
+                                    );
+                                  },
+                                  shrinkWrap: true,
+                                  itemCount: collections[collectionIndex]
+                                          .products
+                                          ?.length ??
+                                      0,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return const SizedBox(height: 20);
+                                  },
+                                ),
+                                context: context,
+                                removeTop: true,
+                                removeBottom: true,
+                              )
+                            ],
                           );
                         },
-                        shrinkWrap: true,
-                        itemCount: 3,
-                        physics: const NeverScrollableScrollPhysics(),
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox(height: 20);
-                        },
+                        childCount: collections.length,
                       ),
-                      context: context,
-                      removeTop: true,
-                      removeBottom: true,
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: 40),
                     )
                   ],
-                );
-              },
-              childCount: 2,
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 40),
-          )
-        ],
-      ),
+                ),
     );
+  }
+
+  void _getCollections() {
+    UltraNetwork.request(
+      context,
+      getCollections,
+      formData: FormData.fromMap(
+        {"CatalogeID": widget.catalog.catalogeID},
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      isLoading = false;
+      if (value != null) {
+        setState(() {
+          Collection collectionsResponse = value;
+          collections = collectionsResponse.data ?? [];
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
+  }
+
+  void _removeCollection(String collectionId) {
+    UltraNetwork.request(
+      context,
+      deleteCollection,
+      showError: false,
+      showLoadingIndicator: false,
+      formData: FormData.fromMap(
+        {"CollectionID": collectionId},
+      ),
+      cancelToken: cancelToken,
+    ).then((value) {
+      setState(() {});
+    });
   }
 }
