@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -602,6 +603,14 @@ class Utils {
   static void printWrapped(String text) {
     final pattern = RegExp('.{1,800}');
     pattern.allMatches(text).forEach((match) => print(match.group(0)));
+  }
+
+  static String generateRandomString(int len) {
+    var r = Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
   }
 }
 

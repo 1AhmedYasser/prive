@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/Screens/Catalogs/catalog_product_sender_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../Helpers/Utils.dart';
@@ -256,7 +257,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 30, right: 30),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CatalogProductSenderScreen(
+                        product: widget.product,
+                      ),
+                    ),
+                  );
+                },
                 child: const Text(
                   "Send Message",
                   style: TextStyle(

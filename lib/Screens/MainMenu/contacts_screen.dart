@@ -193,7 +193,7 @@ class _ContactsScreenState extends State<ContactsScreen>
 
   Future<void> createChannel(BuildContext context, User user) async {
     final core = StreamChatCore.of(context);
-    final channel = core.client.channel('messaging', extraData: {
+    final channel = core.client.channel('messaging',id: Utils.generateRandomString(60), extraData: {
       'members': [
         core.currentUser!.id,
         user.id,

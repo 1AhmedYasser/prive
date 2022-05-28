@@ -103,7 +103,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                         'is_archive': false,
                         'name_colors': usersColors
                       },
-                      id: generateRandomString(60),
+                      id: Utils.generateRandomString(60),
                     );
                     await channel.watch();
                     Navigator.of(context).push(
@@ -490,14 +490,6 @@ class _NewGroupScreenState extends State<NewGroupScreen>
       _random.nextInt(256),
       _random.nextInt(256),
     ).value.toRadixString(16).substring(2);
-  }
-
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
   }
 
   _getContacts() async {

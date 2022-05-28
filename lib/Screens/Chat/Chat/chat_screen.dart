@@ -26,6 +26,7 @@ import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'chat_info_screen.dart';
@@ -1065,7 +1066,9 @@ class _ChatScreenState extends State<ChatScreen> {
             id: defaultMessage.id,
           );
         },
-        'location': _buildLocationMessage
+        'location': _buildLocationMessage,
+        'product': _buildCatalogMessage,
+        'catalog': _buildCatalogMessage
       },
     );
   }
@@ -1325,6 +1328,89 @@ class _ChatScreenState extends State<ChatScreen> {
         MapThumbnailWidget(
           lat: lat,
           long: long,
+        ),
+        const RoundedRectangleBorder(),
+        true,
+      ),
+    );
+  }
+
+  Widget _buildCatalogMessage(
+    BuildContext context,
+    Message details,
+    List<Attachment> _,
+  ) {
+    print(details.type);
+    final String? id = details.attachments.first.extraData['id'] as String?;
+    final String? name = details.attachments.first.extraData['name'] as String?;
+    final String? price =
+        details.attachments.first.extraData['price'] as String?;
+    final String? photo =
+        details.attachments.first.extraData['photo1'] as String?;
+    final String? owner =
+        details.attachments.first.extraData['ownerId'] as String?;
+    return InkWell(
+      onTap: () {},
+      child: wrapAttachmentWidget(
+        context,
+        SizedBox(
+          height: 240,
+          width: 180,
+          child: Column(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedImage(
+                        url: photo ?? "",
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.white.withOpacity(0.3),
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12, right: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          name ?? "",
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      if (price != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: Text(
+                            "$price SAR",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 5, top: 5),
+                child: Text(
+                  "View",
+                  style: TextStyle(color: Colors.white, fontSize: 17),
+                ),
+              ),
+            ],
+          ),
         ),
         const RoundedRectangleBorder(),
         true,

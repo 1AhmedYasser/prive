@@ -16,6 +16,8 @@ import '../../Models/Catalogs/catalog.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../Catalogs/catalog_product_sender_screen.dart';
+
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({Key? key}) : super(key: key);
 
@@ -282,6 +284,27 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                             _getCatalogs();
                                           }
                                         });
+                                      },
+                                    ),
+                                    SwipeAction(
+                                      content: Icon(
+                                        Icons.send,
+                                        color:
+                                            Theme.of(context).primaryColorDark,
+                                      ),
+                                      color: Colors.transparent,
+                                      style: const TextStyle(fontSize: 0),
+                                      onTap: (handler) async {
+                                        await handler(false);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CatalogProductSenderScreen(
+                                              catalog: catalogs[index],
+                                            ),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ],
