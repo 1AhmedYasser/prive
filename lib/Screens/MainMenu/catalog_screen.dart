@@ -15,7 +15,6 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../Models/Catalogs/catalog.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:easy_localization/easy_localization.dart';
-
 import '../Catalogs/catalog_product_sender_screen.dart';
 
 class CatalogScreen extends StatefulWidget {

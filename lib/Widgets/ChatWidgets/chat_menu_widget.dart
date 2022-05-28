@@ -23,13 +23,15 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
     "Search",
     "Clear History",
     "Mute",
-    "Delete Chat"
+    "Delete Chat",
+    "Send Catalog"
   ];
   List<String> chatMoreMenuIcons = [
     R.images.searchChatImage,
     R.images.clearHistoryImage,
     R.images.muteNotificationsImage,
-    R.images.deleteChatImage
+    R.images.deleteChatImage,
+    R.images.catalogManagerImage
   ];
 
   @override
@@ -65,6 +67,9 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
           case "Delete Chat":
             _showDeleteChatDialog();
             break;
+          case "Send Catalog":
+            Navigator.pushNamed(context, R.routes.catalogScreen);
+            break;
           default:
             break;
         }
@@ -72,7 +77,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       resultHeight: 62,
       resultWidth: 30,
       dropdownWidth: 170,
-      dropdownHeight: 150,
+      dropdownHeight: 187,
       dropdownItemHeight: 30,
       dropdownItemGap: 10,
       labelIconGap: 15,

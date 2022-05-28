@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:prive/Screens/Chat/Channels/channel_file_display_screen.dart';
 import 'package:prive/Screens/Chat/Channels/channel_media_display_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
@@ -999,12 +998,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       final res = await showConfirmationDialog(
                         context,
                         title: "Remove Member",
-                        okText:
-                            "Remove",
-                        question:
-                            "Are You Sure",
-                        cancelText:
-                            "Cancel",
+                        okText: "Remove",
+                        question: "Are You Sure",
+                        cancelText: "Cancel",
                       );
 
                       if (res == true) {
