@@ -25,6 +25,15 @@ class CatalogData {
   String? lastUpdatedCataloge;
   String? createdAtCataloge;
 
+  CatalogData({
+    this.catalogeID,
+    this.userID,
+    this.catalogeName,
+    this.catalogePhoto,
+    this.lastUpdatedCataloge,
+    this.createdAtCataloge,
+  });
+
   CatalogData.fromJson(Map<String, dynamic> json) {
     catalogeID = json['CatalogeID'] as String?;
     userID = json['UserID'] as String?;

@@ -16,6 +16,8 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/catalogProduct.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
@@ -29,6 +31,8 @@ import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../Catalogs/catalog_manager_screen.dart';
+import '../../Catalogs/product_details_screen.dart';
 import 'chat_info_screen.dart';
 import 'forward_screen.dart';
 import 'group_info_screen.dart';
@@ -1340,22 +1344,68 @@ class _ChatScreenState extends State<ChatScreen> {
     Message details,
     List<Attachment> _,
   ) {
-    print(details.type);
+    final String? type =
+        details.attachments.first.extraData['ctype'] as String?;
     final String? id = details.attachments.first.extraData['id'] as String?;
+    final String? cid = details.attachments.first.extraData['cid'] as String?;
     final String? name = details.attachments.first.extraData['name'] as String?;
+    final String? description =
+        details.attachments.first.extraData['description'] as String?;
     final String? price =
         details.attachments.first.extraData['price'] as String?;
-    final String? photo =
-        details.attachments.first.extraData['photo1'] as String?;
     final String? owner =
         details.attachments.first.extraData['ownerId'] as String?;
+    String? photo = "";
+    String? photo2 = "";
+    String? photo3 = "";
+    if (type == "product") {
+      photo = details.attachments.first.extraData['photo1'] as String?;
+      photo2 = details.attachments.first.extraData['photo2'] as String?;
+      photo3 = details.attachments.first.extraData['photo3'] as String?;
+    } else {
+      photo = details.attachments.first.extraData['photo'] as String?;
+    }
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        if (type == 'product') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailsScreen(
+                product: CatalogProductData(
+                  itemID: id,
+                  itemName: name,
+                  userID: owner,
+                  description: description,
+                  price: price,
+                  photo1: photo,
+                  photo2: photo2,
+                  photo3: photo3,
+                ),
+              ),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CatalogManagerScreen(
+                catalog: CatalogData(
+                  catalogeID: cid,
+                  userID: owner,
+                  catalogeName: name,
+                  catalogePhoto: photo,
+                ),
+              ),
+            ),
+          );
+        }
+      },
       child: wrapAttachmentWidget(
         context,
         SizedBox(
           height: 240,
-          width: 180,
+          width: type == 'product' ? 180 : 230,
           child: Column(
             children: [
               Expanded(
@@ -1365,27 +1415,35 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: CachedImage(
-                        url: photo ?? "",
-                      ),
+                      child: photo != "NONE"
+                          ? CachedImage(
+                              url: photo ?? "",
+                            )
+                          : Image.asset(R.images.collectionsImage),
                     ),
                   ),
                 ),
               ),
               Container(
-                color: Colors.white.withOpacity(0.3),
+                color: details.user?.id == context.currentUser?.id
+                    ? Colors.white.withOpacity(0.3)
+                    : Colors.grey.shade400.withOpacity(0.3),
                 width: MediaQuery.of(context).size.width,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12, right: 12),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: type == 'product'
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 5),
                         child: Text(
                           name ?? "",
-                          style: const TextStyle(
-                              color: Colors.white,
+                          style: TextStyle(
+                              color: details.user?.id == context.currentUser?.id
+                                  ? Colors.white
+                                  : Colors.black,
                               fontSize: 17,
                               fontWeight: FontWeight.w600),
                         ),
@@ -1395,18 +1453,26 @@ class _ChatScreenState extends State<ChatScreen> {
                           padding: const EdgeInsets.only(bottom: 5),
                           child: Text(
                             "$price SAR",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: details.user?.id == context.currentUser?.id
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                     ],
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 5, top: 5),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5, top: 5),
                 child: Text(
                   "View",
-                  style: TextStyle(color: Colors.white, fontSize: 17),
+                  style: TextStyle(
+                      color: details.user?.id == context.currentUser?.id
+                          ? Colors.white
+                          : Colors.black,
+                      fontSize: 17),
                 ),
               ),
             ],

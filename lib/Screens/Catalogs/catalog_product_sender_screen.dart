@@ -135,7 +135,7 @@ class _CatalogProductSenderScreenState
                                   "photo2": widget.product?.photo2,
                                   "photo3": widget.product?.photo3,
                                   "ownerId": widget.product?.userID,
-                                  "type": "product"
+                                  "ctype": "product"
                                 },
                               )
                             ]),
@@ -147,11 +147,11 @@ class _CatalogProductSenderScreenState
                                 type: 'catalog',
                                 uploadState: const UploadState.success(),
                                 extraData: {
-                                  "id": widget.catalog?.catalogeID,
+                                  "cid": widget.catalog?.catalogeID,
                                   "name": widget.catalog?.catalogeName,
                                   "photo": widget.catalog?.catalogePhoto,
                                   "ownerId": widget.catalog?.userID,
-                                  "type": "catalog"
+                                  "ctype": "catalog"
                                 },
                               )
                             ]),
@@ -229,7 +229,7 @@ class _CatalogProductSenderScreenState
                                 "photo2": widget.product?.photo2,
                                 "photo3": widget.product?.photo3,
                                 "ownerId": widget.product?.userID,
-                                "type": "product"
+                                "ctype": "product"
                               },
                             )
                           ]),
@@ -241,11 +241,11 @@ class _CatalogProductSenderScreenState
                               type: 'catalog',
                               uploadState: const UploadState.success(),
                               extraData: {
-                                "id": widget.catalog?.catalogeID,
+                                "cid": widget.catalog?.catalogeID,
                                 "name": widget.catalog?.catalogeName,
                                 "photo": widget.catalog?.catalogePhoto,
                                 "ownerId": widget.catalog?.userID,
-                                "type": "catalog"
+                                "ctype": "catalog"
                               },
                             )
                           ]),

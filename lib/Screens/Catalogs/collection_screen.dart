@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
@@ -16,7 +18,9 @@ import '../../Widgets/Common/cached_image.dart';
 
 class CollectionScreen extends StatefulWidget {
   final CollectionData collection;
-  const CollectionScreen({Key? key, required this.collection})
+  final CatalogData catalog;
+  const CollectionScreen(
+      {Key? key, required this.collection, required this.catalog})
       : super(key: key);
 
   @override
@@ -58,71 +62,75 @@ class _CollectionScreenState extends State<CollectionScreen> {
             ),
           ),
           actions: [
-            if (products.isNotEmpty)
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    isEditing = !isEditing;
-                    controller.closeAllOpenCell();
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Text(
-                    isEditing ? "Done" : "Edit",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).primaryColorDark,
+            if (widget.catalog.userID == context.currentUser?.id)
+              if (products.isNotEmpty)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isEditing = !isEditing;
+                      controller.closeAllOpenCell();
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Text(
+                      isEditing ? "Done" : "Edit",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
                     ),
                   ),
-                ),
-              )
+                )
           ],
         ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewProductScreen(
-                    collection: widget.collection,
-                  ),
-                ),
-              ).then((value) {
-                if (value == true) {
-                  _getProducts();
-                }
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 20, bottom: 20, left: 18, right: 18),
-              child: Row(
-                children: [
-                  Image.asset(
-                    R.images.newCollectionGroupImage,
-                    fit: BoxFit.fill,
-                    width: 70,
-                  ),
-                  const SizedBox(width: 17),
-                  Text(
-                    "Add New Product",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 17,
-                      color: Theme.of(context).primaryColorDark,
+          if (widget.catalog.userID == context.currentUser?.id)
+            InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewProductScreen(
+                      collection: widget.collection,
                     ),
                   ),
-                ],
+                ).then((value) {
+                  if (value == true) {
+                    _getProducts();
+                  }
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, bottom: 20, left: 18, right: 18),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      R.images.newCollectionGroupImage,
+                      fit: BoxFit.fill,
+                      width: 70,
+                    ),
+                    const SizedBox(width: 17),
+                    Text(
+                      "Add New Product",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 17,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          if (widget.catalog.userID != context.currentUser?.id)
+            const SizedBox(height: 15),
           Expanded(
             child: MediaQuery.removePadding(
               context: context,
@@ -139,51 +147,60 @@ class _CollectionScreenState extends State<CollectionScreen> {
                         horizontalOffset: 50,
                         child: FadeInAnimation(
                           child: SwipeActionCell(
+                            isDraggable: (widget.catalog.userID ==
+                                    context.currentUser?.id)
+                                ? true
+                                : false,
                             controller: controller,
                             index: index,
                             key: ValueKey(products[index]),
                             trailingActions: [
-                              SwipeAction(
-                                content: Image.asset(
-                                  R.images.deleteChatImage,
-                                  width: 15,
-                                  color: Colors.red,
+                              if (widget.catalog.userID ==
+                                  context.currentUser?.id)
+                                SwipeAction(
+                                  content: Image.asset(
+                                    R.images.deleteChatImage,
+                                    width: 15,
+                                    color: Colors.red,
+                                  ),
+                                  color: Colors.transparent,
+                                  style: const TextStyle(fontSize: 0),
+                                  onTap: (handler) async {
+                                    await handler(true);
+                                    _deleteProduct(
+                                        products[index].itemID ?? "");
+                                    setState(() {
+                                      products.removeAt(index);
+                                    });
+                                  },
                                 ),
-                                color: Colors.transparent,
-                                style: const TextStyle(fontSize: 0),
-                                onTap: (handler) async {
-                                  await handler(true);
-                                  _deleteProduct(products[index].itemID ?? "");
-                                  setState(() {
-                                    products.removeAt(index);
-                                  });
-                                },
-                              ),
-                              SwipeAction(
-                                content: Icon(
-                                  Icons.edit,
-                                  color: Theme.of(context).primaryColorDark,
-                                ),
-                                color: Colors.transparent,
-                                style: const TextStyle(fontSize: 0),
-                                onTap: (handler) async {
-                                  await handler(false);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => NewProductScreen(
-                                        product: products[index],
-                                        collection: widget.collection,
-                                        isEdit: true,
+                              if (widget.catalog.userID ==
+                                  context.currentUser?.id)
+                                SwipeAction(
+                                  content: Icon(
+                                    Icons.edit,
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                  color: Colors.transparent,
+                                  style: const TextStyle(fontSize: 0),
+                                  onTap: (handler) async {
+                                    await handler(false);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => NewProductScreen(
+                                          product: products[index],
+                                          collection: widget.collection,
+                                          isEdit: true,
+                                        ),
                                       ),
-                                    ),
-                                  ).then((value) {
-                                    if (value == true) {
-                                      _getProducts();
-                                    }
-                                  });
-                                },
-                              ),
+                                    ).then((value) {
+                                      if (value == true) {
+                                        _getProducts();
+                                      }
+                                    });
+                                  },
+                                ),
                             ],
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 15),

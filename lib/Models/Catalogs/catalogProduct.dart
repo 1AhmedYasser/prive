@@ -29,6 +29,18 @@ class CatalogProductData {
   String? description;
   String? price;
 
+  CatalogProductData({
+    this.itemID,
+    this.itemName,
+    this.collectionID,
+    this.userID,
+    this.photo1,
+    this.photo2,
+    this.photo3,
+    this.description,
+    this.price,
+  });
+
   CatalogProductData.fromJson(Map<String, dynamic> json) {
     itemID = json['ItemID'] as String?;
     itemName = json['ItemName'] as String?;

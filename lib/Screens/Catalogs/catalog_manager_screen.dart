@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -200,54 +201,55 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                         ),
                       ),
                     ),
-                    SliverToBoxAdapter(
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          showMaterialModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => SingleChildScrollView(
-                              controller: ModalScrollController.of(context),
-                              child: NewCatalogCollectionWidget(
-                                title: "Create New Collection",
-                                type: "Collection",
-                                withImage: false,
-                                isCatalog: false,
-                                catalogId: widget.catalog.catalogeID,
-                              ),
-                            ),
-                          ).then((value) {
-                            if (value == true) {
-                              _getCollections();
-                            }
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 20, bottom: 10, left: 13, right: 13),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                R.images.newCollectionGroupImage,
-                                fit: BoxFit.fill,
-                                width: 70,
-                              ),
-                              const SizedBox(width: 17),
-                              Text(
-                                "Add New Collection",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 17,
-                                  color: Theme.of(context).primaryColorDark,
+                    if (widget.catalog.userID == context.currentUser?.id)
+                      SliverToBoxAdapter(
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            showMaterialModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => SingleChildScrollView(
+                                controller: ModalScrollController.of(context),
+                                child: NewCatalogCollectionWidget(
+                                  title: "Create New Collection",
+                                  type: "Collection",
+                                  withImage: false,
+                                  isCatalog: false,
+                                  catalogId: widget.catalog.catalogeID,
                                 ),
                               ),
-                            ],
+                            ).then((value) {
+                              if (value == true) {
+                                _getCollections();
+                              }
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 20, bottom: 10, left: 13, right: 13),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  R.images.newCollectionGroupImage,
+                                  fit: BoxFit.fill,
+                                  width: 70,
+                                ),
+                                const SizedBox(width: 17),
+                                Text(
+                                  "Add New Collection",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 17,
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, collectionIndex) {
@@ -278,70 +280,73 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        GestureDetector(
-                                          child: Icon(
-                                            Icons.edit,
-                                            size: 20,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                          ),
-                                          onTap: () {
-                                            AwesomeDialog(
-                                                context: context,
-                                                animType: AnimType.SCALE,
-                                                dialogType:
-                                                    DialogType.NO_HEADER,
-                                                title:
-                                                    collections[collectionIndex]
-                                                            .collectionName ??
-                                                        "",
-                                                desc: 'Select Your Choice',
-                                                btnOkText: "Edit",
-                                                btnCancelText: "Delete",
-                                                btnOkColor: Theme.of(context)
-                                                    .primaryColor,
-                                                btnOkOnPress: () {
-                                                  showMaterialModalBottomSheet(
-                                                    context: context,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    builder: (context) =>
-                                                        SingleChildScrollView(
-                                                      controller:
-                                                          ModalScrollController
-                                                              .of(context),
-                                                      child:
-                                                          NewCatalogCollectionWidget(
-                                                        title:
-                                                            "Edit Collection",
-                                                        type: "Collection",
-                                                        withImage: false,
-                                                        isCatalog: false,
-                                                        isEdit: true,
-                                                        collection: collections[
-                                                            collectionIndex],
-                                                        catalogId: widget
-                                                            .catalog.catalogeID,
-                                                      ),
-                                                    ),
-                                                  ).then((value) {
-                                                    if (value == true) {
-                                                      _getCollections();
-                                                    }
-                                                  });
-                                                },
-                                                btnCancelOnPress: () {
-                                                  _removeCollection(collections[
+                                        if (widget.catalog.userID ==
+                                            context.currentUser?.id)
+                                          GestureDetector(
+                                            child: Icon(
+                                              Icons.edit,
+                                              size: 20,
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
+                                            onTap: () {
+                                              AwesomeDialog(
+                                                  context: context,
+                                                  animType: AnimType.SCALE,
+                                                  dialogType:
+                                                      DialogType.NO_HEADER,
+                                                  title: collections[
                                                               collectionIndex]
-                                                          .collectionID ??
-                                                      "");
-                                                  setState(() {
-                                                    collections.removeAt(
-                                                        collectionIndex);
-                                                  });
-                                                }).show();
-                                          },
-                                        ),
+                                                          .collectionName ??
+                                                      "",
+                                                  desc: 'Select Your Choice',
+                                                  btnOkText: "Edit",
+                                                  btnCancelText: "Delete",
+                                                  btnOkColor: Theme.of(context)
+                                                      .primaryColor,
+                                                  btnOkOnPress: () {
+                                                    showMaterialModalBottomSheet(
+                                                      context: context,
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      builder: (context) =>
+                                                          SingleChildScrollView(
+                                                        controller:
+                                                            ModalScrollController
+                                                                .of(context),
+                                                        child:
+                                                            NewCatalogCollectionWidget(
+                                                          title:
+                                                              "Edit Collection",
+                                                          type: "Collection",
+                                                          withImage: false,
+                                                          isCatalog: false,
+                                                          isEdit: true,
+                                                          collection: collections[
+                                                              collectionIndex],
+                                                          catalogId: widget
+                                                              .catalog
+                                                              .catalogeID,
+                                                        ),
+                                                      ),
+                                                    ).then((value) {
+                                                      if (value == true) {
+                                                        _getCollections();
+                                                      }
+                                                    });
+                                                  },
+                                                  btnCancelOnPress: () {
+                                                    _removeCollection(collections[
+                                                                collectionIndex]
+                                                            .collectionID ??
+                                                        "");
+                                                    setState(() {
+                                                      collections.removeAt(
+                                                          collectionIndex);
+                                                    });
+                                                  }).show();
+                                            },
+                                          ),
                                         const SizedBox(width: 13),
                                         Text(
                                           "See All",
@@ -364,6 +369,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                       builder: (context) => CollectionScreen(
                                         collection:
                                             collections[collectionIndex],
+                                        catalog: widget.catalog,
                                       ),
                                     ),
                                   ).then((value) => _getCollections());
@@ -384,7 +390,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                               product:
                                                   collections[collectionIndex]
                                                       .products?[index],
-                                                  collection: collections[collectionIndex],
+                                              collection:
+                                                  collections[collectionIndex],
                                             ),
                                           ),
                                         ).then((value) {

@@ -12,11 +12,12 @@ import '../../Models/Catalogs/catalogProduct.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
 import 'new_product_screen.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final CatalogProductData? product;
-  final CollectionData collection;
-  const ProductDetailsScreen({Key? key, this.product, required this.collection})
+  final CollectionData? collection;
+  const ProductDetailsScreen({Key? key, this.product, this.collection})
       : super(key: key);
 
   @override
@@ -91,98 +92,99 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           //     ),
           //   ),
           // ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 20),
-            child: CoolDropdown(
-              dropdownList: moreMenu,
-              isAnimation: false,
-              dropdownItemPadding: EdgeInsets.zero,
-              onChange: (dropdownItem) {
-                switch (dropdownItem['value']) {
-                  case "Edit":
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NewProductScreen(
-                          product: product,
-                          isEdit: true,
+          if (product?.userID == context.currentUser?.id)
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 20),
+              child: CoolDropdown(
+                dropdownList: moreMenu,
+                isAnimation: false,
+                dropdownItemPadding: EdgeInsets.zero,
+                onChange: (dropdownItem) {
+                  switch (dropdownItem['value']) {
+                    case "Edit":
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NewProductScreen(
+                            product: product,
+                            isEdit: true,
+                          ),
                         ),
-                      ),
-                    ).then((value) {
-                      if (value == true) {
-                        _getProducts();
-                      }
-                    });
-                    break;
-                  case "Hide":
-                    print("Hide Product");
-                    break;
-                  case "Delete":
-                    _deleteProduct();
-                    break;
-                  default:
-                    break;
-                }
-              },
-              resultHeight: 62,
-              resultWidth: 30,
-              dropdownWidth: 170,
-              dropdownHeight: 70, //110,
-              dropdownItemHeight: 30,
-              dropdownItemGap: 10,
-              labelIconGap: 15,
-              onOpen: (open) {
-                // if (widget.channel.isMuted) {
-                //   setState(() {
-                //     chatMoreMenuTitles[2] = "UnMute";
-                //     fillMenu();
-                //   });
-                // } else {
-                //   setState(() {
-                //     chatMoreMenuTitles[2] = "Mute";
-                //     fillMenu();
-                //   });
-                // }
-              },
-              dropdownItemTopGap: 0,
-              resultIcon: const Icon(
-                Icons.more_vert_rounded,
-                color: Color(0xff7a8fa6),
-                size: 35,
+                      ).then((value) {
+                        if (value == true) {
+                          _getProducts();
+                        }
+                      });
+                      break;
+                    case "Hide":
+                      print("Hide Product");
+                      break;
+                    case "Delete":
+                      _deleteProduct();
+                      break;
+                    default:
+                      break;
+                  }
+                },
+                resultHeight: 62,
+                resultWidth: 30,
+                dropdownWidth: 170,
+                dropdownHeight: 70, //110,
+                dropdownItemHeight: 30,
+                dropdownItemGap: 10,
+                labelIconGap: 15,
+                onOpen: (open) {
+                  // if (widget.channel.isMuted) {
+                  //   setState(() {
+                  //     chatMoreMenuTitles[2] = "UnMute";
+                  //     fillMenu();
+                  //   });
+                  // } else {
+                  //   setState(() {
+                  //     chatMoreMenuTitles[2] = "Mute";
+                  //     fillMenu();
+                  //   });
+                  // }
+                },
+                dropdownItemTopGap: 0,
+                resultIcon: const Icon(
+                  Icons.more_vert_rounded,
+                  color: Color(0xff7a8fa6),
+                  size: 35,
+                ),
+                resultBD: const BoxDecoration(color: Colors.transparent),
+                resultIconLeftGap: 0,
+                dropdownItemBottomGap: 0,
+                resultPadding: EdgeInsets.zero,
+                resultIconRotation: true,
+                resultIconRotationValue: 1,
+                dropdownItemReverse: true,
+                isDropdownLabel: true,
+                unselectedItemTS: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xff232323),
+                ),
+                selectedItemTS: const TextStyle(
+                  fontSize: 15,
+                  color: Color(0xff232323),
+                ),
+                dropdownItemMainAxis: MainAxisAlignment.start,
+                isResultLabel: false,
+                dropdownItemAlign: Alignment.centerLeft,
+                isResultIconLabel: false,
+                dropdownPadding: const EdgeInsets.all(20),
+                isTriangle: false,
+                selectedItemPadding: EdgeInsets.zero,
+                resultAlign: Alignment.center,
+                resultMainAxis: MainAxisAlignment.center,
+                selectedItemBD: const BoxDecoration(color: Colors.transparent),
+                triangleWidth: 0,
+                triangleHeight: 0,
+                triangleAlign: 'center',
+                dropdownAlign: 'right',
+                gap: 10,
               ),
-              resultBD: const BoxDecoration(color: Colors.transparent),
-              resultIconLeftGap: 0,
-              dropdownItemBottomGap: 0,
-              resultPadding: EdgeInsets.zero,
-              resultIconRotation: true,
-              resultIconRotationValue: 1,
-              dropdownItemReverse: true,
-              isDropdownLabel: true,
-              unselectedItemTS: const TextStyle(
-                fontSize: 15,
-                color: Color(0xff232323),
-              ),
-              selectedItemTS: const TextStyle(
-                fontSize: 15,
-                color: Color(0xff232323),
-              ),
-              dropdownItemMainAxis: MainAxisAlignment.start,
-              isResultLabel: false,
-              dropdownItemAlign: Alignment.centerLeft,
-              isResultIconLabel: false,
-              dropdownPadding: const EdgeInsets.all(20),
-              isTriangle: false,
-              selectedItemPadding: EdgeInsets.zero,
-              resultAlign: Alignment.center,
-              resultMainAxis: MainAxisAlignment.center,
-              selectedItemBD: const BoxDecoration(color: Colors.transparent),
-              triangleWidth: 0,
-              triangleHeight: 0,
-              triangleAlign: 'center',
-              dropdownAlign: 'right',
-              gap: 10,
-            ),
-          )
+            )
         ],
       ),
       body: SingleChildScrollView(
@@ -343,7 +345,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       context,
       getProducts,
       formData: FormData.fromMap(
-        {"CollectionID": widget.collection.collectionID ?? ""},
+        {"CollectionID": widget.collection?.collectionID ?? ""},
       ),
       cancelToken: cancelToken,
     ).then((value) {

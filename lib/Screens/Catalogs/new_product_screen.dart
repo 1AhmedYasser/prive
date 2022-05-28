@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
