@@ -31,6 +31,7 @@ import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
 import '../../Catalogs/catalog_manager_screen.dart';
 import '../../Catalogs/product_details_screen.dart';
 import 'chat_info_screen.dart';
@@ -295,80 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (widget.isChannel == false)
                     GestureDetector(
                       onTap: () async {
-                        final ref = FirebaseDatabase.instance
-                            .ref('Users/${otherMember?.userId}');
-                        final snapshot = await ref.get();
-                        if (snapshot.exists) {
-                          print(snapshot.value as String);
-                          if (snapshot.value as String == "Ended") {
-                            Utils.logCallStart(
-                              context,
-                              context.currentUser?.id ?? "",
-                              otherMember?.userId ?? "",
-                              true,
-                            );
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder: (BuildContext context, _, __) {
-                                  return CallScreen(
-                                    channel: channel,
-                                    isVideo: true,
-                                  );
-                                },
-                                transitionsBuilder: (_,
-                                    Animation<double> animation,
-                                    __,
-                                    Widget child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (_) => CupertinoAlertDialog(
-                                title: const Text("Prive"),
-                                content: Text(
-                                    "${otherMember?.user?.name ?? "Member"} is on another call"),
-                                actions: [
-                                  CupertinoDialogAction(
-                                    child: const Text("Ok"),
-                                    onPressed: () => Navigator.pop(context),
-                                  )
-                                ],
-                              ),
-                            );
-                          }
-                        } else {
-                          Utils.logCallStart(
-                            context,
-                            context.currentUser?.id ?? "",
-                            otherMember?.userId ?? "",
-                            true,
-                          );
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder: (BuildContext context, _, __) {
-                                return CallScreen(
-                                  channel: channel,
-                                  isVideo: true,
-                                );
-                              },
-                              transitionsBuilder: (_,
-                                  Animation<double> animation,
-                                  __,
-                                  Widget child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        }
+                        await startCall();
                       },
                       child: Image.asset(
                         R.images.videoCallImage,
@@ -379,80 +307,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (widget.isChannel == false)
                     GestureDetector(
                       onTap: () async {
-                        final ref = FirebaseDatabase.instance
-                            .ref('Users/${otherMember?.userId}');
-                        final snapshot = await ref.get();
-                        if (snapshot.exists) {
-                          print(snapshot.value as String);
-                          if (snapshot.value as String == "Ended") {
-                            Utils.logCallStart(
-                              context,
-                              context.currentUser?.id ?? "",
-                              otherMember?.userId ?? "",
-                              false,
-                            );
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder: (BuildContext context, _, __) {
-                                  return CallScreen(
-                                    channel: channel,
-                                    isVideo: false,
-                                  );
-                                },
-                                transitionsBuilder: (_,
-                                    Animation<double> animation,
-                                    __,
-                                    Widget child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (_) => CupertinoAlertDialog(
-                                title: const Text("Prive"),
-                                content: Text(
-                                    "${otherMember?.user?.name ?? "Member"} is on another call"),
-                                actions: [
-                                  CupertinoDialogAction(
-                                    child: const Text("Ok"),
-                                    onPressed: () => Navigator.pop(context),
-                                  )
-                                ],
-                              ),
-                            );
-                          }
-                        } else {
-                          Utils.logCallStart(
-                            context,
-                            context.currentUser?.id ?? "",
-                            otherMember?.userId ?? "",
-                            false,
-                          );
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder: (BuildContext context, _, __) {
-                                return CallScreen(
-                                  channel: channel,
-                                  isVideo: false,
-                                );
-                              },
-                              transitionsBuilder: (_,
-                                  Animation<double> animation,
-                                  __,
-                                  Widget child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        }
+                        await startCall(isVideo: false);
                       },
                       child: Image.asset(
                         R.images.voiceCallImage,
@@ -861,6 +716,82 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future<void> startCall({bool isVideo = true}) async {
+    if (widget.channel.isGroup) {
+      print("Start a group ${isVideo ? "Video" : "Voice"} Call");
+    } else {
+      final ref = FirebaseDatabase.instance.ref('Users/${otherMember?.userId}');
+      final snapshot = await ref.get();
+      if (snapshot.exists) {
+        print(snapshot.value as String);
+        if (snapshot.value as String == "Ended") {
+          Utils.logCallStart(
+            context,
+            context.currentUser?.id ?? "",
+            otherMember?.userId ?? "",
+            isVideo,
+          );
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              pageBuilder: (BuildContext context, _, __) {
+                return CallScreen(
+                  channel: channel,
+                  isVideo: isVideo,
+                );
+              },
+              transitionsBuilder:
+                  (_, Animation<double> animation, __, Widget child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (_) => CupertinoAlertDialog(
+              title: const Text("Prive"),
+              content: Text(
+                  "${otherMember?.user?.name ?? "Member"} is on another call"),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text("Ok"),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            ),
+          );
+        }
+      } else {
+        Utils.logCallStart(
+          context,
+          context.currentUser?.id ?? "",
+          otherMember?.userId ?? "",
+          isVideo,
+        );
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, _, __) {
+              return CallScreen(
+                channel: channel,
+                isVideo: isVideo,
+              );
+            },
+            transitionsBuilder:
+                (_, Animation<double> animation, __, Widget child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildLottieAnimation() {
     switch (randomNumber) {
       case 0:
@@ -1069,8 +1000,18 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         },
         'location': _buildLocationMessage,
-        'product': _buildCatalogMessage,
-        'catalog': _buildCatalogMessage
+        'product': (context, defaultMessage, attachments) {
+          return CatalogMessage(
+            context: context,
+            details: defaultMessage,
+          );
+        },
+        'catalog': (context, defaultMessage, attachments) {
+          return CatalogMessage(
+            context: context,
+            details: defaultMessage,
+          );
+        }
       },
     );
   }
@@ -1330,151 +1271,6 @@ class _ChatScreenState extends State<ChatScreen> {
         MapThumbnailWidget(
           lat: lat,
           long: long,
-        ),
-        const RoundedRectangleBorder(),
-        true,
-      ),
-    );
-  }
-
-  Widget _buildCatalogMessage(
-    BuildContext context,
-    Message details,
-    List<Attachment> _,
-  ) {
-    final String? type =
-        details.attachments.first.extraData['ctype'] as String?;
-    final String? id = details.attachments.first.extraData['id'] as String?;
-    final String? cid = details.attachments.first.extraData['cid'] as String?;
-    final String? name = details.attachments.first.extraData['name'] as String?;
-    final String? description =
-        details.attachments.first.extraData['description'] as String?;
-    final String? price =
-        details.attachments.first.extraData['price'] as String?;
-    final String? owner =
-        details.attachments.first.extraData['ownerId'] as String?;
-    String? photo = "";
-    String? photo2 = "";
-    String? photo3 = "";
-    if (type == "product") {
-      photo = details.attachments.first.extraData['photo1'] as String?;
-      photo2 = details.attachments.first.extraData['photo2'] as String?;
-      photo3 = details.attachments.first.extraData['photo3'] as String?;
-    } else {
-      photo = details.attachments.first.extraData['photo'] as String?;
-    }
-    return InkWell(
-      onTap: () {
-        if (type == 'product') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductDetailsScreen(
-                product: CatalogProductData(
-                  itemID: id,
-                  itemName: name,
-                  userID: owner,
-                  description: description,
-                  price: price,
-                  photo1: photo,
-                  photo2: photo2,
-                  photo3: photo3,
-                ),
-              ),
-            ),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CatalogManagerScreen(
-                catalog: CatalogData(
-                  catalogeID: cid,
-                  userID: owner,
-                  catalogeName: name,
-                  catalogePhoto: photo,
-                ),
-              ),
-            ),
-          );
-        }
-      },
-      child: wrapAttachmentWidget(
-        context,
-        SizedBox(
-          height: 240,
-          width: type == 'product' ? 180 : 230,
-          child: Column(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: photo != "NONE"
-                          ? CachedImage(
-                              url: photo ?? "",
-                            )
-                          : Image.asset(R.images.collectionsImage),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                color: details.user?.id == context.currentUser?.id
-                    ? Colors.white.withOpacity(0.3)
-                    : Colors.grey.shade400.withOpacity(0.3),
-                width: MediaQuery.of(context).size.width,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12),
-                  child: Column(
-                    crossAxisAlignment: type == 'product'
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          name ?? "",
-                          style: TextStyle(
-                              color: details.user?.id == context.currentUser?.id
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      if (price != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5),
-                          child: Text(
-                            "$price SAR",
-                            style: TextStyle(
-                              color: details.user?.id == context.currentUser?.id
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5, top: 5),
-                child: Text(
-                  "View",
-                  style: TextStyle(
-                      color: details.user?.id == context.currentUser?.id
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 17),
-                ),
-              ),
-            ],
-          ),
         ),
         const RoundedRectangleBorder(),
         true,
