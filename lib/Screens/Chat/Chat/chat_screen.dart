@@ -85,7 +85,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-
     channel = StreamChannel.of(context).channel;
     otherMember = widget.channel.state?.members
         .where((element) => element.userId != context.currentUser?.id)
@@ -93,7 +92,6 @@ class _ChatScreenState extends State<ChatScreen> {
     Utils.checkForInternetConnection(context);
     _focusNode = FocusNode();
     _getChatBackground();
-
     unreadCountSubscription = StreamChannel.of(context)
         .channel
         .state!
@@ -139,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         if (widget.isChannel == false) {
                           var channel = StreamChannel.of(context).channel;
 
-                          if (channel.memberCount == 2 && channel.isDistinct) {
+                          if (channel.isGroup == false) {
                             final currentUser =
                                 StreamChat.of(context).currentUser;
                             final otherUser =

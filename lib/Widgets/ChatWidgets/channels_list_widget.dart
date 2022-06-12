@@ -41,7 +41,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                   onLongPress: () {
                     if (!widget.isChannel) {
                       Channel channel = widget.channels[index];
-                      if (channel.memberCount == 2 && channel.isDistinct) {
+                      if (channel.isGroup == false) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

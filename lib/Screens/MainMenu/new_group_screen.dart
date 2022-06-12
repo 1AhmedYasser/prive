@@ -98,7 +98,8 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                           ..._selectedUsers.map((e) => e.id),
                         ],
                         'name': groupName,
-                        'channel_type': "Group",
+                        'channel_type':
+                            _selectedUsers.length > 1 ? "Group" : "Normal",
                         'is_important': false,
                         'is_archive': false,
                         'name_colors': usersColors

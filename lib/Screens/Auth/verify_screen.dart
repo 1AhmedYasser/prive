@@ -12,6 +12,8 @@ import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
+import '../../UltraNetwork/ultra_loading_indicator.dart';
+
 class VerifyAccountScreen extends StatefulWidget {
   final String phoneNumber;
   final LoginData? loginData;
@@ -177,12 +179,20 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    BotToast.showAnimationWidget(
+                      toastBuilder: (context) {
+                        return const IgnorePointer(
+                            child: UltraLoadingIndicator());
+                      },
+                      animationDuration: const Duration(milliseconds: 0),
+                    );
                     PhoneAuthCredential credential =
                         PhoneAuthProvider.credential(
                       verificationId: verificationId ?? "",
                       smsCode: codeController.text,
                     );
                     await _auth.signInWithCredential(credential).then((value) {
+                      BotToast.removeAll();
                       if (widget.loginData?.accountState == "NewAccount") {
                         Navigator.pushReplacement(
                           context,
@@ -251,7 +261,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
       print(authCredential.smsCode);
       try {
         await user!.linkWithCredential(authCredential);
-      } on FirebaseAuthException catch (e) {
+      } on FirebaseAuthException catch (_) {
         await _auth.signInWithCredential(authCredential);
       }
     }

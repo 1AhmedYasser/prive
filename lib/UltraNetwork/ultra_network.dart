@@ -54,10 +54,11 @@ class UltraNetwork with ChangeNotifier {
     if (await Connectivity().checkConnectivity() != ConnectivityResult.none) {
       if (showLoadingIndicator) {
         BotToast.showAnimationWidget(
-            toastBuilder: (context) {
-              return const IgnorePointer(child: UltraLoadingIndicator());
-            },
-            animationDuration: const Duration(milliseconds: 0));
+          toastBuilder: (context) {
+            return const IgnorePointer(child: UltraLoadingIndicator());
+          },
+          animationDuration: const Duration(milliseconds: 0),
+        );
       }
       try {
         var response = await dio.request(
