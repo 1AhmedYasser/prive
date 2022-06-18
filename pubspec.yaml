@@ -36,7 +36,7 @@ dependencies:
   # Widgets
   cached_network_image: ^3.2.0
   flutter_spinkit: ^5.1.0
-  image_picker: ^0.8.4+4
+  image_picker: ^0.8.5+2
   intl_phone_field: ^2.1.0
   pin_code_fields: ^7.3.0
   bot_toast: ^4.0.1

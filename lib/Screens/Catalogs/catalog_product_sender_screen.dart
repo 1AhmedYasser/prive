@@ -126,6 +126,8 @@ class _CatalogProductSenderScreenState
                               Attachment(
                                 type: 'product',
                                 uploadState: const UploadState.success(),
+                                title: widget.product?.itemName,
+                                imageUrl: widget.product?.photo1,
                                 extraData: {
                                   "id": widget.product?.itemID,
                                   "name": widget.product?.itemName,
@@ -145,6 +147,8 @@ class _CatalogProductSenderScreenState
                             Message(text: "", type: "catalog", attachments: [
                               Attachment(
                                 type: 'catalog',
+                                title: widget.catalog?.catalogeName,
+                                imageUrl: widget.catalog?.catalogePhoto,
                                 uploadState: const UploadState.success(),
                                 extraData: {
                                   "cid": widget.catalog?.catalogeID,
@@ -153,7 +157,7 @@ class _CatalogProductSenderScreenState
                                   "ownerId": widget.catalog?.userID,
                                   "ctype": "catalog"
                                 },
-                              )
+                              ),
                             ]),
                           );
                         }
@@ -220,6 +224,8 @@ class _CatalogProductSenderScreenState
                             Attachment(
                               type: 'product',
                               uploadState: const UploadState.success(),
+                              title: widget.product?.itemName,
+                              imageUrl: widget.product?.photo1,
                               extraData: {
                                 "id": widget.product?.itemID,
                                 "name": widget.product?.itemName,
@@ -240,6 +246,8 @@ class _CatalogProductSenderScreenState
                             Attachment(
                               type: 'catalog',
                               uploadState: const UploadState.success(),
+                              title: widget.catalog?.catalogeName,
+                              imageUrl: widget.catalog?.catalogePhoto,
                               extraData: {
                                 "cid": widget.catalog?.catalogeID,
                                 "name": widget.catalog?.catalogeName,

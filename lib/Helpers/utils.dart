@@ -174,7 +174,7 @@ class Utils {
     Map<String, String> mainMenuItems = {
       R.images.addContactImage: "Add Contact",
       R.images.loadContactsListImage: "Load Contact List",
-      R.images.newChannelImage: "New Channel",
+      // R.images.newChannelImage: "New Channel",
       R.images.newGroupImage: "New Group",
       R.images.newCatalogImage: "New Catalog",
     };
@@ -212,12 +212,12 @@ class Utils {
                       case 1:
                         Navigator.pushNamed(context, R.routes.contactsRoute);
                         break;
+                      // case 2:
+                      //   break;
                       case 2:
-                        break;
-                      case 3:
                         Navigator.pushNamed(context, R.routes.newGroupScreen);
                         break;
-                      case 4:
+                      case 3:
                         Navigator.pushNamed(context, R.routes.catalogScreen);
                         break;
                     }

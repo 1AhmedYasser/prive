@@ -16,8 +16,6 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Models/Catalogs/catalog.dart';
-import 'package:prive/Models/Catalogs/catalogProduct.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
@@ -32,8 +30,6 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
-import '../../Catalogs/catalog_manager_screen.dart';
-import '../../Catalogs/product_details_screen.dart';
 import 'chat_info_screen.dart';
 import 'forward_screen.dart';
 import 'group_info_screen.dart';
@@ -707,7 +703,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   'location': (context, attachment) => MapThumbnailWidget(
                         lat: attachment.extraData['lat'] as double,
                         long: attachment.extraData['long'] as double,
-                      )
+                      ),
                 },
               ),
           ],
@@ -871,6 +867,18 @@ class _ChatScreenState extends State<ChatScreen> {
       showReplyMessage: true,
       showPinButton: true,
       showDeleteMessage: false,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(7),
+          topRight: const Radius.circular(7),
+          bottomLeft: Radius.circular(details.isMyMessage ? 7 : 0),
+          bottomRight: Radius.circular(details.isMyMessage ? 0 : 7),
+        ),
+        side: BorderSide(
+          color: defaultMessage.messageTheme.messageBorderColor ?? Colors.grey,
+          width: 0.3,
+        ),
+      ),
       usernameBuilder: (context, message) {
         if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
           return Row(
@@ -1011,7 +1019,7 @@ class _ChatScreenState extends State<ChatScreen> {
             context: context,
             details: defaultMessage,
           );
-        }
+        },
       },
     );
   }
@@ -1199,6 +1207,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     unreadCountSubscription.cancel();
+    locationSubscription?.cancel();
     _focusNode!.dispose();
     super.dispose();
   }
