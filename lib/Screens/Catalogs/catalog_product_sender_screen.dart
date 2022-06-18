@@ -149,6 +149,7 @@ class _CatalogProductSenderScreenState
                                 type: 'catalog',
                                 title: widget.catalog?.catalogeName,
                                 imageUrl: widget.catalog?.catalogePhoto,
+                                thumbUrl: widget.catalog?.catalogePhoto,
                                 uploadState: const UploadState.success(),
                                 extraData: {
                                   "cid": widget.catalog?.catalogeID,
@@ -248,6 +249,7 @@ class _CatalogProductSenderScreenState
                               uploadState: const UploadState.success(),
                               title: widget.catalog?.catalogeName,
                               imageUrl: widget.catalog?.catalogePhoto,
+                              thumbUrl: widget.catalog?.catalogePhoto,
                               extraData: {
                                 "cid": widget.catalog?.catalogeID,
                                 "name": widget.catalog?.catalogeName,

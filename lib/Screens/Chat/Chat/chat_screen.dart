@@ -26,7 +26,6 @@ import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
@@ -1190,6 +1189,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _reply(Message message) {
+    print(message.attachments.first.thumbUrl);
     setState(() => _quotedMessage = message);
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       _focusNode!.requestFocus();
