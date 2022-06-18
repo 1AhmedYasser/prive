@@ -125,6 +125,7 @@ class Animations {
   String callLog = "$path/CallLog.json";
   String upcomingRooms = "$path/upcoming_rooms.json";
   String noRooms = "$path/no_rooms.json";
+  String groupCallIndicator = "$path/group_call_indicator.json";
 }
 
 class Sounds {

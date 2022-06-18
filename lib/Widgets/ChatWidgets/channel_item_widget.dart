@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
@@ -32,13 +34,36 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         children: [
           Row(
             children: [
-              ChannelAvatar(
-                channel: widget.channel,
-                borderRadius: BorderRadius.circular(50),
-                constraints: const BoxConstraints(
-                  maxWidth: 65,
-                  maxHeight: 65,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  ChannelAvatar(
+                    channel: widget.channel,
+                    borderRadius: BorderRadius.circular(50),
+                    constraints: const BoxConstraints(
+                      maxWidth: 65,
+                      maxHeight: 65,
+                    ),
+                  ),
+                  // if (widget.channel.isGroup)
+                  //   Positioned(
+                  //     bottom: -3,
+                  //     right: -3,
+                  //     child: Container(
+                  //       height: 30,
+                  //       width: 30,
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.white,
+                  //         borderRadius: BorderRadius.circular(30),
+                  //         border: Border.all(
+                  //           color: Theme.of(context).primaryColorDark,
+                  //         ),
+                  //       ),
+                  //       child: Lottie.asset(R.animations.groupCallIndicator,
+                  //           repeat: true, reverse: true),
+                  //     ),
+                  //   )
+                ],
               ),
               const SizedBox(
                 width: 20,
