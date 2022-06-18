@@ -725,6 +725,7 @@ class _ChatScreenState extends State<ChatScreen> {
             builder: (_, controller) {
               return GroupCallScreen(
                 isVideo: isVideo,
+                channel: channel,
                 scrollController: controller,
               );
             },

@@ -5,12 +5,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Widgets/AppWidgets/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
+  final Channel channel;
   final ScrollController scrollController;
   const GroupCallScreen(
-      {Key? key, this.isVideo = false, required this.scrollController})
+      {Key? key,
+      this.isVideo = false,
+      required this.scrollController,
+      required this.channel})
       : super(key: key);
 
   @override
@@ -19,6 +24,7 @@ class GroupCallScreen extends StatefulWidget {
 
 class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isSpeakerOn = false;
+  bool isVideoOn = false;
   bool isMute = false;
   int count = 3;
 
@@ -204,72 +210,48 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         child: Row(
           children: [
             const SizedBox(width: 50),
-            isSpeakerOn
-                ? InkWell(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          child: const Icon(
-                            FontAwesomeIcons.volumeUp,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          "Speaker",
-                          style: TextStyle(color: Colors.white),
-                        )
-                      ],
+            InkWell(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    child: Icon(
+                      widget.isVideo
+                          ? isVideoOn
+                              ? Icons.videocam
+                              : Icons.videocam_off
+                          : isSpeakerOn
+                              ? FontAwesomeIcons.volumeUp
+                              : FontAwesomeIcons.volumeDown,
+                      color: Colors.white,
+                      size: 25,
                     ),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      setState(() {
-                        isSpeakerOn = !isSpeakerOn;
-                      });
-                    })
-                : InkWell(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 55,
-                          height: 55,
-                          child: const Icon(
-                            FontAwesomeIcons.volumeDown,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          "Speaker",
-                          style: TextStyle(color: Colors.white),
-                        )
-                      ],
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      setState(
-                        () {
-                          isSpeakerOn = !isSpeakerOn;
-                        },
-                      );
-                    },
                   ),
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.isVideo ? "Video" : "Speaker",
+                    style: const TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () {
+                setState(() {
+                  if (widget.isVideo) {
+                    isVideoOn = !isVideoOn;
+                  } else {
+                    isSpeakerOn = !isSpeakerOn;
+                  }
+                });
+              },
+            ),
             const Expanded(child: SizedBox()),
             Column(
               mainAxisSize: MainAxisSize.min,
