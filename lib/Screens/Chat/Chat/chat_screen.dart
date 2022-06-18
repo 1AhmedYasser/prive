@@ -17,6 +17,7 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
+import 'package:prive/Screens/Chat/Calls/group_call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
@@ -584,7 +585,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               ),
             ),
@@ -713,7 +714,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> startCall({bool isVideo = true}) async {
     if (widget.channel.isGroup) {
-      print("Start a group ${isVideo ? "Video" : "Voice"} Call");
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) {
+          return DraggableScrollableSheet(
+            minChildSize: 0.2,
+            maxChildSize: 0.95,
+            builder: (_, controller) {
+              return GroupCallScreen(
+                isVideo: isVideo,
+                scrollController: controller,
+              );
+            },
+          );
+        },
+      );
     } else {
       final ref = FirebaseDatabase.instance.ref('Users/${otherMember?.userId}');
       final snapshot = await ref.get();
