@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
@@ -24,6 +25,15 @@ class ChannelItemWidget extends StatefulWidget {
 }
 
 class _ChannelItemWidgetState extends State<ChannelItemWidget> {
+  bool hasGroupCall = false;
+  @override
+  void initState() {
+    if (widget.channel.isGroup) {
+      checkForGroupCall();
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,24 +55,24 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                       maxHeight: 65,
                     ),
                   ),
-                  // if (widget.channel.isGroup)
-                  //   Positioned(
-                  //     bottom: -3,
-                  //     right: -3,
-                  //     child: Container(
-                  //       height: 30,
-                  //       width: 30,
-                  //       decoration: BoxDecoration(
-                  //         color: Colors.white,
-                  //         borderRadius: BorderRadius.circular(30),
-                  //         border: Border.all(
-                  //           color: Theme.of(context).primaryColorDark,
-                  //         ),
-                  //       ),
-                  //       child: Lottie.asset(R.animations.groupCallIndicator,
-                  //           repeat: true, reverse: true),
-                  //     ),
-                  //   )
+                  if (widget.channel.isGroup && hasGroupCall)
+                    Positioned(
+                      bottom: -3,
+                      right: -3,
+                      child: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                        ),
+                        child: Lottie.asset(R.animations.groupCallIndicator,
+                            repeat: true, reverse: true),
+                      ),
+                    )
                 ],
               ),
               const SizedBox(
@@ -292,5 +302,21 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         ],
       ),
     );
+  }
+
+  void checkForGroupCall() async {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      setState(() {
+        hasGroupCall = true;
+      });
+    } else {
+      setState(() {
+        hasGroupCall = false;
+      });
+    }
   }
 }

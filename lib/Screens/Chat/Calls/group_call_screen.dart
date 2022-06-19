@@ -1,20 +1,31 @@
+import 'dart:async';
+
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:prive/Models/Call/group_call.dart';
+import 'package:prive/Models/Call/group_call_member.dart';
 import 'package:prive/Widgets/AppWidgets/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
+import '../../../Extras/resources.dart';
+import '../../../Helpers/Utils.dart';
+
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
   final Channel channel;
+  final bool isJoining;
   final ScrollController scrollController;
   const GroupCallScreen(
       {Key? key,
       this.isVideo = false,
       required this.scrollController,
+      this.isJoining = false,
       required this.channel})
       : super(key: key);
 
@@ -26,7 +37,26 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isSpeakerOn = false;
   bool isVideoOn = false;
   bool isMute = false;
-  int count = 3;
+  List<GroupCallMember> members = [];
+  GroupCall? groupCall;
+  StreamSubscription? onAddListener;
+  StreamSubscription? onChangeListener;
+  StreamSubscription? onDeleteListener;
+  RtcEngine? agoraEngine;
+  List<GroupCallMember> videoMembers = [];
+  bool showingInfo = false;
+
+  @override
+  void initState() {
+    isVideoOn = widget.isVideo;
+    if (widget.isJoining) {
+      _joinGroupCall();
+    } else {
+      _createGroupCall();
+    }
+    _listenToFirebaseChanges();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +98,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               ),
                             ),
                             const SizedBox(height: 5),
-                            const Text(
-                              "3 Participants",
-                              style: TextStyle(
+                            Text(
+                              "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13.5,
                               ),
@@ -105,7 +135,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         top: 15, left: 15, right: 15, bottom: 0),
                     child: StaggeredGridView.countBuilder(
                       crossAxisCount: 2,
-                      itemCount: count,
+                      itemCount: videoMembers.length,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemBuilder: (BuildContext context, int index) =>
@@ -116,7 +146,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         ),
                       ),
                       staggeredTileBuilder: (int index) {
-                        if (count % 2 != 0 && count - 1 == index) {
+                        if (videoMembers.length % 2 != 0 &&
+                            videoMembers.length - 1 == index) {
                           return const StaggeredTile.count(4, 1);
                         }
                         return const StaggeredTile.count(1, 1);
@@ -147,30 +178,32 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
                                   child: CachedImage(
-                                    url: context.currentUserImage ?? "",
+                                    url: groupCall?.members?[index].image ?? "",
                                     fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                              title: const Text(
-                                "Ahmed Yasser",
-                                style: TextStyle(color: Colors.white),
+                              title: Text(
+                                groupCall?.members?[index].name ?? "",
+                                style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: const Text(
                                 "Listening",
                                 style: TextStyle(color: Colors.grey),
                               ),
-                              trailing: const Padding(
-                                padding: EdgeInsets.only(right: 10),
+                              trailing: Padding(
+                                padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
-                                  Icons.mic,
+                                  groupCall?.members?[index].isMicOn == true
+                                      ? Icons.mic
+                                      : Icons.mic_off_rounded,
                                   color: Colors.white,
                                 ),
                               ),
                             ),
                           );
                         },
-                        itemCount: 2,
+                        itemCount: groupCall?.members?.length ?? 0,
                         separatorBuilder: (BuildContext context, int index) {
                           return const Divider(
                             height: 0,
@@ -210,47 +243,76 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         child: Row(
           children: [
             const SizedBox(width: 50),
-            InkWell(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    child: Icon(
-                      widget.isVideo
-                          ? isVideoOn
-                              ? Icons.videocam
-                              : Icons.videocam_off
-                          : isSpeakerOn
-                              ? FontAwesomeIcons.volumeUp
-                              : FontAwesomeIcons.volumeDown,
-                      color: Colors.white,
-                      size: 25,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (isVideoOn == true)
+                  InkWell(
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      child: const Icon(
+                        Icons.switch_camera_rounded,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {},
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    widget.isVideo ? "Video" : "Speaker",
-                    style: const TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              onTap: () {
-                setState(() {
-                  if (widget.isVideo) {
-                    isVideoOn = !isVideoOn;
-                  } else {
-                    isSpeakerOn = !isSpeakerOn;
-                  }
-                });
-              },
+                if (isVideoOn == true) const SizedBox(height: 13),
+                InkWell(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        child: Icon(
+                          widget.isVideo
+                              ? isVideoOn
+                                  ? Icons.videocam
+                                  : Icons.videocam_off
+                              : isSpeakerOn
+                                  ? FontAwesomeIcons.volumeUp
+                                  : FontAwesomeIcons.volumeDown,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        widget.isVideo ? "Video" : "Speaker",
+                        style: const TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () {
+                    setState(() {
+                      if (widget.isVideo) {
+                        isVideoOn = !isVideoOn;
+                        final ref = FirebaseDatabase.instance.ref(
+                            "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                        ref.update({"isVideoOn": isVideoOn});
+                      } else {
+                        isSpeakerOn = !isSpeakerOn;
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 60),
+              ],
             ),
             const Expanded(child: SizedBox()),
             Column(
@@ -262,6 +324,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       setState(() {
                         this.isMute = isMute;
                       });
+                      final ref = FirebaseDatabase.instance.ref(
+                          "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                      ref.update({"isMicOn": !this.isMute});
                     },
                     initialIsPlaying: false,
                     playIcon: const Icon(Icons.mic),
@@ -297,25 +362,40 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () {
+                    final databaseReference = FirebaseDatabase.instance
+                        .ref("GroupCalls/${widget.channel.id}");
                     showCupertinoModalPopup<void>(
                       context: context,
                       builder: (BuildContext context) => CupertinoActionSheet(
                         title: Text(
                             'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
                         actions: <CupertinoActionSheetAction>[
+                          if (context.currentUser?.id == groupCall?.ownerId)
+                            CupertinoActionSheetAction(
+                              isDestructiveAction: true,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                databaseReference.remove();
+                                DatabaseReference userRef =
+                                    FirebaseDatabase.instance.ref("Users");
+                                userRef.update(
+                                    {context.currentUser?.id ?? "": "Ended"});
+                              },
+                              child: Text(
+                                  'End ${widget.isVideo ? "Video" : "Voice"} Call'),
+                            ),
                           CupertinoActionSheetAction(
-                            isDestructiveAction: true,
                             onPressed: () {
                               Navigator.pop(context);
                               Navigator.pop(context);
-                            },
-                            child: Text(
-                                'End ${widget.isVideo ? "Video" : "Voice"} Call'),
-                          ),
-                          CupertinoActionSheetAction(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                              databaseReference
+                                  .child("members/${context.currentUser?.id}")
+                                  .remove();
+                              DatabaseReference userRef =
+                                  FirebaseDatabase.instance.ref("Users");
+                              userRef.update(
+                                  {context.currentUser?.id ?? "": "Ended"});
                             },
                             child: Text(
                                 'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
@@ -344,5 +424,116 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
       height: 200,
     );
+  }
+
+  Future<void> _createGroupCall() async {
+    GroupCallMember owner = GroupCallMember(
+      id: context.currentUser?.id,
+      name: context.currentUser?.name,
+      image: context.currentUser?.image,
+      phone: context.currentUser?.extraData['phone'] as String,
+      isMicOn: true,
+      isVideoOn: widget.isVideo,
+    );
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    await ref.set({
+      "ownerId": context.currentUser?.id ?? "",
+      "type": widget.isVideo ? "Video" : "Voice",
+      "members": {owner.id: owner.toJson()},
+    });
+    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+    userRef.update({context.currentUser?.id ?? "": "In Call"});
+  }
+
+  void _joinGroupCall() {
+    GroupCallMember joiningUser = GroupCallMember(
+      id: context.currentUser?.id,
+      name: context.currentUser?.name,
+      image: context.currentUser?.image,
+      phone: context.currentUser?.extraData['phone'] as String,
+      isMicOn: true,
+      isVideoOn: widget.isVideo,
+    );
+    final ref = FirebaseDatabase.instance
+        .ref("GroupCalls/${widget.channel.id}/members");
+    ref.update({joiningUser.id ?? "": joiningUser.toJson()});
+    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+    userRef.update({context.currentUser?.id ?? "": "In Call"});
+  }
+
+  void getGroupCall() async {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic>? groupCallResponse = {};
+      groupCallResponse = (snapshot.value as Map<dynamic, dynamic>);
+
+      String? ownerId = groupCallResponse['ownerId'];
+      String? type = groupCallResponse['type'];
+      List<GroupCallMember>? members = [];
+
+      Map<dynamic, dynamic>? membersList =
+          (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      membersList.forEach((key, value) {
+        members.add(
+          GroupCallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+
+      if (membersList.isEmpty == true) {
+        databaseReference.remove();
+      }
+
+      groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+      videoMembers = groupCall?.members
+              ?.where((element) => element.isVideoOn == true)
+              .toList() ??
+          [];
+      setState(() {});
+    } else {
+      if (showingInfo == false) {
+        Utils.showAlert(
+          context,
+          message: "Group Call Has Ended",
+          alertImage: R.images.alertInfoImage,
+        ).then(
+          (value) => Navigator.pop(context),
+        );
+      }
+      showingInfo = true;
+    }
+  }
+
+  void _listenToFirebaseChanges() {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    onAddListener = databaseReference.onChildAdded.listen((event) {
+      getGroupCall();
+    });
+    onChangeListener = databaseReference.onChildChanged.listen((event) {
+      getGroupCall();
+    });
+    onChangeListener = databaseReference.onChildRemoved.listen((event) {
+      getGroupCall();
+    });
+  }
+
+  @override
+  void dispose() {
+    onAddListener?.cancel();
+    onChangeListener?.cancel();
+    onDeleteListener?.cancel();
+    // agoraEngine?.destroy();
+    super.dispose();
   }
 }

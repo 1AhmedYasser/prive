@@ -29,7 +29,10 @@ import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../../Models/Call/group_call.dart';
+import '../../../Models/Call/group_call_member.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
+import '../../../Widgets/Common/cached_image.dart';
 import 'chat_info_screen.dart';
 import 'forward_screen.dart';
 import 'group_info_screen.dart';
@@ -78,6 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageSearchController =
       TextEditingController();
   Member? otherMember;
+  GroupCall? groupCall;
+  StreamSubscription? onAddListener;
+  StreamSubscription? onChangeListener;
+  StreamSubscription? onDeleteListener;
 
   @override
   void initState() {
@@ -94,6 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
         .state!
         .unreadCountStream
         .listen(_unreadCountHandler);
+    _listenToFirebaseChanges();
   }
 
   @override
@@ -290,26 +298,28 @@ class _ChatScreenState extends State<ChatScreen> {
           actions: isMessageSelectionOn == false && isMessageSearchOn == false
               ? [
                   if (widget.isChannel == false)
-                    GestureDetector(
-                      onTap: () async {
-                        await startCall();
-                      },
-                      child: Image.asset(
-                        R.images.videoCallImage,
-                        width: 25,
+                    if (groupCall == null)
+                      GestureDetector(
+                        onTap: () async {
+                          await startCall();
+                        },
+                        child: Image.asset(
+                          R.images.videoCallImage,
+                          width: 25,
+                        ),
                       ),
-                    ),
                   const SizedBox(width: 20),
                   if (widget.isChannel == false)
-                    GestureDetector(
-                      onTap: () async {
-                        await startCall(isVideo: false);
-                      },
-                      child: Image.asset(
-                        R.images.voiceCallImage,
-                        width: 22,
+                    if (groupCall == null)
+                      GestureDetector(
+                        onTap: () async {
+                          await startCall(isVideo: false);
+                        },
+                        child: Image.asset(
+                          R.images.voiceCallImage,
+                          width: 22,
+                        ),
                       ),
-                    ),
                   const SizedBox(width: 20),
                   if (widget.isChannel == false)
                     ChatMenuWidget(
@@ -428,6 +438,130 @@ class _ChatScreenState extends State<ChatScreen> {
             initialMessage != null ? initialMessage?.id ?? "" : null,
         child: Column(
           children: [
+            if (groupCall != null && groupCall?.members?.isNotEmpty == true)
+              Container(
+                height: 65,
+                color: Colors.grey.shade300.withOpacity(0.7),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20, left: 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            groupCall?.type == "Video"
+                                ? "Video Call"
+                                : "Voice Call",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 100,
+                      ),
+                      if (groupCall?.members?.isNotEmpty == true)
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            if ((groupCall?.members?.length ?? 0) >= 1)
+                              SizedBox(
+                                height: 44,
+                                width: 44,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: CachedImage(
+                                    url: groupCall?.members?.first.image ?? "",
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
+                            if ((groupCall?.members?.length ?? 0) > 1)
+                              Positioned(
+                                right: 25.0,
+                                child: SizedBox(
+                                  height: 44,
+                                  width: 44,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: CachedImage(
+                                      url: groupCall?.members?[1].image ?? "",
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if ((groupCall?.members?.length ?? 0) > 2)
+                              Positioned(
+                                right: 50.0,
+                                child: SizedBox(
+                                  height: 44,
+                                  width: 44,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: CachedImage(
+                                      url: groupCall?.members?[2].image ?? "",
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      const Expanded(child: SizedBox()),
+                      ElevatedButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) {
+                              return DraggableScrollableSheet(
+                                minChildSize: 0.2,
+                                maxChildSize: 0.95,
+                                builder: (_, controller) {
+                                  return GroupCallScreen(
+                                    isVideo: groupCall?.type == "Video"
+                                        ? true
+                                        : false,
+                                    isJoining: true,
+                                    channel: channel,
+                                    scrollController: controller,
+                                  );
+                                },
+                              );
+                            },
+                          ).then((value) => checkForGroupCall());
+                          setState(() {
+                            groupCall = null;
+                          });
+                        },
+                        child: const Text("Join"),
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
             Expanded(
               child: Stack(
                 alignment: Alignment.center,
@@ -731,7 +865,7 @@ class _ChatScreenState extends State<ChatScreen> {
             },
           );
         },
-      );
+      ).then((value) => checkForGroupCall());
     } else {
       final ref = FirebaseDatabase.instance.ref('Users/${otherMember?.userId}');
       final snapshot = await ref.get();
@@ -1227,6 +1361,9 @@ class _ChatScreenState extends State<ChatScreen> {
     unreadCountSubscription.cancel();
     locationSubscription?.cancel();
     _focusNode!.dispose();
+    onAddListener?.cancel();
+    onChangeListener?.cancel();
+    onDeleteListener?.cancel();
     super.dispose();
   }
 
@@ -1303,5 +1440,58 @@ class _ChatScreenState extends State<ChatScreen> {
         true,
       ),
     );
+  }
+
+  void checkForGroupCall() async {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic>? groupCallResponse = {};
+      groupCallResponse = (snapshot.value as Map<dynamic, dynamic>);
+
+      String? ownerId = groupCallResponse['ownerId'];
+      String? type = groupCallResponse['type'];
+      List<GroupCallMember>? members = [];
+
+      Map<dynamic, dynamic>? membersList =
+          (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      membersList.forEach((key, value) {
+        members.add(
+          GroupCallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+      if (membersList.isEmpty == true) {
+        groupCall = null;
+      } else {
+        groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+      }
+      setState(() {});
+    } else {
+      groupCall = null;
+      setState(() {});
+    }
+  }
+
+  void _listenToFirebaseChanges() {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    onAddListener = databaseReference.onChildAdded.listen((event) {
+      checkForGroupCall();
+    });
+    onChangeListener = databaseReference.onChildChanged.listen((event) {
+      checkForGroupCall();
+    });
+    onChangeListener = databaseReference.onChildRemoved.listen((event) {
+      checkForGroupCall();
+    });
   }
 }
