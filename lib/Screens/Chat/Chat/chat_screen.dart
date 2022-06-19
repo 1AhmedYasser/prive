@@ -523,7 +523,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       const Expanded(child: SizedBox()),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          print(groupCall?.type);
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -545,9 +546,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               );
                             },
                           ).then((value) => checkForGroupCall());
-                          setState(() {
-                            groupCall = null;
-                          });
+                          // await Future.delayed(
+                          //     const Duration(milliseconds: 300), () {
+                          //   setState(() {
+                          //     groupCall = null;
+                          //   });
+                          // });
                         },
                         child: const Text("Join"),
                         style: ElevatedButton.styleFrom(

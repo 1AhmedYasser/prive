@@ -699,7 +699,7 @@ class _CallScreenState extends State<CallScreen> {
 
   Widget _renderLocalPreview() {
     if (isCalling == false) {
-      return rtc_local_view.SurfaceView();
+      return const rtc_local_view.SurfaceView();
     } else {
       return const SizedBox.shrink();
     }

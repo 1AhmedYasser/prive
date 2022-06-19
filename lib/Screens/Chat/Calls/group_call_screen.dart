@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Models/Call/group_call.dart';
 import 'package:prive/Models/Call/group_call_member.dart';
 import 'package:prive/Widgets/AppWidgets/wave_button.dart';
@@ -15,6 +17,11 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Models/Call/prive_call.dart';
+import '../../../UltraNetwork/ultra_constants.dart';
+import '../../../UltraNetwork/ultra_network.dart';
+import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
 
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -45,10 +52,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   RtcEngine? agoraEngine;
   List<GroupCallMember> videoMembers = [];
   bool showingInfo = false;
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
     isVideoOn = widget.isVideo;
+    print(widget.isVideo);
     if (widget.isJoining) {
       _joinGroupCall();
     } else {
@@ -134,6 +143,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     padding: const EdgeInsets.only(
                         top: 15, left: 15, right: 15, bottom: 0),
                     child: StaggeredGridView.countBuilder(
+                      key: UniqueKey(),
                       crossAxisCount: 2,
                       itemCount: videoMembers.length,
                       physics: const NeverScrollableScrollPhysics(),
@@ -144,6 +154,25 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           color: Colors.grey.shade800,
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        child: videoMembers[index].id == context.currentUser?.id
+                            ? Container(
+                                height: 200,
+                                width: 150,
+                                child: ClipRRect(
+                                  child: _renderLocalPreview(),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints.expand(),
+                              )
+                            : Container(
+                                child: ClipRRect(
+                                  child: _renderRemoteVideo(
+                                    int.parse(videoMembers[index].id ?? "0"),
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints.expand(),
+                              ),
                       ),
                       staggeredTileBuilder: (int index) {
                         if (videoMembers.length % 2 != 0 &&
@@ -263,7 +292,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     ),
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
-                    onTap: () {},
+                    onTap: () {
+                      agoraEngine?.switchCamera();
+                    },
                   ),
                 if (isVideoOn == true) const SizedBox(height: 13),
                 InkWell(
@@ -298,7 +329,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ),
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
                       if (widget.isVideo) {
                         isVideoOn = !isVideoOn;
@@ -309,6 +340,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         isSpeakerOn = !isSpeakerOn;
                       }
                     });
+                    if (widget.isVideo == false) {
+                      await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
+                    }
                   },
                 ),
                 const SizedBox(height: 60),
@@ -320,13 +354,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               children: [
                 SizedBox(
                   child: WaveButton(
-                    onPressed: (isMute) {
+                    onPressed: (isMute) async {
                       setState(() {
                         this.isMute = isMute;
                       });
                       final ref = FirebaseDatabase.instance.ref(
                           "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
                       ref.update({"isMicOn": !this.isMute});
+                      agoraEngine?.muteRemoteAudioStream(
+                          int.parse(context.currentUser?.id ?? "0"),
+                          this.isMute);
+                      await agoraEngine?.muteLocalAudioStream(this.isMute);
                     },
                     initialIsPlaying: false,
                     playIcon: const Icon(Icons.mic),
@@ -381,6 +419,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                     FirebaseDatabase.instance.ref("Users");
                                 userRef.update(
                                     {context.currentUser?.id ?? "": "Ended"});
+                                agoraEngine?.destroy();
                               },
                               child: Text(
                                   'End ${widget.isVideo ? "Video" : "Voice"} Call'),
@@ -396,6 +435,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                   FirebaseDatabase.instance.ref("Users");
                               userRef.update(
                                   {context.currentUser?.id ?? "": "Ended"});
+                              agoraEngine?.destroy();
                             },
                             child: Text(
                                 'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
@@ -444,6 +484,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     });
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "In Call"});
+    initAgora();
   }
 
   void _joinGroupCall() {
@@ -460,6 +501,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     ref.update({joiningUser.id ?? "": joiningUser.toJson()});
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "In Call"});
+    initAgora();
   }
 
   void getGroupCall() async {
@@ -528,12 +570,72 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     });
   }
 
+  Future<void> initAgora() async {
+    UltraNetwork.request(
+      context,
+      roomToken,
+      cancelToken: cancelToken,
+      formData: FormData.fromMap({
+        "Uid": context.currentUser?.id ?? "0",
+        "channelName": widget.channel.id,
+      }),
+      showLoadingIndicator: false,
+      showError: false,
+    ).then((response) async {
+      if (response != null) {
+        PriveCall tokenResponse = response;
+        await [Permission.camera, Permission.microphone].request();
+
+        agoraEngine = await RtcEngine.createWithContext(
+            RtcEngineContext(R.constants.agoraAppId));
+
+        if (widget.isVideo) {
+          await agoraEngine?.enableVideo();
+          setState(() {});
+        } else {
+          await agoraEngine?.setEnableSpeakerphone(false);
+          setState(() {});
+        }
+
+        await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
+        agoraEngine?.setEventHandler(RtcEngineEventHandler(
+            joinChannelSuccess: (String channel, int uid, int elapsed) async {
+          print('joinChannelSuccess $channel $uid');
+        }, userJoined: (int uid, int elapsed) {
+          print('userJoined $uid');
+        }, cameraReady: () async {
+          print("camera readdy");
+          await agoraEngine?.enableVideo();
+          setState(() {});
+        }));
+        await agoraEngine?.setClientRole(ClientRole.Broadcaster);
+
+        await agoraEngine?.joinChannel(
+            tokenResponse.data ?? "",
+            widget.channel.id ?? "",
+            null,
+            int.parse(context.currentUser?.id ?? "0"));
+        setState(() {});
+      }
+    });
+  }
+
+  Widget _renderLocalPreview() {
+    return const rtc_local_view.SurfaceView();
+  }
+
+  Widget _renderRemoteVideo(int uid) {
+    return rtc_remote_view.SurfaceView(
+      uid: uid,
+      channelId: "",
+    );
+  }
+
   @override
   void dispose() {
     onAddListener?.cancel();
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
-    // agoraEngine?.destroy();
     super.dispose();
   }
 }
