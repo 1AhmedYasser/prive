@@ -1345,7 +1345,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _reply(Message message) {
-    print(message.attachments.first.thumbUrl);
     setState(() => _quotedMessage = message);
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       _focusNode!.requestFocus();

@@ -16,6 +16,8 @@ import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/AppWidgets/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:stream_chat_persistence/stream_chat_persistence.dart';
 import 'package:uuid/uuid.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'Utils.dart';
@@ -107,10 +109,16 @@ class NotificationsManager {
     if (initialMessage != null) {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
+      print(channelData);
       stream.Channel? channel;
       final channels = await stream.StreamChatCore.of(notificationsContext)
           .client
-          .queryChannels()
+          .queryChannels(
+            filter: Filter.in_(
+              'members',
+              [await Utils.getString(R.pref.userId) ?? ""],
+            ),
+          )
           .last;
 
       for (var value in channels) {
@@ -128,8 +136,8 @@ class NotificationsManager {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      Map<String, dynamic> channelData =
-          Map<String, dynamic>.from(json.decode(message.data["channel"]));
+      // Map<String, dynamic> channelData =
+      //     Map<String, dynamic>.from(json.decode(message.data["channel"]));
       stream.Channel? channel;
       stream.StreamChatCore.of(notificationsContext)
           .client
@@ -173,6 +181,7 @@ class NotificationsManager {
 
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage backgroundMessage) async {
+    print(backgroundMessage.data);
     storedBackgroundMessage = backgroundMessage;
     listenToCalls();
     if (backgroundMessage.data['type'] != null &&
@@ -180,35 +189,16 @@ class NotificationsManager {
       final messageId = backgroundMessage.data['message_id'];
       final channelId = backgroundMessage.data['channel_id'];
       final channelType = backgroundMessage.data['channel_type'];
-      final cid = '$channelType$channelId';
-      final client = stream.StreamChatClient(R.constants.streamKey);
-      await client.connectUser(
-        stream.User(
-          id: await Utils.getString(R.pref.userId) ?? "",
-          extraData: {
-            'name': await Utils.getString(R.pref.userName),
-            'image': await Utils.getString(R.pref.userImage),
-            'phone': await Utils.getString(R.pref.userPhone),
-          },
-        ),
-        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
-      );
-
-      final stream.Message message =
-          await client.getMessage(messageId).then((res) => res.message);
-
       initializeNotifications();
       await _showLocalNotification(
-          title: message.user?.name ?? "",
-          body: message.text ?? "",
+          title: backgroundMessage.notification?.title ?? "New Message",
+          body: backgroundMessage.notification?.body ?? "",
           payload: json.encode(backgroundMessage.data).toString());
     } else {
       var payload = backgroundMessage.data;
       String type = payload['type'];
       if (type == "call") {
-        var callerId = payload['caller_id'] as String;
         var channelName = payload['channel_name'] as String;
-        var uuid = payload['uuid'] as String;
         var hasVideo = payload['has_video'] == "true";
         var callerName = payload['caller_name'] as String;
         var callerImage = payload['caller_image'] as String;
