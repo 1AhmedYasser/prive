@@ -122,7 +122,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         child: InkWell(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-                          onTap: () => Navigator.pop(context),
+                          //onTap: () => Navigator.pop(context),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.grey.shade800,
@@ -130,7 +130,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ),
                             child: const Icon(
                               Icons.keyboard_arrow_down,
-                              color: Colors.white,
+                              color: Colors.transparent,
                             ),
                           ),
                         ),
@@ -216,10 +216,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 groupCall?.members?[index].name ?? "",
                                 style: const TextStyle(color: Colors.white),
                               ),
-                              subtitle: const Text(
-                                "Listening",
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                              // subtitle: const Text(
+                              //   "Listening",
+                              //   style: TextStyle(color: Colors.grey),
+                              // ),
                               trailing: Padding(
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
