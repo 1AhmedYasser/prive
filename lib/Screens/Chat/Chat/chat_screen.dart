@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -1059,10 +1060,14 @@ class _ChatScreenState extends State<ChatScreen> {
             style: const TextStyle(fontSize: 11),
           );
         } else if (channel.isGroup) {
+          print(message.user?.name);
           Map<String, dynamic>? nameColors =
               channel.extraData['name_colors'] as Map<String, dynamic>?;
           return Text(
             message.user?.name ?? "",
+            overflow: TextOverflow.ellipsis,
+            textWidthBasis: TextWidthBasis.longestLine,
+            textScaleFactor: 0.95,
             style: TextStyle(
               fontSize: 11,
               color: nameColors != null
