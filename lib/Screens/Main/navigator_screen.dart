@@ -1,8 +1,9 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
@@ -34,26 +35,45 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: ConvexAppBar(
-        chipBuilder: _ChipBuilder(),
-        color: const Color(0xff7a8fa6),
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
-        activeColor: Theme.of(context).primaryColor,
-        elevation: 0.5,
-        style: TabStyle.fixed,
-        height: 60,
-        top: -25,
-        items: [
-          _buildTab("Chats", R.images.chatTabImage, 0),
-          _buildTab("Calls", R.images.phoneTabImage, 1),
-          TabItem(
-            icon: Container(),
-          ),
-          _buildTab("Rooms", R.images.micTabImage, 3),
-          _buildTab("Stories", R.images.storiesTabImage, 4),
-        ],
-        initialActiveIndex: 2,
-        onTap: (int i) => _onTabTapped(i),
+      bottomNavigationBar: WillPopScope(
+        onWillPop: () async {
+          Utils.showAlert(
+            context,
+            withCancel: true,
+            message: "Do You Want To Exit Prive ?",
+            okButtonText: "Yes",
+            cancelButtonText: "No",
+            onOkButtonPressed: () {
+              try {
+                SystemNavigator.pop();
+              } catch (e) {
+                exit(0);
+              }
+            },
+          );
+          return false;
+        },
+        child: ConvexAppBar(
+          chipBuilder: _ChipBuilder(),
+          color: const Color(0xff7a8fa6),
+          backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+          activeColor: Theme.of(context).primaryColor,
+          elevation: 0.5,
+          style: TabStyle.fixed,
+          height: 60,
+          top: -25,
+          items: [
+            _buildTab("Chats", R.images.chatTabImage, 0),
+            _buildTab("Calls", R.images.phoneTabImage, 1),
+            TabItem(
+              icon: Container(),
+            ),
+            _buildTab("Rooms", R.images.micTabImage, 3),
+            _buildTab("Stories", R.images.storiesTabImage, 4),
+          ],
+          initialActiveIndex: 2,
+          onTap: (int i) => _onTabTapped(i),
+        ),
       ),
       body: _buildBody(),
     );
