@@ -37,6 +37,7 @@ class _ContactsScreenState extends State<ContactsScreen>
     _animationController = AnimationController(vsync: this);
     Utils.checkForInternetConnection(context);
     _getContacts();
+    loadContacts();
     super.initState();
   }
 
@@ -193,7 +194,8 @@ class _ContactsScreenState extends State<ContactsScreen>
 
   Future<void> createChannel(BuildContext context, User user) async {
     final core = StreamChatCore.of(context);
-    final channel = core.client.channel('messaging',id: Utils.generateRandomString(60), extraData: {
+    final channel = core.client
+        .channel('messaging', id: Utils.generateRandomString(60), extraData: {
       'members': [
         core.currentUser!.id,
         user.id,
@@ -207,6 +209,17 @@ class _ContactsScreenState extends State<ContactsScreen>
     Navigator.of(context).push(
       ChatScreen.routeWithChannel(channel),
     );
+  }
+
+  void loadContacts() async {
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
+    } else {
+      List contacts = await Utils.fetchContacts(context);
+      List<User> users = contacts.first;
+      String usersMap = jsonEncode(users);
+      Utils.saveString(R.pref.myContacts, usersMap);
+      _getContacts();
+    }
   }
 
   _getContacts() async {
