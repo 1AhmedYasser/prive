@@ -94,9 +94,9 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
               child: _buildIcon(isPlaying),
               duration: _kToggleDuration,
             ),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white,
+              color: isPlaying ? Colors.redAccent : Colors.white,
             ),
           ),
         ],

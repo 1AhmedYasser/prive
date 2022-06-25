@@ -57,7 +57,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   @override
   void initState() {
     isVideoOn = widget.isVideo;
-    print(widget.isVideo);
     if (widget.isJoining) {
       _joinGroupCall();
     } else {
@@ -130,7 +129,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ),
                             child: const Icon(
                               Icons.keyboard_arrow_down,
-                              color: Colors.transparent,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -368,7 +367,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     },
                     initialIsPlaying: false,
                     playIcon: const Icon(Icons.mic),
-                    pauseIcon: const Icon(Icons.mic_off_rounded),
+                    pauseIcon: const Icon(
+                      Icons.mic_off_rounded,
+                      color: Colors.white,
+                    ),
                   ),
                   width: 85,
                   height: 85,
