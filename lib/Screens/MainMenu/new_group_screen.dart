@@ -81,37 +81,44 @@ class _NewGroupScreenState extends State<NewGroupScreen>
               onPressed: () async {
                 if (groupNameController.text.isNotEmpty &&
                     _selectedUsers.isNotEmpty) {
-                  Map<String, String> usersColors = {};
-                  usersColors[context.currentUser?.id ?? "0"] =
-                      generateRandomColorHex();
-                  for (var user in _selectedUsers) {
-                    usersColors[user.id] = generateRandomColorHex();
-                  }
-                  try {
-                    final groupName = groupNameController.text;
-                    final client = StreamChat.of(context).client;
-                    final channel = client.channel(
-                      'messaging',
-                      extraData: {
-                        'members': [
-                          client.state.currentUser!.id,
-                          ..._selectedUsers.map((e) => e.id),
-                        ],
-                        'name': groupName,
-                        'channel_type':
-                            _selectedUsers.length > 1 ? "Group" : "Normal",
-                        'is_important': false,
-                        'is_archive': false,
-                        'name_colors': usersColors
-                      },
-                      id: Utils.generateRandomString(60),
+                  if (_selectedUsers.length < 2) {
+                    Utils.showAlert(
+                      context,
+                      message: "The Group Must Have At Least 3 Members",
                     );
-                    await channel.watch();
-                    Navigator.of(context).push(
-                      ChatScreen.routeWithChannel(channel),
-                    );
-                  } catch (err) {
-                    print(err);
+                  } else {
+                    Map<String, String> usersColors = {};
+                    usersColors[context.currentUser?.id ?? "0"] =
+                        generateRandomColorHex();
+                    for (var user in _selectedUsers) {
+                      usersColors[user.id] = generateRandomColorHex();
+                    }
+                    try {
+                      final groupName = groupNameController.text;
+                      final client = StreamChat.of(context).client;
+                      final channel = client.channel(
+                        'messaging',
+                        extraData: {
+                          'members': [
+                            client.state.currentUser!.id,
+                            ..._selectedUsers.map((e) => e.id),
+                          ],
+                          'name': groupName,
+                          'channel_type':
+                              _selectedUsers.length > 1 ? "Group" : "Normal",
+                          'is_important': false,
+                          'is_archive': false,
+                          'name_colors': usersColors
+                        },
+                        id: Utils.generateRandomString(60),
+                      );
+                      await channel.watch();
+                      Navigator.of(context).push(
+                        ChatScreen.routeWithChannel(channel),
+                      );
+                    } catch (err) {
+                      print(err);
+                    }
                   }
                 }
               },

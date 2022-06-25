@@ -119,8 +119,11 @@ class _ChatScreenState extends State<ChatScreen> {
           leading: Padding(
             padding: const EdgeInsets.only(left: 10),
             child: !isMessageSelectionOn
-                ? const BackButton(
-                    color: Color(0xff7a8ea6),
+                ? BackButton(
+                    color: const Color(0xff7a8ea6),
+                    onPressed: () => Navigator.of(context).popUntil(
+                      (route) => route.isFirst,
+                    ),
                   )
                 : GestureDetector(
                     onTap: () {
