@@ -528,7 +528,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       const Expanded(child: SizedBox()),
                       ElevatedButton(
                         onPressed: () async {
-                          print(groupCall?.type);
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -878,7 +877,6 @@ class _ChatScreenState extends State<ChatScreen> {
       final ref = FirebaseDatabase.instance.ref('Users/${otherMember?.userId}');
       final snapshot = await ref.get();
       if (snapshot.exists) {
-        print(snapshot.value as String);
         if (snapshot.value as String == "Ended") {
           Utils.logCallStart(
             context,
@@ -1063,7 +1061,6 @@ class _ChatScreenState extends State<ChatScreen> {
             style: const TextStyle(fontSize: 11),
           );
         } else if (channel.isGroup) {
-          print(message.user?.name);
           Map<String, dynamic>? nameColors =
               channel.extraData['name_colors'] as Map<String, dynamic>?;
           return Text(

@@ -43,7 +43,7 @@ class GroupCallScreen extends StatefulWidget {
 class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isSpeakerOn = false;
   bool isVideoOn = false;
-  bool isMute = false;
+  bool isMute = true;
   List<GroupCallMember> members = [];
   GroupCall? groupCall;
   StreamSubscription? onAddListener;
@@ -361,11 +361,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
                       ref.update({"isMicOn": !this.isMute});
                       agoraEngine?.muteRemoteAudioStream(
-                          int.parse(context.currentUser?.id ?? "0"),
-                          this.isMute);
+                        int.parse(context.currentUser?.id ?? "0"),
+                        this.isMute,
+                      );
                       await agoraEngine?.muteLocalAudioStream(this.isMute);
                     },
-                    initialIsPlaying: false,
+                    initialIsPlaying: true,
                     playIcon: const Icon(Icons.mic),
                     pauseIcon: const Icon(
                       Icons.mic_off_rounded,
@@ -474,7 +475,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       name: context.currentUser?.name,
       image: context.currentUser?.image,
       phone: context.currentUser?.extraData['phone'] as String,
-      isMicOn: true,
+      isMicOn: false,
       isVideoOn: widget.isVideo,
     );
     DatabaseReference ref =
@@ -495,7 +496,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       name: context.currentUser?.name,
       image: context.currentUser?.image,
       phone: context.currentUser?.extraData['phone'] as String,
-      isMicOn: true,
+      isMicOn: false,
       isVideoOn: widget.isVideo,
     );
     final ref = FirebaseDatabase.instance

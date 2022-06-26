@@ -89,7 +89,6 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             stream: widget.channel.nameStream,
                             initialData: widget.channel.name,
                             builder: (context, channelName) {
-                              print("Name $channelName");
                               return Text(
                                 channelName,
                                 style: const TextStyle(color: Colors.black),
@@ -124,14 +123,14 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                           maxWidth / (textStyle.fontSize ?? 1);
                                       var currentChars = 0;
                                       final currentMembers = <Member>[];
-                                      otherMembers.forEach((element) {
+                                      for (var element in otherMembers) {
                                         final newLength = currentChars +
                                             (element.user?.name.length ?? 0);
                                         if (newLength < maxChars) {
                                           currentChars = newLength;
                                           currentMembers.add(element);
                                         }
-                                      });
+                                      }
 
                                       final exceedingMembers =
                                           otherMembers.length -
