@@ -138,6 +138,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
+                                  duration: const Duration(seconds: 30),
                                 ),
                               );
                             } else if (widget.myStories[i].type == "Videos") {
@@ -147,6 +148,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
+                                  duration: const Duration(seconds: 30),
                                 ),
                               );
                             }

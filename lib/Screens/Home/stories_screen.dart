@@ -15,6 +15,7 @@ import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
 import 'package:prive/Screens/Stories/text_story_editor_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
 import 'package:story_view/controller/story_controller.dart';
@@ -22,7 +23,6 @@ import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
@@ -30,7 +30,6 @@ import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
 import 'dart:io';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
-import 'package:path_provider/path_provider.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -132,7 +131,6 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     ),
                   ),
                 ).then((value) {
-                  generateMyVideoThumbs();
                   setState(() {});
                 });
               } else {
@@ -412,58 +410,24 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         width: 70,
                                         height: 70,
                                         child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(60),
-                                          child: usersStories[index]
-                                                      .firstOrNull
-                                                      ?.type ==
-                                                  "Photos"
-                                              ? CachedImage(
-                                                  url: usersStories[index]
-                                                          .firstOrNull
-                                                          ?.content ??
-                                                      "",
-                                                )
-                                              : FadeInImage(
-                                                  placeholder: MemoryImage(
-                                                    kTransparentImage,
-                                                  ),
-                                                  imageErrorBuilder: (context,
-                                                          ob, stackTrace) =>
-                                                      Container(
-                                                    color:
-                                                        const Color(0xffeeeeee),
-                                                  ),
-                                                  placeholderErrorBuilder:
-                                                      (context, ob,
-                                                              stackTrace) =>
-                                                          Container(
-                                                    color:
-                                                        const Color(0xffeeeeee),
-                                                  ),
-                                                  image: FileImage(
-                                                    File(
-                                                      usersThumbnails.length -
-                                                                  1 <
-                                                              index
-                                                          ? ""
-                                                          : usersThumbnails[
-                                                                      index]
-                                                                  .firstOrNull ??
-                                                              "",
-                                                    ),
-                                                  ),
-                                                  fadeOutDuration:
-                                                      const Duration(
-                                                    milliseconds: 100,
-                                                  ),
-                                                  fadeInDuration:
-                                                      const Duration(
-                                                    milliseconds: 100,
-                                                  ),
-                                                  fit: BoxFit.fill,
-                                                ),
-                                        ),
+                                            borderRadius:
+                                                BorderRadius.circular(60),
+                                            child: usersStories[index]
+                                                        .firstOrNull
+                                                        ?.type ==
+                                                    "Photos"
+                                                ? CachedImage(
+                                                    url: usersStories[index]
+                                                            .firstOrNull
+                                                            ?.content ??
+                                                        "",
+                                                  )
+                                                : VideoThumbViewer(
+                                                    videoUrl:
+                                                        usersStories[index]
+                                                                .firstOrNull
+                                                                ?.content ??
+                                                            "")),
                                       ),
                                     ),
                                     dashes: usersStories[index].length,
@@ -599,53 +563,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
             usersGrouped.forEach((key, value) {
               if (key != context.currentUser?.id) {
                 usersStories.add(value);
-                generateUsersVideosThumbs();
               } else {
                 myStories = value;
-                generateMyVideoThumbs();
               }
             });
           });
         }
       }
     });
-  }
-
-  Future<String> getVideoThumb(String url) async {
-    return await VideoThumbnail.thumbnailFile(
-          video: url,
-          thumbnailPath: (await getTemporaryDirectory()).path,
-          quality: 50,
-        ) ??
-        "";
-  }
-
-  void generateMyVideoThumbs() async {
-    myThumbnails.clear();
-    for (var element in myStories) {
-      if (element.type == "Photos") {
-        myThumbnails.add(element.content ?? "");
-      } else {
-        myThumbnails.add(await getVideoThumb(element.content ?? ""));
-      }
-    }
-    setState(() {});
-  }
-
-  void generateUsersVideosThumbs() async {
-    usersThumbnails.clear();
-    for (var stories in usersStories) {
-      List<String> thumbs = [];
-      for (var story in stories) {
-        if (story.type == "Photos") {
-          thumbs.add(story.content ?? "");
-        } else {
-          thumbs.add(await getVideoThumb(story.content ?? ""));
-        }
-      }
-      usersThumbnails.add(thumbs);
-    }
-    setState(() {});
   }
 
   Future getImage(ImageSource source, bool isVideo) async {
