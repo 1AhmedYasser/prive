@@ -13,7 +13,6 @@ import 'package:timeago/timeago.dart' as time_ago;
 import 'package:intl/intl.dart';
 import '../../Extras/resources.dart';
 import '../../Models/Stories/stories.dart';
-import "package:collection/collection.dart";
 import '../../UltraNetwork/ultra_constants.dart';
 import '../../Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
 import '../../Widgets/Common/cached_image.dart';
@@ -237,9 +236,14 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${widget.myStories.firstOrNull?.userFirstName?.trim() ?? ""} ${widget.myStories.firstOrNull?.userLastName?.trim() ?? ""}",
+                                          widget.myStories[index].views != "0"
+                                              ? widget.myStories[index].views !=
+                                                      "1"
+                                                  ? "${widget.myStories[index].views} Views"
+                                                  : "1 View"
+                                              : "No Views Yet",
                                           style: const TextStyle(
-                                            fontSize: 19,
+                                            fontSize: 16.5,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           maxLines: 1,
