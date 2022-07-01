@@ -329,18 +329,17 @@ class _StoriesScreenState extends State<StoriesScreen> {
                             if (story.type == "Photos") {
                               storesStories.add(
                                 StoryItem.pageImage(
-                                  url: story.content ?? "",
-                                  controller: storyController,
-                                  imageFit: BoxFit.fitWidth,
-                                ),
+                                    url: story.content ?? "",
+                                    controller: storyController,
+                                    imageFit: BoxFit.fitWidth,
+                                    duration: const Duration(seconds: 20)),
                               );
                             } else if (story.type == "Videos") {
                               storesStories.add(
-                                StoryItem.pageVideo(
-                                  story.content ?? "",
-                                  controller: storyController,
-                                  imageFit: BoxFit.fitWidth,
-                                ),
+                                StoryItem.pageVideo(story.content ?? "",
+                                    controller: storyController,
+                                    imageFit: BoxFit.fitWidth,
+                                    duration: const Duration(seconds: 30)),
                               );
                             }
                           }
@@ -354,6 +353,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 passedStories: passedStories,
                                 usersStories: usersStories,
                                 passedStoriesInitialIndex: index,
+                                storyController: storyController,
                               );
                             },
                             transitionsBuilder: (_, Animation<double> animation,

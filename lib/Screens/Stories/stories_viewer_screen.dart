@@ -36,7 +36,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
   List<StoriesData>? stories;
   CancelToken cancelToken = CancelToken();
   List<StoryItem> storyItems = [];
-  StoryController storyController = StoryController();
+  //StoryController storyController = StoryController();
   PageController pageController = PageController();
   CarouselSliderController carouselController = CarouselSliderController();
 
@@ -44,9 +44,9 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
 
   @override
   void initState() {
-    if (widget.storyController != null) {
-      storyController = widget.storyController!;
-    }
+    // if (widget.storyController != null) {
+    //   storyController = widget.storyController!;
+    // }
 
     super.initState();
   }
@@ -81,7 +81,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
               child: Stack(
                 children: [
                   StoryView(
-                    controller: storyController,
+                    controller: widget.storyController!,
                     repeat: false,
                     inline: true,
                     onComplete: () {
@@ -152,7 +152,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                 child: Stack(
                   children: [
                     StoryView(
-                      controller: storyController,
+                      controller: widget.storyController!,
                       repeat: false,
                       inline: true,
                       onComplete: () {},
@@ -209,6 +209,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
 
   @override
   void dispose() {
+    widget.storyController?.dispose();
     BotToast.removeAll();
     super.dispose();
   }
