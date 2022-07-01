@@ -18,6 +18,7 @@ import '../../Models/Stories/stories.dart';
 import "package:collection/collection.dart";
 import 'package:path_provider/path_provider.dart';
 import '../../UltraNetwork/ultra_constants.dart';
+import '../../Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
 import '../../Widgets/Common/cached_image.dart';
 import 'dart:io';
 
@@ -34,13 +35,6 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
   SwipeActionController controller = SwipeActionController();
   bool isEditing = false;
   CancelToken cancelToken = CancelToken();
-  List<String> thumbnails = [];
-
-  @override
-  void initState() {
-    generateVideoThumbs();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +107,6 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                           _deleteStory(widget.myStories[index].stotyID ?? "");
                           setState(() {
                             widget.myStories.removeAt(index);
-                            thumbnails.removeAt(index);
                           });
                           if (widget.myStories.isEmpty) {
                             Navigator.pop(context);
@@ -138,7 +131,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
-                                  duration: const Duration(seconds: 30),
+                                  duration: const Duration(seconds: 20),
                                 ),
                               );
                             } else if (widget.myStories[i].type == "Videos") {
@@ -226,41 +219,11 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                                             .content ??
                                                         "",
                                                   )
-                                                : FadeInImage(
-                                                    placeholder: MemoryImage(
-                                                      kTransparentImage,
-                                                    ),
-                                                    imageErrorBuilder: (context,
-                                                            ob, stackTrace) =>
-                                                        Container(
-                                                      color: const Color(
-                                                          0xffeeeeee),
-                                                    ),
-                                                    placeholderErrorBuilder:
-                                                        (context, ob,
-                                                                stackTrace) =>
-                                                            Container(
-                                                      color: const Color(
-                                                          0xffeeeeee),
-                                                    ),
-                                                    image: FileImage(
-                                                      File(
-                                                        thumbnails.length - 1 <
-                                                                index
-                                                            ? ""
-                                                            : thumbnails[index],
-                                                      ),
-                                                    ),
-                                                    fadeOutDuration:
-                                                        const Duration(
-                                                      milliseconds: 100,
-                                                    ),
-                                                    fadeInDuration:
-                                                        const Duration(
-                                                      milliseconds: 100,
-                                                    ),
-                                                    fit: BoxFit.fill,
-                                                  ),
+                                                : VideoThumbViewer(
+                                                    videoUrl: widget
+                                                            .myStories[index]
+                                                            .content ??
+                                                        ""),
                                           ),
                                         ),
                                       ),
@@ -338,26 +301,6 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
         ),
       ),
     );
-  }
-
-  Future<String> getVideoThumb(String url) async {
-    return await VideoThumbnail.thumbnailFile(
-          video: url,
-          thumbnailPath: (await getTemporaryDirectory()).path,
-          quality: 50,
-        ) ??
-        "";
-  }
-
-  void generateVideoThumbs() async {
-    for (var element in widget.myStories) {
-      if (element.type == "Photos") {
-        thumbnails.add(element.content ?? "");
-      } else {
-        thumbnails.add(await getVideoThumb(element.content ?? ""));
-      }
-    }
-    setState(() {});
   }
 
   void _deleteStory(String storyId) {

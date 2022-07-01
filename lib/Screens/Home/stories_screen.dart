@@ -22,7 +22,6 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
-import 'package:transparent_image/transparent_image.dart';
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
@@ -165,36 +164,10 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                                       .lastOrNull?.content ??
                                                   "",
                                             )
-                                          : FadeInImage(
-                                              placeholder: MemoryImage(
-                                                kTransparentImage,
-                                              ),
-                                              imageErrorBuilder:
-                                                  (context, ob, stackTrace) =>
-                                                      Container(
-                                                color: const Color(0xffeeeeee),
-                                              ),
-                                              placeholderErrorBuilder:
-                                                  (context, ob, stackTrace) =>
-                                                      Container(
-                                                color: const Color(0xffeeeeee),
-                                              ),
-                                              image: FileImage(
-                                                File(
-                                                  myThumbnails.length - 1 <
-                                                          myStories.length - 1
-                                                      ? ""
-                                                      : myThumbnails[
-                                                          myStories.length - 1],
-                                                ),
-                                              ),
-                                              fadeOutDuration: const Duration(
-                                                milliseconds: 0,
-                                              ),
-                                              fadeInDuration: const Duration(
-                                                milliseconds: 0,
-                                              ),
-                                              fit: BoxFit.fill,
+                                          : VideoThumbViewer(
+                                              videoUrl: myStories
+                                                      .lastOrNull?.content ??
+                                                  "",
                                             )
                                       : CachedImage(
                                           url: context.currentUserImage ?? "",
@@ -410,24 +383,25 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         width: 70,
                                         height: 70,
                                         child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(60),
-                                            child: usersStories[index]
-                                                        .firstOrNull
-                                                        ?.type ==
-                                                    "Photos"
-                                                ? CachedImage(
-                                                    url: usersStories[index]
-                                                            .firstOrNull
-                                                            ?.content ??
-                                                        "",
-                                                  )
-                                                : VideoThumbViewer(
-                                                    videoUrl:
-                                                        usersStories[index]
-                                                                .firstOrNull
-                                                                ?.content ??
-                                                            "")),
+                                          borderRadius:
+                                              BorderRadius.circular(60),
+                                          child: usersStories[index]
+                                                      .firstOrNull
+                                                      ?.type ==
+                                                  "Photos"
+                                              ? CachedImage(
+                                                  url: usersStories[index]
+                                                          .firstOrNull
+                                                          ?.content ??
+                                                      "",
+                                                )
+                                              : VideoThumbViewer(
+                                                  videoUrl: usersStories[index]
+                                                          .firstOrNull
+                                                          ?.content ??
+                                                      "",
+                                                ),
+                                        ),
                                       ),
                                     ),
                                     dashes: usersStories[index].length,

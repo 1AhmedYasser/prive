@@ -20,7 +20,6 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import '../UltraNetwork/ultra_network.dart';
-import '../Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import '../Widgets/Common/alert_widget.dart';
 
 class Utils {
@@ -79,6 +78,41 @@ class Utils {
                     getImage(ImageSource.gallery, false);
                   },
                 ),
+                if (withVideo)
+                  const SizedBox(
+                    height: 7,
+                  ),
+                if (withVideo) const Divider(),
+                if (withVideo)
+                  const SizedBox(
+                    height: 7,
+                  ),
+                if (withVideo)
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.video_library,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Gallery Video".tr(),
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      getImage(ImageSource.gallery, true);
+                    },
+                  ),
                 const SizedBox(
                   height: 7,
                 ),
