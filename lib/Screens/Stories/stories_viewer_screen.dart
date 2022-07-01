@@ -210,7 +210,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
   @override
   void dispose() {
     widget.storyController?.dispose();
-    BotToast.removeAll();
+    BotToast.removeAll("loading");
     super.dispose();
   }
 }

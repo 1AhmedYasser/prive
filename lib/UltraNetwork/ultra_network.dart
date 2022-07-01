@@ -54,11 +54,11 @@ class UltraNetwork with ChangeNotifier {
     if (await Connectivity().checkConnectivity() != ConnectivityResult.none) {
       if (showLoadingIndicator) {
         BotToast.showAnimationWidget(
-          toastBuilder: (context) {
-            return const IgnorePointer(child: UltraLoadingIndicator());
-          },
-          animationDuration: const Duration(milliseconds: 0),
-        );
+            toastBuilder: (context) {
+              return const IgnorePointer(child: UltraLoadingIndicator());
+            },
+            animationDuration: const Duration(milliseconds: 0),
+            groupKey: "loading");
       }
       try {
         var response = await dio.request(
@@ -76,27 +76,32 @@ class UltraNetwork with ChangeNotifier {
           options: Options(
               headers: await UHeaders.getHeaders(context), method: "post"),
         );
-        if (showLoadingIndicator) BotToast.removeAll();
+        if (showLoadingIndicator) BotToast.removeAll("loading");
         if (response.statusCode! >= 200 && response.statusCode! < 400) {
-          if (decodeResponse) {
-            (isList)
-                ? request.model.fromJsonList(
-                    List<Map<String, dynamic>>.from(response.data),
-                  )
-                : request.model.fromJson(
-                    Map<String, dynamic>.from(
-                      (response.data is String)
-                          ? json.decode(response.data)
-                          : response.data,
-                    ),
-                  );
+          try {
+            if (decodeResponse) {
+              (isList)
+                  ? request.model.fromJsonList(
+                      List<Map<String, dynamic>>.from(response.data),
+                    )
+                  : request.model.fromJson(
+                      Map<String, dynamic>.from(
+                        (response.data is String)
+                            ? json.decode(response.data)
+                            : response.data,
+                      ),
+                    );
+            }
+          } catch (e) {
+            print("Can't Decode $e");
+            if (showLoadingIndicator) BotToast.removeAll("loading");
           }
           print("Ultra Request ${request.path}");
           print("Ultra Response ${response.data}");
           return request.model;
         }
       } on DioError catch (error) {
-        if (showLoadingIndicator) BotToast.removeAll();
+        if (showLoadingIndicator) BotToast.removeAll("loading");
         if (cancelToken.isCancelled == false) {
           if (showError) UltraError.handleError(context, error, onError);
         }

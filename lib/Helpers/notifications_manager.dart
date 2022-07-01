@@ -14,7 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
-import 'package:prive/Widgets/AppWidgets/calling_widget.dart';
+import 'package:prive/Widgets/AppWidgets/Calls/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
@@ -264,17 +264,17 @@ class NotificationsManager {
       final callUUID = const Uuid().v4();
       BotToast.cleanAll();
       BotToast.showAnimationWidget(
-        toastBuilder: (context) {
-          return CallingWidget(
-            channelName: channelName,
-            context: notificationsContext,
-            callerName: callerName,
-            callerImage: callerImage ?? "",
-            isVideoCall: hasVideo,
-          );
-        },
-        animationDuration: const Duration(milliseconds: 0),
-      );
+          toastBuilder: (context) {
+            return CallingWidget(
+              channelName: channelName,
+              context: notificationsContext,
+              callerName: callerName,
+              callerImage: callerImage ?? "",
+              isVideoCall: hasVideo,
+            );
+          },
+          animationDuration: const Duration(milliseconds: 0),
+          groupKey: "incoming_call_overlay");
     }
 
     if (type != "call") {

@@ -4,8 +4,6 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
-
 import '../Chat/chat_screen.dart';
 
 class ChannelsTab extends StatefulWidget {
@@ -23,6 +21,7 @@ class _ChannelsTabState extends State<ChannelsTab>
   @override
   void initState() {
     _animationController = AnimationController(vsync: this);
+    //Utils.showCallOverlay();
     super.initState();
   }
 

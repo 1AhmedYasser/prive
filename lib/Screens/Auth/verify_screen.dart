@@ -180,19 +180,19 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     BotToast.showAnimationWidget(
-                      toastBuilder: (context) {
-                        return const IgnorePointer(
-                            child: UltraLoadingIndicator());
-                      },
-                      animationDuration: const Duration(milliseconds: 0),
-                    );
+                        toastBuilder: (context) {
+                          return const IgnorePointer(
+                              child: UltraLoadingIndicator());
+                        },
+                        animationDuration: const Duration(milliseconds: 0),
+                        groupKey: "loading");
                     PhoneAuthCredential credential =
                         PhoneAuthProvider.credential(
                       verificationId: verificationId ?? "",
                       smsCode: codeController.text,
                     );
                     await _auth.signInWithCredential(credential).then((value) {
-                      BotToast.removeAll();
+                      BotToast.removeAll("loading");
                       if (widget.loginData?.accountState == "NewAccount") {
                         Navigator.pushReplacement(
                           context,
@@ -284,7 +284,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
 
   @override
   void dispose() {
-    BotToast.removeAll();
+    BotToast.removeAll("loading");
     errorController!.close();
     super.dispose();
   }

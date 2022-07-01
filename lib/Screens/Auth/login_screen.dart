@@ -221,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    BotToast.removeAll();
+    BotToast.removeAll("loading");
     super.dispose();
   }
 }

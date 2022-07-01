@@ -59,11 +59,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
   void initState() {
     time_ago.setLocaleMessages('en', time_ago.EnMessages());
     BotToast.showAnimationWidget(
-      toastBuilder: (context) {
-        return const IgnorePointer(child: UltraLoadingIndicator());
-      },
-      animationDuration: const Duration(milliseconds: 0),
-    );
+        toastBuilder: (context) {
+          return const IgnorePointer(child: UltraLoadingIndicator());
+        },
+        animationDuration: const Duration(milliseconds: 0),
+        groupKey: "loading");
     _getContacts();
     super.initState();
   }
@@ -516,6 +516,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
   }
 
   void _getStories(String phoneNumbers) {
+    print(phoneNumbers);
     UltraNetwork.request(
       context,
       getStories,
@@ -526,7 +527,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
       ),
       cancelToken: cancelToken,
     ).then((value) {
-      BotToast.removeAll();
+      BotToast.removeAll("loading");
       if (value != null) {
         Stories storiesResponse = value;
         if (storiesResponse.success == true) {

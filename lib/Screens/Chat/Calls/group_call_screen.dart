@@ -10,7 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Models/Call/group_call.dart';
 import 'package:prive/Models/Call/group_call_member.dart';
-import 'package:prive/Widgets/AppWidgets/wave_button.dart';
+import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';

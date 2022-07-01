@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:map_launcher/map_launcher.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/Widgets/AppWidgets/Calls/call_overlay_widget.dart';
 import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
 import 'package:quiver/iterables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,15 @@ import '../Widgets/Common/alert_widget.dart';
 
 class Utils {
   static final player = AudioPlayer();
+
+  static void showCallOverlay() {
+    BotToast.showWidget(
+      toastBuilder: (context) {
+        return const CallOverlayWidget();
+      },
+      groupKey: "call_overlay",
+    );
+  }
 
   static Future<void> showImagePickerSelector(
       BuildContext context, Function getImage,

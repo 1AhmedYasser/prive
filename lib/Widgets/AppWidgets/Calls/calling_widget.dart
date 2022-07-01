@@ -8,9 +8,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
-import '../../Extras/resources.dart';
-import '../../Helpers/Utils.dart';
-import '../../Screens/Chat/Calls/call_screen.dart';
+import '../../../Extras/resources.dart';
+import '../../../Helpers/Utils.dart';
+import '../../../Screens/Chat/Calls/call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
   final String channelName;
