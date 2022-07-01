@@ -332,7 +332,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                     url: story.content ?? "",
                                     controller: storyController,
                                     imageFit: BoxFit.fitWidth,
-                                    duration: const Duration(seconds: 20)),
+                                    duration: const Duration(seconds: 10)),
                               );
                             } else if (story.type == "Videos") {
                               storesStories.add(

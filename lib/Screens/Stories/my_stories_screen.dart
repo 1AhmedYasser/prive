@@ -127,7 +127,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
-                                  duration: const Duration(seconds: 20),
+                                  duration: const Duration(seconds: 10),
                                 ),
                               );
                             } else if (widget.myStories[i].type == "Videos") {
