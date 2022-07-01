@@ -27,15 +27,6 @@ import '../Widgets/Common/alert_widget.dart';
 class Utils {
   static final player = AudioPlayer();
 
-  static void showCallOverlay() {
-    BotToast.showWidget(
-      toastBuilder: (context) {
-        return const CallOverlayWidget();
-      },
-      groupKey: "call_overlay",
-    );
-  }
-
   static Future<void> showImagePickerSelector(
       BuildContext context, Function getImage,
       {String title = "Pick an Image", bool withVideo = false}) async {
@@ -643,6 +634,15 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static void showCallOverlay() {
+    BotToast.showWidget(
+      toastBuilder: (context) {
+        return const CallOverlayWidget();
+      },
+      groupKey: "call_overlay",
+    );
   }
 
   // For Testing Purposes
