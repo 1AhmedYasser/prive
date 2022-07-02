@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider_transforms.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Providers/stories_provider.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:story_view/story_view.dart';
 import 'dart:ui' as ui;
 import '../../Models/Stories/stories.dart';
+import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
+import 'package:prive/Helpers/stream_manager.dart';
 
 class StoriesViewerScreen extends StatefulWidget {
   final List<List<StoryItem>> passedStories;
@@ -87,6 +90,15 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                           widget.passedStories[index].indexOf(story),
                         ),
                       );
+                      if (widget.showViewers == false) {
+                        int storyIndex =
+                            widget.passedStories[index].indexOf(story);
+                        if (storyIndex != -1) {
+                          _viewStory(
+                              widget.usersStories[index][storyIndex].stotyID ??
+                                  "0");
+                        }
+                      }
                     },
                     onComplete: () {
                       if (index == widget.passedStories.length - 1) {
@@ -252,6 +264,22 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
             ),
           )
         : const SizedBox.shrink();
+  }
+
+  void _viewStory(String storyId) {
+    UltraNetwork.request(
+      context,
+      viewStory,
+      showError: false,
+      showLoadingIndicator: false,
+      formData: FormData.fromMap(
+        {
+          "UserID": context.currentUser?.id,
+          "StoryID": storyId,
+        },
+      ),
+      cancelToken: cancelToken,
+    );
   }
 
   @override

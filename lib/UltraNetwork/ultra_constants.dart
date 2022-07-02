@@ -71,3 +71,5 @@ final deleteStory =
     UltraRequest("${baseUrl}DeleteStory.php", UMethods.post, StatusResponse());
 final addStory = UltraRequest(
     "${baseUrl}AddStoryUserAPI.php", UMethods.post, StatusResponse());
+final viewStory = UltraRequest(
+    "${baseUrl}MakeReviewAPI.php", UMethods.post, StatusResponse());
