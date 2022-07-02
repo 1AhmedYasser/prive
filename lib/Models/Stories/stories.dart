@@ -18,7 +18,7 @@ class Stories extends BaseModel<Stories> {
 }
 
 class StoriesData {
-  List<StoryViewUser>? viewUser;
+  List<StoryViewUser>? viewUsers;
   String? stotyID;
   String? userID;
   String? content;
@@ -42,7 +42,7 @@ class StoriesData {
   String? loged;
 
   StoriesData.fromJson(Map<String, dynamic> json) {
-    viewUser = (json['0'] as List?)
+    viewUsers = (json['0'] as List?)
         ?.map((dynamic e) => StoryViewUser.fromJson(e as Map<String, dynamic>))
         .toList();
     stotyID = json['StotyID'] as String?;

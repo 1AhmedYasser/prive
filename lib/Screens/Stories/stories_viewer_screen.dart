@@ -11,6 +11,7 @@ import 'package:story_view/story_view.dart';
 import 'dart:ui' as ui;
 import '../../Models/Stories/stories.dart';
 import '../../UltraNetwork/ultra_network.dart';
+import '../../Widgets/AppWidgets/Stories/viewers_modal_view.dart';
 import '../../Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
 import 'package:prive/Helpers/stream_manager.dart';
@@ -95,8 +96,9 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                             widget.passedStories[index].indexOf(story);
                         if (storyIndex != -1) {
                           _viewStory(
-                              widget.usersStories[index][storyIndex].stotyID ??
-                                  "0");
+                            widget.usersStories[index][storyIndex].stotyID ??
+                                "0",
+                          );
                         }
                       }
                     },
@@ -155,43 +157,89 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                       bottom: 20,
                       left: 0,
                       right: 0,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            FontAwesomeIcons.chevronUp,
-                            color: Colors.white,
-                            size: 27,
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.remove_red_eye,
-                                color: Colors.white,
-                                size: 25,
-                              ),
-                              const SizedBox(width: 7),
-                              Consumer<StoriesProvider>(
-                                builder: (context, provider, ch) {
-                                  return Text(
-                                    provider.currentShowIndex != -1
-                                        ? "${widget.usersStories[index][provider.currentShowIndex].views}"
-                                        : "0",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
+                      child: Consumer<StoriesProvider>(
+                        builder: (context, provider, ch) {
+                          return InkWell(
+                            onTap: () {
+                              if (provider.currentShowIndex != -1) {
+                                if (widget
+                                        .usersStories[index]
+                                            [provider.currentShowIndex]
+                                        .views !=
+                                    "0") {
+                                  widget.storyController?.pause();
+                                  showModalBottomSheet(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
+                                    isScrollControlled: true,
+                                    isDismissible: true,
+                                    backgroundColor: Colors.grey.shade300,
+                                    context: context,
+                                    builder: (context) =>
+                                        DraggableScrollableSheet(
+                                      expand: false,
+                                      initialChildSize: 0.25,
+                                      minChildSize: 0.2,
+                                      maxChildSize: 0.7,
+                                      builder: (context, scrollController) {
+                                        return SingleChildScrollView(
+                                          controller: scrollController,
+                                          child: ViewersModalView(
+                                            viewUsers: widget
+                                                    .usersStories[index][
+                                                        provider
+                                                            .currentShowIndex]
+                                                    .viewUsers ??
+                                                [],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ).then(
+                                    (value) => widget.storyController?.play(),
                                   );
-                                },
-                              )
-                            ],
-                          )
-                        ],
+                                }
+                              }
+                            },
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  FontAwesomeIcons.chevronUp,
+                                  color: Colors.white,
+                                  size: 27,
+                                ),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.remove_red_eye,
+                                      color: Colors.white,
+                                      size: 25,
+                                    ),
+                                    const SizedBox(width: 7),
+                                    Text(
+                                      provider.currentShowIndex != -1
+                                          ? "${widget.usersStories[index][provider.currentShowIndex].views}"
+                                          : "0",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    )
+                    ),
                 ],
               ),
             ),
