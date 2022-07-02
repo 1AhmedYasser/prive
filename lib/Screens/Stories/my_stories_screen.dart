@@ -147,6 +147,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                               pageBuilder: (BuildContext context, _, __) {
                                 return StoriesViewerScreen(
                                   closeOnSwipeDown: true,
+                                  showViewers: true,
                                   passedStories: passedStories,
                                   usersStories: [widget.myStories],
                                   storyController: storyController,

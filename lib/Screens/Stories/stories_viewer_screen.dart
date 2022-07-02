@@ -3,6 +3,9 @@ import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider_transforms.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:prive/Providers/stories_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:story_view/story_view.dart';
 import 'dart:ui' as ui;
 import '../../Models/Stories/stories.dart';
@@ -15,6 +18,7 @@ class StoriesViewerScreen extends StatefulWidget {
   final int passedStoriesInitialIndex;
   final Map<String, String> parameters;
   final bool closeOnSwipeDown;
+  final bool showViewers;
   final StoryController? storyController;
 
   const StoriesViewerScreen({
@@ -24,6 +28,7 @@ class StoriesViewerScreen extends StatefulWidget {
     this.passedStoriesInitialIndex = 0,
     this.passedStories = const [],
     this.usersStories = const [],
+    this.showViewers = false,
     this.storyController,
   }) : super(key: key);
 
@@ -36,20 +41,10 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
   List<StoriesData>? stories;
   CancelToken cancelToken = CancelToken();
   List<StoryItem> storyItems = [];
-  //StoryController storyController = StoryController();
   PageController pageController = PageController();
   CarouselSliderController carouselController = CarouselSliderController();
 
   bool isCurrentAUrl = false;
-
-  @override
-  void initState() {
-    // if (widget.storyController != null) {
-    //   storyController = widget.storyController!;
-    // }
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +79,22 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                     controller: widget.storyController!,
                     repeat: false,
                     inline: true,
+                    onStoryShow: (story) {
+                      WidgetsBinding.instance?.addPostFrameCallback(
+                        (_) =>
+                            Provider.of<StoriesProvider>(context, listen: false)
+                                .setCurrentShownIndex(
+                          widget.passedStories[index].indexOf(story),
+                        ),
+                      );
+                    },
                     onComplete: () {
                       if (index == widget.passedStories.length - 1) {
                         Navigator.pop(context);
                       } else {
-                        carouselController
-                            .nextPage(const Duration(milliseconds: 500));
+                        carouselController.nextPage(
+                          const Duration(milliseconds: 500),
+                        );
                       }
                     },
                     onVerticalSwipeComplete: (direction) {
@@ -133,6 +138,48 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                       ),
                     ),
                   ),
+                  if (widget.showViewers)
+                    Positioned(
+                      bottom: 20,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.chevronUp,
+                            color: Colors.white,
+                            size: 27,
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.remove_red_eye,
+                                color: Colors.white,
+                                size: 25,
+                              ),
+                              const SizedBox(width: 7),
+                              Consumer<StoriesProvider>(
+                                builder: (context, provider, ch) {
+                                  return Text(
+                                    provider.currentShowIndex != -1
+                                        ? "${widget.usersStories[index][provider.currentShowIndex].views}"
+                                        : "0",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  );
+                                },
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    )
                 ],
               ),
             ),
