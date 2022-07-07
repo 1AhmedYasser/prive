@@ -214,6 +214,18 @@ class _RoomScreenState extends State<RoomScreen> {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 20, top: 10, right: 20),
+                      child: Text(
+                        room?.description ?? "",
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     const Padding(
                       padding: EdgeInsets.only(left: 20, top: 10, right: 20),
                       child: Divider(),
@@ -543,6 +555,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
       String? roomId = roomResponse?['roomId'];
       String? topic = roomResponse?['topic'];
+      String? description = roomResponse?['description'];
       RoomUser? owner = RoomUser(
         id: roomResponse?['owner']['id'],
         name: roomResponse?['owner']['name'],
@@ -623,6 +636,7 @@ class _RoomScreenState extends State<RoomScreen> {
       room = Room(
         roomId: roomId,
         topic: topic,
+        description: description,
         owner: owner,
         speakers: speakers,
         listeners: listeners,

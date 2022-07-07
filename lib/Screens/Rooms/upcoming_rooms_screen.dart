@@ -209,14 +209,28 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(
-                  left: 20, top: 10, bottom: 15, right: 20),
+                  left: 20, top: 10, bottom: 10, right: 20),
               child: Text(
                 upcomingRoomsList[index].topic ?? "",
                 style: const TextStyle(
-                  color: Color(0xff5d5d63),
+                  color: Colors.black,
                   fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, top: 0, bottom: 15, right: 20),
+              child: Text(
+                upcomingRoomsList[index].description ?? "",
+                style: const TextStyle(
+                  color: Color(0xff5d5d63),
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Padding(
@@ -294,10 +308,12 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
         upcomingRooms.forEach((key, value) {
           String roomId = key;
           String topic = "";
+          String description = "";
           RoomUser? owner;
           List<String> contacts = [];
           String dateTime = "";
           topic = value['topic'];
+          description = value['description'];
           dateTime = value['date_time'];
           owner = RoomUser(
             id: value['owner']['id'],
@@ -319,6 +335,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
             UpcomingRoom(
               roomId: roomId,
               topic: topic,
+              description: description,
               owner: owner,
               roomContacts: contacts,
               time: dateTime,

@@ -29,6 +29,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
   List<bool> isSelected = [true, false];
   List<User> users = [];
   TextEditingController topicNameController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -71,48 +72,33 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                 ),
               ),
               const SizedBox(height: 15),
-              TextFormField(
+              _buildRoomField(
                 controller: topicNameController,
-                keyboardType: TextInputType.text,
-                cursorColor: const Color(0xff777777),
-                decoration: InputDecoration(
-                  hintText: "Topic Name",
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  labelStyle: const TextStyle(
-                    color: Color(0xff777777),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                        color: Theme.of(context).primaryColor, width: 2),
-                  ),
-                  errorBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(color: Colors.red, width: 2),
-                  ),
-                  focusedErrorBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(color: Colors.red, width: 2),
-                  ),
-                ),
+                hint: "Topic Name",
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter A Topic Name';
                   }
 
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Tell Us About Your Room",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 15),
+              _buildRoomField(
+                controller: descriptionController,
+                hint: "Room Description",
+                maxLines: 3,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                validator: (value) {
                   return null;
                 },
               ),
@@ -260,6 +246,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                               "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(selectedDateTime ?? DateTime.now()).toString()}");
                           await ref.set({
                             "topic": topicNameController.text,
+                            "description": descriptionController.text,
                             "owner": owner.toJson(),
                             "speakers": {owner.id: owner.toJson()},
                             "listeners": {},
@@ -275,6 +262,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                               .toString();
                           await ref.set({
                             "topic": topicNameController.text,
+                            "description": descriptionController.text,
                             "owner": owner.toJson(),
                             "speakers": {owner.id: owner.toJson()},
                             "listeners": {},
@@ -292,6 +280,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                                 room: Room(
                                   roomId: roomId,
                                   topic: topicNameController.text,
+                                  description: descriptionController.text,
                                   owner: owner,
                                   speakers: [owner],
                                   listeners: [],
@@ -309,6 +298,8 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           MaterialPageRoute(
                             builder: (context) => PeopleChooserScreen(
                               roomName: topicNameController.text.trim(),
+                              roomDescription:
+                                  descriptionController.text.trim(),
                               isNow: isSelected.first,
                               selectedDateTime:
                                   selectedDateTime ?? DateTime.now(),
@@ -340,6 +331,54 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
           ),
         ),
       ),
+    );
+  }
+
+  TextFormField _buildRoomField(
+      {required TextEditingController controller,
+      String hint = "",
+      int maxLines = 1,
+      required Function validator,
+      EdgeInsets contentPadding =
+          const EdgeInsets.symmetric(horizontal: 25, vertical: 10)}) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.text,
+      cursorColor: const Color(0xff777777),
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        contentPadding: contentPadding,
+        labelStyle: const TextStyle(
+          color: Color(0xff777777),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(12),
+          ),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(12),
+          ),
+          borderSide:
+              BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+          borderSide: BorderSide(color: Colors.red, width: 2),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+          borderSide: BorderSide(color: Colors.red, width: 2),
+        ),
+      ),
+      validator: (value) => validator(value),
     );
   }
 

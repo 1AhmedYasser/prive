@@ -23,10 +23,15 @@ import 'package:prive/Helpers/stream_manager.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
   final String roomName;
+  final String roomDescription;
   final bool isNow;
   final DateTime? selectedDateTime;
   const PeopleChooserScreen(
-      {Key? key, this.roomName = "", this.isNow = true, this.selectedDateTime})
+      {Key? key,
+      this.roomName = "",
+      this.roomDescription = "",
+      this.isNow = true,
+      this.selectedDateTime})
       : super(key: key);
 
   @override
@@ -118,6 +123,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                       .ref("rooms/${context.currentUser?.id ?? ""}");
                   await ref.set({
                     "topic": widget.roomName,
+                    "description": widget.roomDescription,
                     "owner": owner.toJson(),
                     "speakers": {owner.id: owner.toJson()},
                     "listeners": {},
@@ -153,6 +159,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                       "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(dateTime ?? DateTime.now()).toString()}");
                   await ref.set({
                     "topic": widget.roomName,
+                    "description": widget.roomDescription,
                     "owner": owner.toJson(),
                     "speakers": {owner.id: owner.toJson()},
                     "listeners": {},
