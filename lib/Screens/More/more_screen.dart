@@ -72,7 +72,8 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: R.images.catalogManagerImage,
                   title: "Catalog Manager",
-                  onPressed: () {},
+                  onPressed: () =>
+                      Navigator.pushNamed(context, R.routes.catalogScreen),
                 ),
                 OptionRowWidget(
                   image: R.images.contactsImage,

@@ -155,31 +155,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Expanded(
                           child: buildTextField(
-                              "First Name", firstNameController,
-                              emptyValidatorMessage:
-                                  "Please enter a first name"),
+                            "First Name",
+                            firstNameController,
+                            emptyValidatorMessage: "Please enter a first name",
+                          ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
-                          child: buildTextField("Last Name", lastNameController,
-                              emptyValidatorMessage:
-                                  "Please enter a last name"),
+                          child: buildTextField(
+                            "Last Name",
+                            lastNameController,
+                            emptyValidatorMessage: "Please enter a last name",
+                          ),
                         ),
                       ],
                       crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                     const SizedBox(height: 20),
-                    buildTextField("Phone Number", phoneNumberController,
-                        type: const TextInputType.numberWithOptions(
-                          signed: true,
-                          decimal: false,
-                        ),
-                        formatters: [FilteringTextInputFormatter.digitsOnly],
-                        emptyValidatorMessage: "Please enter a phone number"),
-                    const SizedBox(height: 20),
-                    buildTextField("Bio", bioController,
-                        maxLines: 4,
-                        emptyValidatorMessage: "Please enter a bio"),
+                    buildTextField(
+                      "Phone Number",
+                      phoneNumberController,
+                      type: const TextInputType.numberWithOptions(
+                        signed: true,
+                        decimal: false,
+                      ),
+                      formatters: [FilteringTextInputFormatter.digitsOnly],
+                      emptyValidatorMessage: "Please enter a phone number",
+                    ),
+                    // const SizedBox(height: 20),
+                    // buildTextField(
+                    //   "Bio",
+                    //   bioController,
+                    //   maxLines: 4,
+                    //   emptyValidatorMessage: "Please enter a bio",
+                    // ),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () {
