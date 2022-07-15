@@ -642,6 +642,7 @@ class Utils {
     bool isVideo = false,
     String callId = "",
     RtcEngine? agoraEngine,
+    required Channel channel,
   }) {
     BotToast.removeAll("call_overlay");
     BotToast.showWidget(
@@ -651,6 +652,7 @@ class Utils {
           isVideo: isVideo,
           callId: callId,
           agoraEngine: agoraEngine,
+          channel: channel,
         );
       },
       groupKey: "call_overlay",

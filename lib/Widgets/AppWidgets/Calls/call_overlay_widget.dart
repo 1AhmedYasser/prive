@@ -9,24 +9,27 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
 import '../../../Models/Call/group_call.dart';
 import '../../../Models/Call/group_call_member.dart';
-import '../../Common/cached_image.dart';
+import '../../../Screens/Chat/Calls/group_call_screen.dart';
 
 class CallOverlayWidget extends StatefulWidget {
   final bool isGroup;
   final bool isVideo;
   final String callId;
   final RtcEngine? agoraEngine;
-  const CallOverlayWidget({
-    Key? key,
-    this.isGroup = false,
-    this.isVideo = false,
-    this.callId = "",
-    this.agoraEngine,
-  }) : super(key: key);
+  final Channel channel;
+  const CallOverlayWidget(
+      {Key? key,
+      this.isGroup = false,
+      this.isVideo = false,
+      this.callId = "",
+      this.agoraEngine,
+      required this.channel})
+      : super(key: key);
 
   @override
   State<CallOverlayWidget> createState() => _CallOverlayWidgetState();
@@ -51,103 +54,160 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DraggableWidget(
-          bottomMargin: 60,
-          intialVisibility: true,
-          horizontalSpace: 20,
-          verticalSpace: 120,
-          shadowBorderRadius: 20,
-          normalShadow: const BoxShadow(
-            color: Colors.transparent,
-            offset: Offset(0, 0),
-            blurRadius: 2,
-          ),
-          child: Container(
-            width: 230,
-            height: 170,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColorDark,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Material(
+    return StreamChannel(
+      channel: widget.channel,
+      child: Stack(
+        children: [
+          DraggableWidget(
+            bottomMargin: 60,
+            intialVisibility: true,
+            horizontalSpace: 20,
+            verticalSpace: 120,
+            shadowBorderRadius: 20,
+            normalShadow: const BoxShadow(
               color: Colors.transparent,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 20),
-                    child: ListTile(
-                      leading: SizedBox(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: CachedImage(
-                            url: context.currentUserImage ?? "",
+              offset: Offset(0, 0),
+              blurRadius: 2,
+            ),
+            child: Container(
+              width: 230,
+              height: 170,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColorDark,
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 20),
+                      child: ListTile(
+                        leading: SizedBox(
+                          child: ChannelAvatar(
+                            borderRadius: BorderRadius.circular(50),
+                            channel: widget.channel,
+                            constraints: const BoxConstraints(
+                              maxWidth: 60,
+                              maxHeight: 60,
+                            ),
                           ),
+                          width: 60,
+                          height: 80,
                         ),
-                        width: 60,
-                        height: 80,
-                      ),
-                      title: const Text(
-                        "Family",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      trailing: GestureDetector(
-                        onTap: () {
-                          print("Expand Call");
-                        },
-                        child: const Icon(
-                          FontAwesomeIcons.expand,
-                          color: Colors.white,
+                        // leading: SizedBox(
+                        //   child: ClipRRect(
+                        //     borderRadius: BorderRadius.circular(20),
+                        //     child: CachedImage(
+                        //       url: context.currentUserImage ?? "",
+                        //     ),
+                        //   ),
+                        //   width: 60,
+                        //   height: 80,
+                        // ),
+                        title: Text(
+                          widget.isGroup ? widget.channel.name ?? "" : "",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        trailing: GestureDetector(
+                          onTap: () {
+                            BotToast.removeAll("call_overlay");
+                            showModalBottomSheet(
+                              context: navigatorKey.currentContext!,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) {
+                                return DraggableScrollableSheet(
+                                  minChildSize: 0.2,
+                                  maxChildSize: 0.95,
+                                  builder: (_, controller) {
+                                    return GroupCallScreen(
+                                      isVideo: groupCall?.type == "Video"
+                                          ? true
+                                          : false,
+                                      isJoining: true,
+                                      channel: widget.channel,
+                                      scrollController: controller,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: const Icon(
+                            FontAwesomeIcons.expand,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25, right: 25),
-                    child: Row(
-                      children: [
-                        buildControl(
-                          FontAwesomeIcons.volumeUp,
-                          Colors.black38,
-                          () {
-                            print("Speaker");
-                          },
-                        ),
-                        const SizedBox(width: 15),
-                        buildControl(
-                          Icons.mic_off,
-                          Colors.black38,
-                          () {
-                            print("Mute");
-                          },
-                        ),
-                        const SizedBox(width: 15),
-                        buildControl(
-                          Icons.call_end,
-                          const Color(0xffff2d55),
-                          () {
-                            final databaseReference = FirebaseDatabase.instance
-                                .ref("GroupCalls/${widget.callId}");
-                            showCupertinoModalPopup<void>(
-                              context: navigatorKey.currentContext!,
-                              builder: (BuildContext context) =>
-                                  CupertinoActionSheet(
-                                title: Text(
-                                    'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
-                                actions: <CupertinoActionSheetAction>[
-                                  if (context.currentUser?.id ==
-                                      groupCall?.ownerId)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25, right: 25),
+                      child: Row(
+                        children: [
+                          buildControl(
+                            FontAwesomeIcons.volumeUp,
+                            Colors.black38,
+                            () {
+                              print("Speaker");
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          buildControl(
+                            Icons.mic_off,
+                            Colors.black38,
+                            () {
+                              print("Mute");
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          buildControl(
+                            Icons.call_end,
+                            const Color(0xffff2d55),
+                            () {
+                              final databaseReference = FirebaseDatabase
+                                  .instance
+                                  .ref("GroupCalls/${widget.callId}");
+                              showCupertinoModalPopup<void>(
+                                context: navigatorKey.currentContext!,
+                                builder: (BuildContext context) =>
+                                    CupertinoActionSheet(
+                                  title: Text(
+                                      'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
+                                  actions: <CupertinoActionSheetAction>[
+                                    if (context.currentUser?.id ==
+                                        groupCall?.ownerId)
+                                      CupertinoActionSheetAction(
+                                        isDestructiveAction: true,
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          BotToast.removeAll("call_overlay");
+                                          databaseReference.remove();
+                                          DatabaseReference userRef =
+                                              FirebaseDatabase.instance
+                                                  .ref("Users");
+                                          userRef.update({
+                                            context.currentUser?.id ?? "":
+                                                "Ended"
+                                          });
+                                          widget.agoraEngine?.destroy();
+                                        },
+                                        child: Text(
+                                          'End ${widget.isVideo ? "Video" : "Voice"} Call',
+                                        ),
+                                      ),
                                     CupertinoActionSheetAction(
-                                      isDestructiveAction: true,
                                       onPressed: () {
                                         Navigator.pop(context);
                                         BotToast.removeAll("call_overlay");
-                                        databaseReference.remove();
+                                        databaseReference
+                                            .child(
+                                                "members/${context.currentUser?.id}")
+                                            .remove();
                                         DatabaseReference userRef =
                                             FirebaseDatabase.instance
                                                 .ref("Users");
@@ -157,50 +217,31 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                         widget.agoraEngine?.destroy();
                                       },
                                       child: Text(
-                                        'End ${widget.isVideo ? "Video" : "Voice"} Call',
-                                      ),
+                                          'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
                                     ),
-                                  CupertinoActionSheetAction(
+                                  ],
+                                  cancelButton: CupertinoActionSheetAction(
+                                    child: const Text('Cancel'),
                                     onPressed: () {
-                                      Navigator.pop(context);
-                                      BotToast.removeAll("call_overlay");
-                                      databaseReference
-                                          .child(
-                                              "members/${context.currentUser?.id}")
-                                          .remove();
-                                      DatabaseReference userRef =
-                                          FirebaseDatabase.instance
-                                              .ref("Users");
-                                      userRef.update({
-                                        context.currentUser?.id ?? "": "Ended"
-                                      });
-                                      widget.agoraEngine?.destroy();
+                                      Navigator.pop(context, 'Cancel');
                                     },
-                                    child: Text(
-                                        'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
                                   ),
-                                ],
-                                cancelButton: CupertinoActionSheetAction(
-                                  child: const Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.pop(context, 'Cancel');
-                                  },
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
+            initialPosition: AnchoringPosition.topRight,
+            dragController: remoteDragController,
           ),
-          initialPosition: AnchoringPosition.topRight,
-          dragController: remoteDragController,
-        ),
-      ],
+        ],
+      ),
     );
   }
 

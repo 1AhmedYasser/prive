@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -526,6 +527,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const Expanded(child: SizedBox()),
                       ElevatedButton(
                         onPressed: () async {
+                          BotToast.removeAll("call_overlay");
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -547,12 +549,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               );
                             },
                           ).then((value) => checkForGroupCall());
-                          // await Future.delayed(
-                          //     const Duration(milliseconds: 300), () {
-                          //   setState(() {
-                          //     groupCall = null;
-                          //   });
-                          // });
+                          await Future.delayed(
+                              const Duration(milliseconds: 300), () {
+                            setState(() {
+                              groupCall = null;
+                            });
+                          });
                         },
                         child: const Text("Join"),
                         style: ElevatedButton.styleFrom(

@@ -53,6 +53,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   List<GroupCallMember> videoMembers = [];
   bool showingInfo = false;
   CancelToken cancelToken = CancelToken();
+  bool didEndCall = false;
 
   @override
   void initState() {
@@ -123,12 +124,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           highlightColor: Colors.transparent,
                           onTap: () {
                             Navigator.pop(context);
-                            Utils.showCallOverlay(
-                              isGroup: true,
-                              isVideo: widget.isVideo,
-                              callId: widget.channel.id ?? "",
-                              agoraEngine: agoraEngine,
-                            );
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -423,6 +418,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             CupertinoActionSheetAction(
                               isDestructiveAction: true,
                               onPressed: () {
+                                didEndCall = true;
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 databaseReference.remove();
@@ -437,6 +433,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ),
                           CupertinoActionSheetAction(
                             onPressed: () {
+                              didEndCall = true;
                               Navigator.pop(context);
                               Navigator.pop(context);
                               databaseReference
@@ -644,6 +641,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   @override
   void dispose() {
+    if (didEndCall == false) {
+      Utils.showCallOverlay(
+        isGroup: true,
+        isVideo: widget.isVideo,
+        callId: widget.channel.id ?? "",
+        agoraEngine: agoraEngine,
+        channel: widget.channel,
+      );
+    }
     onAddListener?.cancel();
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
