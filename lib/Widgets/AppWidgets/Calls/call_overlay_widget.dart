@@ -43,9 +43,12 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   GroupCall? groupCall;
   List<GroupCallMember> videoMembers = [];
   bool showingInfo = false;
+  GroupCallMember? me;
+  bool isSpeakerOn = false;
 
   @override
   void initState() {
+    _getSpeakerStatus();
     if (widget.isGroup) {
       _listenToFirebaseChanges();
     }
@@ -130,6 +133,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           ? true
                                           : false,
                                       isJoining: true,
+                                      startCam: me?.isVideoOn == true,
                                       channel: widget.channel,
                                       scrollController: controller,
                                     );
@@ -150,18 +154,57 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                       child: Row(
                         children: [
                           buildControl(
-                            FontAwesomeIcons.volumeUp,
+                            widget.isVideo
+                                ? me?.isVideoOn == true
+                                    ? Icons.videocam
+                                    : Icons.videocam_off
+                                : isSpeakerOn
+                                    ? FontAwesomeIcons.volumeUp
+                                    : FontAwesomeIcons.volumeDown,
                             Colors.black38,
-                            () {
-                              print("Speaker");
+                            () async {
+                              if (widget.isGroup) {
+                                if (widget.isVideo) {
+                                  bool isVideoOn = me?.isVideoOn == true;
+                                  final ref = FirebaseDatabase.instance.ref(
+                                      "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                                  ref.update({"isVideoOn": !isVideoOn});
+                                  if (isVideoOn) {
+                                    await widget.agoraEngine?.enableVideo();
+                                  } else {
+                                    await widget.agoraEngine?.disableVideo();
+                                  }
+                                } else {
+                                  if (widget.isVideo == false) {
+                                    isSpeakerOn = !isSpeakerOn;
+                                    await widget.agoraEngine
+                                        ?.setEnableSpeakerphone(isSpeakerOn);
+                                    setState(() {});
+                                  }
+                                }
+                              }
                             },
                           ),
                           const SizedBox(width: 15),
                           buildControl(
-                            Icons.mic_off,
+                            me?.isMicOn == true ? Icons.mic : Icons.mic_off,
                             Colors.black38,
-                            () {
-                              print("Mute");
+                            () async {
+                              if (widget.isGroup) {
+                                bool isMute =
+                                    me?.isMicOn == true ? false : true;
+                                final ref = FirebaseDatabase.instance.ref(
+                                    "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                                ref.update({
+                                  "isMicOn": me?.isMicOn == true ? false : true
+                                });
+                                widget.agoraEngine?.muteRemoteAudioStream(
+                                  int.parse(context.currentUser?.id ?? "0"),
+                                  isMute,
+                                );
+                                await widget.agoraEngine
+                                    ?.muteLocalAudioStream(isMute);
+                              }
                             },
                           ),
                           const SizedBox(width: 15),
@@ -169,24 +212,46 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             Icons.call_end,
                             const Color(0xffff2d55),
                             () {
-                              final databaseReference = FirebaseDatabase
-                                  .instance
-                                  .ref("GroupCalls/${widget.callId}");
-                              showCupertinoModalPopup<void>(
-                                context: navigatorKey.currentContext!,
-                                builder: (BuildContext context) =>
-                                    CupertinoActionSheet(
-                                  title: Text(
-                                      'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
-                                  actions: <CupertinoActionSheetAction>[
-                                    if (context.currentUser?.id ==
-                                        groupCall?.ownerId)
+                              if (widget.isGroup) {
+                                final databaseReference = FirebaseDatabase
+                                    .instance
+                                    .ref("GroupCalls/${widget.callId}");
+                                showCupertinoModalPopup<void>(
+                                  context: navigatorKey.currentContext!,
+                                  builder: (BuildContext context) =>
+                                      CupertinoActionSheet(
+                                    title: Text(
+                                        'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
+                                    actions: <CupertinoActionSheetAction>[
+                                      if (context.currentUser?.id ==
+                                          groupCall?.ownerId)
+                                        CupertinoActionSheetAction(
+                                          isDestructiveAction: true,
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            BotToast.removeAll("call_overlay");
+                                            databaseReference.remove();
+                                            DatabaseReference userRef =
+                                                FirebaseDatabase.instance
+                                                    .ref("Users");
+                                            userRef.update({
+                                              context.currentUser?.id ?? "":
+                                                  "Ended"
+                                            });
+                                            widget.agoraEngine?.destroy();
+                                          },
+                                          child: Text(
+                                            'End ${widget.isVideo ? "Video" : "Voice"} Call',
+                                          ),
+                                        ),
                                       CupertinoActionSheetAction(
-                                        isDestructiveAction: true,
                                         onPressed: () {
                                           Navigator.pop(context);
                                           BotToast.removeAll("call_overlay");
-                                          databaseReference.remove();
+                                          databaseReference
+                                              .child(
+                                                  "members/${context.currentUser?.id}")
+                                              .remove();
                                           DatabaseReference userRef =
                                               FirebaseDatabase.instance
                                                   .ref("Users");
@@ -197,37 +262,18 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           widget.agoraEngine?.destroy();
                                         },
                                         child: Text(
-                                          'End ${widget.isVideo ? "Video" : "Voice"} Call',
-                                        ),
+                                            'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
                                       ),
-                                    CupertinoActionSheetAction(
+                                    ],
+                                    cancelButton: CupertinoActionSheetAction(
+                                      child: const Text('Cancel'),
                                       onPressed: () {
-                                        Navigator.pop(context);
-                                        BotToast.removeAll("call_overlay");
-                                        databaseReference
-                                            .child(
-                                                "members/${context.currentUser?.id}")
-                                            .remove();
-                                        DatabaseReference userRef =
-                                            FirebaseDatabase.instance
-                                                .ref("Users");
-                                        userRef.update({
-                                          context.currentUser?.id ?? "": "Ended"
-                                        });
-                                        widget.agoraEngine?.destroy();
+                                        Navigator.pop(context, 'Cancel');
                                       },
-                                      child: Text(
-                                          'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
                                     ),
-                                  ],
-                                  cancelButton: CupertinoActionSheetAction(
-                                    child: const Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.pop(context, 'Cancel');
-                                    },
                                   ),
-                                ),
-                              );
+                                );
+                              }
                             },
                           ),
                         ],
@@ -315,6 +361,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       }
 
       groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+      me = groupCall?.members
+          ?.firstWhere((element) => element.id == context.currentUser?.id);
       videoMembers = groupCall?.members
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
@@ -332,5 +380,11 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       }
       showingInfo = true;
     }
+  }
+
+  void _getSpeakerStatus() async {
+    isSpeakerOn = await widget.agoraEngine?.isSpeakerphoneEnabled() ?? false;
+    print(isSpeakerOn);
+    setState(() {});
   }
 }

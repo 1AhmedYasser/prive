@@ -27,10 +27,12 @@ class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
   final Channel channel;
   final bool isJoining;
+  final bool startCam;
   final ScrollController scrollController;
   const GroupCallScreen(
       {Key? key,
       this.isVideo = false,
+      this.startCam = true,
       required this.scrollController,
       this.isJoining = false,
       required this.channel})
@@ -502,7 +504,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       image: context.currentUser?.image,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: false,
-      isVideoOn: widget.isVideo,
+      isVideoOn: widget.isVideo ? widget.startCam : false,
     );
     final ref = FirebaseDatabase.instance
         .ref("GroupCalls/${widget.channel.id}/members");
