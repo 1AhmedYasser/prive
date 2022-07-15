@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
@@ -636,10 +637,21 @@ class Utils {
     }
   }
 
-  static void showCallOverlay() {
+  static void showCallOverlay({
+    bool isGroup = false,
+    bool isVideo = false,
+    String callId = "",
+    RtcEngine? agoraEngine,
+  }) {
+    BotToast.removeAll("call_overlay");
     BotToast.showWidget(
       toastBuilder: (context) {
-        return const CallOverlayWidget();
+        return CallOverlayWidget(
+          isGroup: isGroup,
+          isVideo: isVideo,
+          callId: callId,
+          agoraEngine: agoraEngine,
+        );
       },
       groupKey: "call_overlay",
     );

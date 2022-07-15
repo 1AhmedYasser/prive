@@ -16,7 +16,7 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Extras/resources.dart';
-import '../../../Helpers/Utils.dart';
+import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
 import '../../../UltraNetwork/ultra_network.dart';
@@ -121,7 +121,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         child: InkWell(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-                          //onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Utils.showCallOverlay(
+                              isGroup: true,
+                              isVideo: widget.isVideo,
+                              callId: widget.channel.id ?? "",
+                              agoraEngine: agoraEngine,
+                            );
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.grey.shade800,
@@ -607,7 +615,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         }, userJoined: (int uid, int elapsed) {
           print('userJoined $uid');
         }, cameraReady: () async {
-          print("camera readdy");
+          print("camera ready");
           await agoraEngine?.enableVideo();
           setState(() {});
         }));

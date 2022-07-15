@@ -1,16 +1,31 @@
+import 'dart:async';
+
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:draggable_widget/draggable_widget.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/main.dart';
+import '../../../Extras/resources.dart';
+import '../../../Helpers/Utils.dart';
+import '../../../Models/Call/group_call.dart';
+import '../../../Models/Call/group_call_member.dart';
 import '../../Common/cached_image.dart';
 
 class CallOverlayWidget extends StatefulWidget {
   final bool isGroup;
   final bool isVideo;
+  final String callId;
+  final RtcEngine? agoraEngine;
   const CallOverlayWidget({
     Key? key,
     this.isGroup = false,
     this.isVideo = false,
+    this.callId = "",
+    this.agoraEngine,
   }) : super(key: key);
 
   @override
@@ -19,6 +34,20 @@ class CallOverlayWidget extends StatefulWidget {
 
 class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   final remoteDragController = DragController();
+  StreamSubscription? onAddListener;
+  StreamSubscription? onChangeListener;
+  StreamSubscription? onDeleteListener;
+  GroupCall? groupCall;
+  List<GroupCallMember> videoMembers = [];
+  bool showingInfo = false;
+
+  @override
+  void initState() {
+    if (widget.isGroup) {
+      _listenToFirebaseChanges();
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,13 +92,18 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                         "Family",
                         style: TextStyle(color: Colors.white),
                       ),
-                      subtitle: const Text(
-                        "4 participants",
-                        style: TextStyle(color: Colors.white),
+                      subtitle: Text(
+                        "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      trailing: Icon(
-                        FontAwesomeIcons.expand,
-                        color: Colors.white,
+                      trailing: GestureDetector(
+                        onTap: () {
+                          print("Expand Call");
+                        },
+                        child: const Icon(
+                          FontAwesomeIcons.expand,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -97,7 +131,63 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                           Icons.call_end,
                           const Color(0xffff2d55),
                           () {
-                            print("End Call");
+                            final databaseReference = FirebaseDatabase.instance
+                                .ref("GroupCalls/${widget.callId}");
+                            showCupertinoModalPopup<void>(
+                              context: navigatorKey.currentContext!,
+                              builder: (BuildContext context) =>
+                                  CupertinoActionSheet(
+                                title: Text(
+                                    'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
+                                actions: <CupertinoActionSheetAction>[
+                                  if (context.currentUser?.id ==
+                                      groupCall?.ownerId)
+                                    CupertinoActionSheetAction(
+                                      isDestructiveAction: true,
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        BotToast.removeAll("call_overlay");
+                                        databaseReference.remove();
+                                        DatabaseReference userRef =
+                                            FirebaseDatabase.instance
+                                                .ref("Users");
+                                        userRef.update({
+                                          context.currentUser?.id ?? "": "Ended"
+                                        });
+                                        widget.agoraEngine?.destroy();
+                                      },
+                                      child: Text(
+                                        'End ${widget.isVideo ? "Video" : "Voice"} Call',
+                                      ),
+                                    ),
+                                  CupertinoActionSheetAction(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      BotToast.removeAll("call_overlay");
+                                      databaseReference
+                                          .child(
+                                              "members/${context.currentUser?.id}")
+                                          .remove();
+                                      DatabaseReference userRef =
+                                          FirebaseDatabase.instance
+                                              .ref("Users");
+                                      userRef.update({
+                                        context.currentUser?.id ?? "": "Ended"
+                                      });
+                                      widget.agoraEngine?.destroy();
+                                    },
+                                    child: Text(
+                                        'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
+                                  ),
+                                ],
+                                cancelButton: CupertinoActionSheetAction(
+                                  child: const Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Cancel');
+                                  },
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -135,5 +225,71 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         ),
       ),
     );
+  }
+
+  void _listenToFirebaseChanges() {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.callId}");
+    onAddListener = databaseReference.onChildAdded.listen((event) {
+      getGroupCall();
+    });
+    onChangeListener = databaseReference.onChildChanged.listen((event) {
+      getGroupCall();
+    });
+    onChangeListener = databaseReference.onChildRemoved.listen((event) {
+      getGroupCall();
+    });
+  }
+
+  void getGroupCall() async {
+    final databaseReference =
+        FirebaseDatabase.instance.ref("GroupCalls/${widget.callId}");
+
+    final snapshot = await databaseReference.get();
+    if (snapshot.exists) {
+      Map<dynamic, dynamic>? groupCallResponse = {};
+      groupCallResponse = (snapshot.value as Map<dynamic, dynamic>);
+
+      String? ownerId = groupCallResponse['ownerId'];
+      String? type = groupCallResponse['type'];
+      List<GroupCallMember>? members = [];
+
+      Map<dynamic, dynamic>? membersList =
+          (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      membersList.forEach((key, value) {
+        members.add(
+          GroupCallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+
+      if (membersList.isEmpty == true) {
+        databaseReference.remove();
+      }
+
+      groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+      videoMembers = groupCall?.members
+              ?.where((element) => element.isVideoOn == true)
+              .toList() ??
+          [];
+      setState(() {});
+    } else {
+      if (showingInfo == false) {
+        Utils.showAlert(
+          context,
+          message: "Group Call Has Ended",
+          alertImage: R.images.alertInfoImage,
+        ).then(
+          (value) => Navigator.pop(context),
+        );
+      }
+      showingInfo = true;
+    }
   }
 }

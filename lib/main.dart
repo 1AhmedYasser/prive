@@ -25,6 +25,8 @@ import 'Screens/Home/channels_screen.dart';
 import 'Screens/More/Settings/language_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -34,7 +36,7 @@ void main() async {
   //   logLevel: Level.INFO,
   //   connectionMode: ConnectionMode.regular,
   // );
-  final client = StreamChatClient(R.constants.streamKey);
+  final client = StreamChatClient(R.constants.streamKey, logLevel: Level.OFF);
   // client.chatPersistenceClient = chatPersistentClient;
   runApp(
     EasyLocalization(
@@ -74,6 +76,7 @@ class Prive extends StatelessWidget {
       child: MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
+        navigatorKey: navigatorKey,
         locale: const Locale("en"), //context.locale,
         theme: theme,
         debugShowCheckedModeBanner: false,

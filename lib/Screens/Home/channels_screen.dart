@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Channels/archive_tab.dart';
 import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
 import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
@@ -17,11 +18,11 @@ class ChannelsScreen extends StatefulWidget {
 class _ChannelsScreenState extends State<ChannelsScreen> {
   final List<String> _tabs = ["Chats", "Groups", "Channels", "Archive"];
 
-  // @override
-  // void initState() {
-  //   _createChannel();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    // _createChannel();
+    super.initState();
+  }
 
   // void _createChannel() async {
   //   StreamChatCore.of(context).client.createChannel('messaging',
@@ -152,31 +153,25 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               actions: [
                 Row(
                   children: [
-                    ClipRRect(
-                      child: Image.asset(
-                        R.images.searchImage,
-                        width: 25,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, R.routes.profileRoute);
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: CachedImage(
-                            url: context.currentUserImage ?? "",
-                            fit: BoxFit.fill,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 23),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, R.routes.profileRoute);
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CachedImage(
+                              url: context.currentUserImage ?? "",
+                              fit: BoxFit.fill,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20),
                   ],
                 ),
               ],
