@@ -55,6 +55,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool showingInfo = false;
   CancelToken cancelToken = CancelToken();
   bool didEndCall = false;
+  rtc_local_view.SurfaceView? localView;
 
   @override
   void initState() {
@@ -146,7 +147,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     padding: const EdgeInsets.only(
                         top: 15, left: 15, right: 15, bottom: 0),
                     child: StaggeredGridView.countBuilder(
-                      key: UniqueKey(),
                       crossAxisCount: 2,
                       itemCount: videoMembers.length,
                       physics: const NeverScrollableScrollPhysics(),
@@ -553,6 +553,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       setState(() {});
     } else {
       if (showingInfo == false) {
+        didEndCall = true;
         Utils.showAlert(
           context,
           message: "Group Call Has Ended",
@@ -624,6 +625,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             widget.channel.id ?? "",
             null,
             int.parse(context.currentUser?.id ?? "0"));
+        localView = const rtc_local_view.SurfaceView();
 
         setState(() {});
       }
@@ -631,7 +633,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   Widget _renderLocalPreview() {
-    return const rtc_local_view.SurfaceView();
+    return localView ?? const SizedBox.shrink();
   }
 
   Widget _renderRemoteVideo(int uid) {

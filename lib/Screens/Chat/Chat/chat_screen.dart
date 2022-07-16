@@ -549,12 +549,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               );
                             },
                           ).then((value) => checkForGroupCall());
-                          await Future.delayed(
-                              const Duration(milliseconds: 300), () {
-                            setState(() {
-                              groupCall = null;
-                            });
-                          });
+                          // await Future.delayed(
+                          //     const Duration(milliseconds: 300), () {
+                          //   setState(() {
+                          //     groupCall = null;
+                          //   });
+                          // });
                         },
                         child: const Text("Join"),
                         style: ElevatedButton.styleFrom(
