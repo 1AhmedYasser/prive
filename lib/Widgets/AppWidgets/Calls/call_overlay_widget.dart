@@ -12,8 +12,8 @@ import 'package:prive/main.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
-import '../../../Models/Call/group_call.dart';
-import '../../../Models/Call/group_call_member.dart';
+import '../../../Models/Call/call.dart';
+import '../../../Models/Call/call_member.dart';
 import '../../../Screens/Chat/Calls/group_call_screen.dart';
 
 class CallOverlayWidget extends StatefulWidget {
@@ -40,10 +40,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
-  GroupCall? groupCall;
-  List<GroupCallMember> videoMembers = [];
+  Call? groupCall;
+  List<CallMember> videoMembers = [];
   bool showingInfo = false;
-  GroupCallMember? me;
+  CallMember? me;
   bool isSpeakerOn = false;
 
   @override
@@ -339,13 +339,13 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
 
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
-      List<GroupCallMember>? members = [];
+      List<CallMember>? members = [];
 
       Map<dynamic, dynamic>? membersList =
           (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
-          GroupCallMember(
+          CallMember(
             id: value['id'],
             name: value['name'],
             image: value['image'],
@@ -360,7 +360,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         databaseReference.remove();
       }
 
-      groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+      groupCall = Call(ownerId: ownerId, type: type, members: members);
       me = groupCall?.members
           ?.firstWhere((element) => element.id == context.currentUser?.id);
       videoMembers = groupCall?.members

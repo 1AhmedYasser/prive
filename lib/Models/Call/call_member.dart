@@ -1,4 +1,4 @@
-class GroupCallMember {
+class CallMember {
   String? id;
   String? name;
   String? image;
@@ -6,7 +6,7 @@ class GroupCallMember {
   bool? isMicOn;
   bool? isVideoOn;
 
-  GroupCallMember({
+  CallMember({
     required this.id,
     required this.name,
     required this.image,
@@ -15,7 +15,7 @@ class GroupCallMember {
     this.isVideoOn,
   });
 
-  GroupCallMember.fromJson(Map<String, dynamic> json) {
+  CallMember.fromJson(Map<String, dynamic> json) {
     id = json['id'] as String?;
     name = json['name'] as String?;
     image = json['image'] as String?;

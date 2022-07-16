@@ -5,12 +5,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:prive/Screens/Chat/Calls/single_call_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
-import '../../../Screens/Chat/Calls/call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
   final String channelName;
@@ -43,7 +44,7 @@ class _CallingWidgetState extends State<CallingWidget> {
     _setupRingingTone();
     timer = Timer.periodic(
         const Duration(seconds: 5), (Timer t) => _setupRingingTone());
-    ref = FirebaseDatabase.instance.ref("Calls/${widget.channelName}");
+    ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
     usersRef = FirebaseDatabase.instance.ref("Users");
     listener = ref.onValue.listen((DatabaseEvent event) async {
       Map<dynamic, dynamic> data =
@@ -58,9 +59,6 @@ class _CallingWidgetState extends State<CallingWidget> {
       if (endedUsers == data.length) {
         BotToast.cleanAll();
         FlutterCallkitIncoming.endAllCalls();
-        await ref.update({
-          await Utils.getString(R.pref.userId) ?? "": "Ended",
-        });
         await usersRef.update({
           await Utils.getString(R.pref.userId) ?? "": "Ended",
         });
@@ -130,33 +128,36 @@ class _CallingWidgetState extends State<CallingWidget> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        DatabaseReference ref = FirebaseDatabase.instance
-                            .ref("Calls/${widget.channelName}");
-
-                        BotToast.cleanAll();
-                        Navigator.of(widget.context).push(
-                          PageRouteBuilder(
-                            pageBuilder: (BuildContext context, _, __) {
-                              return CallScreen(
-                                channelName: widget.channelName,
-                                isJoining: true,
-                                isVideo: widget.isVideoCall,
-                                callImage: widget.callerImage,
-                                callName: widget.callerName,
-                              );
-                            },
-                            transitionsBuilder: (_, Animation<double> animation,
-                                __, Widget child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                        await ref.update({
-                          await Utils.getString(R.pref.userId) ?? "": "In Call",
+                        final client = StreamChatCore.of(context).client;
+                        Channel? channel;
+                        client.state.channels.forEach((key, ch) {
+                          if (ch.id == widget.channelName) {
+                            channel = ch;
+                          }
                         });
+                        BotToast.cleanAll();
+                        if (channel != null) {
+                          Navigator.of(widget.context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (BuildContext context, _, __) {
+                                return SingleCallScreen(
+                                  isJoining: true,
+                                  isVideo: widget.isVideoCall,
+                                  channel: channel!,
+                                );
+                              },
+                              transitionsBuilder: (_,
+                                  Animation<double> animation,
+                                  __,
+                                  Widget child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.transparent,
@@ -190,13 +191,10 @@ class _CallingWidgetState extends State<CallingWidget> {
                         Utils.logAnswerOrCancelCall(context,
                             context.currentUser?.id ?? "", "CANCELLED", "0");
                         DatabaseReference ref = FirebaseDatabase.instance
-                            .ref("Calls/${widget.channelName}");
+                            .ref("SingleCalls/${widget.channelName}");
+                        ref.remove();
                         DatabaseReference usersRef =
                             FirebaseDatabase.instance.ref("Users");
-
-                        await ref.update({
-                          await Utils.getString(R.pref.userId) ?? "": "Ended",
-                        });
                         await usersRef.update({
                           await Utils.getString(R.pref.userId) ?? "": "Ended",
                         });

@@ -16,8 +16,8 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Screens/Chat/Calls/call_screen.dart';
 import 'package:prive/Screens/Chat/Calls/group_call_screen.dart';
+import 'package:prive/Screens/Chat/Calls/single_call_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
@@ -29,8 +29,8 @@ import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Models/Call/group_call.dart';
-import '../../../Models/Call/group_call_member.dart';
+import '../../../Models/Call/call.dart';
+import '../../../Models/Call/call_member.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
 import '../../../Widgets/Common/cached_image.dart';
 import 'chat_info_screen.dart';
@@ -81,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageSearchController =
       TextEditingController();
   Member? otherMember;
-  GroupCall? groupCall;
+  Call? groupCall;
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
@@ -887,7 +887,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Navigator.of(context).push(
             PageRouteBuilder(
               pageBuilder: (BuildContext context, _, __) {
-                return CallScreen(
+                return SingleCallScreen(
                   channel: channel,
                   isVideo: isVideo,
                 );
@@ -927,7 +927,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (BuildContext context, _, __) {
-              return CallScreen(
+              return SingleCallScreen(
                 channel: channel,
                 isVideo: isVideo,
               );
@@ -1461,13 +1461,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
-      List<GroupCallMember>? members = [];
+      List<CallMember>? members = [];
 
       Map<dynamic, dynamic>? membersList =
           (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
-          GroupCallMember(
+          CallMember(
             id: value['id'],
             name: value['name'],
             image: value['image'],
@@ -1480,7 +1480,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (membersList.isEmpty == true) {
         groupCall = null;
       } else {
-        groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
+        groupCall = Call(ownerId: ownerId, type: type, members: members);
       }
       setState(() {});
     } else {

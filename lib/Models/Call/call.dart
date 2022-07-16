@@ -1,20 +1,20 @@
-import 'package:prive/Models/Call/group_call_member.dart';
+import 'package:prive/Models/Call/call_member.dart';
 
-class GroupCall {
+class Call {
   String? ownerId;
   String? type;
-  List<GroupCallMember>? members;
+  List<CallMember>? members;
 
-  GroupCall({
+  Call({
     this.ownerId,
     this.type,
     this.members,
   });
 
-  GroupCall.fromJson(Map<String, dynamic> json) {
+  Call.fromJson(Map<String, dynamic> json) {
     ownerId = json['ownerId'] as String?;
     type = json['type'] as String?;
-    members = json['members'] as List<GroupCallMember>?;
+    members = json['members'] as List<CallMember>?;
   }
 
   Map<String, dynamic> toJson() {

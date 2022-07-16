@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:prive/Models/Call/group_call.dart';
-import 'package:prive/Models/Call/group_call_member.dart';
+import 'package:prive/Models/Call/call.dart';
+import 'package:prive/Models/Call/call_member.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -46,13 +46,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isSpeakerOn = false;
   bool isVideoOn = false;
   bool isMute = true;
-  List<GroupCallMember> members = [];
-  GroupCall? groupCall;
+  Call? call;
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
   RtcEngine? agoraEngine;
-  List<GroupCallMember> videoMembers = [];
+  List<CallMember> videoMembers = [];
   bool showingInfo = false;
   CancelToken cancelToken = CancelToken();
   bool didEndCall = false;
@@ -110,7 +109,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                              "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant" : "Participants"}",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13.5,
@@ -211,13 +210,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
                                   child: CachedImage(
-                                    url: groupCall?.members?[index].image ?? "",
+                                    url: call?.members?[index].image ?? "",
                                     fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
                               title: Text(
-                                groupCall?.members?[index].name ?? "",
+                                call?.members?[index].name ?? "",
                                 style: const TextStyle(color: Colors.white),
                               ),
                               // subtitle: const Text(
@@ -227,7 +226,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               trailing: Padding(
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
-                                  groupCall?.members?[index].isMicOn == true
+                                  call?.members?[index].isMicOn == true
                                       ? Icons.mic
                                       : Icons.mic_off_rounded,
                                   color: Colors.white,
@@ -236,7 +235,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ),
                           );
                         },
-                        itemCount: groupCall?.members?.length ?? 0,
+                        itemCount: call?.members?.length ?? 0,
                         separatorBuilder: (BuildContext context, int index) {
                           return const Divider(
                             height: 0,
@@ -416,7 +415,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         title: Text(
                             'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
                         actions: <CupertinoActionSheetAction>[
-                          if (context.currentUser?.id == groupCall?.ownerId)
+                          if (context.currentUser?.id == call?.ownerId)
                             CupertinoActionSheetAction(
                               isDestructiveAction: true,
                               onPressed: () {
@@ -477,7 +476,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   Future<void> _createGroupCall() async {
-    GroupCallMember owner = GroupCallMember(
+    CallMember owner = CallMember(
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
@@ -498,7 +497,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _joinGroupCall() {
-    GroupCallMember joiningUser = GroupCallMember(
+    CallMember joiningUser = CallMember(
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
@@ -514,7 +513,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     initAgora();
   }
 
-  void getGroupCall() async {
+  void getCall() async {
     final databaseReference =
         FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
 
@@ -525,13 +524,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
-      List<GroupCallMember>? members = [];
+      List<CallMember>? members = [];
 
       Map<dynamic, dynamic>? membersList =
           (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
-          GroupCallMember(
+          CallMember(
             id: value['id'],
             name: value['name'],
             image: value['image'],
@@ -546,8 +545,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         databaseReference.remove();
       }
 
-      groupCall = GroupCall(ownerId: ownerId, type: type, members: members);
-      videoMembers = groupCall?.members
+      call = Call(ownerId: ownerId, type: type, members: members);
+      videoMembers = call?.members
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
           [];
@@ -570,13 +569,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     final databaseReference =
         FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
-      getGroupCall();
+      getCall();
     });
     onChangeListener = databaseReference.onChildChanged.listen((event) {
-      getGroupCall();
+      getCall();
     });
     onChangeListener = databaseReference.onChildRemoved.listen((event) {
-      getGroupCall();
+      getCall();
     });
   }
 
