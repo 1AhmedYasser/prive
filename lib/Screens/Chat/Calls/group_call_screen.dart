@@ -601,8 +601,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
         if (widget.isVideo) {
           await agoraEngine?.enableVideo();
+          await agoraEngine?.setEnableSpeakerphone(true);
+          agoraEngine?.muteLocalAudioStream(true);
           setState(() {});
         } else {
+          agoraEngine?.muteLocalAudioStream(true);
           await agoraEngine?.setEnableSpeakerphone(false);
           setState(() {});
         }
