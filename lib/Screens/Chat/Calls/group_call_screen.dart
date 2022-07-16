@@ -574,7 +574,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     onChangeListener = databaseReference.onChildChanged.listen((event) {
       getCall();
     });
-    onChangeListener = databaseReference.onChildRemoved.listen((event) {
+    onDeleteListener = databaseReference.onChildRemoved.listen((event) {
       getCall();
     });
   }

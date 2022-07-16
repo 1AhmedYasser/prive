@@ -47,16 +47,7 @@ class _CallingWidgetState extends State<CallingWidget> {
     ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
     usersRef = FirebaseDatabase.instance.ref("Users");
     listener = ref.onValue.listen((DatabaseEvent event) async {
-      Map<dynamic, dynamic> data =
-          event.snapshot.value as Map<dynamic, dynamic>;
-      data.remove(await Utils.getString(R.pref.userId));
-      int endedUsers = 0;
-      data.forEach((key, value) {
-        if (value == "Ended") {
-          endedUsers++;
-        }
-      });
-      if (endedUsers == data.length) {
+      if (event.snapshot.exists == false) {
         BotToast.cleanAll();
         FlutterCallkitIncoming.endAllCalls();
         await usersRef.update({
