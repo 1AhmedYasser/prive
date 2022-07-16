@@ -624,6 +624,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             widget.channel.id ?? "",
             null,
             int.parse(context.currentUser?.id ?? "0"));
+
         setState(() {});
       }
     });

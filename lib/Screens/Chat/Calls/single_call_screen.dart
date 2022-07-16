@@ -57,6 +57,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   bool isMute = false;
   rtc_remote_view.SurfaceView? remoteView;
   rtc_local_view.SurfaceView? localView;
+  bool didJoinAgora = false;
 
   @override
   void initState() {
@@ -190,7 +191,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                       ? "Calling ..."
                       : _stats != null
                           ? formatTime(_stats?.duration ?? 0)
-                          : "Connecting ...",
+                          : didJoinAgora
+                              ? ""
+                              : "Connecting ...",
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
@@ -443,6 +446,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               "0"),
           channelId: widget.channel.id ?? "",
         );
+        didJoinAgora = true;
         setState(() {});
       }
     });
