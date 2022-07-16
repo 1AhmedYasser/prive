@@ -27,15 +27,17 @@ class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
   final Channel channel;
   final bool isJoining;
-  final bool startCam;
   final ScrollController scrollController;
+  final RtcEngine? agoraEngine;
+  final Call? call;
   const GroupCallScreen(
       {Key? key,
       this.isVideo = false,
-      this.startCam = true,
       required this.scrollController,
       this.isJoining = false,
-      required this.channel})
+      required this.channel,
+      this.agoraEngine,
+      this.call})
       : super(key: key);
 
   @override
@@ -502,15 +504,32 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       name: context.currentUser?.name,
       image: context.currentUser?.image,
       phone: context.currentUser?.extraData['phone'] as String,
-      isMicOn: false,
-      isVideoOn: widget.isVideo ? widget.startCam : false,
+      isMicOn: widget.call != null
+          ? widget.call?.members
+                  ?.firstWhere((member) => member.id == context.currentUser?.id)
+                  .isMicOn ==
+              true
+          : false,
+      isVideoOn: widget.call != null
+          ? widget.call?.members
+                  ?.firstWhere((member) => member.id == context.currentUser?.id)
+                  .isVideoOn ==
+              true
+          : widget.isVideo,
     );
     final ref = FirebaseDatabase.instance
         .ref("GroupCalls/${widget.channel.id}/members");
     ref.update({joiningUser.id ?? "": joiningUser.toJson()});
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "In Call"});
-    initAgora();
+
+    if (widget.agoraEngine == null) {
+      initAgora();
+    } else {
+      agoraEngine = widget.agoraEngine;
+      localView = const rtc_local_view.SurfaceView();
+      setState(() {});
+    }
   }
 
   void getCall() async {
@@ -616,6 +635,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           print('joinChannelSuccess $channel $uid');
         }, userJoined: (int uid, int elapsed) {
           print('userJoined $uid');
+          localView = const rtc_local_view.SurfaceView();
+          setState(() {});
         }, cameraReady: () async {
           print("camera ready");
           await agoraEngine?.enableVideo();
@@ -629,7 +650,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             null,
             int.parse(context.currentUser?.id ?? "0"));
         localView = const rtc_local_view.SurfaceView();
-
+        for (var videoMember in videoMembers) {}
         setState(() {});
       }
     });

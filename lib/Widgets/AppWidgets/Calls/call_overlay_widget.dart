@@ -15,6 +15,7 @@ import '../../../Helpers/Utils.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Screens/Chat/Calls/group_call_screen.dart';
+import '../../../Screens/Chat/Calls/single_call_screen.dart';
 
 class CallOverlayWidget extends StatefulWidget {
   final bool isGroup;
@@ -40,7 +41,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
-  Call? groupCall;
+  Call? call;
   List<CallMember> videoMembers = [];
   bool showingInfo = false;
   CallMember? me;
@@ -49,9 +50,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   @override
   void initState() {
     _getSpeakerStatus();
-    if (widget.isGroup) {
-      _listenToFirebaseChanges();
-    }
+    _listenToFirebaseChanges();
     super.initState();
   }
 
@@ -98,49 +97,66 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                           width: 60,
                           height: 80,
                         ),
-                        // leading: SizedBox(
-                        //   child: ClipRRect(
-                        //     borderRadius: BorderRadius.circular(20),
-                        //     child: CachedImage(
-                        //       url: context.currentUserImage ?? "",
-                        //     ),
-                        //   ),
-                        //   width: 60,
-                        //   height: 80,
-                        // ),
                         title: Text(
-                          widget.isGroup ? widget.channel.name ?? "" : "",
+                          StreamManager.getChannelName(
+                              widget.channel, context.currentUser!),
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                          "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant" : "Participants"}",
                           style: const TextStyle(color: Colors.white),
                         ),
                         trailing: GestureDetector(
                           onTap: () {
                             BotToast.removeAll("call_overlay");
-                            showModalBottomSheet(
-                              context: navigatorKey.currentContext!,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (_) {
-                                return DraggableScrollableSheet(
-                                  minChildSize: 0.2,
-                                  maxChildSize: 0.95,
-                                  builder: (_, controller) {
-                                    return GroupCallScreen(
-                                      isVideo: groupCall?.type == "Video"
-                                          ? true
-                                          : false,
+                            if (widget.isGroup) {
+                              showModalBottomSheet(
+                                context: navigatorKey.currentContext!,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) {
+                                  return DraggableScrollableSheet(
+                                    minChildSize: 0.2,
+                                    maxChildSize: 0.95,
+                                    builder: (_, controller) {
+                                      return GroupCallScreen(
+                                        isVideo: call?.type == "Video"
+                                            ? true
+                                            : false,
+                                        isJoining: true,
+                                        call: call,
+                                        channel: widget.channel,
+                                        scrollController: controller,
+                                        agoraEngine: widget.agoraEngine,
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            } else {
+                              Navigator.of(navigatorKey.currentContext!).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return SingleCallScreen(
                                       isJoining: true,
-                                      startCam: me?.isVideoOn == true,
+                                      isVideo: widget.isVideo,
                                       channel: widget.channel,
-                                      scrollController: controller,
+                                      agoraEngine: widget.agoraEngine,
+                                      call: call,
                                     );
                                   },
-                                );
-                              },
-                            );
+                                  transitionsBuilder: (_,
+                                      Animation<double> animation,
+                                      __,
+                                      Widget child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
+                            }
                           },
                           child: const Icon(
                             FontAwesomeIcons.expand,
@@ -163,24 +179,24 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                     : FontAwesomeIcons.volumeDown,
                             Colors.black38,
                             () async {
-                              if (widget.isGroup) {
-                                if (widget.isVideo) {
-                                  bool isVideoOn = me?.isVideoOn == true;
-                                  final ref = FirebaseDatabase.instance.ref(
-                                      "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                                  ref.update({"isVideoOn": !isVideoOn});
-                                  if (isVideoOn) {
-                                    await widget.agoraEngine?.enableVideo();
-                                  } else {
-                                    await widget.agoraEngine?.disableVideo();
-                                  }
-                                } else {
-                                  if (widget.isVideo == false) {
-                                    isSpeakerOn = !isSpeakerOn;
-                                    await widget.agoraEngine
-                                        ?.setEnableSpeakerphone(isSpeakerOn);
-                                    setState(() {});
-                                  }
+                              if (widget.isVideo) {
+                                bool isVideoOn = !(call?.members
+                                        ?.firstWhere((element) =>
+                                            element.id ==
+                                            context.currentUser?.id)
+                                        .isVideoOn ??
+                                    false);
+                                final ref = FirebaseDatabase.instance.ref(
+                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
+                                ref.update({"isVideoOn": isVideoOn});
+                                await widget.agoraEngine
+                                    ?.enableLocalVideo(isVideoOn);
+                              } else {
+                                if (widget.isVideo == false) {
+                                  isSpeakerOn = !isSpeakerOn;
+                                  await widget.agoraEngine
+                                      ?.setEnableSpeakerphone(isSpeakerOn);
+                                  setState(() {});
                                 }
                               }
                             },
@@ -190,21 +206,17 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             me?.isMicOn == true ? Icons.mic : Icons.mic_off,
                             Colors.black38,
                             () async {
-                              if (widget.isGroup) {
-                                bool isMute =
-                                    me?.isMicOn == true ? false : true;
-                                final ref = FirebaseDatabase.instance.ref(
-                                    "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                                ref.update({
-                                  "isMicOn": me?.isMicOn == true ? false : true
-                                });
-                                widget.agoraEngine?.muteRemoteAudioStream(
-                                  int.parse(context.currentUser?.id ?? "0"),
-                                  isMute,
-                                );
-                                await widget.agoraEngine
-                                    ?.muteLocalAudioStream(isMute);
-                              }
+                              bool isMicOn = me?.isMicOn == true;
+                              final ref = FirebaseDatabase.instance.ref(
+                                  "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
+                              ref.update({"isMicOn": !isMicOn});
+                              await widget.agoraEngine?.muteRemoteAudioStream(
+                                int.parse(context.currentUser?.id ?? "0"),
+                                isMicOn,
+                              );
+                              await widget.agoraEngine
+                                  ?.muteLocalAudioStream(isMicOn);
+                              setState(() {});
                             },
                           ),
                           const SizedBox(width: 15),
@@ -212,10 +224,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             Icons.call_end,
                             const Color(0xffff2d55),
                             () {
+                              final databaseReference =
+                                  FirebaseDatabase.instance.ref(
+                                      "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
                               if (widget.isGroup) {
-                                final databaseReference = FirebaseDatabase
-                                    .instance
-                                    .ref("GroupCalls/${widget.callId}");
                                 showCupertinoModalPopup<void>(
                                   context: navigatorKey.currentContext!,
                                   builder: (BuildContext context) =>
@@ -224,7 +236,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                         'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
                                     actions: <CupertinoActionSheetAction>[
                                       if (context.currentUser?.id ==
-                                          groupCall?.ownerId)
+                                          call?.ownerId)
                                         CupertinoActionSheetAction(
                                           isDestructiveAction: true,
                                           onPressed: () {
@@ -273,6 +285,20 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                     ),
                                   ),
                                 );
+                              } else {
+                                BotToast.removeAll("call_overlay");
+
+                                final databaseReference = FirebaseDatabase
+                                    .instance
+                                    .ref("SingleCalls/${widget.channel.id}");
+                                DatabaseReference usersRef =
+                                    FirebaseDatabase.instance.ref("Users");
+                                databaseReference.remove();
+                                for (var member
+                                    in widget.channel.state?.members ?? []) {
+                                  usersRef
+                                      .update({member.userId ?? "": "Ended"});
+                                }
                               }
                             },
                           ),
@@ -315,34 +341,34 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("GroupCalls/${widget.callId}");
+    final databaseReference = FirebaseDatabase.instance.ref(
+        "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
-      getGroupCall();
+      getCall();
     });
     onChangeListener = databaseReference.onChildChanged.listen((event) {
-      getGroupCall();
+      getCall();
     });
-    onChangeListener = databaseReference.onChildRemoved.listen((event) {
-      getGroupCall();
+    onDeleteListener = databaseReference.onChildRemoved.listen((event) {
+      getCall();
     });
   }
 
-  void getGroupCall() async {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("GroupCalls/${widget.callId}");
+  void getCall() async {
+    final databaseReference = FirebaseDatabase.instance.ref(
+        "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
-      Map<dynamic, dynamic>? groupCallResponse = {};
-      groupCallResponse = (snapshot.value as Map<dynamic, dynamic>);
+      Map<dynamic, dynamic>? callResponse = {};
+      callResponse = (snapshot.value as Map<dynamic, dynamic>);
 
-      String? ownerId = groupCallResponse['ownerId'];
-      String? type = groupCallResponse['type'];
+      String? ownerId = callResponse['ownerId'];
+      String? type = callResponse['type'];
       List<CallMember>? members = [];
 
       Map<dynamic, dynamic>? membersList =
-          (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+          (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
           CallMember(
@@ -360,10 +386,11 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         databaseReference.remove();
       }
 
-      groupCall = Call(ownerId: ownerId, type: type, members: members);
-      me = groupCall?.members
+      call = Call(ownerId: ownerId, type: type, members: members);
+      me = call?.members
           ?.firstWhere((element) => element.id == context.currentUser?.id);
-      videoMembers = groupCall?.members
+      print("My Mic is On ? : ${me?.isMicOn}");
+      videoMembers = call?.members
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
           [];
@@ -372,7 +399,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       if (showingInfo == false) {
         Utils.showAlert(
           context,
-          message: "Group Call Has Ended",
+          message: "${widget.isGroup ? "Group" : ""} Call Has Ended",
           alertImage: R.images.alertInfoImage,
         ).then(
           (value) => Navigator.pop(context),
@@ -384,7 +411,6 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
 
   void _getSpeakerStatus() async {
     isSpeakerOn = await widget.agoraEngine?.isSpeakerphoneEnabled() ?? false;
-    print(isSpeakerOn);
     setState(() {});
   }
 }
