@@ -5,7 +5,6 @@ import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -56,6 +55,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   bool isRemoteVideoOn = true;
   bool isSpeakerOn = false;
   bool isMute = false;
+  rtc_remote_view.SurfaceView? remoteView;
+  rtc_local_view.SurfaceView? localView;
 
   @override
   void initState() {
@@ -186,10 +187,10 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 const SizedBox(height: 7),
                 Text(
                   call?.members?.length == 1
-                      ? "Calling"
+                      ? "Calling ..."
                       : _stats != null
                           ? formatTime(_stats?.duration ?? 0)
-                          : "Connecting",
+                          : "Connecting ...",
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
@@ -379,29 +380,30 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         agoraEngine = await RtcEngine.createWithContext(
             RtcEngineContext(R.constants.agoraAppId));
 
-        if (widget.isVideo) {
-          await agoraEngine?.enableVideo();
-          await agoraEngine?.setEnableSpeakerphone(true);
-          setState(() {});
-        } else {
-          await agoraEngine?.setEnableSpeakerphone(false);
-          setState(() {});
-        }
-
         agoraEngine?.setEventHandler(
           RtcEngineEventHandler(
             joinChannelSuccess: (String channel, int uid, int elapsed) async {
               print('joinChannelSuccess $channel $uid');
+              setState(() {});
             },
             userJoined: (int uid, int elapsed) {
               print('userJoined $uid');
               timer?.cancel();
+              remoteView = rtc_remote_view.SurfaceView(
+                uid: int.parse(call?.members
+                        ?.firstWhere(
+                            (member) => member.id != context.currentUser?.id)
+                        .id ??
+                    "0"),
+                channelId: widget.channel.id ?? "",
+              );
               setState(() {});
             },
             remoteVideoStateChanged: (uid, state, reason, time) {
               if (state.index == 0) {
                 setState(() {
                   isRemoteVideoOn = false;
+                  print("Remote Closed Camera");
                 });
               } else {
                 setState(() {
@@ -413,13 +415,33 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               _stats = stats;
               setState(() {});
             },
+            cameraReady: () {
+              setState(() {});
+            },
           ),
         );
+        if (widget.isVideo) {
+          await agoraEngine?.enableVideo();
+          await agoraEngine?.setEnableSpeakerphone(true);
+          setState(() {});
+        } else {
+          await agoraEngine?.setEnableSpeakerphone(false);
+          setState(() {});
+        }
+
         await agoraEngine?.joinChannel(
           tokenResponse.data ?? "",
           widget.channel.id ?? "",
           null,
           int.parse(context.currentUser?.id ?? "0"),
+        );
+        localView = const rtc_local_view.SurfaceView();
+        remoteView = rtc_remote_view.SurfaceView(
+          uid: int.parse(call?.members
+                  ?.firstWhere((member) => member.id != context.currentUser?.id)
+                  .id ??
+              "0"),
+          channelId: widget.channel.id ?? "",
         );
         setState(() {});
       }
@@ -497,7 +519,13 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               ],
             ),
           ),
-        if (isVideo && call?.members?.length == 2)
+        if (isVideo &&
+            call?.members?.length == 2 &&
+            call?.members
+                    ?.firstWhere(
+                        (member) => member.id == context.currentUser?.id)
+                    .isVideoOn ==
+                true)
           DraggableWidget(
             bottomMargin: 60,
             intialVisibility: true,
@@ -509,12 +537,13 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               offset: Offset(0, 0),
               blurRadius: 2,
             ),
-            child: FlipCard(
-              controller: _flipController,
-              fill: Fill.fillFront,
-              front: _buildLocalView(), //_buildLocalView(),
-              back: _buildLocalView(),
-            ),
+            child: _buildLocalView(),
+            // child: FlipCard(
+            //   controller: _flipController,
+            //   flipOnTouch: false,
+            //   front: _buildLocalView(), //_buildLocalView(),
+            //   back: _buildLocalView(),
+            // ),
             initialPosition: AnchoringPosition.topRight,
             dragController: remoteDragController,
           ),
@@ -631,7 +660,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                         R.images.cameraSwitch,
                       ),
                       onPressed: () {
-                        _flipController.toggleCard();
+                        // _flipController.toggleCard();
+
                         agoraEngine?.switchCamera();
                       },
                     ),
@@ -688,28 +718,25 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: _renderLocalPreview(),
+          child: localView ?? const SizedBox.shrink(),
         ),
       ),
     );
   }
 
   Widget _renderRemoteVideo() {
-    if (call?.members?.length == 2) {
-      return rtc_remote_view.SurfaceView(
-        uid: int.parse(call?.members
-                ?.firstWhere((element) => element.id != context.currentUser?.id)
-                .id ??
-            "0"),
-        channelId: widget.channel.id ?? "",
-      );
+    if (remoteView != null) {
+      if (call?.members
+              ?.firstWhere((member) => member.id != context.currentUser?.id)
+              .isVideoOn ==
+          true) {
+        return remoteView!;
+      } else {
+        return _buildCallingState(isRemoteVideoOn: false);
+      }
     } else {
       return _buildCallingState(isRemoteVideoOn: false);
     }
-  }
-
-  Widget _renderLocalPreview() {
-    return const rtc_local_view.SurfaceView();
   }
 
   @override
