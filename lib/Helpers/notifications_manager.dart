@@ -12,7 +12,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
-import 'package:prive/Screens/Chat/Calls/call_screen.dart';
+import 'package:prive/Screens/Chat/Calls/single_call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
@@ -29,7 +29,7 @@ class NotificationsManager {
 
   static void setupNotifications(BuildContext context) {
     notificationsContext = context;
-    checkForCurrentCalls();
+    //checkForCurrentCalls();
     listenToCalls();
     initializeNotifications();
     requestPermissions();
@@ -326,33 +326,30 @@ class NotificationsManager {
           case CallEvent.ACTION_CALL_INCOMING:
             break;
           case CallEvent.ACTION_CALL_START:
-            print("hi");
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
-            Navigator.of(notificationsContext).push(
-              PageRouteBuilder(
-                pageBuilder: (BuildContext context, _, __) {
-                  return CallScreen(
-                    channelName: (event.body as Map<String, dynamic>)['extra']
-                        ['channelName'],
-                    isJoining: true,
-                    isVideo: (event.body as Map<String, dynamic>)['type'] == 0
-                        ? false
-                        : true,
-                    callName:
-                        (event.body as Map<String, dynamic>)['nameCaller'],
-                    callImage: (event.body as Map<String, dynamic>)['avatar'],
-                  );
-                },
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-              ),
-            );
+            // Navigator.of(notificationsContext).push(
+            //   PageRouteBuilder(
+            //     pageBuilder: (BuildContext context, _, __) {
+            //       (event.body as Map<String, dynamic>)['extra']
+            //       ['channelName']
+            //       return SingleCallScreen(
+            //         isJoining: true,
+            //         isVideo: (event.body as Map<String, dynamic>)['type'] == 0
+            //             ? false
+            //             : true,
+            //         channel: null,
+            //       );
+            //     },
+            //     transitionsBuilder:
+            //         (_, Animation<double> animation, __, Widget child) {
+            //       return FadeTransition(
+            //         opacity: animation,
+            //         child: child,
+            //       );
+            //     },
+            //   ),
+            // );
             break;
           case CallEvent.ACTION_CALL_DECLINE:
             FlutterCallkitIncoming.endAllCalls();
@@ -415,26 +412,26 @@ class NotificationsManager {
           if (endedUsers == data.length) {
             FlutterCallkitIncoming.endAllCalls();
           } else {
-            Navigator.of(notificationsContext).push(
-              PageRouteBuilder(
-                pageBuilder: (BuildContext context, _, __) {
-                  return CallScreen(
-                    channelName: calls[0]['extra']['channelName'],
-                    isJoining: true,
-                    isVideo: calls[0]['type'] == 0 ? false : true,
-                    callName: calls[0]['nameCaller'],
-                    callImage: calls[0]['avatar'],
-                  );
-                },
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-              ),
-            );
+            // Navigator.of(notificationsContext).push(
+            //   PageRouteBuilder(
+            //     pageBuilder: (BuildContext context, _, __) {
+            //       return CallScreen(
+            //         channelName: calls[0]['extra']['channelName'],
+            //         isJoining: true,
+            //         isVideo: calls[0]['type'] == 0 ? false : true,
+            //         callName: calls[0]['nameCaller'],
+            //         callImage: calls[0]['avatar'],
+            //       );
+            //     },
+            //     transitionsBuilder:
+            //         (_, Animation<double> animation, __, Widget child) {
+            //       return FadeTransition(
+            //         opacity: animation,
+            //         child: child,
+            //       );
+            //     },
+            //   ),
+            // );
           }
         }
       }
