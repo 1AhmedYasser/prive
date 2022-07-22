@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -142,7 +143,7 @@ class _CatalogMessageState extends State<CatalogMessage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 5),
                           child: Text(
-                            "$price SAR",
+                            "$price ${"SAR".tr()}",
                             style: TextStyle(
                               color: widget.details.user?.id ==
                                       context.currentUser?.id
@@ -164,7 +165,7 @@ class _CatalogMessageState extends State<CatalogMessage> {
                           ? Colors.white
                           : Colors.black,
                       fontSize: 17),
-                ),
+                ).tr(),
               ),
             ],
           ),

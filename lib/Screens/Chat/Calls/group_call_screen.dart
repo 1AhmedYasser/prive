@@ -14,7 +14,7 @@ import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
@@ -109,10 +109,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 fontSize: 19,
                                 fontWeight: FontWeight.w600,
                               ),
-                            ),
+                            ).tr(),
                             const SizedBox(height: 5),
                             Text(
-                              "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant" : "Participants"}",
+                              "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13.5,
@@ -329,7 +329,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Text(
                         widget.isVideo ? "Video" : "Speaker",
                         style: const TextStyle(color: Colors.white),
-                      )
+                      ).tr()
                     ],
                   ),
                   splashColor: Colors.transparent,
@@ -386,7 +386,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 Text(
                   isMute ? "Un Mute" : "Mute",
                   style: const TextStyle(color: Colors.white, fontSize: 17),
-                )
+                ).tr()
               ],
             ),
             const Expanded(child: SizedBox()),
@@ -415,7 +415,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       context: context,
                       builder: (BuildContext context) => CupertinoActionSheet(
                         title: Text(
-                            'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
+                            '${"Are You Sure  You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
                         actions: <CupertinoActionSheetAction>[
                           if (context.currentUser?.id == call?.ownerId)
                             CupertinoActionSheetAction(
@@ -432,7 +432,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 agoraEngine?.destroy();
                               },
                               child: Text(
-                                  'End ${widget.isVideo ? "Video" : "Voice"} Call'),
+                                  '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
                             ),
                           CupertinoActionSheetAction(
                             onPressed: () {
@@ -449,13 +449,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               agoraEngine?.destroy();
                             },
                             child: Text(
-                                'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
+                                '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
                           ),
                         ],
                         cancelButton: CupertinoActionSheetAction(
-                          child: const Text('Cancel'),
+                          child: const Text('Cancel').tr(),
                           onPressed: () {
-                            Navigator.pop(context, 'Cancel');
+                            Navigator.pop(context, 'Cancel'.tr());
                           },
                         ),
                       ),
@@ -466,7 +466,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 const Text(
                   "Leave",
                   style: TextStyle(color: Colors.white),
-                )
+                ).tr()
               ],
             ),
             const SizedBox(width: 50)
@@ -575,7 +575,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         didEndCall = true;
         Utils.showAlert(
           context,
-          message: "Group Call Has Ended",
+          message: "Group Call Has Ended".tr(),
           alertImage: R.images.alertInfoImage,
         ).then(
           (value) => Navigator.pop(context),
@@ -650,7 +650,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             null,
             int.parse(context.currentUser?.id ?? "0"));
         localView = const rtc_local_view.SurfaceView();
-        for (var videoMember in videoMembers) {}
         setState(() {});
       }
     });

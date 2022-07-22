@@ -21,7 +21,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Notifications & Sounds"),
+        child: PriveAppBar(title: "Notifications & Sounds".tr()),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(
@@ -45,7 +45,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                         color: Theme.of(context).primaryColorDark,
                         fontSize: 18,
                         fontWeight: FontWeight.w500),
-                  ),
+                  ).tr(),
                 ),
                 const SizedBox(height: 20),
                 buildSetting("Private Chats", "Tab To Change", 0),
@@ -86,7 +86,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => NotificationsInnerSettingsScreen(
-                title: title,
+                title: title.tr(),
               ),
             ),
           );
@@ -103,7 +103,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 3),
                 Text(
                   subTitle,
@@ -112,7 +112,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                     fontWeight: FontWeight.w400,
                     color: Color(0xff7a8fa6),
                   ),
-                ),
+                ).tr(),
               ],
             ),
             Switch(

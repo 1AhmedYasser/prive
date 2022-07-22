@@ -209,11 +209,11 @@ class Utils {
 
   static Future<dynamic> showMainMenu(BuildContext context) {
     Map<String, String> mainMenuItems = {
-      R.images.addContactImage: "Add Contact",
-      R.images.loadContactsListImage: "Load Contact List",
-      // R.images.newChannelImage: "New Channel",
-      R.images.newGroupImage: "New Group",
-      R.images.newCatalogImage: "New Catalog",
+      R.images.addContactImage: "Add Contact".tr(),
+      R.images.loadContactsListImage: "Load Contact List".tr(),
+      // R.images.newChannelImage: "New Channel".tr(),
+      R.images.newGroupImage: "New Group".tr(),
+      R.images.newCatalogImage: "New Catalog".tr(),
     };
     return showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -405,7 +405,7 @@ class Utils {
     if (messageDateFormatted == today) {
       return DateFormat('hh:mm a').format(messageDate);
     } else if (messageDateFormatted == yesterday) {
-      return "Yesterday";
+      return "Yesterday".tr();
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));
@@ -418,7 +418,7 @@ class Utils {
   }
 
   static String getLastSeenDate(DateTime data, BuildContext context) {
-    String lastSeen = "last seen ";
+    String lastSeen = "last seen ".tr();
     final now = DateTime.now();
     DateTime lastSeenDate = data.toLocal();
     final today = DateTime(now.year, now.month, now.day);
@@ -428,18 +428,18 @@ class Utils {
         DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
 
     if (lastSeenDateFormatted == today) {
-      lastSeen += "today at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else if (lastSeenDateFormatted == yesterday) {
-      lastSeen += "yesterday at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));
       if (lastSeenDate.isBefore(firstDayOfTheCurrentWeek)) {
         lastSeen +=
-            "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+            "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} ${"at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
       } else {
         lastSeen +=
-            "${DateFormat('EEEE').format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+            "${DateFormat('EEEE').format(lastSeenDate)} ${"at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
       }
     }
     return lastSeen;
@@ -586,13 +586,13 @@ class Utils {
                   color: Colors.white),
               child: Wrap(
                 children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.only(
+                  Padding(
+                    padding: const EdgeInsets.only(
                         left: 20, top: 20, bottom: 10, right: 20),
                     child: Text(
-                      "Open Via",
+                      "Open Via".tr(),
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                          const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
                   ListTile(

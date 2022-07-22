@@ -7,6 +7,7 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/More/more_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import "dart:io";
+import 'package:easy_localization/easy_localization.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -73,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontSize: 17,
                     fontWeight: FontWeight.w400,
                   ),
-                )
+                ).tr()
               ],
             ),
             style: ElevatedButton.styleFrom(
@@ -143,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               Text(
-                "Online",
+                "Online".tr(),
                 style: TextStyle(
                     color: Theme.of(context).primaryColor, fontSize: 15.5),
               ),
@@ -155,17 +156,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Expanded(
                           child: buildTextField(
-                            "First Name",
+                            "First Name".tr(),
                             firstNameController,
-                            emptyValidatorMessage: "Please enter a first name",
+                            emptyValidatorMessage:
+                                "Please enter a first name".tr(),
                           ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
                           child: buildTextField(
-                            "Last Name",
+                            "Last Name".tr(),
                             lastNameController,
-                            emptyValidatorMessage: "Please enter a last name",
+                            emptyValidatorMessage:
+                                "Please enter a last name".tr(),
                           ),
                         ),
                       ],
@@ -173,14 +176,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 20),
                     buildTextField(
-                      "Phone Number",
+                      "Phone Number".tr(),
                       phoneNumberController,
                       type: const TextInputType.numberWithOptions(
                         signed: true,
                         decimal: false,
                       ),
                       formatters: [FilteringTextInputFormatter.digitsOnly],
-                      emptyValidatorMessage: "Please enter a phone number",
+                      emptyValidatorMessage: "Please enter a phone number".tr(),
                     ),
                     // const SizedBox(height: 20),
                     // buildTextField(
@@ -200,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
                         ),
-                      ),
+                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         minimumSize:
@@ -227,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
                         ),
-                      ),
+                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColorDark,
                         minimumSize:

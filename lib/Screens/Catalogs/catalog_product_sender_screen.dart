@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
 import 'package:prive/Models/Catalogs/catalogProduct.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Widgets/ChatWidgets/channel_item_widget.dart';
 
@@ -33,9 +33,9 @@ class _CatalogProductSenderScreenState
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarBrightness: Brightness.light,
         ),
-        title: const Text(
-          "Send To",
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          "Send To".tr(),
+          style: const TextStyle(color: Colors.black),
         ),
         leading: const BackButton(
           color: Color(0xff7a8ea6),
@@ -56,7 +56,7 @@ class _CatalogProductSenderScreenState
               child: Text(
                 isSelectedEnabled ? "Unselect" : "Select",
                 style: const TextStyle(color: Colors.black, fontSize: 17),
-              ),
+              ).tr(),
             ),
           ),
         ],
@@ -265,9 +265,9 @@ class _CatalogProductSenderScreenState
                     Navigator.pop(context);
                   }
                 },
-                child: const Text(
-                  "Forward",
-                  style: TextStyle(
+                child: Text(
+                  "Forward".tr(),
+                  style: const TextStyle(
                     fontSize: 17.5,
                   ),
                 ),

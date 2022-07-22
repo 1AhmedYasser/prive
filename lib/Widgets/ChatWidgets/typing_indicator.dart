@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
@@ -39,7 +40,7 @@ class TypingIndicatorWidget extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade500,
                       ),
-                    ),
+                    ).tr(),
                   )
                 : Align(
                     alignment: Alignment.centerLeft,

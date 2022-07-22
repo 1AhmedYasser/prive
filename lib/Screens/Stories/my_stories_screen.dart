@@ -16,6 +16,7 @@ import '../../Models/Stories/stories.dart';
 import '../../UltraNetwork/ultra_constants.dart';
 import '../../Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
 import '../../Widgets/Common/cached_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 //ignore: must_be_immutable
 class MyStoriesScreen extends StatefulWidget {
@@ -53,7 +54,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
               color: Colors.black,
               fontWeight: FontWeight.w400,
             ),
-          ),
+          ).tr(),
           actions: [
             TextButton(
               onPressed: () {
@@ -68,7 +69,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                   fontSize: 17,
                   color: Theme.of(context).primaryColorDark,
                 ),
-              ),
+              ).tr(),
             )
           ],
         ),
@@ -240,9 +241,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                           widget.myStories[index].views != "0"
                                               ? widget.myStories[index].views !=
                                                       "1"
-                                                  ? "${widget.myStories[index].views} Views"
-                                                  : "1 View"
-                                              : "No Views Yet",
+                                                  ? "${widget.myStories[index].views} ${"Views"}"
+                                                  : "1 ${"View"}"
+                                              : "No Views Yet".tr(),
                                           style: const TextStyle(
                                             fontSize: 16.5,
                                             fontWeight: FontWeight.w600,
@@ -297,7 +298,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
               child: Text(
                 "Your story updates will disappear after 24 hours.",
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-              ),
+              ).tr(),
             )
           ],
         ),

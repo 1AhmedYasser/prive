@@ -36,7 +36,7 @@ class NotificationsManager {
     getToken();
   }
 
-  static void getToken() {
+  static void getToken() async {
     FirebaseMessaging.instance.getToken().then((token) async {
       stream.StreamChat.of(notificationsContext)
           .client
@@ -44,6 +44,9 @@ class NotificationsManager {
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
+    var devicePushTokenVoIP =
+        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    print("Device Token $devicePushTokenVoIP");
   }
 
   static void initializeNotifications() {
@@ -236,7 +239,7 @@ class NotificationsManager {
             'supportsHolding': true,
             'supportsGrouping': false,
             'supportsUngrouping': false,
-            'ringtonePath': R.sounds.calling
+            'ringtonePath': "Ringtone"
           }
         };
         await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -354,12 +357,10 @@ class NotificationsManager {
           case CallEvent.ACTION_CALL_DECLINE:
             FlutterCallkitIncoming.endAllCalls();
             await Firebase.initializeApp();
-            DatabaseReference ref = FirebaseDatabase.instance.ref(
-                "Calls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
+            final databaseReference = FirebaseDatabase.instance.ref(
+                "SingleCalls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
             DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
-            ref.update({
-              await Utils.getString(R.pref.userId) ?? "": "Ended",
-            });
+            databaseReference.remove();
             usersRef.update({
               await Utils.getString(R.pref.userId) ?? "": "Ended",
             });

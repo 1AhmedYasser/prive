@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:intl/intl.dart';
 import '../../../Models/Stories/stories.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ViewersModalView extends StatefulWidget {
   final List<StoryViewUser> viewUsers;
@@ -44,8 +45,8 @@ class _ViewersModalViewState extends State<ViewersModalView> {
               alignment: Alignment.centerLeft,
               child: Text(
                 widget.viewUsers.length == 1
-                    ? "1 View"
-                    : "${widget.viewUsers.length} Views",
+                    ? "1 ${"View".tr()}"
+                    : "${widget.viewUsers.length} ${"Views".tr()}",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

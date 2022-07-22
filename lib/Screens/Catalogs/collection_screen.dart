@@ -15,6 +15,7 @@ import '../../Extras/resources.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CollectionScreen extends StatefulWidget {
   final CollectionData collection;
@@ -79,7 +80,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                         fontSize: 18,
                         color: Theme.of(context).primaryColorDark,
                       ),
-                    ),
+                    ).tr(),
                   ),
                 )
           ],
@@ -118,7 +119,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     ),
                     const SizedBox(width: 17),
                     Text(
-                      "Add New Product",
+                      "Add New Product".tr(),
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 17,
@@ -333,7 +334,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                                           .price
                                                           ?.isNotEmpty ==
                                                       true
-                                                  ? "${products[index].price} SAR"
+                                                  ? "${products[index].price} ${"SAR"}"
                                                   : "",
                                               style: const TextStyle(
                                                 fontSize: 14,

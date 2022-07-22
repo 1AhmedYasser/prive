@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -98,7 +98,7 @@ class _TextStoryEditorScreenState extends State<TextStoryEditorScreen> {
                   maxLines: null,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    hintText: "Type A Status",
+                    hintText: "Type A Status".tr(),
                     hintStyle: textFont,
                     border: InputBorder.none,
                   ),

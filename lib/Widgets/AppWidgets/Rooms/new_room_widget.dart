@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +62,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
                 ),
-              ),
+              ).tr(),
               const SizedBox(height: 20),
               const Text(
                 "What Will Your Room Be About ?",
@@ -70,14 +70,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
-              ),
+              ).tr(),
               const SizedBox(height: 15),
               _buildRoomField(
                 controller: topicNameController,
-                hint: "Topic Name",
+                hint: "Topic Name".tr(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please Enter A Topic Name';
+                    return 'Please Enter A Topic Name'.tr();
                   }
 
                   return null;
@@ -90,11 +90,11 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
-              ),
+              ).tr(),
               const SizedBox(height: 15),
               _buildRoomField(
                 controller: descriptionController,
-                hint: "Room Description",
+                hint: "Room Description".tr(),
                 maxLines: 3,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
@@ -109,20 +109,21 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
-              ),
+              ).tr(),
               const SizedBox(height: 15),
               buildRoomType(
                   R.images.publicRoom,
-                  "Open For Every One",
-                  "Start A Public Room Open For Every One In Your Contacts",
+                  "Open For Every One".tr(),
+                  "Start A Public Room Open For Every One In Your Contacts"
+                      .tr(),
                   0, () {
                 setState(() {
                   selectedRoomType = 0;
                 });
               }),
               const SizedBox(height: 15),
-              buildRoomType(R.images.closedRoom, "Closed",
-                  "Start A Private Room With These People", 1, () {
+              buildRoomType(R.images.closedRoom, "Closed".tr(),
+                  "Start A Private Room With These People".tr(), 1, () {
                 setState(() {
                   selectedRoomType = 1;
                 });
@@ -131,10 +132,10 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                 padding: const EdgeInsets.only(top: 20, bottom: 15),
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        "Choose Date & Time",
-                        style: TextStyle(
+                        "Choose Date & Time".tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -149,20 +150,20 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         selectedBorderColor: Colors.grey.shade600,
                         selectedColor: Colors.white,
                         borderRadius: BorderRadius.circular(5),
-                        children: const <Widget>[
+                        children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.all(2),
-                            child: Text(
+                            padding: const EdgeInsets.all(2),
+                            child: const Text(
                               'Now',
                               style: TextStyle(fontSize: 12),
-                            ),
+                            ).tr(),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(2),
-                            child: Text(
+                            padding: const EdgeInsets.all(2),
+                            child: const Text(
                               'Later',
                               style: TextStyle(fontSize: 12),
-                            ),
+                            ).tr(),
                           ),
                         ],
                         onPressed: (int index) {
@@ -316,7 +317,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                             : "Schedule Room"
                         : "Choose People",
                     style: const TextStyle(fontSize: 18),
-                  ),
+                  ).tr(),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     minimumSize: Size(MediaQuery.of(context).size.width, 50),
@@ -414,7 +415,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           color: Colors.red,
                           fontSize: 17,
                         ),
-                      ),
+                      ).tr(),
                     ),
                     TextButton(
                       onPressed: () {
@@ -442,7 +443,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           color: Theme.of(context).primaryColor,
                           fontSize: 17,
                         ),
-                      ),
+                      ).tr(),
                     )
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

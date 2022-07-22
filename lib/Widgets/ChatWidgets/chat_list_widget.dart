@@ -29,7 +29,6 @@ class ChatListWidget extends StatefulWidget {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -219,9 +218,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         element.createdAt.year, element.createdAt.month, element.createdAt.day);
 
     if (messageDateFormatted == today) {
-      return "Today";
+      return "Today".tr();
     } else if (messageDateFormatted == yesterday) {
-      return "Yesterday";
+      return "Yesterday".tr();
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));

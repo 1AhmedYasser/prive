@@ -77,7 +77,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                         ),
                       ),
                       const Text(
-                        "Organize Your Catalog\nFor Better Sales",
+                        "${"Organize Your Catalog"}\n${"For Better Sales"}",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -89,7 +89,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                         padding:
                             const EdgeInsets.only(left: 50, right: 50, top: 15),
                         child: Text(
-                          "Create Collections To Make Your Item Easier To Find And Your Catalog More Interesting To Browse",
+                          "Create Collections To Make Your Item Easier To Find And Your Catalog More Interesting To Browse"
+                              .tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey.shade600,
@@ -113,8 +114,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
                                 child: NewCatalogCollectionWidget(
-                                  title: "Create New Collection",
-                                  type: "Collection",
+                                  title: "Create New Collection".tr(),
+                                  type: "Collection".tr(),
                                   withImage: false,
                                   catalogId: widget.catalog.catalogeID,
                                   isCatalog: false,
@@ -126,9 +127,9 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               }
                             });
                           },
-                          child: const Text(
-                            "Create Collections",
-                            style: TextStyle(
+                          child: Text(
+                            "Create Collections".tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
                             ),
@@ -213,8 +214,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
                                 child: NewCatalogCollectionWidget(
-                                  title: "Create New Collection",
-                                  type: "Collection",
+                                  title: "Create New Collection".tr(),
+                                  type: "Collection".tr(),
                                   withImage: false,
                                   isCatalog: false,
                                   catalogId: widget.catalog.catalogeID,
@@ -238,7 +239,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                 ),
                                 const SizedBox(width: 17),
                                 Text(
-                                  "Add New Collection",
+                                  "Add New Collection".tr(),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 17,
@@ -268,8 +269,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                   ),
                                   subtitle: Text(
                                     collections[collectionIndex].itemsNum == "1"
-                                        ? "1 Item"
-                                        : "${collections[collectionIndex].itemsNum} Items",
+                                        ? "1 ${"Item"}"
+                                        : "${collections[collectionIndex].itemsNum} ${"Items"}",
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -293,15 +294,16 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                               AwesomeDialog(
                                                   context: context,
                                                   animType: AnimType.SCALE,
-                                                  dialogType:
-                                                      DialogType.NO_HEADER,
+                                                  dialogType: DialogType
+                                                      .NO_HEADER,
                                                   title: collections[
                                                               collectionIndex]
                                                           .collectionName ??
                                                       "",
-                                                  desc: 'Select Your Choice',
-                                                  btnOkText: "Edit",
-                                                  btnCancelText: "Delete",
+                                                  desc:
+                                                      'Select Your Choice'.tr(),
+                                                  btnOkText: "Edit".tr(),
+                                                  btnCancelText: "Delete".tr(),
                                                   btnOkColor: Theme.of(context)
                                                       .primaryColor,
                                                   btnOkOnPress: () {
@@ -317,8 +319,10 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                         child:
                                                             NewCatalogCollectionWidget(
                                                           title:
-                                                              "Edit Collection",
-                                                          type: "Collection",
+                                                              "Edit Collection"
+                                                                  .tr(),
+                                                          type:
+                                                              "Collection".tr(),
                                                           withImage: false,
                                                           isCatalog: false,
                                                           isEdit: true,
@@ -349,7 +353,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                           ),
                                         const SizedBox(width: 13),
                                         Text(
-                                          "See All",
+                                          "See All".tr(),
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Theme.of(context)

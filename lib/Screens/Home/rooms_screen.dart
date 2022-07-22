@@ -12,7 +12,7 @@ import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Screens/Rooms/upcoming_rooms_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/new_room_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
@@ -79,7 +79,7 @@ class _RoomsScreenState extends State<RoomsScreen>
                         fontSize: 34,
                         fontWeight: FontWeight.w600,
                       ),
-                    ),
+                    ).tr(),
                     const Expanded(child: SizedBox()),
                     SizedBox(
                       width: 20,
@@ -109,7 +109,7 @@ class _RoomsScreenState extends State<RoomsScreen>
                           ),
                         );
                       },
-                      child: const Text("Start A Room"),
+                      child: const Text("Start A Room").tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         elevation: 0,
@@ -226,10 +226,10 @@ class _RoomsScreenState extends State<RoomsScreen>
                                                             .speakers?[2]),
                                                   buildInfo(
                                                       "${(roomsList[index].speakers?.length ?? 0) > 3 ? "+${((roomsList[index].speakers?.length ?? 0) - 3)}" : roomsList[index].speakers?.length ?? 0}",
-                                                      "speakers"),
+                                                      "speakers".tr()),
                                                   buildInfo(
                                                       "${roomsList[index].listeners?.length ?? 0}",
-                                                      "listeners")
+                                                      "listeners".tr())
                                                 ],
                                               ),
                                             )
@@ -271,7 +271,7 @@ class _RoomsScreenState extends State<RoomsScreen>
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
+                          ).tr(),
                         ],
                       ),
                     ),

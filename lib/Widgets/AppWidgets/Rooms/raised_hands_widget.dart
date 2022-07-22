@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../Common/cached_image.dart';
 
 class RaisedHandsWidget extends StatefulWidget {
@@ -48,7 +48,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
           Padding(
             padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
             child: Text(
-              "Raised Hands ${raisedHands.isNotEmpty ? "(${raisedHands.length})" : ""}",
+              "${"Raised Hands".tr()} ${raisedHands.isNotEmpty ? "(${raisedHands.length})" : ""}",
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 23,
@@ -60,17 +60,18 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
             child: Padding(
               padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
               child: raisedHands.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                      padding: EdgeInsets.only(bottom: 50),
-                      child: Text(
-                        "No Raised Hands",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        padding: const EdgeInsets.only(bottom: 50),
+                        child: const Text(
+                          "No Raised Hands",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ).tr(),
                       ),
-                    ))
+                    )
                   : MediaQuery.removePadding(
                       context: context,
                       removeTop: true,

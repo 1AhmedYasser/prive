@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class TermsPrivacyScreen extends StatefulWidget {
@@ -18,7 +18,9 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen> {
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: PriveAppBar(
-            title: widget.isTerms ? "Terms & Conditions" : "Privacy Policy"),
+            title: widget.isTerms
+                ? "Terms & Conditions".tr()
+                : "Privacy Policy".tr()),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

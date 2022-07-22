@@ -8,6 +8,7 @@ import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'chat_info_screen.dart';
 import 'pinned_messages_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class GroupInfoScreen extends StatefulWidget {
   final MessageThemeData messageTheme;
@@ -108,7 +109,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                          );
+                          ).tr();
                         }
 
                         return Text(
@@ -132,7 +133,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     height: 3.0,
                   ),
                   Text(
-                    '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member" : "Members"}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} Online',
+                    '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
                     style: TextStyle(
                       color: StreamChatTheme.of(context)
                           .colorTheme
@@ -260,7 +261,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                       .colorTheme
                                       .textHighEmphasis
                                       .withOpacity(0.5)),
-                            ),
+                            ).tr(),
                           ),
                         ],
                       ),
@@ -307,7 +308,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${members.length - groupMembersLength} More',
+                                  '${members.length - groupMembersLength} ${"More".tr()}',
                                   style: TextStyle(
                                       color: StreamChatTheme.of(context)
                                           .colorTheme
@@ -352,7 +353,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                         .colorTheme
                         .textHighEmphasis
                         .withOpacity(0.5)),
-              ),
+              ).tr(),
             ),
             const SizedBox(
               width: 7.0,
@@ -364,7 +365,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 cursorColor:
                     StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                 decoration: InputDecoration.collapsed(
-                    hintText: "Add A Group Name",
+                    hintText: "Add A Group Name".tr(),
                     hintStyle: StreamChatTheme.of(context)
                         .textTheme
                         .bodyBold
@@ -451,7 +452,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               return OptionListTile(
                 tileColor: StreamChatTheme.of(context).colorTheme.appBg,
                 separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-                title: "Mute Group",
+                title: "Mute Group".tr(),
                 titleTextStyle: StreamChatTheme.of(context).textTheme.body,
                 leading: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -485,7 +486,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               );
             }),
         OptionListTile(
-          title: "Pinned Messages",
+          title: "Pinned Messages".tr(),
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
@@ -547,7 +548,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         OptionListTile(
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: "Photo & Videos",
+          title: "Photo & Videos".tr(),
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -609,7 +610,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         OptionListTile(
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: "Files",
+          title: "Files".tr(),
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -652,7 +653,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           OptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Leave Group",
+            title: "Leave Group".tr(),
             titleTextStyle: StreamChatTheme.of(context).textTheme.body,
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -671,10 +672,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             onTap: () async {
               final res = await showConfirmationDialog(
                 context,
-                title: "Leave Conversation",
-                okText: "Leave",
-                question: "Are You Sure ?",
-                cancelText: "Cancel",
+                title: "Leave Conversation".tr(),
+                okText: "Leave".tr(),
+                question: "Are You Sure ?".tr(),
+                cancelText: "Cancel".tr(),
                 icon: StreamSvgIcon.userRemove(
                   color: StreamChatTheme.of(context).colorTheme.accentError,
                 ),
@@ -770,7 +771,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                             ),
                                           ),
                                           const Text(
-                                              "No User Match this keyword"),
+                                                  "No User Match this keyword")
+                                              .tr(),
                                         ],
                                       ),
                                     ),
@@ -807,7 +809,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   cursorColor: theme.colorTheme.textHighEmphasis,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: "Search",
+                    hintText: "Search".tr(),
                     hintStyle: theme.textTheme.body.copyWith(
                       color: theme.colorTheme.textLowEmphasis,
                     ),
@@ -909,7 +911,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             .textLowEmphasis,
                         size: 24.0,
                       ),
-                      "View Info",
+                      "View Info".tr(),
                       () async {
                         var client = StreamChat.of(context).client;
 
@@ -945,7 +947,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             .textLowEmphasis,
                         size: 24.0,
                       ),
-                      "Message",
+                      "Message".tr(),
                       () async {
                         var client = StreamChat.of(context).client;
 
@@ -994,13 +996,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               .accentError,
                           size: 24.0,
                         ),
-                        "Remove From Group", () async {
+                        "Remove From Group".tr(), () async {
                       final res = await showConfirmationDialog(
                         context,
-                        title: "Remove Member",
-                        okText: "Remove",
-                        question: "Are You Sure",
-                        cancelText: "Cancel",
+                        title: "Remove Member".tr(),
+                        okText: "Remove".tr(),
+                        question: "Are You Sure ?".tr(),
+                        cancelText: "Cancel".tr(),
                       );
 
                       if (res == true) {
@@ -1018,7 +1020,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             .textLowEmphasis,
                         size: 24.0,
                       ),
-                      "Cancel", () {
+                      "Cancel".tr(), () {
                     Navigator.pop(context);
                   }),
                 ],
@@ -1044,7 +1046,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     if (otherMember != null) {
       if (otherMember.online) {
         alternativeWidget = Text(
-          "Online",
+          "Online".tr(),
           style: TextStyle(
               color: StreamChatTheme.of(context)
                   .colorTheme
@@ -1053,7 +1055,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         );
       } else {
         alternativeWidget = Text(
-          'Last Seen ${Jiffy(otherMember.lastActive).fromNow()}',
+          '${"Last Seen".tr()} ${Jiffy(otherMember.lastActive).fromNow()}',
           style: TextStyle(
               color: StreamChatTheme.of(context)
                   .colorTheme
@@ -1133,7 +1135,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         title =
             '${currentMembers.map((e) => e.user!.name).join(', ')} ${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
       } else {
-        title = "No Title";
+        title = "No Title".tr();
       }
     } else {
       title = extraData['name'];
@@ -1143,9 +1145,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   String _getLastSeen(User user) {
     if (user.online) {
-      return "Online";
+      return "Online".tr();
     } else {
-      return 'Last Seen ${Jiffy(user.lastActive).fromNow()}';
+      return '${"Last Seen".tr()} ${Jiffy(user.lastActive).fromNow()}';
     }
   }
 }

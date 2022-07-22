@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -74,7 +75,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
                     color: Colors.grey,
                   ),
                 ),
-                hintText: widget.hintText,
+                hintText: widget.hintText.tr(),
                 contentPadding: const EdgeInsets.all(0),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,

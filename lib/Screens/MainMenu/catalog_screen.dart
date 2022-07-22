@@ -78,7 +78,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       fontSize: 18,
                       color: Theme.of(context).primaryColorDark,
                     ),
-                  ),
+                  ).tr(),
                 ),
               )
           ],
@@ -106,7 +106,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           fontSize: 21,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
+                      ).tr(),
                       Padding(
                         padding:
                             const EdgeInsets.only(left: 50, right: 50, top: 15),
@@ -118,7 +118,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
-                        ),
+                        ).tr(),
                       ),
                       Padding(
                         padding:
@@ -134,9 +134,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               backgroundColor: Colors.transparent,
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
-                                child: const NewCatalogCollectionWidget(
-                                  title: "Create New Catalog",
-                                  type: "Catalog",
+                                child: NewCatalogCollectionWidget(
+                                  title: "Create New Catalog".tr(),
+                                  type: "Catalog".tr(),
                                 ),
                               ),
                             ).then((value) {
@@ -151,7 +151,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
+                          ).tr(),
                           style: ElevatedButton.styleFrom(
                             primary: Theme.of(context).primaryColor,
                             minimumSize:
@@ -182,9 +182,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       backgroundColor: Colors.transparent,
                       builder: (context) => SingleChildScrollView(
                         controller: ModalScrollController.of(context),
-                        child: const NewCatalogCollectionWidget(
-                          title: "Create New Catalog",
-                          type: "Catalog",
+                        child: NewCatalogCollectionWidget(
+                          title: "Create New Catalog".tr(),
+                          type: "Catalog".tr(),
                         ),
                       ),
                     ).then((value) {
@@ -211,7 +211,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             fontSize: 17,
                             color: Theme.of(context).primaryColorDark,
                           ),
-                        ),
+                        ).tr(),
                       ],
                     ),
                   ),
@@ -272,8 +272,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 ModalScrollController.of(
                                                     context),
                                             child: NewCatalogCollectionWidget(
-                                              title: "Edit Catalog",
-                                              type: "Catalog",
+                                              title: "Edit Catalog".tr(),
+                                              type: "Catalog".tr(),
                                               isEdit: true,
                                               catalog: catalogs[index],
                                             ),

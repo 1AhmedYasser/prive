@@ -11,7 +11,7 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
@@ -60,13 +60,14 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Verify",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 29),
+              Text(
+                "Verify".tr(),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 29),
               ),
               const SizedBox(height: 20),
               Text(
-                "Please enter the 6 digits that has sent to your Mobile phone ${widget.phoneNumber}",
+                "${"Please enter the 6 digits that has sent to your Mobile phone".tr()} ${widget.phoneNumber}",
                 style: const TextStyle(
                   color: Color(0xff5d5d63),
                   fontSize: 18,
@@ -215,14 +216,15 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       }
                     }).catchError((error) {
                       Utils.showAlert(context,
-                          message: "You Entered An Invalid Code",
+                          message: "You Entered An Invalid Code".tr(),
                           alertImage: R.images.alertInfoImage);
                     });
                   }
                 },
-                child: const Text(
-                  "Verify Account",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                child: Text(
+                  "Verify Account".tr(),
+                  style: const TextStyle(
+                      fontSize: 21, fontWeight: FontWeight.w400),
                 ),
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,

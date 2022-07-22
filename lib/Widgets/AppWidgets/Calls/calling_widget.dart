@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +101,9 @@ class _CallingWidgetState extends State<CallingWidget> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          widget.isVideoCall ? "Video Call" : "Voice Call",
+                          widget.isVideoCall
+                              ? "Video Call".tr()
+                              : "Voice Call".tr(),
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w600,
@@ -170,7 +172,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
                             ),
-                          )
+                          ).tr()
                         ],
                       ),
                     ),
@@ -211,7 +213,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
                             ),
-                          )
+                          ).tr()
                         ],
                       ),
                     ),

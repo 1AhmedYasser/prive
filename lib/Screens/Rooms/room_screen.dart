@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:badges/badges.dart';
 import 'package:dio/dio.dart';
@@ -138,7 +138,7 @@ class _RoomScreenState extends State<RoomScreen> {
                             const Text(
                               "Leave",
                               style: TextStyle(fontSize: 16, color: Colors.red),
-                            ),
+                            ).tr(),
                           ],
                         ),
                         style: ElevatedButton.styleFrom(
@@ -166,17 +166,17 @@ class _RoomScreenState extends State<RoomScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Flexible(
+                        Flexible(
                           child: Padding(
-                            padding: EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                                 left: 25, right: 50, top: 30, bottom: 20),
-                            child: Text(
+                            child: const Text(
                               "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 15),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
-                            ),
+                            ).tr(),
                           ),
                         ),
                         IconButton(
@@ -231,7 +231,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       child: Divider(),
                     ),
                     buildRoomSectionInfo(
-                      "Speakers",
+                      "Speakers".tr(),
                       "${room?.speakers?.length ?? "0"}",
                       true,
                       withInvite: room?.owner?.id == context.currentUser?.id
@@ -323,7 +323,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       ),
                     ),
                     buildRoomSectionInfo(
-                      "Listeners",
+                      "Listeners".tr(),
                       "${room?.listeners?.length ?? "0"}",
                       false,
                       withInvite: true,
@@ -498,7 +498,7 @@ class _RoomScreenState extends State<RoomScreen> {
               fontSize: 16.5,
               fontWeight: FontWeight.w400,
             ),
-          ),
+          ).tr(),
           const SizedBox(width: 10),
           Text(
             value,
@@ -507,7 +507,7 @@ class _RoomScreenState extends State<RoomScreen> {
               fontSize: 15.5,
               fontWeight: FontWeight.w400,
             ),
-          ),
+          ).tr(),
           if (withInvite) const Expanded(child: SizedBox()),
           if (withInvite)
             GestureDetector(
@@ -532,7 +532,7 @@ class _RoomScreenState extends State<RoomScreen> {
                   color: Theme.of(context).primaryColor,
                   fontSize: 16.5,
                 ),
-              ),
+              ).tr(),
             )
         ],
       ),
@@ -659,7 +659,7 @@ class _RoomScreenState extends State<RoomScreen> {
     } else {
       if (showingInfo == false) {
         Utils.showAlert(context,
-                message: "The Room Has Ended",
+                message: "The Room Has Ended".tr(),
                 alertImage: R.images.alertInfoImage)
             .then(
           (value) => Navigator.pop(context),

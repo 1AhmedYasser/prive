@@ -27,6 +27,7 @@ import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Models/Call/call.dart';
@@ -231,7 +232,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.green,
                                       ),
-                                    );
+                                    ).tr();
                                   case ConnectionStatus.disconnected:
                                     return const Text(
                                       'Offline',
@@ -240,7 +241,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.red,
                                       ),
-                                    );
+                                    ).tr();
                                   default:
                                     return const SizedBox.shrink();
                                 }
@@ -297,7 +298,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       : const Text(
                           "Select Messages",
                           style: TextStyle(color: Colors.black, fontSize: 17),
-                        ),
+                        ).tr(),
           actions: isMessageSelectionOn == false && isMessageSearchOn == false
               ? [
                   if (widget.isChannel == false)
@@ -353,7 +354,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 });
                               },
                               child: Text(
-                                "Cancel",
+                                "Cancel".tr(),
                                 style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 15,
@@ -462,10 +463,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
-                          ),
+                          ).tr(),
                           const SizedBox(height: 5),
                           Text(
-                            "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant" : "Participants"}",
+                            "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 12.5,
@@ -556,7 +557,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           //   });
                           // });
                         },
-                        child: const Text("Join"),
+                        child: const Text("Join").tr(),
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
                           elevation: 0,
@@ -617,7 +618,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               fontWeight: FontWeight.w500,
                                               fontSize: 18,
                                             ),
-                                          ),
+                                          ).tr(),
                                           const SizedBox(height: 20),
                                           SizedBox(
                                             width: 120,
@@ -907,10 +908,10 @@ class _ChatScreenState extends State<ChatScreen> {
             builder: (_) => CupertinoAlertDialog(
               title: const Text("Prive"),
               content: Text(
-                  "${otherMember?.user?.name ?? "Member"} is on another call"),
+                  "${otherMember?.user?.name ?? "Member".tr()} ${"is on another call".tr()}"),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text("Ok"),
+                  child: const Text("Ok").tr(),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -1051,7 +1052,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
-              ),
+              ).tr(),
             ],
           );
         } else if (message.user?.id != context.currentUser?.id &&
@@ -1111,7 +1112,7 @@ class _ChatScreenState extends State<ChatScreen> {
           title: const Text(
             'Delete Message',
             style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
-          ),
+          ).tr(),
           onTap: (message) {
             Navigator.pop(context);
             showDeletePopup(message);
@@ -1125,7 +1126,7 @@ class _ChatScreenState extends State<ChatScreen> {
           title: const Text(
             'Forward',
             style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          ).tr(),
           onTap: (message) {
             Navigator.pop(context);
             Navigator.push(
@@ -1146,7 +1147,7 @@ class _ChatScreenState extends State<ChatScreen> {
           title: const Text(
             'Select',
             style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          ).tr(),
           onTap: (message) {
             Navigator.pop(context);
             setState(() {
@@ -1189,22 +1190,11 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) => CupertinoActionSheet(
         actions: [
-          if (message.user?.id == StreamChatCore.of(context).currentUser?.id)
-            CupertinoActionSheetAction(
-              child: Text(
-                "Delete For Everyone",
-                style: TextStyle(color: Theme.of(context).primaryColorDark),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                widget.channel.deleteMessage(message, hard: true);
-              },
-            ),
           CupertinoActionSheetAction(
             child: Text(
-              "Delete For Me",
+              "Delete Message",
               style: TextStyle(color: Theme.of(context).primaryColorDark),
-            ),
+            ).tr(),
             onPressed: () {
               Navigator.pop(context);
               widget.channel.deleteMessage(message);
@@ -1215,7 +1205,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: const Text(
             "Cancel",
             style: TextStyle(color: Colors.red),
-          ),
+          ).tr(),
           onPressed: () => Navigator.pop(context),
         ),
       ),

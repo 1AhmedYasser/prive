@@ -22,6 +22,7 @@ import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:transition_plus/transition_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
@@ -102,14 +103,14 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Stories",
                           style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w600,
                           ),
-                        ),
+                        ).tr(),
                       ],
                     ),
                   ),
@@ -134,7 +135,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                 });
               } else {
                 Utils.showImagePickerSelector(context, getImage,
-                    title: "Choose Story Type", withVideo: true);
+                    title: "Choose Story Type".tr(), withVideo: true);
               }
             },
             child: Padding(
@@ -211,13 +212,13 @@ class _StoriesScreenState extends State<StoriesScreen> {
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
                           ),
-                        ),
+                        ).tr(),
                         const SizedBox(
                           height: 4,
                         ),
                         Text(
                           myStories.isEmpty
-                              ? "Add to my story"
+                              ? "Add to my story".tr()
                               : time_ago.format(
                                   DateFormat("yyyy-MM-dd HH:mm:ss", "en")
                                       .parse(
@@ -240,7 +241,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       highlightColor: Colors.transparent,
                       onTap: () {
                         Utils.showImagePickerSelector(context, getImage,
-                            title: "Choose Story Type", withVideo: true);
+                            title: "Choose Story Type".tr(), withVideo: true);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -305,7 +306,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
               child: Text(
                 "Recent Updates",
                 style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
-              ),
+              ).tr(),
             ),
           Expanded(
             child: MediaQuery.removePadding(

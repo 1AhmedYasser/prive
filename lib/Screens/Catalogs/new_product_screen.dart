@@ -11,6 +11,7 @@ import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NewProductScreen extends StatefulWidget {
   final CollectionData? collection;
@@ -48,7 +49,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Add Products Or Services"),
+        child: PriveAppBar(title: "Add Products Or Services".tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -94,13 +95,13 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                           ),
                                         ),
                                       ),
-                                      const Padding(
-                                        padding: EdgeInsets.only(
+                                      Padding(
+                                        padding: const EdgeInsets.only(
                                             top: 10, bottom: 15),
-                                        child: Text(
+                                        child: const Text(
                                           "Add Images",
                                           style: TextStyle(color: Colors.white),
-                                        ),
+                                        ).tr(),
                                       )
                                     ],
                                   )
@@ -150,24 +151,25 @@ class _NewProductScreenState extends State<NewProductScreen> {
                   Form(
                     key: _formKey,
                     child: buildTextField(
-                      "Product Or Service Name",
+                      "Product Or Service Name".tr(),
                       productNameController,
                       emptyValidatorMessage:
-                          "Please enter a product or service name",
+                          "Please enter a product or service name".tr(),
                     ),
                   ),
                   const SizedBox(height: 20),
                   buildTextField(
-                    "Price (Optional)",
+                    "Price (Optional)".tr(),
                     priceController,
-                    emptyValidatorMessage: "Please enter a product price",
+                    emptyValidatorMessage: "Please enter a product price".tr(),
                   ),
                   const SizedBox(height: 20),
                   buildTextField(
-                    "Description (Optional)",
+                    "Description (Optional)".tr(),
                     descriptionController,
                     maxLines: 4,
-                    emptyValidatorMessage: "Please enter a product description",
+                    emptyValidatorMessage:
+                        "Please enter a product description".tr(),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
@@ -186,7 +188,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
-                    ),
+                    ).tr(),
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor,
                       minimumSize: Size(MediaQuery.of(context).size.width, 55),
@@ -310,7 +312,8 @@ class _NewProductScreenState extends State<NewProductScreen> {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Added To ${widget.collection?.collectionName}",
+          message:
+              "${"Product Added To".tr()} ${widget.collection?.collectionName}",
         ).then((value) => Navigator.pop(context, true));
       }
     });
@@ -335,7 +338,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Updated Successfully",
+          message: "Product Updated Successfully".tr(),
         ).then((value) => Navigator.pop(context, true));
       }
     });

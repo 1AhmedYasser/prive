@@ -11,7 +11,7 @@ import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -50,10 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Phone Number',
+              Text(
+                'Phone Number'.tr(),
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w500,
                 ),
@@ -61,9 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 15,
               ),
-              const Text(
-                'Please confirm your country code and enter your phone number',
-                style: TextStyle(
+              Text(
+                'Please confirm your country code and enter your phone number'
+                    .tr(),
+                style: const TextStyle(
                   fontSize: 17,
                   color: Color(0xff5d5d63),
                 ),
@@ -84,12 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 validator: (value) {
                   if (!isPhoneNumberValid) {
-                    return "Enter A Valid Phone Number";
+                    return "Enter A Valid Phone Number".tr();
                   }
                   return null;
                 },
                 searchBoxDecoration: InputDecoration(
-                  label: const Text("Search by country name or dial code"),
+                  label: Text("Search by country name or dial code".tr()),
                   labelStyle: TextStyle(
                       fontSize: 14, color: Theme.of(context).primaryColorDark),
                   enabledBorder: OutlineInputBorder(
@@ -118,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     leadingPadding: 20),
                 ignoreBlank: false,
                 inputDecoration: InputDecoration(
-                  hintText: "Phone Number",
+                  hintText: "Phone Number".tr(),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                     borderSide:
@@ -196,9 +197,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   }
                 },
-                child: const Text(
-                  "Next",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                child: Text(
+                  "Next".tr(),
+                  style: const TextStyle(
+                      fontSize: 21, fontWeight: FontWeight.w400),
                 ),
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,

@@ -106,7 +106,7 @@ dependencies:
 
   # Agora
   agora_rtc_engine: ^5.0.0
-  flutter_callkit_incoming: ^1.0.1+6
+  flutter_callkit_incoming: ^1.0.2+1
   connectycube_flutter_call_kit: ^2.0.2
 
   # Maps

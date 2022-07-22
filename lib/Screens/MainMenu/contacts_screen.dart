@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -46,7 +47,7 @@ class _ContactsScreenState extends State<ContactsScreen>
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: widget.title),
+        child: PriveAppBar(title: widget.title.tr()),
       ),
       body: phoneContacts.isNotEmpty
           ? users.isNotEmpty
@@ -99,8 +100,8 @@ class _ContactsScreenState extends State<ContactsScreen>
                                               const SizedBox(height: 3),
                                               Text(
                                                 users[index].online
-                                                    ? "Online"
-                                                    : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                    ? "Online".tr()
+                                                    : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                         users[index]
                                                                 .lastActive ??
                                                             DateTime.now(),
@@ -138,7 +139,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                 )
               : ChannelsEmptyState(
                   animationController: _animationController,
-                  title: "No Contacts Found",
+                  title: "No Contacts Found".tr(),
                   message: "",
                 )
           : _permissionDenied == false
@@ -158,10 +159,10 @@ class _ContactsScreenState extends State<ContactsScreen>
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        "Contacts Permission is needed\nTo view your contacts",
+                      Text(
+                        "${"Contacts Permission is needed".tr()}\n${"To view your contacts".tr()}",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -173,7 +174,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                           "Go To Settings",
                           style: TextStyle(
                               fontSize: 17, fontWeight: FontWeight.w500),
-                        ),
+                        ).tr(),
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
                           elevation: 0,

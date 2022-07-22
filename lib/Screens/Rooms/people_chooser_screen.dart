@@ -20,6 +20,7 @@ import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../Widgets/Common/cached_image.dart';
 import '../MainMenu/new_group_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
   final String roomName;
@@ -180,14 +181,14 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected";
+              statusString = "Connected".tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting";
+              statusString = "Connecting".tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected";
+              statusString = "Disconnected".tr();
               break;
           }
           return InfoTile(
@@ -222,7 +223,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                           top: 10, left: 15, right: 15, bottom: 10),
                       child: SearchTextField(
                         controller: _controller,
-                        hintText: "Search",
+                        hintText: "Search".tr(),
                         showCloseButton: false,
                         onChanged: (value) {
                           if (value.isEmpty) {
@@ -263,8 +264,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                           ),
                           child: Text(
                             _controller?.text.isNotEmpty == true
-                                ? 'Matches For "${_controller?.text.trim()}"'
-                                : "Start The Room With",
+                                ? '${"Matches For".tr()} "${_controller?.text.trim()}"'
+                                : "Start The Room With".tr(),
                             style: TextStyle(
                               color: StreamChatTheme.of(context)
                                   .colorTheme
@@ -341,8 +342,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                                       const SizedBox(height: 3),
                                                       Text(
                                                         users[index].online
-                                                            ? "Online"
-                                                            : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                            ? "Online".tr()
+                                                            : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                                 users[index]
                                                                         .lastActive ??
                                                                     DateTime
@@ -400,7 +401,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                         )
                       : ChannelsEmptyState(
                           animationController: _animationController,
-                          title: "No Contacts Found",
+                          title: "No Contacts Found".tr(),
                           message: "",
                         )
                   : _permissionDenied == false
@@ -420,10 +421,10 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
-                                "Contacts Permission is needed\nTo view your contacts",
+                              Text(
+                                "${"Contacts Permission is needed".tr()}\n${"To view your contacts".tr()}",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -436,7 +437,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                   style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w500),
-                                ),
+                                ).tr(),
                                 style: ElevatedButton.styleFrom(
                                   primary: Theme.of(context).primaryColor,
                                   elevation: 0,

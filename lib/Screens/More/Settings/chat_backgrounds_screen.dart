@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'dart:io';
 import 'package:prive/Helpers/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChatBackgroundsScreen extends StatefulWidget {
   const ChatBackgroundsScreen({Key? key}) : super(key: key);
@@ -128,14 +129,14 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
           child: SizedBox(
             height: 100,
             width: MediaQuery.of(context).size.width,
-            child: const Padding(
-              padding: EdgeInsets.only(top: 30),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 30),
               child: Align(
                 alignment: Alignment.topCenter,
-                child: Text(
+                child: const Text(
                   "Set Background",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
+                ).tr(),
               ),
             ),
           ),

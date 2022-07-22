@@ -64,7 +64,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                 widget.title,
                 style:
                     const TextStyle(fontWeight: FontWeight.w600, fontSize: 21),
-              ),
+              ).tr(),
               if (widget.description.isNotEmpty)
                 const SizedBox(
                   height: 20,
@@ -79,7 +79,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                         fontWeight: FontWeight.w400,
                         fontSize: 17,
                         color: Color(0xff777777)),
-                  ),
+                  ).tr(),
                 ),
               const SizedBox(
                 height: 40,

@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 
 import '../../Extras/resources.dart';
@@ -33,7 +33,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Add Contact"),
+        child: PriveAppBar(title: "Add Contact".tr()),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -87,20 +87,24 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 padding: const EdgeInsets.only(left: 25, right: 25, top: 35),
                 child: Column(
                   children: [
-                    buildTextField("First Name (Required)", firstNameController,
-                        emptyValidatorMessage: "Please enter a first name"),
+                    buildTextField(
+                        "First Name (Required)".tr(), firstNameController,
+                        emptyValidatorMessage:
+                            "Please enter a first name".tr()),
                     const SizedBox(height: 20),
-                    buildTextField("Last Name (Optional)", lastNameController,
-                        emptyValidatorMessage: "Please enter a last name",
+                    buildTextField(
+                        "Last Name (Optional)".tr(), lastNameController,
+                        emptyValidatorMessage: "Please enter a last name".tr(),
                         validate: false),
                     const SizedBox(height: 20),
-                    buildTextField("Phone Number", phoneNumberController,
+                    buildTextField("Phone Number".tr(), phoneNumberController,
                         type: const TextInputType.numberWithOptions(
                           signed: true,
                           decimal: false,
                         ),
                         formatters: [FilteringTextInputFormatter.digitsOnly],
-                        emptyValidatorMessage: "Please enter a phone number"),
+                        emptyValidatorMessage:
+                            "Please enter a phone number".tr()),
                     const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: () async {
@@ -119,7 +123,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             ];
                           await newContact.insert();
                           Utils.showAlert(context,
-                                  message: "The Room Has Ended",
+                                  message: "The Room Has Ended".tr(),
                                   alertImage: R.images.alertSuccessImage)
                               .then(
                             (value) => Navigator.pop(context),
@@ -132,7 +136,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           fontSize: 22,
                           fontWeight: FontWeight.w400,
                         ),
-                      ),
+                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         minimumSize:

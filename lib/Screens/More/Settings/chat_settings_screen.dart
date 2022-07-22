@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChatSettingsScreen extends StatefulWidget {
   const ChatSettingsScreen({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Chat Settings"),
+        child: PriveAppBar(title: "Chat Settings".tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -44,7 +45,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 18,
                 ),
-              ),
+              ).tr(),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 10, right: 10, bottom: 15),
@@ -107,7 +108,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 18,
                 ),
-              ),
+              ).tr(),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 7, right: 7),

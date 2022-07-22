@@ -6,6 +6,7 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/MainMenu/contacts_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({Key? key}) : super(key: key);
@@ -46,16 +47,16 @@ class _MoreScreenState extends State<MoreScreen> {
                   padding:
                       const EdgeInsets.only(left: 15, right: 27, bottom: 30),
                   child: Row(
-                    children: const [
-                      BackButton(),
-                      SizedBox(width: 8),
-                      Text(
+                    children: [
+                      const BackButton(),
+                      const SizedBox(width: 8),
+                      const Text(
                         "Settings",
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
+                      ).tr(),
                     ],
                   ),
                 ),
@@ -82,8 +83,8 @@ class _MoreScreenState extends State<MoreScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ContactsScreen(
-                          title: "Contacts",
+                        builder: (context) => ContactsScreen(
+                          title: "Contacts".tr(),
                         ),
                       ),
                     );
@@ -109,7 +110,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: R.images.logoutImage,
                   imageColor: const Color(0xff7a8fa6).withOpacity(0.9),
-                  title: "Logout",
+                  title: "Log out",
                   showDivider: false,
                   onPressed: () {
                     Utils.saveString(R.pref.token, "");

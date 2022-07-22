@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
@@ -218,7 +218,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 30),
               ],
             ),
@@ -565,7 +565,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 30),
               ],
             ),

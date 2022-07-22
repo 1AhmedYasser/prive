@@ -42,7 +42,7 @@ class StreamManager {
           .toList();
 
       if (otherMembers?.length == 1) {
-        return otherMembers!.first.user?.name ?? 'No name';
+        return otherMembers!.first.user?.name ?? '';
       } else {
         return 'Multiple users';
       }

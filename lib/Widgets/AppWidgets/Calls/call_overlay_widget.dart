@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:draggable_widget/draggable_widget.dart';
@@ -103,7 +103,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant" : "Participants"}",
+                          "${call?.members?.length ?? "0"} ${call?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
                           style: const TextStyle(color: Colors.white),
                         ),
                         trailing: GestureDetector(
@@ -233,7 +233,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                   builder: (BuildContext context) =>
                                       CupertinoActionSheet(
                                     title: Text(
-                                        'Are You Sure  You Want to leave this ${widget.isVideo ? "video" : "voice"} call ?'),
+                                        '${"Are You Sure You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
                                     actions: <CupertinoActionSheetAction>[
                                       if (context.currentUser?.id ==
                                           call?.ownerId)
@@ -253,7 +253,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                             widget.agoraEngine?.destroy();
                                           },
                                           child: Text(
-                                            'End ${widget.isVideo ? "Video" : "Voice"} Call',
+                                            '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}',
                                           ),
                                         ),
                                       CupertinoActionSheetAction(
@@ -274,11 +274,11 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           widget.agoraEngine?.destroy();
                                         },
                                         child: Text(
-                                            'Leave ${widget.isVideo ? "Video" : "Voice"} Call'),
+                                            '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
                                       ),
                                     ],
                                     cancelButton: CupertinoActionSheetAction(
-                                      child: const Text('Cancel'),
+                                      child: const Text('Cancel').tr(),
                                       onPressed: () {
                                         Navigator.pop(context, 'Cancel');
                                       },
@@ -399,7 +399,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       if (showingInfo == false) {
         Utils.showAlert(
           context,
-          message: "${widget.isGroup ? "Group" : ""} Call Has Ended",
+          message:
+              "${widget.isGroup ? "Group".tr() : ""} ${"Call Has Ended".tr()}",
           alertImage: R.images.alertInfoImage,
         ).then(
           (value) => Navigator.pop(context),

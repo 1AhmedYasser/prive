@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/channel_item_widget.dart';
-import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ForwardScreen extends StatefulWidget {
   final List<Message> selectedMessages;
@@ -32,7 +32,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
         title: const Text(
           "Forward",
           style: TextStyle(color: Colors.black),
-        ),
+        ).tr(),
         leading: const BackButton(
           color: Color(0xff7a8ea6),
         ),
@@ -52,7 +52,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
               child: Text(
                 isSelectedEnabled ? "Unselect" : "Select",
                 style: const TextStyle(color: Colors.black, fontSize: 17),
-              ),
+              ).tr(),
             ),
           ),
         ],
@@ -211,7 +211,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
                   style: TextStyle(
                     fontSize: 17.5,
                   ),
-                ),
+                ).tr(),
               ),
             )
         ],

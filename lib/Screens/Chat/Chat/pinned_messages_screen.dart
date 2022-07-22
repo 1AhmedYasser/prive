@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PinnedMessagesScreen extends StatefulWidget {
   /// The sorting used for the channels matching the filters.
@@ -23,7 +24,8 @@ class PinnedMessagesScreen extends StatefulWidget {
 
   final MessageThemeData messageTheme;
 
-   const PinnedMessagesScreen({Key? key,
+  const PinnedMessagesScreen({
+    Key? key,
     required this.messageTheme,
     this.sortOptions,
     this.paginationParams = const PaginationParams(limit: 20),
@@ -69,7 +71,7 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
             color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
             fontSize: 16.0,
           ),
-        ),
+        ).tr(),
         leading: const Padding(
           padding: EdgeInsets.only(left: 10),
           child: BackButton(
@@ -111,10 +113,10 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
                   style: TextStyle(
                     fontSize: 17.0,
                     color:
-                    StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
+                ).tr(),
               ],
             ),
           );
@@ -164,8 +166,8 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
                   text != ''
                       ? text
                       : (attachments.isNotEmpty
-                      ? '${attachments.length} ${attachments.length > 1 ? "Attachments" : "Attachment"}'
-                      : ''),
+                          ? '${attachments.length} ${attachments.length > 1 ? "Attachments".tr() : "Attachment".tr()}'
+                          : ''),
                 ),
                 onTap: () {
                   widget.onShowMessage?.call(data[position].message,

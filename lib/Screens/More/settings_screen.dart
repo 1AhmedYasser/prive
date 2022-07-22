@@ -19,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Settings"),
+        child: PriveAppBar(title: "Settings".tr()),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(
@@ -135,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "Please note that our APP support is done by volunteers. We try to respond as quickly as possible,but it may take a while.",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade600),
-                ),
+                ).tr(),
                 const SizedBox(
                   height: 30,
                 ),
@@ -153,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.grey.shade600, fontSize: 16),
-                          ),
+                          ).tr(),
                         ),
                         style: ElevatedButton.styleFrom(
                           primary: Colors.transparent,
@@ -182,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(
                                 color: Theme.of(context).primaryColorDark,
                                 fontSize: 15),
-                          ),
+                          ).tr(),
                         ),
                         style: ElevatedButton.styleFrom(
                           primary: Colors.transparent,

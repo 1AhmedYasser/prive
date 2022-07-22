@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -43,7 +43,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Upcoming Rooms"),
+        child: PriveAppBar(title: "Upcoming Rooms".tr()),
       ),
       body: isLoading
           ? const Padding(
@@ -118,7 +118,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                           height: 15,
                         ),
                         Text(
-                          "Upcoming Rooms\nWill Appear Here",
+                          "${"Upcoming Rooms".tr()}\n${"Will Appear Here".tr()}",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
@@ -245,7 +245,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                     ),
-                  ),
+                  ).tr(),
                   Padding(
                     padding: const EdgeInsets.only(
                       left: 10,

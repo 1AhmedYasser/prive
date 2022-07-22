@@ -1,4 +1,5 @@
 import 'package:cool_dropdown/cool_dropdown.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -154,10 +155,10 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   void _showDeleteChatDialog() async {
     final res = await showConfirmationDialog(
       context,
-      title: "Delete Conversation",
-      okText: "Delete",
-      question: "Are You Sure ?",
-      cancelText: "Cancel",
+      title: "Delete Conversation".tr(),
+      okText: "Delete".tr(),
+      question: "Are You Sure ?".tr(),
+      cancelText: "Cancel".tr(),
       icon: StreamSvgIcon.delete(
         color: StreamChatTheme.of(context).colorTheme.accentError,
       ),

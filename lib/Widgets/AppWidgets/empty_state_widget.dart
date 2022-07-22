@@ -14,7 +14,7 @@ class EmptyStateWidget extends StatefulWidget {
       this.image = "",
       this.title = "",
       this.description = "",
-      this.buttonText = "Shop Now",
+      this.buttonText = "",
       required this.onButtonPressed,
       this.columnMainAxis = MainAxisAlignment.center})
       : super(key: key);
@@ -50,7 +50,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
             widget.title,
             textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-          ),
+          ).tr(),
           if (widget.description.isNotEmpty)
             const SizedBox(
               height: 20,
@@ -66,7 +66,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
                     fontWeight: FontWeight.w400,
                     fontSize: 15,
                     color: Color(0xff777777)),
-              ),
+              ).tr(),
             ),
           const SizedBox(
             height: 50,

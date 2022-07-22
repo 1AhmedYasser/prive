@@ -74,14 +74,14 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected";
+              statusString = "Connected".tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting";
+              statusString = "Connecting".tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected";
+              statusString = "Disconnected".tr();
               break;
           }
           return Stack(
@@ -110,7 +110,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
-                        ),
+                        ).tr(),
                       ),
                       Padding(
                         padding:
@@ -119,7 +119,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                           height: 60,
                           child: SearchTextField(
                             controller: _controller,
-                            hintText: "Search",
+                            hintText: "Search".tr(),
                             showCloseButton: false,
                             borderRadius: 12,
                             onChanged: (value) {
@@ -235,7 +235,8 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                                                     users[index]
                                                                             .online
                                                                         ? "Online"
-                                                                        : "Last Seen ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} at ${DateFormat('hh:mm a').format(
+                                                                            .tr()
+                                                                        : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                                             users[index].lastActive ??
                                                                                 DateTime.now(),
                                                                           )}",
@@ -304,7 +305,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                 )
                               : ChannelsEmptyState(
                                   animationController: _animationController,
-                                  title: "No Contacts Found",
+                                  title: "No Contacts Found".tr(),
                                   message: "",
                                 )
                           : _permissionDenied == false
@@ -324,10 +325,10 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                         ),
                                       ),
                                       const SizedBox(height: 20),
-                                      const Text(
-                                        "Contacts Permission is needed\nTo view your contacts",
+                                      Text(
+                                        "${"Contacts Permission is needed".tr()}\n${"To view your contacts".tr()}",
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -341,7 +342,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                           style: TextStyle(
                                               fontSize: 17,
                                               fontWeight: FontWeight.w500),
-                                        ),
+                                        ).tr(),
                                         style: ElevatedButton.styleFrom(
                                           primary:
                                               Theme.of(context).primaryColor,

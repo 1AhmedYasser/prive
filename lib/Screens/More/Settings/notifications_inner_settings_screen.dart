@@ -40,7 +40,7 @@ class _NotificationsInnerSettingsScreenState
               ),
               children: [
                 const SizedBox(height: 30),
-                buildSetting("Notifications For ${widget.title}",
+                buildSetting("${"Notifications For".tr()} ${widget.title}",
                     currentValues[0] == true ? "On" : "Off", 0,
                     isSwitch: true),
                 const SizedBox(height: 5),
@@ -55,7 +55,7 @@ class _NotificationsInnerSettingsScreenState
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
-                  ),
+                  ).tr(),
                 ),
                 buildSetting("Message Preview", "", 1, isSwitch: true),
                 const SizedBox(height: 5),
@@ -94,7 +94,7 @@ class _NotificationsInnerSettingsScreenState
             context,
             MaterialPageRoute(
               builder: (context) => NotificationsInnerSettingsScreen(
-                title: title,
+                title: title.tr(),
               ),
             ),
           );
@@ -111,7 +111,7 @@ class _NotificationsInnerSettingsScreenState
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 3),
                 if (subTitle.isNotEmpty && isSwitch)
                   Text(
@@ -121,7 +121,7 @@ class _NotificationsInnerSettingsScreenState
                       fontWeight: FontWeight.w400,
                       color: Color(0xff7a8fa6),
                     ),
-                  ),
+                  ).tr(),
               ],
             ),
             if (isSwitch)
@@ -142,7 +142,7 @@ class _NotificationsInnerSettingsScreenState
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).primaryColorDark,
                 ),
-              ),
+              ).tr(),
           ],
         ),
       ),

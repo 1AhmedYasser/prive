@@ -10,6 +10,7 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../../Helpers/Utils.dart';
 import '../../../UltraNetwork/ultra_network.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NewCatalogCollectionWidget extends StatefulWidget {
   final String title;
@@ -83,7 +84,7 @@ class _NewCatalogCollectionWidgetState
                 ),
               ),
               Text(
-                "What Will Be Your ${widget.type} Name ?",
+                "${"What Will Be Your".tr()} ${widget.type} ${"Name ?".tr()}",
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -95,7 +96,7 @@ class _NewCatalogCollectionWidgetState
                 keyboardType: TextInputType.text,
                 cursorColor: const Color(0xff777777),
                 decoration: InputDecoration(
-                  hintText: "${widget.type} Name",
+                  hintText: "${widget.type} ${"Name".tr()}",
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
                   labelStyle: const TextStyle(
@@ -129,7 +130,7 @@ class _NewCatalogCollectionWidgetState
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please Enter A ${widget.type} Name';
+                    return '${"Please Enter A".tr()} ${widget.type} ${"Name".tr()}';
                   }
                   return null;
                 },
@@ -138,7 +139,7 @@ class _NewCatalogCollectionWidgetState
                 Padding(
                   padding: const EdgeInsets.only(top: 25, bottom: 20),
                   child: Text(
-                    "Select a ${widget.type} Image (Optional)",
+                    "${"Select a".tr()} ${widget.type} ${"Image (Optional)".tr()}",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -211,7 +212,7 @@ class _NewCatalogCollectionWidgetState
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                     ),
-                  ),
+                  ).tr(),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     minimumSize: Size(MediaQuery.of(context).size.width, 55),

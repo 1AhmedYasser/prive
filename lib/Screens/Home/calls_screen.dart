@@ -15,6 +15,7 @@ import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:collection/collection.dart';
 import '../../Models/Call/call_logs.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -79,16 +80,16 @@ class _CallsScreenState extends State<CallsScreen>
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: SizedBox(
                               height: 48,
-                              child: Text(
+                              child: const Text(
                                 "Calls",
                                 style: TextStyle(
                                   fontSize: 34,
                                   fontWeight: FontWeight.w600,
                                 ),
-                              ),
+                              ).tr(),
                             ),
                           ),
                           if (isEditing)
@@ -108,7 +109,7 @@ class _CallsScreenState extends State<CallsScreen>
                                   fontSize: 17,
                                   color: Theme.of(context).primaryColorDark,
                                 ),
-                              ),
+                              ).tr(),
                             ),
                           if (callLogs.isNotEmpty)
                             TextButton(
@@ -124,7 +125,7 @@ class _CallsScreenState extends State<CallsScreen>
                                   fontSize: 17,
                                   color: Theme.of(context).primaryColorDark,
                                 ),
-                              ),
+                              ).tr(),
                             )
                         ],
                       ),
@@ -137,9 +138,9 @@ class _CallsScreenState extends State<CallsScreen>
                           width: 200,
                           child: CupertinoSlidingSegmentedControl(
                             groupValue: currentTab,
-                            children: const <int, Widget>{
-                              0: Text('All'),
-                              1: Text('Missed'),
+                            children: <int, Widget>{
+                              0: const Text("All").tr(),
+                              1: const Text("Missed").tr(),
                             },
                             onValueChanged: (value) {
                               setState(() {
@@ -389,13 +390,13 @@ class _CallsScreenState extends State<CallsScreen>
                                 height: 20,
                               ),
                               Text(
-                                "Your Call Will Appear Here",
+                                "Your Calls Will Appear Here",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.grey.shade600,
                                 ),
-                              )
+                              ).tr()
                             ],
                           ),
                         ),

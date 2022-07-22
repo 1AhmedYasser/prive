@@ -1,5 +1,6 @@
 import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -246,7 +247,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Text(
                     product?.price?.isEmpty == true
                         ? ""
-                        : "${product?.price ?? ""} SAR",
+                        : "${product?.price ?? ""} ${"SAR".tr()}",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
@@ -269,9 +270,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   );
                 },
-                child: const Text(
-                  "Send Message",
-                  style: TextStyle(
+                child: Text(
+                  "Send Message".tr(),
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
                   ),
@@ -372,7 +373,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Deleted Successfully",
+          message: "Product Deleted Successfully".tr(),
         ).then((value) => Navigator.pop(context, true));
       }
     });

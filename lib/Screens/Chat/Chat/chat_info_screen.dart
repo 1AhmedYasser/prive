@@ -7,6 +7,7 @@ import 'package:prive/Screens/Chat/Channels/channel_media_display_screen.dart';
 import 'package:prive/Screens/Chat/Chat/pinned_messages_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 /// Detail screen for a 1:1 chat correspondence
 class ChatInfoScreen extends StatefulWidget {
@@ -153,7 +154,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
 
               return OptionListTile(
                 tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                title: "Mute User",
+                title: "Mute User".tr(),
                 titleTextStyle: StreamChatTheme.of(context).textTheme.body,
                 leading: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22.0),
@@ -205,7 +206,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
         //   onTap: () {},
         // ),
         OptionListTile(
-          title: "Pinned Messages",
+          title: "Pinned Messages".tr(),
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
@@ -265,7 +266,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
           },
         ),
         OptionListTile(
-          title: "Photos & Videos",
+          title: "Photos & Videos".tr(),
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
@@ -325,7 +326,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
           },
         ),
         OptionListTile(
-          title: "Files",
+          title: "Files".tr(),
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
@@ -395,7 +396,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
 
   Widget _buildDeleteListTile() {
     return OptionListTile(
-      title: 'Delete Conversation',
+      title: 'Delete Conversation'.tr(),
       tileColor: StreamChatTheme.of(context).colorTheme.appBg,
       titleTextStyle: StreamChatTheme.of(context).textTheme.body.copyWith(
             color: StreamChatTheme.of(context).colorTheme.accentError,
@@ -417,10 +418,10 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   void _showDeleteDialog() async {
     final res = await showConfirmationDialog(
       context,
-      title: "Delete Conversation",
-      okText: "Delete",
-      question: "Are You Sure ?",
-      cancelText: "Cancel",
+      title: "Delete Conversation".tr(),
+      okText: "Delete".tr(),
+      question: "Are You Sure ?".tr(),
+      cancelText: "Cancel".tr(),
       icon: StreamSvgIcon.delete(
         color: StreamChatTheme.of(context).colorTheme.accentError,
       ),
@@ -447,10 +448,10 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                   .colorTheme
                   .textHighEmphasis
                   .withOpacity(0.5)),
-        );
+        ).tr();
       } else {
         alternativeWidget = Text(
-          '${"Last Seen"} ${Jiffy(otherMember.lastActive).fromNow()}',
+          '${"Last Seen".tr()} ${Jiffy(otherMember.lastActive).fromNow()}',
           style: TextStyle(
               color: StreamChatTheme.of(context)
                   .colorTheme
@@ -510,7 +511,7 @@ class __SharedGroupsScreenState extends State<_SharedGroupsScreen> {
         elevation: 1,
         centerTitle: true,
         title: Text(
-          "Shared Groups",
+          "Shared Groups".tr(),
           style: TextStyle(
               color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
               fontSize: 16.0),
@@ -543,7 +544,7 @@ class __SharedGroupsScreenState extends State<_SharedGroupsScreen> {
                   ),
                   const SizedBox(height: 16.0),
                   Text(
-                    "No Shared Groups",
+                    "No Shared Groups".tr(),
                     style: TextStyle(
                       fontSize: 14.0,
                       color: StreamChatTheme.of(context)
@@ -553,7 +554,7 @@ class __SharedGroupsScreenState extends State<_SharedGroupsScreen> {
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    "Groups Shared With User Appear Here",
+                    "Groups Shared With User Appear Here".tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.0,
@@ -649,7 +650,7 @@ class __SharedGroupsScreenState extends State<_SharedGroupsScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      '${channel.memberCount} ${channel.memberCount == 1 ? "Member" : "Members"}',
+                      '${channel.memberCount} ${channel.memberCount == 1 ? "Member".tr() : "Members".tr()}',
                       style: TextStyle(
                           color: StreamChatTheme.of(context)
                               .colorTheme

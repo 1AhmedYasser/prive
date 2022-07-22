@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChannelMediaDisplayScreen extends StatefulWidget {
   /// The sorting used for the channels matching the filters.
@@ -23,7 +24,8 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
 
   final MessageThemeData messageTheme;
 
-   const ChannelMediaDisplayScreen({Key? key,
+  const ChannelMediaDisplayScreen({
+    Key? key,
     required this.messageTheme,
     this.sortOptions,
     this.paginationParams = const PaginationParams(limit: 20),
@@ -70,7 +72,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
             color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
             fontSize: 16.0,
           ),
-        ),
+        ).tr(),
         leading: const Padding(
           padding: EdgeInsets.only(left: 10),
           child: BackButton(
@@ -112,9 +114,9 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                   style: TextStyle(
                     fontSize: 14.0,
                     color:
-                    StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 8.0),
                 Text(
                   "Photos & Videos Will Appear Here",
@@ -126,7 +128,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                         .textHighEmphasis
                         .withOpacity(0.5),
                   ),
-                ),
+                ).tr(),
               ],
             ),
           );
@@ -137,8 +139,8 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
         for (var item in snapshot.data!) {
           item.message.attachments
               .where((e) =>
-          (e.type == 'image' || e.type == 'video') &&
-              e.ogScrapeUrl == null)
+                  (e.type == 'image' || e.type == 'video') &&
+                  e.ogScrapeUrl == null)
               .forEach((e) {
             VideoPlayerController? controller;
             if (e.type == 'video') {
@@ -172,8 +174,8 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
             ),
           ),
           child: GridView.builder(
-            gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3),
             itemBuilder: (context, position) {
               var channel = StreamChannel.of(context).channel;
               return Padding(
@@ -187,7 +189,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                           channel: channel,
                           child: FullScreenMedia(
                             mediaAttachments:
-                            media.map((e) => e.attachment).toList(),
+                                media.map((e) => e.attachment).toList(),
                             startIndex: position,
                             message: media[position].message,
                             userName: media[position].message.user!.name,
@@ -199,17 +201,17 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                   },
                   child: media[position].attachment.type == 'image'
                       ? IgnorePointer(
-                    child: ImageAttachment(
-                      attachment: media[position].attachment,
-                      message: media[position].message,
-                      showTitle: false,
-                      size: Size(
-                        MediaQuery.of(context).size.width * 0.8,
-                        MediaQuery.of(context).size.height * 0.3,
-                      ),
-                      messageTheme: widget.messageTheme,
-                    ),
-                  )
+                          child: ImageAttachment(
+                            attachment: media[position].attachment,
+                            message: media[position].message,
+                            showTitle: false,
+                            size: Size(
+                              MediaQuery.of(context).size.width * 0.8,
+                              MediaQuery.of(context).size.height * 0.3,
+                            ),
+                            messageTheme: widget.messageTheme,
+                          ),
+                        )
                       : VideoPlayer(media[position].videoPlayer!),
                 ),
               );

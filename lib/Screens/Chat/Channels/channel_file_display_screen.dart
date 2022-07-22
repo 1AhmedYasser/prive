@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ChannelFileDisplayScreen extends StatefulWidget {
   /// The sorting used for the channels matching the filters.
@@ -61,7 +62,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
           style: TextStyle(
               color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
               fontSize: 16.0),
-        ),
+        ).tr(),
         leading: const Padding(
           padding: EdgeInsets.only(left: 10),
           child: BackButton(
@@ -105,7 +106,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                     color:
                         StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                   ),
-                ),
+                ).tr(),
                 const SizedBox(height: 8.0),
                 Text(
                   "Files Will Appear Here",
@@ -117,7 +118,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                         .textHighEmphasis
                         .withOpacity(0.5),
                   ),
-                ),
+                ).tr(),
               ],
             ),
           );

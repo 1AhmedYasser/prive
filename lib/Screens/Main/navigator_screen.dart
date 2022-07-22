@@ -13,6 +13,7 @@ import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/rooms_screen.dart';
 import 'package:prive/Screens/Home/stories_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -40,9 +41,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           Utils.showAlert(
             context,
             withCancel: true,
-            message: "Do You Want To Exit Prive ?",
-            okButtonText: "Yes",
-            cancelButtonText: "No",
+            message: "Do You Want To Exit Prive ?".tr(),
+            okButtonText: "Yes".tr(),
+            cancelButtonText: "No".tr(),
             onOkButtonPressed: () {
               try {
                 SystemNavigator.pop();
@@ -63,13 +64,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           height: 60,
           top: -25,
           items: [
-            _buildTab("Chats", R.images.chatTabImage, 0),
-            _buildTab("Calls", R.images.phoneTabImage, 1),
+            _buildTab("Chat".tr(), R.images.chatTabImage, 0),
+            _buildTab("Calls".tr(), R.images.phoneTabImage, 1),
             TabItem(
               icon: Container(),
             ),
-            _buildTab("Rooms", R.images.micTabImage, 3),
-            _buildTab("Stories", R.images.storiesTabImage, 4),
+            _buildTab("Rooms".tr(), R.images.micTabImage, 3),
+            _buildTab("Stories".tr(), R.images.storiesTabImage, 4),
           ],
           initialActiveIndex: 2,
           onTap: (int i) => _onTabTapped(i),
@@ -215,17 +216,17 @@ class _ChipBuilder extends ChipBuilder {
   String getTitles(int index) {
     switch (index) {
       case 0:
-        return "Chat";
+        return "Chat".tr();
       case 1:
-        return "Calls";
+        return "Calls".tr();
       case 2:
         return "";
       case 3:
-        return "Rooms";
+        return "Rooms".tr();
       case 4:
-        return "Stories";
+        return "Stories".tr();
       default:
-        return "Chat";
+        return "Chat".tr();
     }
   }
 }

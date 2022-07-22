@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -13,6 +12,7 @@ import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SignUpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -55,13 +55,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             width: MediaQuery.of(context).size.width,
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20, top: 100),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 100),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Sign Up",
-                      style: TextStyle(
+                      "Sign Up".tr(),
+                      style: const TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.w600,
                       ),
@@ -110,13 +110,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   formatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
                 const SizedBox(height: 23),
-                const Padding(
-                  padding: EdgeInsets.only(left: 35, right: 35),
+                Padding(
+                  padding: const EdgeInsets.only(left: 35, right: 35),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Gender (Optional)",
-                      style: TextStyle(
+                      "Gender (Optional)".tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
                       ),
@@ -152,13 +152,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.only(left: 35, right: 35),
+                Padding(
+                  padding: const EdgeInsets.only(left: 35, right: 35),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "By Signing Up,",
-                      style: TextStyle(
+                      "By Signing Up,".tr(),
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w400,
                         color: Color(0xff7a8fa6),
@@ -170,11 +170,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: const EdgeInsets.only(left: 35, right: 35, top: 5),
                   child: Row(
                     children: [
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "You Agree To The ",
-                          style: TextStyle(
+                          "You Agree To The ".tr(),
+                          style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w400,
                               color: Color(0xff7a8fa6)),
@@ -185,7 +185,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: GestureDetector(
                           onTap: () {},
                           child: Text(
-                            "Terms & Conditions",
+                            "Terms & Conditions".tr(),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w400,
@@ -203,7 +203,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (_formKey.currentState!.validate()) {
                       if (profileImage.path.isEmpty) {
                         Utils.showAlert(context,
-                            message: "Please Choose An Image",
+                            message: "Please Choose An Image".tr(),
                             alertImage: R.images.alertInfoImage);
                       } else {
                         if (loading == false) {
@@ -253,9 +253,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       }
                     }
                   },
-                  child: const Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
+                  child: Text(
+                    "Sign Up".tr(),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w400),
                   ),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
@@ -313,7 +314,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           const SizedBox(width: 10),
           Text(
-            title,
+            title.tr(),
             style: const TextStyle(fontSize: 18),
           ),
         ],
@@ -336,7 +337,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.white,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          hintText: title,
+          hintText: title.tr(),
           hintStyle: const TextStyle(color: Color(0xff777777)),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
