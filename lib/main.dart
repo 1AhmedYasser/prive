@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:prive/Providers/stories_provider.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
@@ -20,7 +24,9 @@ import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'Extras/resources.dart';
+import 'Helpers/stream_manager.dart';
 import 'Screens/Auth/login_screen.dart';
+import 'Screens/Chat/Calls/single_call_screen.dart';
 import 'Screens/Home/channels_screen.dart';
 import 'Screens/More/Settings/language_screen.dart';
 import 'UltraNetwork/ultra_network.dart';
@@ -50,10 +56,16 @@ void main() async {
   );
 }
 
-class Prive extends StatelessWidget {
+class Prive extends StatefulWidget {
   Prive({Key? key, required this.client}) : super(key: key);
 
   final StreamChatClient client;
+
+  @override
+  State<Prive> createState() => _PriveState();
+}
+
+class _PriveState extends State<Prive> {
   final botToastBuilder = BotToastInit();
 
   @override
@@ -83,11 +95,11 @@ class Prive extends StatelessWidget {
         builder: (context, child) {
           child = botToastBuilder(context, child);
           return StreamChat(
-            client: client,
+            client: widget.client,
             streamChatThemeData:
                 StreamChatThemeData.fromTheme(theme).copyWith(),
             child: StreamChatCore(
-              client: client,
+              client: widget.client,
               child: ChannelsBloc(
                 child: UsersBloc(
                   child: child,

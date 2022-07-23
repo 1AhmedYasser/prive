@@ -6,6 +6,7 @@ import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
@@ -242,6 +243,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                             BotToast.removeAll("call_overlay");
+                                            FlutterCallkitIncoming
+                                                .endAllCalls();
                                             databaseReference.remove();
                                             DatabaseReference userRef =
                                                 FirebaseDatabase.instance
@@ -259,6 +262,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                       CupertinoActionSheetAction(
                                         onPressed: () {
                                           Navigator.pop(context);
+                                          FlutterCallkitIncoming.endAllCalls();
                                           BotToast.removeAll("call_overlay");
                                           databaseReference
                                               .child(
@@ -287,7 +291,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                 );
                               } else {
                                 BotToast.removeAll("call_overlay");
-
+                                FlutterCallkitIncoming.endAllCalls();
                                 final databaseReference = FirebaseDatabase
                                     .instance
                                     .ref("SingleCalls/${widget.channel.id}");

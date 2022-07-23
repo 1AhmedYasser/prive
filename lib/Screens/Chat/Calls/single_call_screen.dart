@@ -11,6 +11,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/stream_manager.dart';
@@ -27,6 +28,8 @@ class SingleCallScreen extends StatefulWidget {
   final bool isVideo;
   final Channel channel;
   final bool isJoining;
+  final String channelName;
+  final String channelImage;
   final RtcEngine? agoraEngine;
   final Call? call;
   const SingleCallScreen(
@@ -34,6 +37,8 @@ class SingleCallScreen extends StatefulWidget {
       this.isVideo = false,
       required this.channel,
       this.isJoining = false,
+      this.channelName = "",
+      this.channelImage = "",
       this.agoraEngine,
       this.call})
       : super(key: key);
@@ -167,14 +172,22 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               blur: 12,
               blurColor: Colors.black,
               child: Center(
-                child: ChannelAvatar(
-                  borderRadius: BorderRadius.circular(0),
-                  channel: widget.channel,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width,
-                    maxHeight: MediaQuery.of(context).size.height,
-                  ),
-                ),
+                child: widget.channelImage.isEmpty
+                    ? ChannelAvatar(
+                        borderRadius: BorderRadius.circular(0),
+                        channel: widget.channel,
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width,
+                          maxHeight: MediaQuery.of(context).size.height,
+                        ),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: CachedImage(
+                          url: widget.channelImage,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -182,20 +195,33 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ChannelAvatar(
-                  borderRadius: BorderRadius.circular(50),
-                  channel: widget.channel,
-                  constraints: const BoxConstraints(
-                    maxWidth: 100,
-                    maxHeight: 100,
-                  ),
-                ),
+                widget.channelImage.isEmpty
+                    ? ChannelAvatar(
+                        borderRadius: BorderRadius.circular(0),
+                        channel: widget.channel,
+                        constraints: const BoxConstraints(
+                          maxWidth: 100,
+                          maxHeight: 100,
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: CachedImage(
+                            url: widget.channelImage,
+                          ),
+                        ),
+                      ),
                 const SizedBox(height: 20),
                 Text(
-                  StreamManager.getChannelName(
-                    widget.channel,
-                    context.currentUser!,
-                  ),
+                  widget.channelName.isEmpty
+                      ? StreamManager.getChannelName(
+                          widget.channel,
+                          context.currentUser!,
+                        )
+                      : widget.channelName,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 21,
@@ -515,14 +541,22 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               blur: 12,
               blurColor: Colors.black,
               child: Center(
-                child: ChannelAvatar(
-                  borderRadius: BorderRadius.circular(0),
-                  channel: widget.channel,
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width,
-                    maxHeight: MediaQuery.of(context).size.height,
-                  ),
-                ),
+                child: widget.channelImage.isEmpty
+                    ? ChannelAvatar(
+                        borderRadius: BorderRadius.circular(0),
+                        channel: widget.channel,
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width,
+                          maxHeight: MediaQuery.of(context).size.height,
+                        ),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: CachedImage(
+                          url: widget.channelImage,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -531,20 +565,33 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ChannelAvatar(
-                  borderRadius: BorderRadius.circular(50),
-                  channel: widget.channel,
-                  constraints: const BoxConstraints(
-                    maxWidth: 100,
-                    maxHeight: 100,
-                  ),
-                ),
+                widget.channelImage.isEmpty
+                    ? ChannelAvatar(
+                        borderRadius: BorderRadius.circular(50),
+                        channel: widget.channel,
+                        constraints: const BoxConstraints(
+                          maxWidth: 100,
+                          maxHeight: 100,
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: CachedImage(
+                            url: widget.channelImage,
+                          ),
+                        ),
+                      ),
                 const SizedBox(height: 20),
                 Text(
-                  StreamManager.getChannelName(
-                    widget.channel,
-                    context.currentUser!,
-                  ),
+                  widget.channelName.isEmpty
+                      ? StreamManager.getChannelName(
+                          widget.channel,
+                          context.currentUser!,
+                        )
+                      : widget.channelName,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 21,

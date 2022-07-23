@@ -15,6 +15,7 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Screens/Chat/Calls/single_call_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/calling_widget.dart';
+import 'package:prive/main.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_persistence/stream_chat_persistence.dart';
@@ -331,28 +332,6 @@ class NotificationsManager {
           case CallEvent.ACTION_CALL_START:
             break;
           case CallEvent.ACTION_CALL_ACCEPT:
-            // Navigator.of(notificationsContext).push(
-            //   PageRouteBuilder(
-            //     pageBuilder: (BuildContext context, _, __) {
-            //       (event.body as Map<String, dynamic>)['extra']
-            //       ['channelName']
-            //       return SingleCallScreen(
-            //         isJoining: true,
-            //         isVideo: (event.body as Map<String, dynamic>)['type'] == 0
-            //             ? false
-            //             : true,
-            //         channel: null,
-            //       );
-            //     },
-            //     transitionsBuilder:
-            //         (_, Animation<double> animation, __, Widget child) {
-            //       return FadeTransition(
-            //         opacity: animation,
-            //         child: child,
-            //       );
-            //     },
-            //   ),
-            // );
             break;
           case CallEvent.ACTION_CALL_DECLINE:
             FlutterCallkitIncoming.endAllCalls();
