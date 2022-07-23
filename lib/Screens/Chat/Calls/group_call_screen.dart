@@ -58,6 +58,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   CancelToken cancelToken = CancelToken();
   bool didEndCall = false;
   rtc_local_view.SurfaceView? localView;
+  List<rtc_remote_view.SurfaceView> remoteViews = [];
 
   @override
   void initState() {
@@ -171,9 +172,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               )
                             : Container(
                                 child: ClipRRect(
-                                  child: _renderRemoteVideo(
-                                    int.parse(videoMembers[index].id ?? "0"),
-                                  ),
+                                  child: index > remoteViews.length
+                                      ? const SizedBox.shrink()
+                                      : remoteViews[index],
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 constraints: const BoxConstraints.expand(),
@@ -569,17 +570,29 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
           [];
+
+      if (agoraEngine != null) {
+        remoteViews.clear();
+        for (var member in videoMembers) {
+          remoteViews.add(rtc_remote_view.SurfaceView(
+            uid: int.parse(member.id ?? "0"),
+            channelId: widget.channel.id ?? "",
+          ));
+        }
+      }
       setState(() {});
     } else {
       if (showingInfo == false) {
         didEndCall = true;
-        Utils.showAlert(
-          context,
-          message: "Group Call Has Ended".tr(),
-          alertImage: R.images.alertInfoImage,
-        ).then(
-          (value) => Navigator.pop(context),
-        );
+        if (mounted) {
+          Utils.showAlert(
+            context,
+            message: "Group Call Has Ended".tr(),
+            alertImage: R.images.alertInfoImage,
+          ).then(
+            (value) => Navigator.pop(context),
+          );
+        }
       }
       showingInfo = true;
     }
@@ -636,6 +649,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         }, userJoined: (int uid, int elapsed) {
           print('userJoined $uid');
           localView = const rtc_local_view.SurfaceView();
+          remoteViews.clear();
+          for (var member in videoMembers) {
+            remoteViews.add(rtc_remote_view.SurfaceView(
+              uid: int.parse(member.id ?? "0"),
+              channelId: widget.channel.id ?? "",
+            ));
+          }
           setState(() {});
         }, cameraReady: () async {
           print("camera ready");
@@ -644,12 +664,26 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         }));
         await agoraEngine?.setClientRole(ClientRole.Broadcaster);
 
-        await agoraEngine?.joinChannel(
-            tokenResponse.data ?? "",
-            widget.channel.id ?? "",
-            null,
-            int.parse(context.currentUser?.id ?? "0"));
-        localView = const rtc_local_view.SurfaceView();
+        agoraEngine
+            ?.joinChannel(tokenResponse.data ?? "", widget.channel.id ?? "",
+                null, int.parse(context.currentUser?.id ?? "0"))
+            .then(
+          (value) {
+            localView = const rtc_local_view.SurfaceView();
+            remoteViews.clear();
+
+            for (var member in videoMembers) {
+              remoteViews.add(rtc_remote_view.SurfaceView(
+                uid: int.parse(member.id ?? "0"),
+                channelId: widget.channel.id ?? "",
+              ));
+            }
+            print("Number of video members ${videoMembers.length}");
+            print("Number of remote views ${remoteViews.length}");
+
+            setState(() {});
+          },
+        );
         setState(() {});
       }
     });

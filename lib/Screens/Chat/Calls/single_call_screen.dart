@@ -197,7 +197,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               children: [
                 widget.channelImage.isEmpty
                     ? ChannelAvatar(
-                        borderRadius: BorderRadius.circular(0),
+                        borderRadius: BorderRadius.circular(50),
                         channel: widget.channel,
                         constraints: const BoxConstraints(
                           maxWidth: 100,

@@ -89,7 +89,7 @@ class _PriveState extends State<Prive> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         navigatorKey: navigatorKey,
-        locale: const Locale("en"), //context.locale,
+        locale: context.locale,
         theme: theme,
         debugShowCheckedModeBanner: false,
         builder: (context, child) {

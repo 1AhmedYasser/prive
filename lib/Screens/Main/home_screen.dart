@@ -73,7 +73,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   checkForCalls() async {
-    print(navigatorKey.currentContext);
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
       print("Have Calls");

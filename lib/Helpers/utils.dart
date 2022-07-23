@@ -234,7 +234,8 @@ class Utils {
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 2.5 / 2,
+                //childAspectRatio: 2.5 / 2,
+                childAspectRatio: 2 / 2,
               ),
               itemBuilder: (context, index) {
                 return InkWell(
@@ -428,9 +429,11 @@ class Utils {
         DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
 
     if (lastSeenDateFormatted == today) {
-      lastSeen += "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen +=
+          "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else if (lastSeenDateFormatted == yesterday) {
-      lastSeen += "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen +=
+          "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));
@@ -591,8 +594,8 @@ class Utils {
                         left: 20, top: 20, bottom: 10, right: 20),
                     child: Text(
                       "Open Via".tr(),
-                      style:
-                          const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
                   ListTile(
