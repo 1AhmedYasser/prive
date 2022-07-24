@@ -15,6 +15,7 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:wakelock/wakelock.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
@@ -62,6 +63,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   @override
   void initState() {
+    Wakelock.enable();
     isVideoOn = widget.isVideo;
     if (widget.isJoining) {
       _joinGroupCall();
@@ -164,20 +166,20 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             ? Container(
                                 height: 200,
                                 width: 150,
-                                child: ClipRRect(
-                                  child: _renderLocalPreview(),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
                                 constraints: const BoxConstraints.expand(),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: _renderLocalPreview(),
+                                ),
                               )
                             : Container(
+                                constraints: const BoxConstraints.expand(),
                                 child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
                                   child: index > remoteViews.length
                                       ? const SizedBox.shrink()
                                       : remoteViews[index],
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                constraints: const BoxConstraints.expand(),
                               ),
                       ),
                       staggeredTileBuilder: (int index) {
@@ -263,6 +265,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       bottom: 0,
       left: 0,
       right: 0,
+      height: 200,
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -283,56 +286,27 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               children: [
                 if (isVideoOn == true)
                   InkWell(
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      child: const Icon(
-                        Icons.switch_camera_rounded,
-                        color: Colors.white,
-                        size: 25,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () {
                       agoraEngine?.switchCamera();
                     },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: const Icon(
+                        Icons.switch_camera_rounded,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                    ),
                   ),
                 if (isVideoOn == true) const SizedBox(height: 13),
                 InkWell(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: Icon(
-                          widget.isVideo
-                              ? isVideoOn
-                                  ? Icons.videocam
-                                  : Icons.videocam_off
-                              : isSpeakerOn
-                                  ? FontAwesomeIcons.volumeUp
-                                  : FontAwesomeIcons.volumeDown,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white10,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.isVideo ? "Video" : "Speaker",
-                        style: const TextStyle(color: Colors.white),
-                      ).tr()
-                    ],
-                  ),
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () async {
@@ -350,6 +324,35 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
                     }
                   },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Icon(
+                          widget.isVideo
+                              ? isVideoOn
+                                  ? Icons.videocam
+                                  : Icons.videocam_off
+                              : isSpeakerOn
+                                  ? FontAwesomeIcons.volumeHigh
+                                  : FontAwesomeIcons.volumeLow,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        widget.isVideo ? "Video" : "Speaker",
+                        style: const TextStyle(color: Colors.white),
+                      ).tr()
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 60),
               ],
@@ -359,6 +362,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
+                  width: 85,
+                  height: 85,
                   child: WaveButton(
                     onPressed: (isMute) async {
                       setState(() {
@@ -380,8 +385,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  width: 85,
-                  height: 85,
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -395,18 +398,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 InkWell(
-                  child: Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                  ),
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () {
@@ -462,6 +453,18 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       ),
                     );
                   },
+                  child: Container(
+                    height: 55,
+                    width: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 6),
                 const Text(
@@ -474,7 +477,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           ],
         ),
       ),
-      height: 200,
     );
   }
 
@@ -693,13 +695,6 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     return localView ?? const SizedBox.shrink();
   }
 
-  Widget _renderRemoteVideo(int uid) {
-    return rtc_remote_view.SurfaceView(
-      uid: uid,
-      channelId: "",
-    );
-  }
-
   @override
   void dispose() {
     if (didEndCall == false) {
@@ -711,6 +706,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         channel: widget.channel,
       );
     }
+    Wakelock.disable();
     onAddListener?.cancel();
     onChangeListener?.cancel();
     onDeleteListener?.cancel();

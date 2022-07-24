@@ -37,6 +37,7 @@ import '../../../Widgets/Common/cached_image.dart';
 import 'chat_info_screen.dart';
 import 'forward_screen.dart';
 import 'group_info_screen.dart';
+import 'dart:ui' as ui;
 
 class ChatScreen extends StatefulWidget {
   final Channel channel;
@@ -158,12 +159,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => StreamChannel(
+                                    channel: channel,
                                     child: ChatInfoScreen(
                                       messageTheme: StreamChatTheme.of(context)
                                           .ownMessageTheme,
                                       user: otherUser.user,
                                     ),
-                                    channel: channel,
                                   ),
                                 ),
                               );
@@ -177,11 +178,11 @@ class _ChatScreenState extends State<ChatScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => StreamChannel(
+                                  channel: channel,
                                   child: GroupInfoScreen(
                                     messageTheme: StreamChatTheme.of(context)
                                         .ownMessageTheme,
                                   ),
-                                  channel: channel,
                                 ),
                               ),
                             );
@@ -559,7 +560,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           //   });
                           // });
                         },
-                        child: const Text("Join").tr(),
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
                           elevation: 0,
@@ -567,6 +567,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        child: const Text("Join").tr(),
                       )
                     ],
                   ),
@@ -637,95 +638,102 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                     errorBuilder: (context, error) => Container(),
                     messageListBuilder: (context, messages) {
-                      return MessageListViewTheme(
-                        data: MessageListViewTheme.of(context).copyWith(
-                          backgroundImage: isAFile == true
-                              ? DecorationImage(
-                                  image: FileImage(File(chatBackground)),
-                                  fit: BoxFit.cover,
-                                )
-                              : DecorationImage(
-                                  image: AssetImage(chatBackground),
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
-                        child: MessageListView(
-                          key: isMessageSearchOn ? UniqueKey() : null,
-                          highlightInitialMessage: true,
-                          dateDividerBuilder: (date) {
-                            return SizedBox(
-                              height: 60,
-                              child: Align(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xff1293a8),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20.0),
-                                    ),
+                      return Directionality(
+                        textDirection: ui.TextDirection.ltr,
+                        child: StreamMessageListViewTheme(
+                          data: StreamMessageListViewTheme.of(context).copyWith(
+                            backgroundImage: isAFile == true
+                                ? DecorationImage(
+                                    image: FileImage(File(chatBackground)),
+                                    fit: BoxFit.cover,
+                                  )
+                                : DecorationImage(
+                                    image: AssetImage(chatBackground),
+                                    fit: BoxFit.cover,
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10, top: 7, bottom: 7),
-                                    child: Text(
-                                      getHeaderDate(context, date),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w400,
+                          ),
+                          child: StreamMessageListView(
+                            key: isMessageSearchOn ? UniqueKey() : null,
+                            highlightInitialMessage: true,
+                            dateDividerBuilder: (date) {
+                              return SizedBox(
+                                height: 60,
+                                child: Align(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xff1293a8),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          messageHighlightColor: Colors.grey.shade300,
-                          onMessageSwiped: _reply,
-                          messageFilter: defaultFilter,
-                          messageBuilder:
-                              (context, details, messages, defaultMessage) {
-                            return isMessageSelectionOn
-                                ? Container(
-                                    color: selectedMessages
-                                            .contains(defaultMessage.message)
-                                        ? Colors.green.withOpacity(0.4)
-                                        : Colors.transparent,
-                                    child: Theme(
-                                      data: ThemeData(
-                                        checkboxTheme: CheckboxThemeData(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10,
+                                          right: 10,
+                                          top: 7,
+                                          bottom: 7),
+                                      child: Text(
+                                        getHeaderDate(context, date),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          IgnorePointer(
-                                            child: Checkbox(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              value: selectedMessages.contains(
-                                                      defaultMessage.message)
-                                                  ? true
-                                                  : false,
-                                              onChanged: (value) {},
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: _buildChatMessage(
-                                              defaultMessage,
-                                              details,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     ),
-                                  )
-                                : _buildChatMessage(defaultMessage, details);
-                          },
+                                  ),
+                                ),
+                              );
+                            },
+                            messageHighlightColor: Colors.grey.shade300,
+                            onMessageSwiped: _reply,
+                            messageFilter: defaultFilter,
+                            messageBuilder:
+                                (context, details, messages, defaultMessage) {
+                              return isMessageSelectionOn
+                                  ? Container(
+                                      color: selectedMessages
+                                              .contains(defaultMessage.message)
+                                          ? Colors.green.withOpacity(0.4)
+                                          : Colors.transparent,
+                                      child: Theme(
+                                        data: ThemeData(
+                                          checkboxTheme: CheckboxThemeData(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            IgnorePointer(
+                                              child: Checkbox(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                value: selectedMessages
+                                                        .contains(defaultMessage
+                                                            .message)
+                                                    ? true
+                                                    : false,
+                                                onChanged: (value) {},
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: _buildChatMessage(
+                                                defaultMessage,
+                                                details,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : _buildChatMessage(defaultMessage, details);
+                            },
+                          ),
                         ),
                       );
                     },
@@ -1099,10 +1107,10 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       },
       deletedBottomRowBuilder: (context, message) {
-        return const VisibleFootnote();
+        return const StreamVisibleFootnote();
       },
       customActions: [
-        MessageAction(
+        StreamMessageAction(
           leading: Padding(
             padding: const EdgeInsets.only(right: 3),
             child: Image.asset(
@@ -1141,7 +1149,7 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           },
         ),
-        MessageAction(
+        StreamMessageAction(
           leading: const Icon(
             Icons.check_circle_outlined,
             color: Color(0xff7e7e7e),
@@ -1262,7 +1270,7 @@ class _ChatScreenState extends State<ChatScreen> {
               fontWeight: FontWeight.w500,
               color: Colors.green,
             ),
-          );
+          ).tr();
         } else {
           alternativeWidget = Text(
             getLastSeenDate(
@@ -1283,7 +1291,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   String getLastSeenDate(DateTime data) {
-    String lastSeen = "last seen ";
+    String lastSeen = "last seen ".tr();
     final now = DateTime.now();
     DateTime lastSeenDate = data.toLocal();
     final today = DateTime(now.year, now.month, now.day);
@@ -1293,9 +1301,11 @@ class _ChatScreenState extends State<ChatScreen> {
         DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
 
     if (lastSeenDateFormatted == today) {
-      lastSeen += "today at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen +=
+          "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else if (lastSeenDateFormatted == yesterday) {
-      lastSeen += "yesterday at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen +=
+          "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));
@@ -1327,9 +1337,9 @@ class _ChatScreenState extends State<ChatScreen> {
         DateTime(element.year, element.month, element.day);
 
     if (messageDateFormatted == today) {
-      return "Today";
+      return "Today".tr();
     } else if (messageDateFormatted == yesterday) {
-      return "Yesterday";
+      return "Yesterday".tr();
     } else {
       DateTime firstDayOfTheCurrentWeek =
           now.subtract(Duration(days: now.weekday - 1));

@@ -58,6 +58,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pushNamedAndRemoveUntil(context, R.routes.loginRoute,
                   (Route<dynamic> route) => false);
             },
+            style: ElevatedButton.styleFrom(
+                primary: Colors.transparent,
+                elevation: 0,
+                shadowColor: Colors.transparent),
             child: Row(
               children: [
                 Image.asset(
@@ -77,10 +81,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ).tr()
               ],
             ),
-            style: ElevatedButton.styleFrom(
-                primary: Colors.transparent,
-                elevation: 0,
-                shadowColor: Colors.transparent),
           )
         ],
       ),
@@ -222,15 +222,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(
                             builder: (context) => const MoreScreen(),
                           ),
-                        );
+                        ).then((value) => setState(() {}));
                       },
-                      child: const Text(
-                        "Settings",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColorDark,
                         minimumSize:
@@ -240,6 +233,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: const Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ).tr(),
                     )
                   ],
                 ),

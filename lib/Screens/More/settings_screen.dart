@@ -37,40 +37,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 30),
                 OptionRowWidget(
                   image: R.images.notificationBellImage,
-                  title: "Notifications & Sounds",
+                  title: "Notifications & Sounds".tr(),
                   onPressed: () => Navigator.pushNamed(
-                      context, R.routes.notificationsSoundsRoute),
+                          context, R.routes.notificationsSoundsRoute)
+                      .then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: R.images.chatImage,
-                  title: "Chat Settings",
+                  title: "Chat Settings".tr(),
                   onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.chatSettingsRoute),
+                      Navigator.pushNamed(context, R.routes.chatSettingsRoute)
+                          .then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: R.images.blockedUserImage,
-                  title: "Blocked Users",
+                  title: "Blocked Users".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.languageImage,
-                  title: "Language",
+                  title: "Language".tr(),
                   onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.languageRoute),
+                      Navigator.pushNamed(context, R.routes.languageRoute)
+                          .then((value) => setState(() {})),
                 ),
                 const SizedBox(height: 5),
                 buildSettingsChoices("Help", () {},
                     bottom: 30, textColor: const Color(0xff232323)),
-                buildSettingsChoices("Ask a Question", () {
+                buildSettingsChoices("Ask a Question".tr(), () {
                   _showAskQuestionDialog();
                 }),
                 buildSettingsChoices(
-                  "Terms & Conditions",
-                  () =>
-                      Navigator.pushNamed(context, R.routes.termsPrivacyRoute),
+                  "Terms & Conditions".tr(),
+                  () => Navigator.pushNamed(context, R.routes.termsPrivacyRoute)
+                      .then((value) => setState(() {})),
                 ),
                 buildSettingsChoices(
-                  "Privacy Policy",
+                  "Privacy Policy".tr(),
                   () {
                     Navigator.push(
                       context,
@@ -79,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           isTerms: false,
                         ),
                       ),
-                    );
+                    ).then((value) => setState(() {}));
                   },
                 ),
               ],
@@ -146,15 +149,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text(
-                            "Cancel",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.grey.shade600, fontSize: 16),
-                          ).tr(),
-                        ),
                         style: ElevatedButton.styleFrom(
                           primary: Colors.transparent,
                           elevation: 0,
@@ -165,6 +159,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                         ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 5),
+                          child: Text(
+                            "Cancel",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.grey.shade600, fontSize: 16),
+                          ).tr(),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -173,6 +176,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(
+                                color: Theme.of(context).primaryColorDark),
+                          ),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
                           child: Text(
@@ -183,15 +195,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 color: Theme.of(context).primaryColorDark,
                                 fontSize: 15),
                           ).tr(),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.transparent,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                                color: Theme.of(context).primaryColorDark),
-                          ),
                         ),
                       ),
                     ),

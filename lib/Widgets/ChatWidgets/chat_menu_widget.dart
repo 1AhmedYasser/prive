@@ -107,7 +107,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       resultPadding: EdgeInsets.zero,
       resultIconRotation: true,
       resultIconRotationValue: 1,
-      dropdownItemReverse: true,
+      dropdownItemReverse: context.locale.languageCode == "en" ? true : false,
       isDropdownLabel: true,
       unselectedItemTS: const TextStyle(
         fontSize: 15,
@@ -117,9 +117,11 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
         fontSize: 15,
         color: Color(0xff232323),
       ),
-      dropdownItemMainAxis: MainAxisAlignment.start,
+      dropdownItemMainAxis: context.locale.languageCode == "en"
+          ? MainAxisAlignment.start
+          : MainAxisAlignment.end,
       isResultLabel: false,
-      dropdownItemAlign: Alignment.centerLeft,
+      dropdownItemAlign: Alignment.centerRight,
       isResultIconLabel: false,
       dropdownPadding: const EdgeInsets.all(20),
       isTriangle: false,
@@ -130,7 +132,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       triangleWidth: 0,
       triangleHeight: 0,
       triangleAlign: 'center',
-      dropdownAlign: 'right',
+      dropdownAlign: context.locale.languageCode == "en" ? "right" : "left",
       gap: 10,
     );
   }
@@ -139,7 +141,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
     chatMoreMenu.clear();
     for (var i = 0; i < chatMoreMenuTitles.length; i++) {
       chatMoreMenu.add({
-        'label': chatMoreMenuTitles[i],
+        'label': chatMoreMenuTitles[i].tr(),
         'value': chatMoreMenuTitles[i],
         'icon': SizedBox(
           width: 18,

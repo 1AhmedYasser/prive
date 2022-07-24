@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class ChatSettingsScreen extends StatefulWidget {
   const ChatSettingsScreen({Key? key}) : super(key: key);
@@ -73,7 +72,8 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () =>
-                    Navigator.pushNamed(context, R.routes.chatBackgroundRoute),
+                    Navigator.pushNamed(context, R.routes.chatBackgroundRoute)
+                        .then((value) => setState(() {})),
                 child: Row(
                   children: [
                     Image.asset(
@@ -140,7 +140,9 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                               children: [
                                 Image.asset(themes.keys.toList()[index]),
                                 Positioned.fill(
+                                  bottom: 10,
                                   child: Align(
+                                    alignment: Alignment.bottomCenter,
                                     child: Container(
                                       height: 26,
                                       width: 26,
@@ -155,15 +157,13 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                                       ),
                                       child: currentSelectedIndex == index
                                           ? Icon(
-                                              FontAwesomeIcons.solidCheckCircle,
+                                              FontAwesomeIcons.solidCircleCheck,
                                               color: Theme.of(context)
                                                   .primaryColor,
                                             )
                                           : null,
                                     ),
-                                    alignment: Alignment.bottomCenter,
                                   ),
-                                  bottom: 10,
                                 )
                               ],
                             ),

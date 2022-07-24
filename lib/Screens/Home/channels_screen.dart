@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Channels/archive_tab.dart';
 import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
 import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
@@ -67,7 +67,9 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               backgroundColor: Colors.grey.shade200.withOpacity(0.3),
               titleSpacing: 0,
               title: Align(
-                alignment: Alignment.centerLeft,
+                alignment: context.locale.languageCode == "en"
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
                   child: Image.asset(
@@ -109,6 +111,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                                   tabs: _tabs.map(
                                     (String name) {
                                       return SizedBox(
+                                        height: 38,
                                         child: Tab(
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -135,7 +138,6 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                                             ),
                                           ),
                                         ),
-                                        height: 38,
                                       );
                                     },
                                   ).toList(),
@@ -154,7 +156,9 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 23),
+                      padding: EdgeInsets.only(
+                          right: context.locale.languageCode == "en" ? 23 : 0,
+                          left: context.locale.languageCode == "en" ? 0 : 23),
                       child: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, R.routes.profileRoute);

@@ -13,6 +13,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:wakelock/wakelock.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/stream_manager.dart';
 import '../../../Helpers/utils.dart';
@@ -72,6 +73,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      Wakelock.enable();
       if (widget.isJoining == false) {
         _startCall();
       } else {
@@ -129,8 +131,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 },
                 child: Icon(
                   isSpeakerOn
-                      ? FontAwesomeIcons.volumeUp
-                      : FontAwesomeIcons.volumeDown,
+                      ? FontAwesomeIcons.volumeHigh
+                      : FontAwesomeIcons.volumeLow,
                   color: Colors.white,
                   size: 25,
                 ),
@@ -643,7 +645,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               offset: Offset(0, 0),
               blurRadius: 2,
             ),
-            child: _buildLocalView(),
             // child: FlipCard(
             //   controller: _flipController,
             //   flipOnTouch: false,
@@ -652,6 +653,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             // ),
             initialPosition: AnchoringPosition.topRight,
             dragController: remoteDragController,
+            child: _buildLocalView(),
           ),
         Positioned(
           bottom: 50,
@@ -678,6 +680,10 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   child: Container(
                     width: 60,
                     height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(23),
+                      color: Colors.grey.withOpacity(0.7),
+                    ),
                     child: Icon(
                       call?.members
                                   ?.firstWhere((element) =>
@@ -688,10 +694,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                           : Icons.videocam_off,
                       size: 28,
                       color: Colors.white,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(23),
-                      color: Colors.grey.withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -714,14 +716,14 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 child: Container(
                   width: 60,
                   height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(23),
+                    color: Colors.grey.withOpacity(0.7),
+                  ),
                   child: Icon(
                     me?.isMicOn == false ? Icons.mic_off_rounded : Icons.mic,
                     size: 28,
                     color: Colors.white,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    color: Colors.grey.withOpacity(0.7),
                   ),
                 ),
               ),
@@ -738,19 +740,19 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   child: Container(
                     width: 60,
                     height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(23),
+                      color: Colors.grey.withOpacity(0.7),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(6),
                       child: Icon(
                         isSpeakerOn
-                            ? FontAwesomeIcons.volumeUp
-                            : FontAwesomeIcons.volumeDown,
+                            ? FontAwesomeIcons.volumeHigh
+                            : FontAwesomeIcons.volumeLow,
                         color: Colors.white,
                         size: 25,
                       ),
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(23),
-                      color: Colors.grey.withOpacity(0.7),
                     ),
                   ),
                 ),
@@ -758,6 +760,10 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 Container(
                   width: 60,
                   height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(23),
+                    color: Colors.grey.withOpacity(0.7),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(6),
                     child: IconButton(
@@ -771,10 +777,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                         agoraEngine?.switchCamera();
                       },
                     ),
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    color: Colors.grey.withOpacity(0.7),
                   ),
                 ),
               const SizedBox(width: 15),
@@ -848,6 +850,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   @override
   void dispose() {
     if (mounted) {
+      Wakelock.disable();
       player.dispose();
       timer?.cancel();
     }

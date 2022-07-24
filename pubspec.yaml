@@ -87,7 +87,7 @@ dependencies:
   transition_plus: 0.0.12
   screenshot: ^1.2.3
   transparent_image: ^2.0.0
-#  video_thumbnail: ^0.5.2
+  wakelock: ^0.6.2
 
   # Firebase
   firebase_core: ^1.20.0
@@ -97,13 +97,15 @@ dependencies:
   firebase_database: ^9.0.20
 
   # Stream
-  stream_chat_flutter: ^4.4.0
 #  stream_chat_flutter:
 #    git:
 #      path: packages/stream_chat_flutter
 #      url: https://github.com/1AhmedYasser/stream-chat-flutter.git
 #      ref: develop
+  # Stream
+  stream_chat_flutter: ^4.4.0
   stream_chat_persistence: ^4.3.0
+  stream_chat_localizations: ^3.3.0
 
   # Agora
   agora_rtc_engine: ^5.3.0

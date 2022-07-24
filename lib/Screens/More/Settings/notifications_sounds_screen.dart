@@ -40,7 +40,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                   padding: const EdgeInsets.only(
                       top: 25, left: 25, bottom: 17, right: 20),
                   child: Text(
-                    "Notifications & Sounds",
+                    "Notifications & Sounds".tr(),
                     style: TextStyle(
                         color: Theme.of(context).primaryColorDark,
                         fontSize: 18,
@@ -48,15 +48,15 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                   ).tr(),
                 ),
                 const SizedBox(height: 20),
-                buildSetting("Private Chats", "Tab To Change", 0),
+                buildSetting("Private Chats".tr(), "Tab To Change".tr(), 0),
                 const SizedBox(height: 5),
                 buildDivider(),
                 const SizedBox(height: 5),
-                buildSetting("Groups", "Tab To Change", 1),
+                buildSetting("Groups".tr(), "Tab To Change".tr(), 1),
                 const SizedBox(height: 5),
                 buildDivider(),
                 const SizedBox(height: 5),
-                buildSetting("Channels", "Tab To Change", 2),
+                buildSetting("Channels".tr(), "Tab To Change".tr(), 2),
               ],
             ),
           ),
@@ -89,7 +89,7 @@ class _NotificationsSoundsScreenState extends State<NotificationsSoundsScreen> {
                 title: title.tr(),
               ),
             ),
-          );
+          ).then((value) => setState(() {}));
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -50,35 +50,36 @@ class _MoreScreenState extends State<MoreScreen> {
                     children: [
                       const BackButton(),
                       const SizedBox(width: 8),
-                      const Text(
-                        "Settings",
-                        style: TextStyle(
+                      Text(
+                        "Settings".tr(),
+                        style: const TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w600,
                         ),
-                      ).tr(),
+                      ),
                     ],
                   ),
                 ),
                 OptionRowWidget(
                   image: R.images.myGroupsImage,
-                  title: "My Groups",
+                  title: "My Groups".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.myChannelsImage,
-                  title: "My Channels",
+                  title: "My Channels".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.catalogManagerImage,
-                  title: "Catalog Manager",
+                  title: "Catalog Manager".tr(),
                   onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.catalogScreen),
+                      Navigator.pushNamed(context, R.routes.catalogScreen)
+                          .then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: R.images.contactsImage,
-                  title: "Contacts",
+                  title: "Contacts".tr(),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -87,30 +88,31 @@ class _MoreScreenState extends State<MoreScreen> {
                           title: "Contacts".tr(),
                         ),
                       ),
-                    );
+                    ).then((value) => setState(() {}));
                   },
                 ),
                 OptionRowWidget(
                   image: R.images.peopleNearbyImage,
-                  title: "People Nearby",
+                  title: "People Nearby".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.inviteFriendsImage,
-                  title: "Invite Friends",
+                  title: "Invite Friends".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: R.images.settingsImage,
-                  title: "Settings",
+                  title: "Settings".tr(),
                   onPressed: () {
-                    Navigator.pushNamed(context, R.routes.settingsRoute);
+                    Navigator.pushNamed(context, R.routes.settingsRoute)
+                        .then((value) => setState(() {}));
                   },
                 ),
                 OptionRowWidget(
                   image: R.images.logoutImage,
                   imageColor: const Color(0xff7a8fa6).withOpacity(0.9),
-                  title: "Log out",
+                  title: "Log out".tr(),
                   showDivider: false,
                   onPressed: () {
                     Utils.saveString(R.pref.token, "");

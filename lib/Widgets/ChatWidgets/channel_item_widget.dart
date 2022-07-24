@@ -205,18 +205,24 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                 children: [
                                   Expanded(
                                     child: TypingIndicatorWidget(
-                                      alternativeWidget: Text(
-                                        lastMessage?.text ?? "",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 14.5,
-                                          fontWeight: count > 0
-                                              ? FontWeight.w500
-                                              : FontWeight.w400,
-                                          color: count > 0
-                                              ? const Color(0xff1293a8)
-                                              : Colors.grey,
+                                      alternativeWidget: Align(
+                                        alignment:
+                                            context.locale.languageCode == "en"
+                                                ? Alignment.centerLeft
+                                                : Alignment.centerRight,
+                                        child: Text(
+                                          lastMessage?.text ?? "",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 14.5,
+                                            fontWeight: count > 0
+                                                ? FontWeight.w500
+                                                : FontWeight.w400,
+                                            color: count > 0
+                                                ? const Color(0xff1293a8)
+                                                : Colors.grey,
+                                          ),
                                         ),
                                       ),
                                     ),

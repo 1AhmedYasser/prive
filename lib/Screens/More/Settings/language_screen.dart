@@ -27,7 +27,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: const PriveAppBar(title: "Language"),
+        child: PriveAppBar(title: "Language".tr()),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(

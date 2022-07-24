@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:prive/Extras/resources.dart';
 import 'dart:io';
 import 'package:prive/Helpers/utils.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class ChatBackgroundsScreen extends StatefulWidget {
   const ChatBackgroundsScreen({Key? key}) : super(key: key);
@@ -216,7 +215,9 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                               Image.asset(chatBackgrounds[index]),
                               if (selectedImage == chatBackgrounds[index])
                                 Positioned.fill(
+                                  bottom: 10,
                                   child: Align(
+                                    alignment: Alignment.center,
                                     child: Container(
                                       height: 26,
                                       width: 26,
@@ -229,13 +230,11 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                                             width: 0.5),
                                       ),
                                       child: Icon(
-                                        FontAwesomeIcons.solidCheckCircle,
+                                        FontAwesomeIcons.solidCircleCheck,
                                         color: Theme.of(context).primaryColor,
                                       ),
                                     ),
-                                    alignment: Alignment.center,
                                   ),
-                                  bottom: 10,
                                 )
                             ],
                           ),
