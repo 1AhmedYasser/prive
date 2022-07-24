@@ -125,6 +125,14 @@ class _RoomScreenState extends State<RoomScreen> {
                         onPressed: () {
                           leaveRoom();
                         },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: const BorderSide(color: Colors.red),
+                          ),
+                        ),
                         child: Row(
                           children: [
                             Image.asset(
@@ -140,14 +148,6 @@ class _RoomScreenState extends State<RoomScreen> {
                               style: TextStyle(fontSize: 16, color: Colors.red),
                             ).tr(),
                           ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.transparent,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: const BorderSide(color: Colors.red),
-                          ),
                         ),
                       ),
                     ),
@@ -264,22 +264,22 @@ class _RoomScreenState extends State<RoomScreen> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(25),
                                         child: SizedBox(
+                                          height: 78,
+                                          width: 80,
                                           child: CachedImage(
                                             url: room?.speakers?[index].image ??
                                                 "",
                                           ),
-                                          height: 78,
-                                          width: 80,
                                         ),
                                       ),
                                       if (room?.speakers?[index].isOwner ==
                                           true)
                                         const Positioned(
+                                          right: 8,
                                           child: Icon(
                                             Icons.star,
                                             color: Colors.yellow,
                                           ),
-                                          right: 8,
                                         ),
                                     ],
                                   ),
@@ -352,11 +352,11 @@ class _RoomScreenState extends State<RoomScreen> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: SizedBox(
+                                    height: 78,
+                                    width: 80,
                                     child: CachedImage(
                                       url: room?.listeners?[index].image ?? "",
                                     ),
-                                    height: 78,
-                                    width: 80,
                                   ),
                                 ),
                                 const SizedBox(height: 3),
@@ -658,12 +658,14 @@ class _RoomScreenState extends State<RoomScreen> {
       setState(() {});
     } else {
       if (showingInfo == false) {
-        Utils.showAlert(context,
-                message: "The Room Has Ended".tr(),
-                alertImage: R.images.alertInfoImage)
-            .then(
-          (value) => Navigator.pop(context),
-        );
+        if (mounted) {
+          Utils.showAlert(context,
+                  message: "The Room Has Ended".tr(),
+                  alertImage: R.images.alertInfoImage)
+              .then(
+            (value) => Navigator.pop(context),
+          );
+        }
       }
       showingInfo = true;
     }

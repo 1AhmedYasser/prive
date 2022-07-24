@@ -130,13 +130,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           );
                         }
                       },
-                      child: const Text(
-                        "Add Contact",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         minimumSize:
@@ -146,6 +139,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: const Text(
+                        "Add Contact",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ).tr(),
                     )
                   ],
                 ),

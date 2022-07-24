@@ -145,13 +145,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               }
                             });
                           },
-                          child: const Text(
-                            "Create Catalog",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ).tr(),
                           style: ElevatedButton.styleFrom(
                             primary: Theme.of(context).primaryColor,
                             minimumSize:
@@ -161,6 +154,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
+                          child: const Text(
+                            "Create Catalog",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ).tr(),
                         ),
                       ),
                     ],
@@ -310,8 +310,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                   child: Row(
                                     children: [
                                       Visibility(
-                                        child: const SizedBox(width: 15),
                                         visible: isEditing,
+                                        child: const SizedBox(width: 15),
                                       ),
                                       Visibility(
                                         visible: isEditing,
@@ -358,13 +358,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                           .catalogePhoto ==
                                                       "NONE"
                                                   ? Container(
-                                                      child: Image.asset(
-                                                        R.images
-                                                            .collectionsImage,
-                                                        fit: BoxFit.fill,
-                                                        height: 70,
-                                                        width: 73,
-                                                      ),
                                                       decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
@@ -379,8 +372,29 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                           ),
                                                         ],
                                                       ),
+                                                      child: Image.asset(
+                                                        R.images
+                                                            .collectionsImage,
+                                                        fit: BoxFit.fill,
+                                                        height: 70,
+                                                        width: 73,
+                                                      ),
                                                     )
                                                   : Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            spreadRadius: 0.3,
+                                                            blurRadius: 2,
+                                                          ),
+                                                        ],
+                                                      ),
                                                       child: ClipRRect(
                                                         borderRadius:
                                                             BorderRadius
@@ -394,20 +408,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                                 "",
                                                           ),
                                                         ),
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.grey
-                                                                .withOpacity(
-                                                                    0.5),
-                                                            spreadRadius: 0.3,
-                                                            blurRadius: 2,
-                                                          ),
-                                                        ],
                                                       ),
                                                     ),
                                               title: Text(

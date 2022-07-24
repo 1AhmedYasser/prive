@@ -13,7 +13,7 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -153,6 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: buildTextField(
@@ -172,7 +173,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ],
-                      crossAxisAlignment: CrossAxisAlignment.start,
                     ),
                     const SizedBox(height: 20),
                     buildTextField(
@@ -197,13 +197,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {}
                       },
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ).tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         minimumSize:
@@ -213,6 +206,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: const Text(
+                        "Save",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ).tr(),
                     ),
                     const SizedBox(height: 25),
                     ElevatedButton(

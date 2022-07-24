@@ -9,7 +9,7 @@ class ChatSettingsScreen extends StatefulWidget {
   const ChatSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  _ChatSettingsScreenState createState() => _ChatSettingsScreenState();
+  State<ChatSettingsScreen> createState() => _ChatSettingsScreenState();
 }
 
 class _ChatSettingsScreenState extends State<ChatSettingsScreen> {

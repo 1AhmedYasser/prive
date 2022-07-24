@@ -11,7 +11,6 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
@@ -22,7 +21,7 @@ class VerifyAccountScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _VerifyAccountScreenState createState() => _VerifyAccountScreenState();
+  State<VerifyAccountScreen> createState() => _VerifyAccountScreenState();
 }
 
 class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
@@ -161,6 +160,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           });
                         }
                       },
+                      style:
+                          TextButton.styleFrom(shadowColor: Colors.transparent),
                       child: Text(
                         "Resend Code".tr(),
                         style: TextStyle(
@@ -170,8 +171,6 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           fontSize: 17,
                         ),
                       ),
-                      style:
-                          TextButton.styleFrom(shadowColor: Colors.transparent),
                     ),
                   ],
                 ),
@@ -221,11 +220,6 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                     });
                   }
                 },
-                child: Text(
-                  "Verify Account".tr(),
-                  style: const TextStyle(
-                      fontSize: 21, fontWeight: FontWeight.w400),
-                ),
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
                   elevation: 0,
@@ -236,6 +230,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                ),
+                child: Text(
+                  "Verify Account".tr(),
+                  style: const TextStyle(
+                      fontSize: 21, fontWeight: FontWeight.w400),
                 ),
               ),
             ],

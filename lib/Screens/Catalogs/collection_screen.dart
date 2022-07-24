@@ -186,20 +186,23 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                   style: const TextStyle(fontSize: 0),
                                   onTap: (handler) async {
                                     await handler(false);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => NewProductScreen(
-                                          product: products[index],
-                                          collection: widget.collection,
-                                          isEdit: true,
+                                    if (mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              NewProductScreen(
+                                            product: products[index],
+                                            collection: widget.collection,
+                                            isEdit: true,
+                                          ),
                                         ),
-                                      ),
-                                    ).then((value) {
-                                      if (value == true) {
-                                        _getProducts();
-                                      }
-                                    });
+                                      ).then((value) {
+                                        if (value == true) {
+                                          _getProducts();
+                                        }
+                                      });
+                                    }
                                   },
                                 ),
                             ],
@@ -208,8 +211,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
                               child: Row(
                                 children: [
                                   Visibility(
-                                    child: const SizedBox(width: 15),
                                     visible: isEditing,
+                                    child: const SizedBox(width: 15),
                                   ),
                                   Visibility(
                                     visible: isEditing,
@@ -252,6 +255,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                           padding: const EdgeInsets.only(
                                               left: 13, right: 13),
                                           child: SizedBox(
+                                            width: 90,
+                                            height: 90,
                                             child: Stack(
                                               children: [
                                                 Positioned.fill(
@@ -297,8 +302,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                                 //   ),
                                               ],
                                             ),
-                                            width: 90,
-                                            height: 90,
                                           ),
                                         ),
                                         Column(

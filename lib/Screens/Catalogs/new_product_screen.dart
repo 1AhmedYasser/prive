@@ -182,13 +182,6 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         }
                       }
                     },
-                    child: Text(
-                      widget.isEdit ? "Edit" : "Save",
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ).tr(),
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor,
                       minimumSize: Size(MediaQuery.of(context).size.width, 55),
@@ -197,6 +190,13 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+                    child: Text(
+                      widget.isEdit ? "Edit" : "Save",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ).tr(),
                   ),
                   const SizedBox(height: 25),
                 ],
@@ -301,22 +301,24 @@ class _NewProductScreenState extends State<NewProductScreen> {
           filename: "Photo3");
     }
 
-    UltraNetwork.request(
-      context,
-      addProduct,
-      formData: FormData.fromMap(
-        parameters,
-      ),
-      cancelToken: cancelToken,
-    ).then((value) {
-      if (value != null) {
-        Utils.showAlert(
-          context,
-          message:
-              "${"Product Added To".tr()} ${widget.collection?.collectionName}",
-        ).then((value) => Navigator.pop(context, true));
-      }
-    });
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        addProduct,
+        formData: FormData.fromMap(
+          parameters,
+        ),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Utils.showAlert(
+            context,
+            message:
+                "${"Product Added To".tr()} ${widget.collection?.collectionName}",
+          ).then((value) => Navigator.pop(context, true));
+        }
+      });
+    }
   }
 
   void _updateProduct() async {

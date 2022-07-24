@@ -5,7 +5,7 @@ class UltraLoadingIndicator extends StatefulWidget {
   const UltraLoadingIndicator({Key? key}) : super(key: key);
 
   @override
-  _UltraLoadingIndicatorState createState() => _UltraLoadingIndicatorState();
+  State<UltraLoadingIndicator> createState() => _UltraLoadingIndicatorState();
 }
 
 class _UltraLoadingIndicatorState extends State<UltraLoadingIndicator> {

@@ -9,7 +9,7 @@ class ArchiveTab extends StatefulWidget {
   const ArchiveTab({Key? key}) : super(key: key);
 
   @override
-  _ArchiveTabState createState() => _ArchiveTabState();
+  State<ArchiveTab> createState() => _ArchiveTabState();
 }
 
 class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {

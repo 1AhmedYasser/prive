@@ -270,19 +270,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   );
                 },
-                child: Text(
-                  "Send Message".tr(),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
                   minimumSize: Size(MediaQuery.of(context).size.width, 55),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  "Send Message".tr(),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

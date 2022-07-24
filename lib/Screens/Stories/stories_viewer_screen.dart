@@ -37,7 +37,7 @@ class StoriesViewerScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StoriesViewerScreenState createState() => _StoriesViewerScreenState();
+  State<StoriesViewerScreen> createState() => _StoriesViewerScreenState();
 }
 
 class _StoriesViewerScreenState extends State<StoriesViewerScreen> {

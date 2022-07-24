@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -197,11 +197,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   }
                 },
-                child: Text(
-                  "Next".tr(),
-                  style: const TextStyle(
-                      fontSize: 21, fontWeight: FontWeight.w400),
-                ),
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
                   elevation: 0,
@@ -212,6 +207,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                ),
+                child: Text(
+                  "Next".tr(),
+                  style: const TextStyle(
+                      fontSize: 21, fontWeight: FontWeight.w400),
                 ),
               ),
             ],

@@ -27,7 +27,7 @@ class ChannelFileDisplayScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ChannelFileDisplayScreenState createState() =>
+  State<ChannelFileDisplayScreen> createState() =>
       _ChannelFileDisplayScreenState();
 }
 

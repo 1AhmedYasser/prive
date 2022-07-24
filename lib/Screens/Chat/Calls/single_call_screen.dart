@@ -409,13 +409,15 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           context.currentUser?.id ?? "": "Ended",
         });
         agoraEngine?.destroy();
-        Utils.showAlert(
-          context,
-          message: "Call Has Ended",
-          alertImage: R.images.alertInfoImage,
-        ).then(
-          (value) => Navigator.pop(context),
-        );
+        if (mounted) {
+          Utils.showAlert(
+            context,
+            message: "Call Has Ended",
+            alertImage: R.images.alertInfoImage,
+          ).then(
+            (value) => Navigator.pop(context),
+          );
+        }
       }
       showingInfo = true;
     }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Screens/More/Settings/notifications_inner_settings_screen.dart';
@@ -9,7 +8,7 @@ class NotificationsSoundsScreen extends StatefulWidget {
   const NotificationsSoundsScreen({Key? key}) : super(key: key);
 
   @override
-  _NotificationsSoundsScreenState createState() =>
+  State<NotificationsSoundsScreen> createState() =>
       _NotificationsSoundsScreenState();
 }
 

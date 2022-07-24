@@ -72,6 +72,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
               offset: Offset(0, 0),
               blurRadius: 2,
             ),
+            initialPosition: AnchoringPosition.topRight,
+            dragController: remoteDragController,
             child: Container(
               width: 230,
               height: 170,
@@ -87,6 +89,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                       padding: const EdgeInsets.only(top: 10, bottom: 20),
                       child: ListTile(
                         leading: SizedBox(
+                          width: 60,
+                          height: 80,
                           child: StreamChannelAvatar(
                             borderRadius: BorderRadius.circular(50),
                             channel: widget.channel,
@@ -97,8 +101,6 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                               maxHeight: 60,
                             ),
                           ),
-                          width: 60,
-                          height: 80,
                         ),
                         title: Text(
                           StreamManager.getChannelName(
@@ -178,8 +180,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                     ? Icons.videocam
                                     : Icons.videocam_off
                                 : isSpeakerOn
-                                    ? FontAwesomeIcons.volumeUp
-                                    : FontAwesomeIcons.volumeDown,
+                                    ? FontAwesomeIcons.volumeHigh
+                                    : FontAwesomeIcons.volumeLow,
                             Colors.black38,
                             () async {
                               if (widget.isVideo) {
@@ -315,8 +317,6 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                 ),
               ),
             ),
-            initialPosition: AnchoringPosition.topRight,
-            dragController: remoteDragController,
           ),
         ],
       ),
@@ -332,14 +332,14 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         child: Container(
           width: 50,
           height: 50,
+          decoration: BoxDecoration(
+            color: containerColor,
+            borderRadius: BorderRadius.circular(30),
+          ),
           child: Icon(
             icon,
             color: Colors.white,
             size: 25,
-          ),
-          decoration: BoxDecoration(
-            color: containerColor,
-            borderRadius: BorderRadius.circular(30),
           ),
         ),
       ),
@@ -403,14 +403,16 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       setState(() {});
     } else {
       if (showingInfo == false) {
-        Utils.showAlert(
-          context,
-          message:
-              "${widget.isGroup ? "Group".tr() : ""} ${"Call Has Ended".tr()}",
-          alertImage: R.images.alertInfoImage,
-        ).then(
-          (value) => Navigator.pop(context),
-        );
+        if (mounted) {
+          Utils.showAlert(
+            context,
+            message:
+                "${widget.isGroup ? "Group".tr() : ""} ${"Call Has Ended".tr()}",
+            alertImage: R.images.alertInfoImage,
+          ).then(
+            (value) => Navigator.pop(context),
+          );
+        }
       }
       showingInfo = true;
     }

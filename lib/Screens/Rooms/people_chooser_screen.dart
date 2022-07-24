@@ -132,24 +132,26 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     "raised_hands": {},
                     "roomId": roomId
                   });
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RoomScreen(
-                        isNewRoomCreation: true,
-                        room: Room(
-                          roomId: roomId,
-                          topic: widget.roomName,
-                          owner: owner,
-                          speakers: [owner],
-                          listeners: [],
-                          roomContacts: [],
-                          raisedHands: [],
+                  if (mounted) {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RoomScreen(
+                          isNewRoomCreation: true,
+                          room: Room(
+                            roomId: roomId,
+                            topic: widget.roomName,
+                            owner: owner,
+                            speakers: [owner],
+                            listeners: [],
+                            roomContacts: [],
+                            raisedHands: [],
+                          ),
                         ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 } else {
                   DateTime? dateTime = widget.selectedDateTime;
                   if (dateTime?.isBefore(DateTime.now()) == true) {
@@ -432,12 +434,6 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                               const SizedBox(height: 20),
                               ElevatedButton(
                                 onPressed: () => AppSettings.openAppSettings(),
-                                child: const Text(
-                                  "Go To Settings",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500),
-                                ).tr(),
                                 style: ElevatedButton.styleFrom(
                                   primary: Theme.of(context).primaryColor,
                                   elevation: 0,
@@ -449,6 +445,12 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
+                                child: const Text(
+                                  "Go To Settings",
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500),
+                                ).tr(),
                               )
                             ],
                           ),

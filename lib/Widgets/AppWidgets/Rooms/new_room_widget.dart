@@ -150,6 +150,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         selectedBorderColor: Colors.grey.shade600,
                         selectedColor: Colors.white,
                         borderRadius: BorderRadius.circular(5),
+                        onPressed: (int index) {
+                          setState(() {
+                            for (int i = 0; i < isSelected.length; i++) {
+                              isSelected[i] = i == index;
+                            }
+                          });
+                        },
+                        isSelected: isSelected,
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(2),
@@ -166,14 +174,6 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                             ).tr(),
                           ),
                         ],
-                        onPressed: (int index) {
-                          setState(() {
-                            for (int i = 0; i < isSelected.length; i++) {
-                              isSelected[i] = i == index;
-                            }
-                          });
-                        },
-                        isSelected: isSelected,
                       ),
                     ),
                   ],
@@ -272,25 +272,27 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                             "roomId": roomId
                           });
 
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RoomScreen(
-                                isNewRoomCreation: true,
-                                room: Room(
-                                  roomId: roomId,
-                                  topic: topicNameController.text,
-                                  description: descriptionController.text,
-                                  owner: owner,
-                                  speakers: [owner],
-                                  listeners: [],
-                                  roomContacts: [],
-                                  raisedHands: [],
+                          if (mounted) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RoomScreen(
+                                  isNewRoomCreation: true,
+                                  room: Room(
+                                    roomId: roomId,
+                                    topic: topicNameController.text,
+                                    description: descriptionController.text,
+                                    owner: owner,
+                                    speakers: [owner],
+                                    listeners: [],
+                                    roomContacts: [],
+                                    raisedHands: [],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       } else {
                         Navigator.pop(context);
@@ -310,14 +312,6 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                       }
                     }
                   },
-                  child: Text(
-                    selectedRoomType == 0
-                        ? isSelected.first
-                            ? "Start Room"
-                            : "Schedule Room"
-                        : "Choose People",
-                    style: const TextStyle(fontSize: 18),
-                  ).tr(),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     minimumSize: Size(MediaQuery.of(context).size.width, 50),
@@ -326,6 +320,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  child: Text(
+                    selectedRoomType == 0
+                        ? isSelected.first
+                            ? "Start Room"
+                            : "Schedule Room"
+                        : "Choose People",
+                    style: const TextStyle(fontSize: 18),
+                  ).tr(),
                 ),
               )
             ],
@@ -404,6 +406,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
                       onPressed: () {
@@ -446,7 +449,6 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                       ).tr(),
                     )
                   ],
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 ),
               ),
               SizedBox(

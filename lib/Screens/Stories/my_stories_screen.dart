@@ -105,7 +105,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                             widget.myStories.removeAt(index);
                           });
                           if (widget.myStories.isEmpty) {
-                            Navigator.pop(context);
+                            if (mounted) {
+                              Navigator.pop(context);
+                            }
                           }
                         },
                       ),
@@ -174,8 +176,8 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                               Row(
                                 children: [
                                   Visibility(
-                                    child: const SizedBox(width: 15),
                                     visible: isEditing,
+                                    child: const SizedBox(width: 15),
                                   ),
                                   Visibility(
                                     visible: isEditing,
@@ -201,6 +203,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                       right: 20,
                                     ),
                                     child: DashedCircle(
+                                      dashes: 0,
+                                      gapSize: 0,
+                                      color: Theme.of(context).primaryColor,
                                       child: Padding(
                                         padding: const EdgeInsets.all(3),
                                         child: SizedBox(
@@ -225,9 +230,6 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                           ),
                                         ),
                                       ),
-                                      dashes: 0,
-                                      gapSize: 0,
-                                      color: Theme.of(context).primaryColor,
                                     ),
                                   ),
                                   Expanded(

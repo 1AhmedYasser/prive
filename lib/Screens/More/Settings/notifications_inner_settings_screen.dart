@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
@@ -11,7 +10,7 @@ class NotificationsInnerSettingsScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _NotificationsInnerSettingsScreenState createState() =>
+  State<NotificationsInnerSettingsScreen> createState() =>
       _NotificationsInnerSettingsScreenState();
 }
 

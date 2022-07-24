@@ -108,6 +108,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         backGroundColor:
                             isMe ? const Color(0xff7a8fa6) : Colors.white,
                         margin: const EdgeInsets.only(top: 12),
+                        elevation: 1,
                         child: Container(
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -162,7 +163,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                       : Container() //_buildAudio(element),
                               ),
                         ),
-                        elevation: 1,
                       ),
                       const SizedBox(
                         height: 5,

@@ -114,11 +114,11 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(20),
                                     child: SizedBox(
+                                      height: 60,
+                                      width: 60,
                                       child: CachedImage(
                                         url: raisedHands[index].image ?? "",
                                       ),
-                                      height: 60,
-                                      width: 60,
                                     ),
                                   ),
                                   const SizedBox(width: 15),
@@ -144,16 +144,6 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                   ),
                                   const SizedBox(width: 10),
                                   Container(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(5),
-                                      child: Icon(
-                                        raisedHands[index].isMicOn == true
-                                            ? FontAwesomeIcons.check
-                                            : null,
-                                        color: Colors.white,
-                                        size: 12,
-                                      ),
-                                    ),
                                     decoration: BoxDecoration(
                                       color: raisedHands[index].isMicOn == true
                                           ? Theme.of(context).primaryColor
@@ -164,6 +154,16 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                             raisedHands[index].isMicOn == true
                                                 ? Theme.of(context).primaryColor
                                                 : const Color(0xff7a8fa6),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: Icon(
+                                        raisedHands[index].isMicOn == true
+                                            ? FontAwesomeIcons.check
+                                            : null,
+                                        color: Colors.white,
+                                        size: 12,
                                       ),
                                     ),
                                   )

@@ -127,13 +127,6 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               }
                             });
                           },
-                          child: Text(
-                            "Create Collections".tr(),
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
                           style: ElevatedButton.styleFrom(
                             primary: Theme.of(context).primaryColor,
                             minimumSize:
@@ -141,6 +134,13 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            "Create Collections".tr(),
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -257,6 +257,20 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                           return Column(
                             children: [
                               InkWell(
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CollectionScreen(
+                                        collection:
+                                            collections[collectionIndex],
+                                        catalog: widget.catalog,
+                                      ),
+                                    ),
+                                  ).then((value) => _getCollections());
+                                },
                                 child: ListTile(
                                   title: Text(
                                     collections[collectionIndex]
@@ -364,22 +378,11 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                     ),
                                   ),
                                 ),
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CollectionScreen(
-                                        collection:
-                                            collections[collectionIndex],
-                                        catalog: widget.catalog,
-                                      ),
-                                    ),
-                                  ).then((value) => _getCollections());
-                                },
                               ),
                               MediaQuery.removePadding(
+                                context: context,
+                                removeTop: true,
+                                removeBottom: true,
                                 child: ListView.separated(
                                   itemBuilder: (context, index) {
                                     return InkWell(
@@ -410,6 +413,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                             padding: const EdgeInsets.only(
                                                 left: 13, right: 13),
                                             child: SizedBox(
+                                              width: 90,
+                                              height: 90,
                                               child: Stack(
                                                 children: [
                                                   Positioned.fill(
@@ -464,8 +469,6 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                   //   ),
                                                 ],
                                               ),
-                                              width: 90,
-                                              height: 90,
                                             ),
                                           ),
                                           Expanded(
@@ -537,9 +540,6 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                     return const SizedBox(height: 20);
                                   },
                                 ),
-                                context: context,
-                                removeTop: true,
-                                removeBottom: true,
                               )
                             ],
                           );

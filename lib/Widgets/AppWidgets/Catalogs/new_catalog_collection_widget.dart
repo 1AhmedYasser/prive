@@ -156,6 +156,10 @@ class _NewCatalogCollectionWidgetState
                   child: Container(
                     width: 85,
                     height: 85,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade500.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: image.path.isEmpty
                         ? widget.catalog?.catalogePhoto == "NONE" ||
                                 widget.catalog == null
@@ -179,10 +183,6 @@ class _NewCatalogCollectionWidgetState
                               fit: BoxFit.fill,
                             ),
                           ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade500.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
                   ),
                 ),
               Padding(
@@ -206,13 +206,6 @@ class _NewCatalogCollectionWidgetState
                       }
                     }
                   },
-                  child: Text(
-                    "${widget.isEdit ? "Edit" : "Create"} ${widget.type}",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ).tr(),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     minimumSize: Size(MediaQuery.of(context).size.width, 55),
@@ -221,6 +214,13 @@ class _NewCatalogCollectionWidgetState
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  child: Text(
+                    "${widget.isEdit ? "Edit" : "Create"} ${widget.type}",
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ).tr(),
                 ),
               ),
             ],
@@ -252,18 +252,20 @@ class _NewCatalogCollectionWidgetState
           await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
     }
 
-    UltraNetwork.request(
-      context,
-      addCatalog,
-      formData: FormData.fromMap(
-        parameters,
-      ),
-      cancelToken: cancelToken,
-    ).then((value) {
-      if (value != null) {
-        Navigator.pop(context, true);
-      }
-    });
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        addCatalog,
+        formData: FormData.fromMap(
+          parameters,
+        ),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Navigator.pop(context, true);
+        }
+      });
+    }
   }
 
   Future<void> _updateCatalog(String catalogId) async {
@@ -277,18 +279,20 @@ class _NewCatalogCollectionWidgetState
           await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
     }
 
-    UltraNetwork.request(
-      context,
-      updateCatalog,
-      formData: FormData.fromMap(
-        parameters,
-      ),
-      cancelToken: cancelToken,
-    ).then((value) {
-      if (value != null) {
-        Navigator.pop(context, true);
-      }
-    });
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        updateCatalog,
+        formData: FormData.fromMap(
+          parameters,
+        ),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Navigator.pop(context, true);
+        }
+      });
+    }
   }
 
   void _createCollection(String catalogId) async {
@@ -303,18 +307,20 @@ class _NewCatalogCollectionWidgetState
           await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
     }
 
-    UltraNetwork.request(
-      context,
-      addCollection,
-      formData: FormData.fromMap(
-        parameters,
-      ),
-      cancelToken: cancelToken,
-    ).then((value) {
-      if (value != null) {
-        Navigator.pop(context, true);
-      }
-    });
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        addCollection,
+        formData: FormData.fromMap(
+          parameters,
+        ),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Navigator.pop(context, true);
+        }
+      });
+    }
   }
 
   Future<void> _updateCollection(String catalogId, String collectionId) async {
@@ -329,17 +335,19 @@ class _NewCatalogCollectionWidgetState
           await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
     }
 
-    UltraNetwork.request(
-      context,
-      updateCollection,
-      formData: FormData.fromMap(
-        parameters,
-      ),
-      cancelToken: cancelToken,
-    ).then((value) {
-      if (value != null) {
-        Navigator.pop(context, true);
-      }
-    });
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        updateCollection,
+        formData: FormData.fromMap(
+          parameters,
+        ),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Navigator.pop(context, true);
+        }
+      });
+    }
   }
 }

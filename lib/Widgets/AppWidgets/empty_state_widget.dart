@@ -75,13 +75,6 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
             padding: const EdgeInsets.only(left: 60, right: 60),
             child: ElevatedButton(
               onPressed: () => widget.onButtonPressed(),
-              child: Text(
-                widget.buttonText,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ).tr(),
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).primaryColor,
                 minimumSize: Size(MediaQuery.of(context).size.width, 53),
@@ -90,6 +83,13 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
+              child: Text(
+                widget.buttonText,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ).tr(),
             ),
           ),
           const SizedBox(

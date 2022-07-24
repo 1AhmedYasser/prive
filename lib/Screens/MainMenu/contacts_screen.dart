@@ -170,11 +170,6 @@ class _ContactsScreenState extends State<ContactsScreen>
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () => AppSettings.openAppSettings(),
-                        child: const Text(
-                          "Go To Settings",
-                          style: TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.w500),
-                        ).tr(),
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
                           elevation: 0,
@@ -186,6 +181,11 @@ class _ContactsScreenState extends State<ContactsScreen>
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        child: const Text(
+                          "Go To Settings",
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ).tr(),
                       )
                     ],
                   ),

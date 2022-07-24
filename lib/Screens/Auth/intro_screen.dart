@@ -11,7 +11,7 @@ class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
 
   @override
-  _IntroScreenState createState() => _IntroScreenState();
+  State<IntroScreen> createState() => _IntroScreenState();
 }
 
 class _IntroScreenState extends State<IntroScreen> {
@@ -85,11 +85,6 @@ class _IntroScreenState extends State<IntroScreen> {
             ElevatedButton(
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, R.routes.loginRoute),
-              child: Text(
-                "Start Messaging".tr(),
-                style:
-                    const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
-              ),
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).primaryColor,
                 elevation: 0,
@@ -100,6 +95,11 @@ class _IntroScreenState extends State<IntroScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+              ),
+              child: Text(
+                "Start Messaging".tr(),
+                style:
+                    const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
               ),
             ),
             SizedBox(

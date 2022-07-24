@@ -337,12 +337,6 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                       ElevatedButton(
                                         onPressed: () =>
                                             AppSettings.openAppSettings(),
-                                        child: const Text(
-                                          "Go To Settings",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500),
-                                        ).tr(),
                                         style: ElevatedButton.styleFrom(
                                           primary:
                                               Theme.of(context).primaryColor,
@@ -357,6 +351,12 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                                 BorderRadius.circular(10),
                                           ),
                                         ),
+                                        child: const Text(
+                                          "Go To Settings",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500),
+                                        ).tr(),
                                       )
                                     ],
                                   ),
@@ -388,10 +388,6 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                     Navigator.pop(context);
                     _sendInvitations();
                   },
-                  child: const Text(
-                    "Send Invitation",
-                    style: TextStyle(fontSize: 18),
-                  ),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     minimumSize: const Size(0, 50),
@@ -399,6 +395,10 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                  ),
+                  child: const Text(
+                    "Send Invitation",
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               )

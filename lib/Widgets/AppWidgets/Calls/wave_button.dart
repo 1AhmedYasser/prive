@@ -16,7 +16,7 @@ class WaveButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _WaveButtonState createState() => _WaveButtonState();
+  State<WaveButton> createState() => _WaveButtonState();
 }
 
 class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
@@ -90,13 +90,13 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
           ],
           Container(
             constraints: const BoxConstraints.expand(),
-            child: AnimatedSwitcher(
-              child: _buildIcon(isPlaying),
-              duration: _kToggleDuration,
-            ),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isPlaying ? Colors.redAccent : Colors.white,
+            ),
+            child: AnimatedSwitcher(
+              child: _buildIcon(isPlaying),
+              duration: _kToggleDuration,
             ),
           ),
         ],

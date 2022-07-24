@@ -16,7 +16,7 @@ class ChatSendWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChatSendWidgetState createState() => _ChatSendWidgetState();
+  State<ChatSendWidget> createState() => _ChatSendWidgetState();
 }
 
 class _ChatSendWidgetState extends State<ChatSendWidget> {

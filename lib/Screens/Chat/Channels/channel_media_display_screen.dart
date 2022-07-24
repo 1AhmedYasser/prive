@@ -34,7 +34,7 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ChannelMediaDisplayScreenState createState() =>
+  State<ChannelMediaDisplayScreen> createState() =>
       _ChannelMediaDisplayScreenState();
 }
 

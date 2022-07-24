@@ -22,7 +22,7 @@ class SignUpScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -211,53 +211,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               await profileImage.readAsBytes();
                           String base64Image = base64Encode(imageBytes);
                           loading = true;
-                          UltraNetwork.request(
-                            context,
-                            signup,
-                            cancelToken: cancelToken,
-                            formData: FormData.fromMap({
-                              "UserFirstName": firstNameController.text,
-                              "UserLastName": lastNameController.text,
-                              "UserPhoto": base64Image,
-                              "UserGender":
-                                  selectedGender == 0 ? "Male" : "Female",
-                              "UserBarCode": "783473487",
-                              "UserID": widget.loginData?.userID
-                            }),
-                          ).then((value) {
-                            loading = false;
-                            Login signup = value;
-                            if (signup.success == true) {
-                              LoginData? signupData = signup.data?[0];
-                              Utils.saveString(
-                                  R.pref.token, signupData?.token ?? "");
-                              Utils.saveString(
-                                  R.pref.userId, signupData?.userID ?? "");
-                              Utils.saveString(R.pref.userImage,
-                                  signupData?.userPhoto ?? "");
-                              Utils.saveString(R.pref.userPhone,
-                                  signupData?.userPhone ?? "");
-                              Utils.saveString(R.pref.userFirstName,
-                                  signupData?.userFirstName ?? "");
-                              Utils.saveString(R.pref.userLastName,
-                                  signupData?.userLastName ?? "");
-                              Utils.saveString(R.pref.userName,
-                                  "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
-                              StreamManager.connectUserToStream(context);
-                              Utils.saveBool(R.pref.isLoggedIn, true);
-                              Navigator.pushReplacementNamed(
-                                  context, R.routes.navigatorRoute);
-                            }
-                          });
+                          if (mounted) {
+                            UltraNetwork.request(
+                              context,
+                              signup,
+                              cancelToken: cancelToken,
+                              formData: FormData.fromMap({
+                                "UserFirstName": firstNameController.text,
+                                "UserLastName": lastNameController.text,
+                                "UserPhoto": base64Image,
+                                "UserGender":
+                                    selectedGender == 0 ? "Male" : "Female",
+                                "UserBarCode": "783473487",
+                                "UserID": widget.loginData?.userID
+                              }),
+                            ).then((value) {
+                              loading = false;
+                              Login signup = value;
+                              if (signup.success == true) {
+                                LoginData? signupData = signup.data?[0];
+                                Utils.saveString(
+                                    R.pref.token, signupData?.token ?? "");
+                                Utils.saveString(
+                                    R.pref.userId, signupData?.userID ?? "");
+                                Utils.saveString(R.pref.userImage,
+                                    signupData?.userPhoto ?? "");
+                                Utils.saveString(R.pref.userPhone,
+                                    signupData?.userPhone ?? "");
+                                Utils.saveString(R.pref.userFirstName,
+                                    signupData?.userFirstName ?? "");
+                                Utils.saveString(R.pref.userLastName,
+                                    signupData?.userLastName ?? "");
+                                Utils.saveString(R.pref.userName,
+                                    "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
+                                StreamManager.connectUserToStream(context);
+                                Utils.saveBool(R.pref.isLoggedIn, true);
+                                Navigator.pushReplacementNamed(
+                                    context, R.routes.navigatorRoute);
+                              }
+                            });
+                          }
                         }
                       }
                     }
                   },
-                  child: Text(
-                    "Sign Up".tr(),
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.w400),
-                  ),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     elevation: 0,
@@ -268,6 +265,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                  ),
+                  child: Text(
+                    "Sign Up".tr(),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w400),
                   ),
                 ),
                 const SizedBox(height: 30),

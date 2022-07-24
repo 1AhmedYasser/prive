@@ -11,7 +11,7 @@ class ChatBackgroundsScreen extends StatefulWidget {
   const ChatBackgroundsScreen({Key? key}) : super(key: key);
 
   @override
-  _ChatBackgroundsScreenState createState() => _ChatBackgroundsScreenState();
+  State<ChatBackgroundsScreen> createState() => _ChatBackgroundsScreenState();
 }
 
 class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {

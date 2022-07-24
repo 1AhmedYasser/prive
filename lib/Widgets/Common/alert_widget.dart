@@ -94,14 +94,6 @@ class _AlertWidgetState extends State<AlertWidget> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: Text(
-                            widget.cancelButtonText,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ).tr(),
                           style: ElevatedButton.styleFrom(
                             primary: Colors.white,
                             minimumSize:
@@ -114,6 +106,14 @@ class _AlertWidgetState extends State<AlertWidget> {
                               ),
                             ),
                           ),
+                          child: Text(
+                            widget.cancelButtonText,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ).tr(),
                         ),
                       ),
                     if (widget.withCancel) const SizedBox(width: 10),
@@ -126,13 +126,6 @@ class _AlertWidgetState extends State<AlertWidget> {
                             widget.onOkButtonPressed!();
                           }
                         },
-                        child: Text(
-                          widget.okButtonText,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ).tr(),
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
                           minimumSize:
@@ -142,6 +135,13 @@ class _AlertWidgetState extends State<AlertWidget> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
+                        child: Text(
+                          widget.okButtonText,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ).tr(),
                       ),
                     ),
                   ],

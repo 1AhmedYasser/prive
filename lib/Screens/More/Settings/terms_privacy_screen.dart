@@ -8,7 +8,7 @@ class TermsPrivacyScreen extends StatefulWidget {
   const TermsPrivacyScreen({Key? key, this.isTerms = true}) : super(key: key);
 
   @override
-  _TermsPrivacyScreenState createState() => _TermsPrivacyScreenState();
+  State<TermsPrivacyScreen> createState() => _TermsPrivacyScreenState();
 }
 
 class _TermsPrivacyScreenState extends State<TermsPrivacyScreen> {
