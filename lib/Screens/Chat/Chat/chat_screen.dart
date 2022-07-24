@@ -188,10 +188,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           }
                         }
                       },
-                      child: ChannelAvatar(
+                      child: StreamChannelAvatar(
                         borderRadius: BorderRadius.circular(50),
                         channel: channel,
                         constraints: const BoxConstraints(
+                          minWidth: 50,
+                          minHeight: 50,
                           maxWidth: 50,
                           maxHeight: 50,
                         ),
@@ -1341,7 +1343,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _reply(Message message) {
     setState(() => _quotedMessage = message);
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _focusNode!.requestFocus();
     });
   }

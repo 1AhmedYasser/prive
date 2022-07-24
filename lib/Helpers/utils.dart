@@ -517,18 +517,18 @@ class Utils {
 
   static Future<CountryDialCode> _getCountry() async {
     String? deviceCountryCode =
-        WidgetsBinding.instance?.window.locale.countryCode;
+        WidgetsBinding.instance.window.locale.countryCode;
     CountryDialCode? deviceDialCode;
     try {
       deviceCountryCode =
           (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
       if (deviceCountryCode.isEmpty == true) {
-        deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+        deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
       }
       deviceDialCode =
           CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     } catch (e) {
-      deviceCountryCode = WidgetsBinding.instance?.window.locale.countryCode;
+      deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
       deviceDialCode =
           CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     }

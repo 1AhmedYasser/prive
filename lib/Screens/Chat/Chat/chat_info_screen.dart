@@ -636,10 +636,13 @@ class __SharedGroupsScreenState extends State<_SharedGroupsScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ChannelAvatar(
+                    child: StreamChannelAvatar(
                       channel: channel,
-                      constraints:
-                          const BoxConstraints(maxWidth: 40.0, maxHeight: 40.0),
+                      constraints: const BoxConstraints(
+                          maxWidth: 40.0,
+                          maxHeight: 40.0,
+                          minHeight: 40,
+                          minWidth: 40),
                     ),
                   ),
                   Expanded(

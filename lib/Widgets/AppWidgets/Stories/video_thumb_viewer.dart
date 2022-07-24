@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+// import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoThumbViewer extends StatefulWidget {
   final String videoUrl;
@@ -17,7 +17,7 @@ class _VideoThumbViewerState extends State<VideoThumbViewer> {
 
   @override
   void initState() {
-    _getVideoThumb();
+    //_getVideoThumb();
     super.initState();
   }
 
@@ -45,14 +45,14 @@ class _VideoThumbViewerState extends State<VideoThumbViewer> {
     );
   }
 
-  void _getVideoThumb() async {
-    await VideoThumbnail.thumbnailFile(
-      video: widget.videoUrl,
-      thumbnailPath: (await getTemporaryDirectory()).path,
-      quality: 50,
-    ).then((value) {
-      videoThumbnail = File(value ?? "");
-      setState(() {});
-    });
-  }
+  // void _getVideoThumb() async {
+  //   await VideoThumbnail.thumbnailFile(
+  //     video: widget.videoUrl,
+  //     thumbnailPath: (await getTemporaryDirectory()).path,
+  //     quality: 50,
+  //   ).then((value) {
+  //     videoThumbnail = File(value ?? "");
+  //     setState(() {});
+  //   });
+  // }
 }

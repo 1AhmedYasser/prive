@@ -43,8 +43,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
   List<List<StoriesData>> usersStories = [];
   List<StoriesData> myStories = [];
   CancelToken cancelToken = CancelToken();
-  String? deviceCountryCode =
-      WidgetsBinding.instance?.window.locale.countryCode;
+  String? deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
   CountryDialCode? deviceDialCode;
   bool permissionDenied = false;
   var phoneContacts = [];

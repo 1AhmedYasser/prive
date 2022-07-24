@@ -47,10 +47,12 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  ChannelAvatar(
+                  StreamChannelAvatar(
                     channel: widget.channel,
                     borderRadius: BorderRadius.circular(50),
                     constraints: const BoxConstraints(
+                      minWidth: 65,
+                      minHeight: 65,
                       maxWidth: 65,
                       maxHeight: 65,
                     ),

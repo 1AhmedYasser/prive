@@ -84,7 +84,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                     repeat: false,
                     inline: true,
                     onStoryShow: (story) {
-                      WidgetsBinding.instance?.addPostFrameCallback(
+                      WidgetsBinding.instance.addPostFrameCallback(
                         (_) =>
                             Provider.of<StoriesProvider>(context, listen: false)
                                 .setCurrentShownIndex(

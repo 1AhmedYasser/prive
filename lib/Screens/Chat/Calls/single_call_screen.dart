@@ -71,7 +71,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.isJoining == false) {
         _startCall();
       } else {
@@ -173,10 +173,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               blurColor: Colors.black,
               child: Center(
                 child: widget.channelImage.isEmpty
-                    ? ChannelAvatar(
+                    ? StreamChannelAvatar(
                         borderRadius: BorderRadius.circular(0),
                         channel: widget.channel,
                         constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                          minHeight: MediaQuery.of(context).size.height,
                           maxWidth: MediaQuery.of(context).size.width,
                           maxHeight: MediaQuery.of(context).size.height,
                         ),
@@ -196,10 +198,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 widget.channelImage.isEmpty
-                    ? ChannelAvatar(
+                    ? StreamChannelAvatar(
                         borderRadius: BorderRadius.circular(50),
                         channel: widget.channel,
                         constraints: const BoxConstraints(
+                          minWidth: 100,
+                          minHeight: 100,
                           maxWidth: 100,
                           maxHeight: 100,
                         ),
@@ -542,10 +546,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               blurColor: Colors.black,
               child: Center(
                 child: widget.channelImage.isEmpty
-                    ? ChannelAvatar(
+                    ? StreamChannelAvatar(
                         borderRadius: BorderRadius.circular(0),
                         channel: widget.channel,
                         constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                          minHeight: MediaQuery.of(context).size.height,
                           maxWidth: MediaQuery.of(context).size.width,
                           maxHeight: MediaQuery.of(context).size.height,
                         ),
@@ -566,10 +572,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 widget.channelImage.isEmpty
-                    ? ChannelAvatar(
+                    ? StreamChannelAvatar(
                         borderRadius: BorderRadius.circular(50),
                         channel: widget.channel,
                         constraints: const BoxConstraints(
+                          minWidth: 100,
+                          minHeight: 100,
                           maxWidth: 100,
                           maxHeight: 100,
                         ),

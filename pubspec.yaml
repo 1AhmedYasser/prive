@@ -6,44 +6,44 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   # App Configs
-  cupertino_icons: ^1.0.4
-  flutter_launcher_icons: ^0.9.2
-  flutter_native_splash: ^1.3.2
-  easy_localization: ^3.0.0
-  flutter_local_notifications: ^9.1.5
-  permission_handler: ^8.3.0
-  uuid: ^3.0.5
+  cupertino_icons: ^1.0.5
+  flutter_launcher_icons: ^0.9.3
+  flutter_native_splash: ^2.2.3+1
+  easy_localization: ^3.0.1
+  flutter_local_notifications: ^9.6.1
+  permission_handler: ^10.0.0
+  uuid: ^3.0.6
 
   # State Management
-  provider: 5.0.0
-  shared_preferences: ^2.0.11
+  provider: ^6.0.3
+  shared_preferences: ^2.0.15
 
   # Network
-  dio: ^4.0.4
-  connectivity_plus: ^2.1.0
+  dio: ^4.0.6
+  connectivity_plus: ^2.3.5
 
   # Audio
-  just_audio: ^0.9.18
+  just_audio: ^0.9.27
   record: ^3.0.2
 
   # Widgets
-  cached_network_image: ^3.2.0
+  cached_network_image: ^3.2.1
   flutter_spinkit: ^5.1.0
-  image_picker: ^0.8.5+2
-  intl_phone_field: ^2.1.0
-  pin_code_fields: ^7.3.0
-  bot_toast: ^4.0.1
+  image_picker: ^0.8.5+3
+  intl_phone_field: ^3.1.0
+  pin_code_fields: ^7.4.0
+  bot_toast: ^4.0.2
   flutter_staggered_animations: ^1.0.0
-  modal_bottom_sheet: ^2.0.1
-  flutter_rating_bar: ^4.0.0
-  lottie: ^1.2.1
+  modal_bottom_sheet: ^2.1.0
+  flutter_rating_bar: ^4.0.1
+  lottie: ^1.3.0
   smooth_page_indicator: ^1.0.0+2
   page_indicator: ^0.4.1
   auto_size_text: ^3.0.0
@@ -51,24 +51,24 @@ dependencies:
   intl_phone_number_input: ^0.7.0+2
   bs_flutter_selectbox: ^1.3.0
   timer_count_down: ^2.2.1
-  syncfusion_flutter_sliders: ^19.4.38
-  grouped_list: ^4.2.0
+  syncfusion_flutter_sliders: ^20.1.61
+  grouped_list: ^5.1.2
   flutter_chat_bubble: ^2.0.0
   cool_dropdown: ^1.4.1
-  blur: ^3.0.0
+  blur: ^3.1.0
   community_material_icon: ^5.9.55
-  country_dial_code: ^1.1.2
-  phone_numbers_parser: ^4.2.0
+  country_dial_code: ^1.2.0
+  phone_numbers_parser: ^5.0.5
   flutter_sim_country_code: ^0.1.2
   draggable_widget: ^2.0.0
   flip_card: ^0.6.0
-  flutter_swipe_action_cell: ^2.2.0
-  badges: ^2.0.2
+  flutter_swipe_action_cell: ^3.0.4
+  badges: ^2.0.3
   dashed_circle: ^0.0.2
   story_view: ^0.13.2
-  flutter_carousel_slider: ^1.0.8
-  google_fonts: ^2.3.2
-  map_launcher: ^2.2.2
+  flutter_carousel_slider: ^1.0.9
+  google_fonts: ^3.0.1
+  map_launcher: ^2.2.3
   carousel_slider: ^4.1.1
   awesome_dialog: ^2.2.1
   flutter_staggered_grid_view: ^0.4.0
@@ -77,52 +77,53 @@ dependencies:
   # Utils
   supercharged: ^2.1.1
   intl: ^0.17.0
-  share_plus: ^3.0.4
-  country_calling_code_picker: ^2.0.0
-  font_awesome_flutter: ^9.2.0
+  share_plus: ^4.0.10
+  country_calling_code_picker: ^2.0.1
+  font_awesome_flutter: ^10.1.0
   timeago: ^3.2.2
-  flutter_contacts: ^1.1.2
-  app_settings: ^4.1.1
-  quiver: ^3.0.1+1
+  flutter_contacts: ^1.1.5
+  app_settings: ^4.1.8
+  quiver: ^3.1.0
   transition_plus: 0.0.12
   screenshot: ^1.2.3
   transparent_image: ^2.0.0
-  video_thumbnail:
+#  video_thumbnail: ^0.5.2
 
   # Firebase
-  firebase_core: ^1.10.6
-  firebase_auth: ^3.3.4
-  firebase_messaging: ^11.2.4
-  cloud_firestore: ^3.1.5
-  firebase_database: ^9.0.8
+  firebase_core: ^1.18.0
+  firebase_auth: ^3.3.20
+  firebase_messaging: ^11.4.2
+  cloud_firestore: ^3.1.18
+  firebase_database: ^9.0.16
 
   # Stream
-  stream_chat_flutter:
-    git:
-      path: packages/stream_chat_flutter
-      url: https://github.com/1AhmedYasser/stream-chat-flutter.git
-      ref: develop
-  stream_chat_persistence: ^3.1.0
+  stream_chat_flutter: ^4.4.0
+#  stream_chat_flutter:
+#    git:
+#      path: packages/stream_chat_flutter
+#      url: https://github.com/1AhmedYasser/stream-chat-flutter.git
+#      ref: develop
+  stream_chat_persistence: ^4.2.0
 
   # Agora
-  agora_rtc_engine: ^5.0.0
+  agora_rtc_engine: ^5.2.0
 #  flutter_callkit_incoming: ^1.0.2+1
   flutter_callkit_incoming:
     git:
       url: https://github.com/rohithmahesh3/flutter_callkit_incoming
       ref: master
-  connectycube_flutter_call_kit: ^2.0.2
+  connectycube_flutter_call_kit: ^2.0.5
 
   # Maps
-  location: ^4.3.0
-  geolocator: ^8.0.1
-  google_maps_flutter: ^2.1.1
+  location: ^4.4.0
+  geolocator: ^9.0.0
+  google_maps_flutter: ^2.1.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^1.0.4
+  flutter_lints: ^2.0.1
 
 flutter_icons:
   android: "launcher_icon"

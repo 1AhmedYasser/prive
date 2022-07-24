@@ -87,10 +87,12 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                       padding: const EdgeInsets.only(top: 10, bottom: 20),
                       child: ListTile(
                         leading: SizedBox(
-                          child: ChannelAvatar(
+                          child: StreamChannelAvatar(
                             borderRadius: BorderRadius.circular(50),
                             channel: widget.channel,
                             constraints: const BoxConstraints(
+                              minWidth: 60,
+                              minHeight: 60,
                               maxWidth: 60,
                               maxHeight: 60,
                             ),
