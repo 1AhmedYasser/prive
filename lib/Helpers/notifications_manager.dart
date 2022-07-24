@@ -38,7 +38,11 @@ class NotificationsManager {
     FirebaseMessaging.instance.getToken().then((token) async {
       stream.StreamChat.of(notificationsContext)
           .client
-          .addDevice(token ?? "", stream.PushProvider.firebase);
+          .addDevice(token ?? "", stream.PushProvider.firebase,
+              pushProviderName: "prive_firebase")
+          .then((value) {
+        print("Added Device to stream");
+      });
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
@@ -80,6 +84,7 @@ class NotificationsManager {
     final didNotificationLaunchApp =
         notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
     if (didNotificationLaunchApp) {
+      print("Notification Launched the app");
       Map selectedNotification =
           json.decode(notificationAppLaunchDetails?.payload ?? "");
       print(selectedNotification['channel_id']);
@@ -87,7 +92,12 @@ class NotificationsManager {
         stream.Channel? channel;
         var channels = await stream.StreamChatCore.of(notificationsContext)
             .client
-            .queryChannels()
+            .queryChannels(
+              filter: Filter.in_(
+                'members',
+                [await Utils.getString(R.pref.userId) ?? ""],
+              ),
+            )
             .last;
 
         for (var currentChannel in channels) {
@@ -106,7 +116,7 @@ class NotificationsManager {
 
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
-    print("do you have initial message $initialMessage");
+    print("do you have initial message ${initialMessage != null}");
     if (initialMessage != null) {
       Map<String, dynamic> channelData = Map<String, dynamic>.from(
           json.decode(initialMessage.data["channel"]));
