@@ -17,13 +17,12 @@ import '../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class NewGroupScreen extends StatefulWidget {
   const NewGroupScreen({Key? key}) : super(key: key);
 
   @override
-  _NewGroupScreenState createState() => _NewGroupScreenState();
+  State<NewGroupScreen> createState() => _NewGroupScreenState();
 }
 
 class _NewGroupScreenState extends State<NewGroupScreen>
@@ -114,9 +113,11 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                         id: Utils.generateRandomString(60),
                       );
                       await channel.watch();
-                      Navigator.of(context).push(
-                        ChatScreen.routeWithChannel(channel),
-                      );
+                      if (mounted) {
+                        Navigator.of(context).push(
+                          ChatScreen.routeWithChannel(channel),
+                        );
+                      }
                     } catch (err) {
                       print(err);
                     }

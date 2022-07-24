@@ -150,6 +150,13 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         clipBehavior: Clip.none,
                         children: [
                           DashedCircle(
+                            dashes: myStories.length,
+                            gapSize: myStories.isNotEmpty
+                                ? myStories.length == 1
+                                    ? 0
+                                    : 3
+                                : 0,
+                            color: Colors.grey.shade400.withOpacity(0.8),
                             child: Padding(
                               padding: const EdgeInsets.all(3),
                               child: SizedBox(
@@ -175,13 +182,6 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 ),
                               ),
                             ),
-                            dashes: myStories.length,
-                            gapSize: myStories.isNotEmpty
-                                ? myStories.length == 1
-                                    ? 0
-                                    : 3
-                                : 0,
-                            color: Colors.grey.shade400.withOpacity(0.8),
                           ),
                           if (myStories.isEmpty)
                             Positioned(
@@ -380,6 +380,10 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                   padding: const EdgeInsets.only(
                                       left: 20, right: 20),
                                   child: DashedCircle(
+                                    dashes: usersStories[index].length,
+                                    gapSize:
+                                        usersStories[index].length == 1 ? 0 : 3,
+                                    color: Theme.of(context).primaryColor,
                                     child: Padding(
                                       padding: const EdgeInsets.all(3),
                                       child: SizedBox(
@@ -407,10 +411,6 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         ),
                                       ),
                                     ),
-                                    dashes: usersStories[index].length,
-                                    gapSize:
-                                        usersStories[index].length == 1 ? 0 : 3,
-                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                                 Expanded(

@@ -21,7 +21,7 @@ class RoomsScreen extends StatefulWidget {
   const RoomsScreen({Key? key}) : super(key: key);
 
   @override
-  _RoomsScreenState createState() => _RoomsScreenState();
+  State<RoomsScreen> createState() => _RoomsScreenState();
 }
 
 class _RoomsScreenState extends State<RoomsScreen>
@@ -109,7 +109,6 @@ class _RoomsScreenState extends State<RoomsScreen>
                           ),
                         );
                       },
-                      child: const Text("Start A Room").tr(),
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
                         elevation: 0,
@@ -117,6 +116,7 @@ class _RoomsScreenState extends State<RoomsScreen>
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
+                      child: const Text("Start A Room").tr(),
                     )
                   ],
                 ),

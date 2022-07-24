@@ -23,7 +23,7 @@ class ContactsScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ContactsScreenState createState() => _ContactsScreenState();
+  State<ContactsScreen> createState() => _ContactsScreenState();
 }
 
 class _ContactsScreenState extends State<ContactsScreen>
@@ -207,9 +207,11 @@ class _ContactsScreenState extends State<ContactsScreen>
     });
     await channel.watch();
 
-    Navigator.of(context).push(
-      ChatScreen.routeWithChannel(channel),
-    );
+    if (mounted) {
+      Navigator.of(context).push(
+        ChatScreen.routeWithChannel(channel),
+      );
+    }
   }
 
   void loadContacts() async {

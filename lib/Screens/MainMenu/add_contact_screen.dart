@@ -122,12 +122,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               Phone(phoneNumberController.text),
                             ];
                           await newContact.insert();
-                          Utils.showAlert(context,
-                                  message: "The Room Has Ended".tr(),
-                                  alertImage: R.images.alertSuccessImage)
-                              .then(
-                            (value) => Navigator.pop(context),
-                          );
+                          if (mounted) {
+                            Utils.showAlert(context,
+                                    message: "The Room Has Ended".tr(),
+                                    alertImage: R.images.alertSuccessImage)
+                                .then(
+                              (value) => Navigator.pop(context),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(

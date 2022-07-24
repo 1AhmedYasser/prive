@@ -15,13 +15,12 @@ import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:collection/collection.dart';
 import '../../Models/Call/call_logs.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
 
   @override
-  _CallsScreenState createState() => _CallsScreenState();
+  State<CallsScreen> createState() => _CallsScreenState();
 }
 
 class _CallsScreenState extends State<CallsScreen>
@@ -230,8 +229,8 @@ class _CallsScreenState extends State<CallsScreen>
                                         Row(
                                           children: [
                                             Visibility(
-                                              child: const SizedBox(width: 15),
                                               visible: isEditing,
+                                              child: const SizedBox(width: 15),
                                             ),
                                             Visibility(
                                               visible: isEditing,
@@ -261,6 +260,8 @@ class _CallsScreenState extends State<CallsScreen>
                                                 top: 5,
                                               ),
                                               child: SizedBox(
+                                                height: 50,
+                                                width: 50,
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(30),
@@ -281,8 +282,6 @@ class _CallsScreenState extends State<CallsScreen>
                                                             "",
                                                   ),
                                                 ),
-                                                height: 50,
-                                                width: 50,
                                               ),
                                             ),
                                             Expanded(

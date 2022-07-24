@@ -295,15 +295,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       style: const TextStyle(fontSize: 0),
                                       onTap: (handler) async {
                                         await handler(false);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                CatalogProductSenderScreen(
-                                              catalog: catalogs[index],
+                                        if (mounted) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CatalogProductSenderScreen(
+                                                catalog: catalogs[index],
+                                              ),
                                             ),
-                                          ),
-                                        );
+                                          );
+                                        }
                                       },
                                     ),
                                   ],
