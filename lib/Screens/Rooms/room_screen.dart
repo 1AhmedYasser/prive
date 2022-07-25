@@ -795,6 +795,7 @@ class _RoomScreenState extends State<RoomScreen> {
             room?.roomId ?? "",
             null,
             int.parse(await Utils.getString(R.pref.userId) ?? "0"));
+        agoraEngine?.setParameters('{"che.audio.opensl":true}');
         setState(() {});
       }
     });

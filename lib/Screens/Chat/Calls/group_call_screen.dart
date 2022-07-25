@@ -695,6 +695,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             }
           },
         );
+        agoraEngine?.setParameters('{"che.audio.opensl":true}');
         if (mounted) {
           setState(() {});
         }

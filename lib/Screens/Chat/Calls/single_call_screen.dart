@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
@@ -7,6 +8,7 @@ import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
@@ -74,6 +76,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Platform.isAndroid) {
+        _configureForegroundService();
+      }
       Wakelock.enable();
       if (widget.isJoining == false) {
         _startCall();
@@ -266,6 +271,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   DatabaseReference usersRef =
                       FirebaseDatabase.instance.ref("Users");
                   databaseReference.remove();
+                  if (Platform.isAndroid) {
+                    _disableForegroundService();
+                  }
                   for (var member in widget.channel.state?.members ?? []) {
                     usersRef.update({member.userId ?? "": "Ended"});
                   }
@@ -400,6 +408,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
     } else {
       if (showingInfo == false) {
         didEndCall = true;
+        if (Platform.isAndroid) {
+          _disableForegroundService();
+        }
         DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
         if (mounted) {
           await usersRef.update({
@@ -537,6 +548,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           didJoinAgora = true;
           setState(() {});
         });
+        agoraEngine?.setParameters('{"che.audio.opensl":true}');
       }
     });
   }
@@ -804,6 +816,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     usersRef.update({member.userId ?? "": "Ended"});
                   }
                   FlutterCallkitIncoming.endAllCalls();
+                  if (Platform.isAndroid) {
+                    _disableForegroundService();
+                  }
                   Utils.logAnswerOrCancelCall(
                     context,
                     context.currentUser?.id ?? "",
@@ -855,6 +870,33 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       }
     } else {
       return _buildCallingState(isRemoteVideoOn: false);
+    }
+  }
+
+  void _configureForegroundService() async {
+    const androidConfig = FlutterBackgroundAndroidConfig(
+      notificationTitle: "Prive",
+      notificationText: "Call In Progress",
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon:
+          AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+    );
+    bool initializeSuccess =
+        await FlutterBackground.initialize(androidConfig: androidConfig);
+    if (initializeSuccess) {
+      print("Initialized Foreground Service");
+      bool hasPermissions = await FlutterBackground.hasPermissions;
+      if (hasPermissions) {
+        print("Foreground Services has permissions");
+        await FlutterBackground.enableBackgroundExecution();
+      }
+    }
+  }
+
+  void _disableForegroundService() async {
+    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
+    if (enabled) {
+      await FlutterBackground.disableBackgroundExecution();
     }
   }
 
