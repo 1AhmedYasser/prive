@@ -637,11 +637,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           await agoraEngine?.enableVideo();
           await agoraEngine?.setEnableSpeakerphone(true);
           agoraEngine?.muteLocalAudioStream(true);
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         } else {
           agoraEngine?.muteLocalAudioStream(true);
           await agoraEngine?.setEnableSpeakerphone(false);
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         }
 
         await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
@@ -658,11 +662,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               channelId: widget.channel.id ?? "",
             ));
           }
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         }, cameraReady: () async {
           print("camera ready");
           await agoraEngine?.enableVideo();
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         }));
         await agoraEngine?.setClientRole(ClientRole.Broadcaster);
 
@@ -682,11 +690,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             }
             print("Number of video members ${videoMembers.length}");
             print("Number of remote views ${remoteViews.length}");
-
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           },
         );
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
   }

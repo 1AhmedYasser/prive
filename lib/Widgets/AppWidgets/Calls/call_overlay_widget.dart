@@ -404,14 +404,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
     } else {
       if (showingInfo == false) {
         if (mounted) {
-          Utils.showAlert(
-            context,
-            message:
-                "${widget.isGroup ? "Group".tr() : ""} ${"Call Has Ended".tr()}",
-            alertImage: R.images.alertInfoImage,
-          ).then(
-            (value) => Navigator.pop(context),
-          );
+          BotToast.removeAll("call_overlay");
         }
       }
       showingInfo = true;
