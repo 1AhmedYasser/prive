@@ -352,13 +352,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       }
       agoraEngine = widget.agoraEngine;
       localView = const rtc_local_view.SurfaceView();
-      remoteView = rtc_remote_view.SurfaceView(
-        uid: int.parse(call?.members
-                ?.firstWhere((member) => member.id != context.currentUser?.id)
-                .id ??
-            "0"),
-        channelId: widget.channel.id ?? "",
-      );
       setState(() {});
     }
   }
@@ -402,6 +395,16 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
           [];
+
+      if (widget.agoraEngine != null) {
+        remoteView = rtc_remote_view.SurfaceView(
+          uid: int.parse(call?.members
+                  ?.firstWhere((member) => member.id != context.currentUser?.id)
+                  .id ??
+              "0"),
+          channelId: widget.channel.id ?? "",
+        );
+      }
 
       if (call?.members?.length == 2) {
         player.dispose();
