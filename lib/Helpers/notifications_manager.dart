@@ -79,50 +79,13 @@ class NotificationsManager {
       _firebaseMessagingHandler(message);
     });
 
-    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
-        await notificationPlugin.getNotificationAppLaunchDetails();
-    final didNotificationLaunchApp =
-        notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
-    if (didNotificationLaunchApp) {
-      print("Notification Launched the app");
-      Map selectedNotification =
-          json.decode(notificationAppLaunchDetails?.payload ?? "");
-      print(selectedNotification['channel_id']);
-      if (selectedNotification.isNotEmpty) {
-        stream.Channel? channel;
-        var channels = await stream.StreamChatCore.of(notificationsContext)
-            .client
-            .queryChannels(
-              filter: Filter.in_(
-                'members',
-                [await Utils.getString(R.pref.userId) ?? ""],
-              ),
-            )
-            .last;
-
-        for (var currentChannel in channels) {
-          if (currentChannel.id == selectedNotification['channel_id']) {
-            channel = currentChannel;
-          }
-        }
-
-        if (channel != null) {
-          Navigator.of(notificationsContext).push(
-            ChatScreen.routeWithChannel(channel),
-          );
-        }
-      }
-    }
-
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     print("do you have initial message ${initialMessage != null}");
+    print("Initial Message Data ${initialMessage?.data}");
     if (initialMessage != null) {
-      Map<String, dynamic> channelData = Map<String, dynamic>.from(
-          json.decode(initialMessage.data["channel"]));
-      print(channelData);
       stream.Channel? channel;
-      final channels = await stream.StreamChatCore.of(notificationsContext)
+      var channels = await stream.StreamChatCore.of(notificationsContext)
           .client
           .queryChannels(
             filter: Filter.in_(
@@ -132,9 +95,9 @@ class NotificationsManager {
           )
           .last;
 
-      for (var value in channels) {
-        if (value.id == initialMessage.data['channel_id']) {
-          channel = value;
+      for (var currentChannel in channels) {
+        if (currentChannel.id == initialMessage.data['channel_id']) {
+          channel = currentChannel;
         }
       }
 
@@ -142,13 +105,14 @@ class NotificationsManager {
         Navigator.of(notificationsContext).push(
           ChatScreen.routeWithChannel(channel),
         );
+      } else {
+        print("Channel not found");
       }
     }
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Map<String, dynamic> channelData =
-      //     Map<String, dynamic>.from(json.decode(message.data["channel"]));
+      print("Notifications Message Opened App");
       stream.Channel? channel;
       stream.StreamChatCore.of(notificationsContext)
           .client
@@ -192,7 +156,6 @@ class NotificationsManager {
 
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage backgroundMessage) async {
-    print(backgroundMessage.data);
     storedBackgroundMessage = backgroundMessage;
     listenToCalls();
     if (backgroundMessage.data['type'] != null &&
@@ -201,10 +164,10 @@ class NotificationsManager {
       final channelId = backgroundMessage.data['channel_id'];
       final channelType = backgroundMessage.data['channel_type'];
       initializeNotifications();
-      await _showLocalNotification(
-          title: backgroundMessage.notification?.title ?? "New Message",
-          body: backgroundMessage.notification?.body ?? "",
-          payload: json.encode(backgroundMessage.data).toString());
+      // await _showLocalNotification(
+      //     title: backgroundMessage.notification?.title ?? "New Message",
+      //     body: backgroundMessage.notification?.body ?? "",
+      //     payload: json.encode(backgroundMessage.data).toString());
     } else {
       var payload = backgroundMessage.data;
       String type = payload['type'];

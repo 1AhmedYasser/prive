@@ -12,7 +12,7 @@ class RecordButton extends StatefulWidget {
   final RecordCallback recordingFinishedCallback;
 
   @override
-  _RecordButtonState createState() => _RecordButtonState();
+  State<RecordButton> createState() => _RecordButtonState();
 }
 
 class _RecordButtonState extends State<RecordButton> {
