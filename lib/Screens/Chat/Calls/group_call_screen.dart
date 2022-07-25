@@ -1,10 +1,11 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -63,6 +64,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   @override
   void initState() {
+    if (Platform.isAndroid) {
+      _configureForegroundService();
+    }
     Wakelock.enable();
     isVideoOn = widget.isVideo;
     if (widget.isJoining) {
@@ -417,6 +421,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 databaseReference.remove();
+                                if (Platform.isAndroid) {
+                                  _disableForegroundService();
+                                }
                                 DatabaseReference userRef =
                                     FirebaseDatabase.instance.ref("Users");
                                 userRef.update(
@@ -434,6 +441,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               databaseReference
                                   .child("members/${context.currentUser?.id}")
                                   .remove();
+                              if (Platform.isAndroid) {
+                                _disableForegroundService();
+                              }
                               DatabaseReference userRef =
                                   FirebaseDatabase.instance.ref("Users");
                               userRef.update(
@@ -586,6 +596,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     } else {
       if (showingInfo == false) {
         didEndCall = true;
+        if (Platform.isAndroid) {
+          _disableForegroundService();
+        }
         if (mounted) {
           Utils.showAlert(
             context,
@@ -705,6 +718,33 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   Widget _renderLocalPreview() {
     return localView ?? const SizedBox.shrink();
+  }
+
+  void _configureForegroundService() async {
+    const androidConfig = FlutterBackgroundAndroidConfig(
+      notificationTitle: "Prive",
+      notificationText: "Call In Progress",
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon:
+          AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+    );
+    bool initializeSuccess =
+        await FlutterBackground.initialize(androidConfig: androidConfig);
+    if (initializeSuccess) {
+      print("Initialized Foreground Service");
+      bool hasPermissions = await FlutterBackground.hasPermissions;
+      if (hasPermissions) {
+        print("Foreground Services has permissions");
+        await FlutterBackground.enableBackgroundExecution();
+      }
+    }
+  }
+
+  void _disableForegroundService() async {
+    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
+    if (enabled) {
+      await FlutterBackground.disableBackgroundExecution();
+    }
   }
 
   @override
