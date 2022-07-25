@@ -537,6 +537,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     } else {
       agoraEngine = widget.agoraEngine;
       localView = const rtc_local_view.SurfaceView();
+      remoteViews.clear();
+      for (var member in videoMembers) {
+        remoteViews.add(rtc_remote_view.SurfaceView(
+          uid: int.parse(member.id ?? "0"),
+          channelId: widget.channel.id ?? "",
+        ));
+      }
       setState(() {});
     }
   }
