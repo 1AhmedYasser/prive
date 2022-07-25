@@ -69,6 +69,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   rtc_remote_view.SurfaceView? remoteView;
   rtc_local_view.SurfaceView? localView;
   bool didJoinAgora = false;
+  bool didEndCall = false;
 
   @override
   void initState() {
@@ -100,13 +101,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);
-            Utils.showCallOverlay(
-              isGroup: false,
-              isVideo: widget.isVideo,
-              callId: widget.channel.id ?? "",
-              agoraEngine: agoraEngine,
-              channel: widget.channel,
-            );
           },
           color: Colors.white,
         ),
@@ -266,6 +260,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   R.images.closeCall,
                 ),
                 onPressed: () async {
+                  didEndCall = true;
                   final databaseReference = FirebaseDatabase.instance
                       .ref("SingleCalls/${widget.channel.id}");
                   DatabaseReference usersRef =
@@ -404,10 +399,13 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       }
     } else {
       if (showingInfo == false) {
+        didEndCall = true;
         DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
-        await usersRef.update({
-          context.currentUser?.id ?? "": "Ended",
-        });
+        if (mounted) {
+          await usersRef.update({
+            context.currentUser?.id ?? "": "Ended",
+          });
+        }
         agoraEngine?.destroy();
         if (mounted) {
           Utils.showAlert(
@@ -462,7 +460,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           RtcEngineEventHandler(
             joinChannelSuccess: (String channel, int uid, int elapsed) async {
               print('joinChannelSuccess $channel $uid');
-              setState(() {});
+              if (mounted) {
+                setState(() {});
+              }
             },
             userJoined: (int uid, int elapsed) {
               print('userJoined $uid');
@@ -475,26 +475,34 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     "0"),
                 channelId: widget.channel.id ?? "",
               );
-              setState(() {});
+              if (mounted) {
+                setState(() {});
+              }
             },
             remoteVideoStateChanged: (uid, state, reason, time) {
-              if (state.index == 0) {
-                setState(() {
-                  isRemoteVideoOn = false;
-                  print("Remote Closed Camera");
-                });
-              } else {
-                setState(() {
-                  isRemoteVideoOn = true;
-                });
+              if (mounted) {
+                if (state.index == 0) {
+                  setState(() {
+                    isRemoteVideoOn = false;
+                    print("Remote Closed Camera");
+                  });
+                } else {
+                  setState(() {
+                    isRemoteVideoOn = true;
+                  });
+                }
               }
             },
             rtcStats: (stats) {
               _stats = stats;
-              setState(() {});
+              if (mounted) {
+                setState(() {});
+              }
             },
             cameraReady: () {
-              setState(() {});
+              if (mounted) {
+                setState(() {});
+              }
             },
           ),
         );
@@ -786,6 +794,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () {
+                  didEndCall = true;
                   final databaseReference = FirebaseDatabase.instance
                       .ref("SingleCalls/${widget.channel.id}");
                   DatabaseReference usersRef =
@@ -851,6 +860,15 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
 
   @override
   void dispose() {
+    if (didEndCall == false) {
+      Utils.showCallOverlay(
+        isGroup: false,
+        isVideo: widget.isVideo,
+        callId: widget.channel.id ?? "",
+        agoraEngine: agoraEngine,
+        channel: widget.channel,
+      );
+    }
     if (mounted) {
       Wakelock.disable();
       player.dispose();
