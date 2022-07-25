@@ -88,7 +88,7 @@ dependencies:
   screenshot: ^1.2.3
   transparent_image: ^2.0.0
   wakelock: ^0.6.2
-  flutter_background: ^1.1.0
+  flutter_foreground_task: ^3.8.1
 
   # Firebase
   firebase_core: ^1.20.0

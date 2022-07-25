@@ -8,8 +8,8 @@ import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -77,7 +77,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Platform.isAndroid) {
-        _configureForegroundService();
+        _initForegroundTask();
       }
       Wakelock.enable();
       if (widget.isJoining == false) {
@@ -271,9 +271,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   DatabaseReference usersRef =
                       FirebaseDatabase.instance.ref("Users");
                   databaseReference.remove();
-                  if (Platform.isAndroid) {
-                    _disableForegroundService();
-                  }
+                  _stopForegroundTask();
                   for (var member in widget.channel.state?.members ?? []) {
                     usersRef.update({member.userId ?? "": "Ended"});
                   }
@@ -408,9 +406,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
     } else {
       if (showingInfo == false) {
         didEndCall = true;
-        if (Platform.isAndroid) {
-          _disableForegroundService();
-        }
+        _stopForegroundTask();
         DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
         if (mounted) {
           await usersRef.update({
@@ -812,13 +808,11 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   DatabaseReference usersRef =
                       FirebaseDatabase.instance.ref("Users");
                   databaseReference.remove();
+                  _stopForegroundTask();
                   for (var member in widget.channel.state?.members ?? []) {
                     usersRef.update({member.userId ?? "": "Ended"});
                   }
                   FlutterCallkitIncoming.endAllCalls();
-                  if (Platform.isAndroid) {
-                    _disableForegroundService();
-                  }
                   Utils.logAnswerOrCancelCall(
                     context,
                     context.currentUser?.id ?? "",
@@ -873,30 +867,36 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
     }
   }
 
-  void _configureForegroundService() async {
-    const androidConfig = FlutterBackgroundAndroidConfig(
-      notificationTitle: "Prive",
-      notificationText: "Call In Progress",
-      notificationImportance: AndroidNotificationImportance.Default,
-      notificationIcon:
-          AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+  Future<void> _initForegroundTask() async {
+    await FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'call_channel_id',
+        channelName: 'Prive',
+        channelDescription: 'Call In Progress',
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.LOW,
+        iconData: const NotificationIconData(
+          resType: ResourceType.mipmap,
+          resPrefix: ResourcePrefix.ic,
+          name: 'launcher_icon',
+        ),
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: true,
+        playSound: false,
+      ),
+      foregroundTaskOptions: const ForegroundTaskOptions(
+        autoRunOnBoot: true,
+        allowWifiLock: true,
+      ),
     );
-    bool initializeSuccess =
-        await FlutterBackground.initialize(androidConfig: androidConfig);
-    if (initializeSuccess) {
-      print("Initialized Foreground Service");
-      bool hasPermissions = await FlutterBackground.hasPermissions;
-      if (hasPermissions) {
-        print("Foreground Services has permissions");
-        await FlutterBackground.enableBackgroundExecution();
-      }
-    }
+    await FlutterForegroundTask.startService(
+        notificationTitle: "Prive", notificationText: "Call In Progress");
   }
 
-  void _disableForegroundService() async {
-    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
-    if (enabled) {
-      await FlutterBackground.disableBackgroundExecution();
+  Future<void> _stopForegroundTask() async {
+    if (Platform.isAndroid) {
+      await FlutterForegroundTask.stopService();
     }
   }
 

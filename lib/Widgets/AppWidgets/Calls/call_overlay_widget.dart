@@ -7,8 +7,8 @@ import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
@@ -251,9 +251,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                             FlutterCallkitIncoming
                                                 .endAllCalls();
                                             databaseReference.remove();
-                                            if (Platform.isAndroid) {
-                                              _disableForegroundService();
-                                            }
+                                            _stopForegroundTask();
                                             DatabaseReference userRef =
                                                 FirebaseDatabase.instance
                                                     .ref("Users");
@@ -272,9 +270,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           Navigator.pop(context);
                                           FlutterCallkitIncoming.endAllCalls();
                                           BotToast.removeAll("call_overlay");
-                                          if (Platform.isAndroid) {
-                                            _disableForegroundService();
-                                          }
+                                          _stopForegroundTask();
                                           databaseReference
                                               .child(
                                                   "members/${context.currentUser?.id}")
@@ -309,9 +305,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                 DatabaseReference usersRef =
                                     FirebaseDatabase.instance.ref("Users");
                                 databaseReference.remove();
-                                if (Platform.isAndroid) {
-                                  _disableForegroundService();
-                                }
+                                _stopForegroundTask();
                                 for (var member
                                     in widget.channel.state?.members ?? []) {
                                   usersRef
@@ -413,9 +407,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       setState(() {});
     } else {
       if (showingInfo == false) {
-        if (Platform.isAndroid) {
-          _disableForegroundService();
-        }
+        _stopForegroundTask();
         if (mounted) {
           BotToast.removeAll("call_overlay");
         }
@@ -424,10 +416,9 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
     }
   }
 
-  void _disableForegroundService() async {
-    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
-    if (enabled) {
-      await FlutterBackground.disableBackgroundExecution();
+  Future<void> _stopForegroundTask() async {
+    if (Platform.isAndroid) {
+      await FlutterForegroundTask.stopService();
     }
   }
 

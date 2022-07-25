@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -37,6 +38,8 @@
         android:fullBackupOnly="false"
         android:icon="@mipmap/launcher_icon"
         android:label="Prive">
+
+        <service android:name="com.pravera.flutter_foreground_task.service.ForegroundService" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCkYgschahRvE2oDkNRGhOP2kDRMED2AJw" />
