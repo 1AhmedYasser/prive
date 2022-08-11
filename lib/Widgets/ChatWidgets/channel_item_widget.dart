@@ -101,42 +101,55 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                               );
                             },
                             noDataBuilder: (context) {
-                              TextStyle textStyle = const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              );
-                              return LayoutBuilder(
-                                builder: (context, constraints) {
-                                  String channelName = "";
-                                  if (widget.channel.isGroup) {
-                                    channelName = widget.channel.name ?? "";
+                              return FutureBuilder(
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const SizedBox.shrink();
                                   } else {
-                                    final otherMember = widget
-                                        .channel.state!.members
-                                        .firstWhere(
-                                      (member) =>
-                                          member.userId !=
-                                          context.currentUser?.id,
+                                    return Text(
+                                      snapshot.data as String? ?? "",
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     );
-                                    _getContacts();
-                                    if (usersPhoneNumbers.contains(otherMember
-                                        .user?.extraData["phone"] as String?)) {
-                                      channelName =
-                                          otherMember.user?.name ?? "";
-                                    } else {
-                                      channelName = otherMember.user
-                                              ?.extraData["phone"] as String? ??
-                                          "";
-                                    }
                                   }
-
-                                  return Text(
-                                    channelName,
-                                    style: textStyle,
-                                    overflow: TextOverflow.ellipsis,
-                                  );
                                 },
+                                future: _getChannelName(),
                               );
+                              // return LayoutBuilder(
+                              //   builder: (context, constraints) {
+                              //     String channelName = "";
+                              //     if (widget.channel.isGroup) {
+                              //       channelName = widget.channel.name ?? "";
+                              //     } else {
+                              //       final otherMember = widget
+                              //           .channel.state!.members
+                              //           .firstWhere(
+                              //         (member) =>
+                              //             member.userId !=
+                              //             context.currentUser?.id,
+                              //       );
+                              //       _getContacts();
+                              //       if (usersPhoneNumbers.contains(otherMember
+                              //           .user?.extraData["phone"] as String?)) {
+                              //         channelName =
+                              //             otherMember.user?.name ?? "";
+                              //       } else {
+                              //         channelName = otherMember.user
+                              //                 ?.extraData["phone"] as String? ??
+                              //             "";
+                              //       }
+                              //     }
+                              //
+                              //     return Text(
+                              //       channelName,
+                              //       style: textStyle,
+                              //       overflow: TextOverflow.ellipsis,
+                              //     );
+                              //   },
+                              // );
                             },
                           ),
                         ),
@@ -296,6 +309,23 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         ],
       ),
     );
+  }
+
+  Future<String?> _getChannelName() async {
+    if (widget.channel.isGroup) {
+      return widget.channel.name ?? "";
+    } else {
+      final otherMember = widget.channel.state!.members.firstWhere(
+        (member) => member.userId != context.currentUser?.id,
+      );
+      await _getContacts();
+      if (usersPhoneNumbers
+          .contains(otherMember.user?.extraData["phone"] as String?)) {
+        return otherMember.user?.name ?? "";
+      } else {
+        return otherMember.user?.extraData["phone"] as String? ?? "";
+      }
+    }
   }
 
   _getContacts() async {

@@ -527,7 +527,6 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
 
   Future<String?> _getUserName(User user) async {
     await _getContacts();
-    print(usersPhoneNumbers);
     if (usersPhoneNumbers.contains(user.extraData["phone"] as String?)) {
       userInContacts = true;
       return user.name;
