@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -5,7 +7,6 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
-import 'package:stream_chat_flutter/src/extension.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:collection/collection.dart';
@@ -25,6 +26,8 @@ class ChannelItemWidget extends StatefulWidget {
 }
 
 class _ChannelItemWidgetState extends State<ChannelItemWidget> {
+  List<User> users = [];
+  List<String> usersPhoneNumbers = [];
   bool hasGroupCall = false;
   @override
   void initState() {
@@ -104,42 +107,26 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                               );
                               return LayoutBuilder(
                                 builder: (context, constraints) {
-                                  var channelName =
-                                      context.translations.noTitleText;
-                                  final otherMembers =
-                                      widget.channel.state!.members.where(
-                                    (member) =>
-                                        member.userId !=
-                                        context.currentUser?.id,
-                                  );
-
-                                  if (otherMembers.isNotEmpty) {
-                                    if (otherMembers.length == 1) {
-                                      final user = otherMembers.first.user;
-                                      if (user != null) {
-                                        channelName = user.name;
-                                      }
-                                    } else {
-                                      final maxWidth = constraints.maxWidth;
-                                      final maxChars =
-                                          maxWidth / (textStyle.fontSize ?? 1);
-                                      var currentChars = 0;
-                                      final currentMembers = <Member>[];
-                                      for (var element in otherMembers) {
-                                        final newLength = currentChars +
-                                            (element.user?.name.length ?? 0);
-                                        if (newLength < maxChars) {
-                                          currentChars = newLength;
-                                          currentMembers.add(element);
-                                        }
-                                      }
-
-                                      final exceedingMembers =
-                                          otherMembers.length -
-                                              currentMembers.length;
+                                  String channelName = "";
+                                  if (widget.channel.isGroup) {
+                                    channelName = widget.channel.name ?? "";
+                                  } else {
+                                    final otherMember = widget
+                                        .channel.state!.members
+                                        .firstWhere(
+                                      (member) =>
+                                          member.userId !=
+                                          context.currentUser?.id,
+                                    );
+                                    _getContacts();
+                                    if (usersPhoneNumbers.contains(otherMember
+                                        .user?.extraData["phone"] as String?)) {
                                       channelName =
-                                          '${currentMembers.map((e) => e.user?.name).join(', ')} '
-                                          '${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
+                                          otherMember.user?.name ?? "";
+                                    } else {
+                                      channelName = otherMember.user
+                                              ?.extraData["phone"] as String? ??
+                                          "";
                                     }
                                   }
 
@@ -309,6 +296,30 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         ],
       ),
     );
+  }
+
+  _getContacts() async {
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      usersPhoneNumbers = users
+          .map(
+            (e) => e.extraData['phone'] as String,
+          )
+          .toList();
+      usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
+    }
   }
 
   void checkForGroupCall() async {

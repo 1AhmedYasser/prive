@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class StreamManager {
+  static List<User> users = [];
+  static List<String> usersPhoneNumbers = [];
+
   static Future<void> connectUserToStream(BuildContext context) async {
     try {
       final client = StreamChatCore.of(context).client;
@@ -32,22 +37,43 @@ class StreamManager {
   }
 
   static String getChannelName(Channel channel, User currentUser) {
-    if (channel.name != null) {
-      return channel.name!;
-    } else if (channel.state?.members.isNotEmpty ?? false) {
-      final otherMembers = channel.state?.members
-          .where(
-            (element) => element.userId != currentUser.id,
+    if (channel.isGroup) {
+      return channel.name ?? "";
+    } else {
+      final otherMember = channel.state!.members.firstWhere(
+        (member) => member.userId != currentUser.id,
+      );
+      _getContacts(currentUser);
+      if (usersPhoneNumbers
+          .contains(otherMember.user?.extraData["phone"] as String?)) {
+        return otherMember.user?.name ?? "";
+      } else {
+        return otherMember.user?.extraData["phone"] as String? ?? "";
+      }
+    }
+  }
+
+  static void _getContacts(User currentUser) async {
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      usersPhoneNumbers = users
+          .map(
+            (e) => e.extraData['phone'] as String,
           )
           .toList();
-
-      if (otherMembers?.length == 1) {
-        return otherMembers!.first.user?.name ?? '';
-      } else {
-        return 'Multiple users';
-      }
-    } else {
-      return 'No Channel Name';
+      usersPhoneNumbers.add(currentUser?.extraData['phone'] as String);
     }
   }
 

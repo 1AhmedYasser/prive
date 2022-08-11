@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,10 @@ import 'package:prive/Screens/Chat/Chat/pinned_messages_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+
+import '../../../Extras/resources.dart';
+import '../../../Helpers/Utils.dart';
 
 /// Detail screen for a 1:1 chat correspondence
 class ChatInfoScreen extends StatefulWidget {
@@ -28,6 +34,9 @@ class ChatInfoScreen extends StatefulWidget {
 
 class _ChatInfoScreenState extends State<ChatInfoScreen> {
   ValueNotifier<bool?> mutedBool = ValueNotifier(false);
+  List<User> users = [];
+  List<String> usersPhoneNumbers = [];
+  bool userInContacts = true;
 
   @override
   void initState() {
@@ -86,17 +95,36 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                     showOnlineStatus: false,
                   ),
                 ),
-                Text(
-                  widget.user!.name,
-                  style: const TextStyle(
-                      fontSize: 16.0, fontWeight: FontWeight.bold),
+                FutureBuilder(
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox.shrink();
+                    } else {
+                      if (userInContacts) {
+                        return Column(
+                          children: [
+                            Text(
+                              snapshot.data as String? ?? "",
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 7.0),
+                          ],
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    }
+                  },
+                  future: _getUserName(widget.user!),
                 ),
-                const SizedBox(height: 7.0),
                 Text(
                   widget.user!.extraData["phone"] as String? ?? "",
                   style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 7.0),
@@ -475,6 +503,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
         if (widget.user!.online)
           Material(
             type: MaterialType.circle,
+            color: StreamChatTheme.of(context).colorTheme.barsBg,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               constraints: const BoxConstraints.tightFor(
@@ -486,7 +515,6 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                 color: StreamChatTheme.of(context).colorTheme.accentInfo,
               ),
             ),
-            color: StreamChatTheme.of(context).colorTheme.barsBg,
           ),
         alternativeWidget,
         if (widget.user!.online)
@@ -495,6 +523,42 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
           ),
       ],
     );
+  }
+
+  Future<String?> _getUserName(User user) async {
+    await _getContacts();
+    print(usersPhoneNumbers);
+    if (usersPhoneNumbers.contains(user.extraData["phone"] as String?)) {
+      userInContacts = true;
+      return user.name;
+    } else {
+      userInContacts = false;
+      return user.extraData["phone"] as String? ?? "";
+    }
+  }
+
+  _getContacts() async {
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      usersPhoneNumbers = users
+          .map(
+            (e) => e.extraData['phone'] as String,
+          )
+          .toList();
+      usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
+    }
   }
 }
 
