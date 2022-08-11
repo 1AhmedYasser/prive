@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,12 @@ import 'package:prive/Screens/Chat/Channels/channel_file_display_screen.dart';
 import 'package:prive/Screens/Chat/Channels/channel_media_display_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../../Extras/resources.dart';
+import '../../../Helpers/Utils.dart';
 import 'chat_info_screen.dart';
 import 'pinned_messages_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 
 class GroupInfoScreen extends StatefulWidget {
   final MessageThemeData messageTheme;
@@ -30,6 +34,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   Timer? _debounce;
   Function? modalSetStateCallback;
+  List<User> users = [];
+  List<String> usersPhoneNumbers = [];
+  bool userInContacts = true;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -145,23 +152,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 ],
               ),
               centerTitle: true,
-              actions: [
-                if (!channel.channel.isDistinct && isOwner)
-                  StreamNeumorphicButton(
-                    child: InkWell(
-                      onTap: () {
-                        _buildAddUserModal(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: StreamSvgIcon.userAdd(
-                            color: StreamChatTheme.of(context)
-                                .colorTheme
-                                .accentPrimary),
-                      ),
-                    ),
-                  ),
-              ],
             ),
             body: ListView(
               children: [
@@ -202,6 +192,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           itemBuilder: (context, index) {
             final member = groupMembers[index];
             return Material(
+              color: StreamChatTheme.of(context).colorTheme.appBg,
               child: InkWell(
                 onTap: () {
                   final userMember = groupMembers.firstWhereOrNull(
@@ -233,10 +224,28 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  member.user!.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                // Text(
+                                //   member.user!.name,
+                                //   style: const TextStyle(
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
+                                FutureBuilder(
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const SizedBox.shrink();
+                                    } else {
+                                      return Text(
+                                        snapshot.data as String? ?? "",
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  future: _getUserName(member.user!),
                                 ),
                                 const SizedBox(
                                   height: 1.0,
@@ -273,7 +282,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   ),
                 ),
               ),
-              color: StreamChatTheme.of(context).colorTheme.appBg,
             );
           },
         ),
@@ -1105,6 +1113,41 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         ),
       ),
     );
+  }
+
+  Future<String?> _getUserName(User user) async {
+    await _getContacts();
+    if (usersPhoneNumbers.contains(user.extraData["phone"] as String?)) {
+      userInContacts = true;
+      return user.name;
+    } else {
+      userInContacts = false;
+      return user.extraData["phone"] as String? ?? "";
+    }
+  }
+
+  _getContacts() async {
+    String? myContacts = await Utils.getString(R.pref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true) {
+      List<dynamic> usersMapList =
+          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<User> myUsers = [];
+      for (var user in usersMapList) {
+        myUsers.add(User(
+          id: user['id'],
+          name: user['name'],
+          image: user['image'],
+          extraData: {'phone': user['phone'], 'shadow_banned': false},
+        ));
+      }
+      users = myUsers;
+      usersPhoneNumbers = users
+          .map(
+            (e) => e.extraData['phone'] as String,
+          )
+          .toList();
+      usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
+    }
   }
 
   String? _getChannelName(
