@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:prive/Providers/channels_provider.dart';
 import 'package:prive/Providers/stories_provider.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
@@ -74,6 +75,9 @@ class _PriveState extends State<Prive> {
       providers: [
         ChangeNotifierProvider(
           create: (ctx) => UltraNetwork(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => ChannelsProvider(),
         ),
         ChangeNotifierProvider(
           create: (ctx) => StoriesProvider(),

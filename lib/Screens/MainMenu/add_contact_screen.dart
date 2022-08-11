@@ -8,10 +8,12 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_contacts/properties/phone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Providers/channels_provider.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../Extras/resources.dart';
@@ -125,8 +127,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               Phone(phoneNumberController.text),
                             ];
                           await newContact.insert();
-                          loadContacts();
+                          await loadContacts();
                           if (mounted) {
+                            Provider.of<ChannelsProvider>(context,
+                                    listen: false)
+                                .refreshChannels();
                             Utils.showAlert(context,
                                     message: "Contact Added Successfully".tr(),
                                     alertImage: R.images.alertSuccessImage)
@@ -233,7 +238,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     });
   }
 
-  void loadContacts() async {
+  Future<void> loadContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
     } else {
       List contacts = await Utils.fetchContacts(context);

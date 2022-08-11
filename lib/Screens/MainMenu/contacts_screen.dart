@@ -38,7 +38,6 @@ class _ContactsScreenState extends State<ContactsScreen>
     _animationController = AnimationController(vsync: this);
     Utils.checkForInternetConnection(context);
     _getContacts();
-    loadContacts();
     super.initState();
   }
 
