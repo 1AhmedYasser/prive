@@ -92,6 +92,14 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                       fontSize: 16.0, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 7.0),
+                Text(
+                  widget.user!.extraData["phone"] as String? ?? "",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 7.0),
                 _buildConnectedTitleState(),
                 const SizedBox(height: 15.0),
                 // OptionListTile(
