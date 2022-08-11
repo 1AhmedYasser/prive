@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_contacts/properties/phone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/utils.dart';
@@ -10,6 +12,7 @@ import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../Extras/resources.dart';
 
@@ -122,9 +125,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               Phone(phoneNumberController.text),
                             ];
                           await newContact.insert();
+                          loadContacts();
                           if (mounted) {
                             Utils.showAlert(context,
-                                    message: "The Room Has Ended".tr(),
+                                    message: "Contact Added Successfully".tr(),
                                     alertImage: R.images.alertSuccessImage)
                                 .then(
                               (value) => Navigator.pop(context),
@@ -227,5 +231,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
         profileImage = File(pickedFile.path);
       }
     });
+  }
+
+  void loadContacts() async {
+    if (!await FlutterContacts.requestPermission(readonly: true)) {
+    } else {
+      List contacts = await Utils.fetchContacts(context);
+      List<User> users = contacts.first;
+      String usersMap = jsonEncode(users);
+      Utils.saveString(R.pref.myContacts, usersMap);
+    }
   }
 }

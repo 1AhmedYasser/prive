@@ -29,6 +29,7 @@ class _ChannelsTabState extends State<ChannelsTab>
   Widget build(BuildContext context) {
     return ChannelsBloc(
       child: ChannelListView(
+        channelListController: channelListController,
         filter: Filter.and(
           [
             Filter.equal('type', 'messaging'),
