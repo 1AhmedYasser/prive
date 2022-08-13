@@ -8,10 +8,12 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Providers/channels_provider.dart';
 import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/rooms_screen.dart';
 import 'package:prive/Screens/Home/stories_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -129,6 +131,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       List<User> users = contacts.first;
       String usersMap = jsonEncode(users);
       Utils.saveString(R.pref.myContacts, usersMap);
+      if (mounted) {
+        Provider.of<ChannelsProvider>(context, listen: false).refreshChannels();
+      }
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Providers/channels_provider.dart';
 import 'package:prive/Providers/stories_provider.dart';
+import 'package:prive/Providers/volume_provider.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/Screens/Main/home_screen.dart';
@@ -78,6 +79,9 @@ class _PriveState extends State<Prive> {
         ),
         ChangeNotifierProvider(
           create: (ctx) => ChannelsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => VolumeProvider(),
         ),
         ChangeNotifierProvider(
           create: (ctx) => StoriesProvider(),

@@ -5,6 +5,7 @@ class CallMember {
   String? phone;
   bool? isMicOn;
   bool? isVideoOn;
+  bool? isSpeaking;
 
   CallMember({
     required this.id,
@@ -13,6 +14,7 @@ class CallMember {
     required this.phone,
     required this.isMicOn,
     this.isVideoOn,
+    this.isSpeaking = false,
   });
 
   CallMember.fromJson(Map<String, dynamic> json) {

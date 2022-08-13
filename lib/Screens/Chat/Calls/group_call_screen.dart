@@ -11,9 +11,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Models/Call/call.dart';
 import 'package:prive/Models/Call/call_member.dart';
+import 'package:prive/Providers/volume_provider.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock/wakelock.dart';
@@ -21,6 +23,7 @@ import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
+import 'package:collection/collection.dart';
 import '../../../UltraNetwork/ultra_network.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
@@ -167,23 +170,61 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: videoMembers[index].id == context.currentUser?.id
-                            ? Container(
-                                height: 200,
-                                width: 150,
-                                constraints: const BoxConstraints.expand(),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: _renderLocalPreview(),
-                                ),
+                            ? Consumer<VolumeProvider>(
+                                builder: (context, provider, ch) {
+                                  return Container(
+                                    height: 200,
+                                    width: 150,
+                                    constraints: const BoxConstraints.expand(),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color:
+                                            call?.members?[index].isSpeaking ==
+                                                    true
+                                                ? Colors.green
+                                                : Colors.transparent,
+                                        width:
+                                            call?.members?[index].isSpeaking ==
+                                                    true
+                                                ? 1
+                                                : 0,
+                                      ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: _renderLocalPreview(),
+                                    ),
+                                  );
+                                },
                               )
-                            : Container(
-                                constraints: const BoxConstraints.expand(),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: index > remoteViews.length
-                                      ? const SizedBox.shrink()
-                                      : remoteViews[index],
-                                ),
+                            : Consumer<VolumeProvider>(
+                                builder: (context, provider, ch) {
+                                  return Container(
+                                    constraints: const BoxConstraints.expand(),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color:
+                                            call?.members?[index].isSpeaking ==
+                                                    true
+                                                ? Colors.green
+                                                : Colors.transparent,
+                                        width:
+                                            call?.members?[index].isSpeaking ==
+                                                    true
+                                                ? 1
+                                                : 0,
+                                      ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: index > remoteViews.length
+                                          ? const SizedBox.shrink()
+                                          : remoteViews[index],
+                                    ),
+                                  );
+                                },
                               ),
                       ),
                       staggeredTileBuilder: (int index) {
@@ -228,10 +269,16 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 call?.members?[index].name ?? "",
                                 style: const TextStyle(color: Colors.white),
                               ),
-                              // subtitle: const Text(
-                              //   "Listening",
-                              //   style: TextStyle(color: Colors.grey),
-                              // ),
+                              subtitle: Consumer<VolumeProvider>(
+                                builder: (context, provider, ch) {
+                                  return Text(
+                                    call?.members?[index].isSpeaking == true
+                                        ? "Speaking"
+                                        : "Listening",
+                                    style: const TextStyle(color: Colors.grey),
+                                  );
+                                },
+                              ),
                               trailing: Padding(
                                 padding: const EdgeInsets.only(right: 10),
                                 child: Icon(
@@ -656,29 +703,72 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         }
 
         await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
-        agoraEngine?.setEventHandler(RtcEngineEventHandler(
+        await agoraEngine?.enableAudioVolumeIndication(250, 6, true);
+        agoraEngine?.setEventHandler(
+          RtcEngineEventHandler(
             joinChannelSuccess: (String channel, int uid, int elapsed) async {
-          print('joinChannelSuccess $channel $uid');
-        }, userJoined: (int uid, int elapsed) {
-          print('userJoined $uid');
-          localView = const rtc_local_view.SurfaceView();
-          remoteViews.clear();
-          for (var member in videoMembers) {
-            remoteViews.add(rtc_remote_view.SurfaceView(
-              uid: int.parse(member.id ?? "0"),
-              channelId: widget.channel.id ?? "",
-            ));
-          }
-          if (mounted) {
-            setState(() {});
-          }
-        }, cameraReady: () async {
-          print("camera ready");
-          await agoraEngine?.enableVideo();
-          if (mounted) {
-            setState(() {});
-          }
-        }));
+              print('joinChannelSuccess $channel $uid');
+            },
+            userJoined: (int uid, int elapsed) {
+              print('userJoined $uid');
+              localView = const rtc_local_view.SurfaceView();
+              remoteViews.clear();
+              for (var member in videoMembers) {
+                remoteViews.add(rtc_remote_view.SurfaceView(
+                  uid: int.parse(member.id ?? "0"),
+                  channelId: widget.channel.id ?? "",
+                ));
+              }
+              if (mounted) {
+                setState(() {});
+              }
+            },
+            cameraReady: () async {
+              print("camera ready");
+              await agoraEngine?.enableVideo();
+              if (mounted) {
+                setState(() {});
+              }
+            },
+            audioVolumeIndication: (volumeInfo, v) {
+              for (var speaker in volumeInfo) {
+                if (speaker.volume > 5) {
+                  try {
+                    if (speaker.uid == 0) {
+                      call?.members
+                          ?.firstWhereOrNull((member) =>
+                              (member.id ?? 0) == context.currentUser?.id)
+                          ?.isSpeaking = true;
+                    } else {
+                      call?.members
+                          ?.firstWhereOrNull(
+                              (member) => (member.id ?? 0) == "${speaker.uid}")
+                          ?.isSpeaking = true;
+                    }
+                    Provider.of<VolumeProvider>(context, listen: false)
+                        .refreshVolumes();
+                  } catch (error) {
+                    print('Error:${error.toString()}');
+                  }
+                } else {
+                  if (speaker.uid == 0) {
+                    call?.members
+                        ?.firstWhereOrNull((member) =>
+                            (member.id ?? 0) == context.currentUser?.id)
+                        ?.isSpeaking = false;
+                  } else {
+                    call?.members
+                        ?.firstWhereOrNull(
+                            (member) => (member.id ?? 0) == "${speaker.uid}")
+                        ?.isSpeaking = false;
+                  }
+                  Provider.of<VolumeProvider>(context, listen: false)
+                      .refreshVolumes();
+                }
+              }
+            },
+          ),
+        );
         await agoraEngine?.setClientRole(ClientRole.Broadcaster);
 
         agoraEngine
