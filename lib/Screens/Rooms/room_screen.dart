@@ -16,12 +16,15 @@ import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import '../../Models/Call/prive_call.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
+import '../../Providers/volume_provider.dart';
 import '../../UltraNetwork/ultra_network.dart';
+import 'package:collection/collection.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
@@ -261,17 +264,36 @@ class _RoomScreenState extends State<RoomScreen> {
                                 children: [
                                   Stack(
                                     children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(25),
-                                        child: SizedBox(
-                                          height: 78,
-                                          width: 80,
-                                          child: CachedImage(
-                                            url: room?.speakers?[index].image ??
-                                                "",
+                                      Consumer<VolumeProvider>(
+                                          builder: (context, provider, ch) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: room?.speakers?[index]
+                                                          .isSpeaking ==
+                                                      true
+                                                  ? Colors.green
+                                                  : Colors.transparent,
+                                              width: 1.5,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(25),
                                           ),
-                                        ),
-                                      ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            child: SizedBox(
+                                              height: 78,
+                                              width: 80,
+                                              child: CachedImage(
+                                                url: room?.speakers?[index]
+                                                        .image ??
+                                                    "",
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
                                       if (room?.speakers?[index].isOwner ==
                                           true)
                                         const Positioned(
@@ -288,18 +310,26 @@ class _RoomScreenState extends State<RoomScreen> {
                                     children: [
                                       SizedBox(
                                         width: 20,
-                                        child: Icon(
-                                          room?.speakers?[index].isMicOn == true
-                                              ? FontAwesomeIcons.microphone
-                                              : FontAwesomeIcons
-                                                  .microphoneSlash,
-                                          color:
-                                              room?.speakers?[index].isMicOn ==
-                                                      true
-                                                  ? const Color(0xff7a8fa6)
-                                                  : Colors.red,
-                                          size: 15,
-                                        ),
+                                        child: Consumer<VolumeProvider>(
+                                            builder: (context, provider, ch) {
+                                          return Icon(
+                                            room?.speakers?[index].isMicOn ==
+                                                    true
+                                                ? FontAwesomeIcons.microphone
+                                                : FontAwesomeIcons
+                                                    .microphoneSlash,
+                                            color: room?.speakers?[index]
+                                                        .isMicOn ==
+                                                    true
+                                                ? (room?.speakers?[index]
+                                                            .isSpeaking ==
+                                                        true
+                                                    ? Colors.green
+                                                    : const Color(0xff7a8fa6))
+                                                : Colors.red,
+                                            size: 15,
+                                          );
+                                        }),
                                       ),
                                       const SizedBox(width: 3),
                                       Expanded(
@@ -349,31 +379,58 @@ class _RoomScreenState extends State<RoomScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: SizedBox(
-                                    height: 78,
-                                    width: 80,
-                                    child: CachedImage(
-                                      url: room?.listeners?[index].image ?? "",
+                                Consumer<VolumeProvider>(
+                                    builder: (context, provider, ch) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: room?.listeners?[index]
+                                                    .isSpeaking ==
+                                                true
+                                            ? Colors.green
+                                            : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
-                                  ),
-                                ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(25),
+                                      child: SizedBox(
+                                        height: 78,
+                                        width: 80,
+                                        child: CachedImage(
+                                          url: room?.listeners?[index].image ??
+                                              "",
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
                                 const SizedBox(height: 3),
                                 Row(
                                   children: [
                                     SizedBox(
                                       width: 20,
-                                      child: Icon(
-                                        room?.listeners?[index].isMicOn == true
-                                            ? FontAwesomeIcons.microphone
-                                            : FontAwesomeIcons.microphoneSlash,
-                                        color:
+                                      child: Consumer<VolumeProvider>(
+                                        builder: (context, provider, ch) {
+                                          return Icon(
                                             room?.listeners?[index].isMicOn ==
                                                     true
-                                                ? const Color(0xff7a8fa6)
+                                                ? FontAwesomeIcons.microphone
+                                                : FontAwesomeIcons
+                                                    .microphoneSlash,
+                                            color: room?.listeners?[index]
+                                                        .isMicOn ==
+                                                    true
+                                                ? (room?.listeners?[index]
+                                                            .isSpeaking ==
+                                                        true
+                                                    ? Colors.green
+                                                    : const Color(0xff7a8fa6))
                                                 : Colors.red,
-                                        size: 15,
+                                            size: 15,
+                                          );
+                                        },
                                       ),
                                     ),
                                     const SizedBox(width: 3),
@@ -780,12 +837,27 @@ class _RoomScreenState extends State<RoomScreen> {
             RtcEngineContext(R.constants.agoraAppId));
 
         await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
+        await agoraEngine?.enableAudioVolumeIndication(250, 6, true);
         agoraEngine?.setEventHandler(RtcEngineEventHandler(
           joinChannelSuccess: (String channel, int uid, int elapsed) {
             print('joinChannelSuccess $channel $uid');
           },
           userJoined: (int uid, int elapsed) {
             print('userJoined $uid');
+          },
+          audioVolumeIndication: (volumeInfo, v) {
+            for (var speaker in volumeInfo) {
+              if (speaker.volume > 5) {
+                print("User Speaking ${speaker.uid}");
+                try {
+                  changeVolumeStatus(speaker.uid, true);
+                } catch (error) {
+                  print('Error:${error.toString()}');
+                }
+              } else {
+                changeVolumeStatus(speaker.uid, false);
+              }
+            }
           },
         ));
         await agoraEngine?.setClientRole(
@@ -799,6 +871,27 @@ class _RoomScreenState extends State<RoomScreen> {
         setState(() {});
       }
     });
+  }
+
+  void changeVolumeStatus(int speakerId, bool status) {
+    if (speakerId == 0) {
+      room?.speakers
+          ?.firstWhereOrNull(
+              (member) => (member.id ?? 0) == context.currentUser?.id)
+          ?.isSpeaking = status;
+      room?.listeners
+          ?.firstWhereOrNull(
+              (member) => (member.id ?? 0) == context.currentUser?.id)
+          ?.isSpeaking = status;
+    } else {
+      room?.speakers
+          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
+          ?.isSpeaking = status;
+      room?.listeners
+          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
+          ?.isSpeaking = status;
+    }
+    Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
   }
 
   @override

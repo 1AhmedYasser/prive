@@ -734,36 +734,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               for (var speaker in volumeInfo) {
                 if (speaker.volume > 5) {
                   try {
-                    if (speaker.uid == 0) {
-                      call?.members
-                          ?.firstWhereOrNull((member) =>
-                              (member.id ?? 0) == context.currentUser?.id)
-                          ?.isSpeaking = true;
-                    } else {
-                      call?.members
-                          ?.firstWhereOrNull(
-                              (member) => (member.id ?? 0) == "${speaker.uid}")
-                          ?.isSpeaking = true;
-                    }
-                    Provider.of<VolumeProvider>(context, listen: false)
-                        .refreshVolumes();
+                    changeVolumeStatus(speaker.uid, true);
                   } catch (error) {
                     print('Error:${error.toString()}');
                   }
                 } else {
-                  if (speaker.uid == 0) {
-                    call?.members
-                        ?.firstWhereOrNull((member) =>
-                            (member.id ?? 0) == context.currentUser?.id)
-                        ?.isSpeaking = false;
-                  } else {
-                    call?.members
-                        ?.firstWhereOrNull(
-                            (member) => (member.id ?? 0) == "${speaker.uid}")
-                        ?.isSpeaking = false;
-                  }
-                  Provider.of<VolumeProvider>(context, listen: false)
-                      .refreshVolumes();
+                  changeVolumeStatus(speaker.uid, false);
                 }
               }
             },
@@ -835,6 +811,20 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     if (Platform.isAndroid) {
       await FlutterForegroundTask.stopService();
     }
+  }
+
+  void changeVolumeStatus(int speakerId, bool status) {
+    if (speakerId == 0) {
+      call?.members
+          ?.firstWhereOrNull(
+              (member) => (member.id ?? 0) == context.currentUser?.id)
+          ?.isSpeaking = status;
+    } else {
+      call?.members
+          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
+          ?.isSpeaking = status;
+    }
+    Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
   }
 
   @override
