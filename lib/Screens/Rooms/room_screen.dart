@@ -13,12 +13,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/room_menu_dialog.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:collection/collection.dart';
 
 import '../../Models/Call/prive_call.dart';
 import '../../Models/Rooms/room.dart';
@@ -350,79 +351,96 @@ class _RoomScreenState extends State<RoomScreen> {
                           itemCount: room?.listeners?.length ?? 0,
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                Consumer<VolumeProvider>(
-                                    builder: (context, provider, ch) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: room?.listeners?[index]
-                                                    .isSpeaking ==
-                                                true
-                                            ? Colors.green
-                                            : Colors.transparent,
-                                        width: 1.5,
+                            return InkWell(
+                              highlightColor: Colors.transparent,
+                              splashColor: Colors.transparent,
+                              onTap: () {
+                                if (speakersIds
+                                    .contains(context.currentUser?.id ?? "")) {
+                                  RoomMenuDialog.showListenerMenu(
+                                      context, room?.listeners?[index],
+                                      onUpgradedPressed: () {
+                                    print("Upgrade Ya 3m");
+                                  }, onKickPressed: () {
+                                    print("Kick Ya 3m");
+                                  });
+                                }
+                              },
+                              child: Column(
+                                children: [
+                                  Consumer<VolumeProvider>(
+                                      builder: (context, provider, ch) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: room?.listeners?[index]
+                                                      .isSpeaking ==
+                                                  true
+                                              ? Colors.green
+                                              : Colors.transparent,
+                                          width: 1.5,
+                                        ),
+                                        borderRadius: BorderRadius.circular(25),
                                       ),
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: SizedBox(
-                                        height: 78,
-                                        width: 80,
-                                        child: CachedImage(
-                                          url: room?.listeners?[index].image ??
-                                              "",
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(25),
+                                        child: SizedBox(
+                                          height: 78,
+                                          width: 80,
+                                          child: CachedImage(
+                                            url:
+                                                room?.listeners?[index].image ??
+                                                    "",
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                }),
-                                const SizedBox(height: 3),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      child: Consumer<VolumeProvider>(
-                                        builder: (context, provider, ch) {
-                                          return Icon(
-                                            room?.listeners?[index].isMicOn ==
-                                                    true
-                                                ? FontAwesomeIcons.microphone
-                                                : FontAwesomeIcons
-                                                    .microphoneSlash,
-                                            color: room?.listeners?[index]
-                                                        .isMicOn ==
-                                                    true
-                                                ? (room?.listeners?[index]
-                                                            .isSpeaking ==
-                                                        true
-                                                    ? Colors.green
-                                                    : const Color(0xff7a8fa6))
-                                                : Colors.red,
-                                            size: 15,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Expanded(
-                                      child: Text(
-                                        (room?.listeners?[index].name
-                                                    ?.split(" ")
-                                                    .first ??
-                                                "")
-                                            .trim(),
-                                        style: const TextStyle(
-                                          color: Colors.black,
+                                    );
+                                  }),
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        child: Consumer<VolumeProvider>(
+                                          builder: (context, provider, ch) {
+                                            return Icon(
+                                              room?.listeners?[index].isMicOn ==
+                                                      true
+                                                  ? FontAwesomeIcons.microphone
+                                                  : FontAwesomeIcons
+                                                      .microphoneSlash,
+                                              color: room?.listeners?[index]
+                                                          .isMicOn ==
+                                                      true
+                                                  ? (room?.listeners?[index]
+                                                              .isSpeaking ==
+                                                          true
+                                                      ? Colors.green
+                                                      : const Color(0xff7a8fa6))
+                                                  : Colors.red,
+                                              size: 15,
+                                            );
+                                          },
                                         ),
-                                        maxLines: 1,
                                       ),
-                                    )
-                                  ],
-                                )
-                              ],
+                                      const SizedBox(width: 3),
+                                      Expanded(
+                                        child: Text(
+                                          (room?.listeners?[index].name
+                                                      ?.split(" ")
+                                                      .first ??
+                                                  "")
+                                              .trim(),
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
                             );
                           },
                         ),
