@@ -73,7 +73,7 @@ class StreamManager {
             (e) => e.extraData['phone'] as String,
           )
           .toList();
-      usersPhoneNumbers.add(currentUser?.extraData['phone'] as String);
+      usersPhoneNumbers.add(currentUser.extraData['phone'] as String);
     }
   }
 
