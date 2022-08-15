@@ -215,6 +215,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         image: context.currentUser?.image ?? "",
                         isOwner: true,
                         isSpeaker: true,
+                        hasPermissionToSpeak: true,
                         isListener: false,
                         phone:
                             context.currentUser?.extraData['phone'] as String,
@@ -230,6 +231,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           image: user.image,
                           isOwner: false,
                           isSpeaker: false,
+                          hasPermissionToSpeak: false,
                           isListener: true,
                           phone: user.extraData["phone"] as String,
                           isHandRaised: false,

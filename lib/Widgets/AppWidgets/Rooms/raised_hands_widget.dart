@@ -91,21 +91,33 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                   FirebaseDatabase.instance
                                       .ref(
                                           "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({"isMicOn": false});
+                                      .update({
+                                    "isMicOn": false,
+                                    "hasPermissionToSpeak": false
+                                  });
                                   FirebaseDatabase.instance
                                       .ref(
                                           "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({"isMicOn": false});
+                                      .update({
+                                    "isMicOn": false,
+                                    "hasPermissionToSpeak": false
+                                  });
                                 } else {
                                   raisedHands[index].isMicOn = true;
                                   FirebaseDatabase.instance
                                       .ref(
                                           "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({"isMicOn": true});
+                                      .update({
+                                    "isMicOn": true,
+                                    "hasPermissionToSpeak": true
+                                  });
                                   FirebaseDatabase.instance
                                       .ref(
                                           "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({"isMicOn": true});
+                                      .update({
+                                    "isMicOn": true,
+                                    "hasPermissionToSpeak": true
+                                  });
                                 }
                                 setState(() {});
                               },
@@ -200,6 +212,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
             isListener: value['isListener'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
           ),
         );

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
+
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:badges/badges.dart';
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,20 +13,21 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
-import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:prive/Helpers/stream_manager.dart';
+import 'package:collection/collection.dart';
+
 import '../../Models/Call/prive_call.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
 import '../../Providers/volume_provider.dart';
 import '../../UltraNetwork/ultra_network.dart';
-import 'package:collection/collection.dart';
+import '../../Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
+import '../../Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
+import '../../Widgets/Common/cached_image.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
@@ -84,43 +87,13 @@ class _RoomScreenState extends State<RoomScreen> {
                   ),
                   actions: [
                     if (speakersIds.contains(context.currentUser?.id ?? ""))
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: GestureDetector(
-                          onTap: () async {
-                            setState(() {
-                              isMyMicOn = !isMyMicOn;
-                            });
-                            agoraEngine?.muteRemoteAudioStream(
-                                int.parse(
-                                    await Utils.getString(R.pref.userId) ??
-                                        "0"),
-                                !isMyMicOn);
-
-                            await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
-                            if (room?.owner?.id == context.currentUser?.id) {
-                              final ref = FirebaseDatabase.instance
-                                  .ref('rooms/${room?.owner?.id}/owner');
-                              ref.update({"isMicOn": isMyMicOn});
-                            }
-                            final ref = FirebaseDatabase.instance.ref(
-                                'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
-                            ref.update({"isMicOn": isMyMicOn});
-                          },
-                          child: SizedBox(
-                            width: 30,
-                            child: Icon(
-                              isMyMicOn
-                                  ? FontAwesomeIcons.microphone
-                                  : FontAwesomeIcons.microphoneSlash,
-                              color: isMyMicOn
-                                  ? const Color(0xff7a8fa6)
-                                  : Colors.red,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
+                      _buildRoomUserMic(true),
+                    if (room?.listeners
+                            ?.firstWhereOrNull((listener) =>
+                                listener.id == context.currentUser?.id)
+                            ?.hasPermissionToSpeak ==
+                        true)
+                      _buildRoomUserMic(false),
                     Padding(
                       padding: const EdgeInsets.only(
                           right: 20, left: 15, top: 15, bottom: 5),
@@ -492,10 +465,16 @@ class _RoomScreenState extends State<RoomScreen> {
                       );
                     } else {
                       if (raisedHandsIds.contains(context.currentUser?.id)) {
+                        final ref = FirebaseDatabase.instance.ref(
+                            'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+                        isMyMicOn = false;
+                        ref.update(
+                            {"isMicOn": false, "hasPermissionToSpeak": false});
                         FirebaseDatabase.instance
                             .ref(
                                 'rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}')
                             .remove();
+                        setState(() {});
                       } else {
                         final ref = FirebaseDatabase.instance
                             .ref('rooms/${room?.owner?.id}');
@@ -620,6 +599,7 @@ class _RoomScreenState extends State<RoomScreen> {
         isOwner: roomResponse?['owner']['isOwner'],
         isSpeaker: roomResponse?['owner']['isSpeaker'],
         isListener: roomResponse?['owner']['isListener'],
+        hasPermissionToSpeak: roomResponse?['owner']['hasPermissionToSpeak'],
         phone: roomResponse?['owner']['phone'],
         isHandRaised: roomResponse?['owner']['isHandRaised'],
         isMicOn: roomResponse?['owner']['isMicOn'],
@@ -643,6 +623,7 @@ class _RoomScreenState extends State<RoomScreen> {
             isListener: value['isListener'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
           ),
         );
@@ -661,6 +642,7 @@ class _RoomScreenState extends State<RoomScreen> {
             isListener: value['isListener'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
           ),
         );
@@ -685,6 +667,7 @@ class _RoomScreenState extends State<RoomScreen> {
             isListener: value['isListener'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
           ),
         );
@@ -765,6 +748,7 @@ class _RoomScreenState extends State<RoomScreen> {
             isOwner: value['isOwner'],
             isSpeaker: value['isSpeaker'],
             isListener: value['isListener'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
             isMicOn: value['isMicOn'],
@@ -783,6 +767,7 @@ class _RoomScreenState extends State<RoomScreen> {
           "isListener": currentUser.isListener,
           "phone": currentUser.phone,
           "isHandRaised": currentUser.isHandRaised,
+          "hasPermissionToSpeak": currentUser.hasPermissionToSpeak,
           "isOwner": currentUser.isOwner,
           "isMicOn": currentUser.isMicOn,
         });
@@ -796,6 +781,7 @@ class _RoomScreenState extends State<RoomScreen> {
           "isListener": currentUser.isListener,
           "phone": currentUser.phone,
           "isHandRaised": currentUser.isHandRaised,
+          "hasPermissionToSpeak": currentUser.hasPermissionToSpeak,
           "isOwner": currentUser.isOwner,
           "isMicOn": currentUser.isMicOn,
         });
@@ -892,6 +878,66 @@ class _RoomScreenState extends State<RoomScreen> {
           ?.isSpeaking = status;
     }
     Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
+  }
+
+  Widget _buildRoomUserMic(bool isSpeaker) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: GestureDetector(
+        onTap: () async {
+          setState(() {
+            isMyMicOn = !isMyMicOn;
+          });
+          agoraEngine?.muteRemoteAudioStream(
+              int.parse(await Utils.getString(R.pref.userId) ?? "0"),
+              !isMyMicOn);
+
+          await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
+          if (isSpeaker) {
+            if (room?.owner?.id == context.currentUser?.id) {
+              final ref = FirebaseDatabase.instance
+                  .ref('rooms/${room?.owner?.id}/owner');
+              ref.update({"isMicOn": isMyMicOn});
+            }
+            final ref = FirebaseDatabase.instance.ref(
+                'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+            ref.update({"isMicOn": isMyMicOn});
+          } else {
+            final ref = FirebaseDatabase.instance.ref(
+                'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+            ref.update({"isMicOn": isMyMicOn});
+          }
+        },
+        child: SizedBox(
+          width: 30,
+          child: Icon(
+            isSpeaker == true
+                ? isMyMicOn
+                    ? FontAwesomeIcons.microphone
+                    : FontAwesomeIcons.microphoneSlash
+                : room?.listeners
+                            ?.firstWhereOrNull((listener) =>
+                                listener.id == context.currentUser?.id)
+                            ?.isMicOn ==
+                        true
+                    ? FontAwesomeIcons.microphone
+                    : FontAwesomeIcons.microphoneSlash,
+            color: isSpeaker == true
+                ? isMyMicOn
+                    ? const Color(0xff7a8fa6)
+                    : Colors.red
+                : room?.listeners
+                            ?.firstWhereOrNull((listener) =>
+                                listener.id == context.currentUser?.id)
+                            ?.isMicOn ==
+                        true
+                    ? const Color(0xff7a8fa6)
+                    : Colors.red,
+            size: 24,
+          ),
+        ),
+      ),
+    );
   }
 
   @override

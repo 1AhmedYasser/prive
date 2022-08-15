@@ -9,19 +9,20 @@ class RoomUser {
   bool? isHandRaised;
   bool? isMicOn;
   bool? isSpeaking;
+  bool? hasPermissionToSpeak;
 
-  RoomUser({
-    required this.id,
-    required this.name,
-    required this.image,
-    required this.isOwner,
-    required this.isSpeaker,
-    required this.isListener,
-    required this.phone,
-    required this.isHandRaised,
-    required this.isMicOn,
-    this.isSpeaking = false,
-  });
+  RoomUser(
+      {required this.id,
+      required this.name,
+      required this.image,
+      required this.isOwner,
+      required this.isSpeaker,
+      required this.isListener,
+      required this.phone,
+      required this.isHandRaised,
+      required this.isMicOn,
+      this.isSpeaking = false,
+      this.hasPermissionToSpeak});
 
   RoomUser.fromJson(Map<String, dynamic> json) {
     id = json['id'] as String?;
@@ -33,6 +34,7 @@ class RoomUser {
     phone = json['phone'] as String?;
     isHandRaised = json['isHandRaised'] as bool?;
     isMicOn = json['isMicOn'] as bool?;
+    hasPermissionToSpeak = json['hasPermissionToSpeak'] as bool?;
   }
 
   Map<String, dynamic> toJson() {
@@ -46,6 +48,7 @@ class RoomUser {
     json['phone'] = phone;
     json['isHandRaised'] = isHandRaised;
     json['isMicOn'] = isMicOn;
+    json['hasPermissionToSpeak'] = hasPermissionToSpeak;
     return json;
   }
 }
