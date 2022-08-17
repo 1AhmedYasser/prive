@@ -26,6 +26,7 @@ import '../../../UltraNetwork/ultra_constants.dart';
 import '../../../UltraNetwork/ultra_network.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
+import 'dart:math';
 
 class SingleCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -72,6 +73,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   rtc_local_view.SurfaceView? localView;
   bool didJoinAgora = false;
   bool didEndCall = false;
+  bool isSharingScreen = false;
+  String userAgoraToken = "";
 
   @override
   void initState() {
@@ -308,13 +311,19 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
     final databaseReference =
         FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
     onChangeListener = databaseReference.onChildChanged.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
     onDeleteListener = databaseReference.onChildRemoved.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
   }
 
@@ -531,7 +540,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           await agoraEngine?.setEnableSpeakerphone(false);
           setState(() {});
         }
-
+        userAgoraToken = tokenResponse.data ?? "";
         agoraEngine
             ?.joinChannel(
           tokenResponse.data ?? "",
@@ -661,7 +670,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     ?.firstWhere(
                         (member) => member.id == context.currentUser?.id)
                     .isVideoOn ==
-                true)
+                true &&
+            isSharingScreen == false)
           DraggableWidget(
             bottomMargin: 60,
             intialVisibility: true,
@@ -685,25 +695,23 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           ),
         Positioned(
           bottom: 50,
-          right: 20,
-          left: 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          right: 35,
+          left: 35,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (isVideo)
                 InkWell(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () {
-                    bool isVideoOn = !(call?.members
-                            ?.firstWhere((element) =>
-                                element.id == context.currentUser?.id)
-                            .isVideoOn ??
-                        false);
-                    final ref = FirebaseDatabase.instance.ref(
-                        "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                    ref.update({"isVideoOn": isVideoOn});
-                    agoraEngine?.enableLocalVideo(isVideoOn);
+                    if (agoraEngine != null) {
+                      if (isSharingScreen == false) {
+                        _startScreenShare();
+                      } else {
+                        _stopScreenShare();
+                      }
+                    }
                   },
                   child: Container(
                     width: 60,
@@ -713,131 +721,170 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                       color: Colors.grey.withOpacity(0.7),
                     ),
                     child: Icon(
-                      call?.members
-                                  ?.firstWhere((element) =>
-                                      element.id == context.currentUser?.id)
-                                  .isVideoOn ==
-                              true
-                          ? Icons.videocam
-                          : Icons.videocam_off,
+                      isSharingScreen == false
+                          ? Icons.mobile_screen_share_rounded
+                          : Icons.mobile_off_rounded,
                       size: 28,
                       color: Colors.white,
                     ),
                   ),
                 ),
-              if (isVideo) const SizedBox(width: 15),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {
-                  bool isMicOn = me?.isMicOn == true;
-                  final ref = FirebaseDatabase.instance.ref(
-                      "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                  ref.update({"isMicOn": !isMicOn});
-                  await agoraEngine?.muteRemoteAudioStream(
-                    int.parse(context.currentUser?.id ?? "0"),
-                    isMicOn,
-                  );
-                  await agoraEngine?.muteLocalAudioStream(isMicOn);
-                  setState(() {});
-                },
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    color: Colors.grey.withOpacity(0.7),
-                  ),
-                  child: Icon(
-                    me?.isMicOn == false ? Icons.mic_off_rounded : Icons.mic,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 15),
-              if (isVideo == false)
-                InkWell(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () async {
-                    isSpeakerOn = !isSpeakerOn;
-                    await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
-                    setState(() {});
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(23),
-                      color: Colors.grey.withOpacity(0.7),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(
-                        isSpeakerOn
-                            ? FontAwesomeIcons.volumeHigh
-                            : FontAwesomeIcons.volumeLow,
-                        color: Colors.white,
-                        size: 25,
-                      ),
-                    ),
-                  ),
-                ),
-              if (isVideo)
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    color: Colors.grey.withOpacity(0.7),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: IconButton(
-                      iconSize: 30,
-                      icon: Image.asset(
-                        R.images.cameraSwitch,
-                      ),
-                      onPressed: () {
-                        // _flipController.toggleCard();
-
-                        agoraEngine?.switchCamera();
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (isVideo)
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        bool isVideoOn = !(call?.members
+                                ?.firstWhere((element) =>
+                                    element.id == context.currentUser?.id)
+                                .isVideoOn ??
+                            false);
+                        final ref = FirebaseDatabase.instance.ref(
+                            "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                        ref.update({"isVideoOn": isVideoOn});
+                        agoraEngine?.enableLocalVideo(isVideoOn);
                       },
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(23),
+                          color: Colors.grey.withOpacity(0.7),
+                        ),
+                        child: Icon(
+                          call?.members
+                                      ?.firstWhere((element) =>
+                                          element.id == context.currentUser?.id)
+                                      .isVideoOn ==
+                                  true
+                              ? Icons.videocam
+                              : Icons.videocam_off,
+                          size: 28,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  if (isVideo) const SizedBox(width: 15),
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      bool isMicOn = me?.isMicOn == true;
+                      final ref = FirebaseDatabase.instance.ref(
+                          "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                      ref.update({"isMicOn": !isMicOn});
+                      await agoraEngine?.muteRemoteAudioStream(
+                        int.parse(context.currentUser?.id ?? "0"),
+                        isMicOn,
+                      );
+                      await agoraEngine?.muteLocalAudioStream(isMicOn);
+                      setState(() {});
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(23),
+                        color: Colors.grey.withOpacity(0.7),
+                      ),
+                      child: Icon(
+                        me?.isMicOn == false
+                            ? Icons.mic_off_rounded
+                            : Icons.mic,
+                        size: 28,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              const SizedBox(width: 15),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  didEndCall = true;
-                  final databaseReference = FirebaseDatabase.instance
-                      .ref("SingleCalls/${widget.channel.id}");
-                  DatabaseReference usersRef =
-                      FirebaseDatabase.instance.ref("Users");
-                  databaseReference.remove();
-                  _stopForegroundTask();
-                  for (var member in widget.channel.state?.members ?? []) {
-                    usersRef.update({member.userId ?? "": "Ended"});
-                  }
-                  FlutterCallkitIncoming.endAllCalls();
-                  Utils.logAnswerOrCancelCall(
-                    context,
-                    context.currentUser?.id ?? "",
-                    "END",
-                    formatTime(_stats?.duration ?? 0),
-                  );
-                },
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: Image.asset(
-                    R.images.closeCall,
-                  ),
-                ),
-              )
+                  const SizedBox(width: 15),
+                  if (isVideo == false)
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        isSpeakerOn = !isSpeakerOn;
+                        await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
+                        setState(() {});
+                      },
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(23),
+                          color: Colors.grey.withOpacity(0.7),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Icon(
+                            isSpeakerOn
+                                ? FontAwesomeIcons.volumeHigh
+                                : FontAwesomeIcons.volumeLow,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (isVideo)
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(23),
+                        color: Colors.grey.withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: IconButton(
+                          iconSize: 30,
+                          icon: Image.asset(
+                            R.images.cameraSwitch,
+                          ),
+                          onPressed: () {
+                            // _flipController.toggleCard();
+
+                            agoraEngine?.switchCamera();
+                          },
+                        ),
+                      ),
+                    ),
+                  const SizedBox(width: 15),
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      didEndCall = true;
+                      final databaseReference = FirebaseDatabase.instance
+                          .ref("SingleCalls/${widget.channel.id}");
+                      DatabaseReference usersRef =
+                          FirebaseDatabase.instance.ref("Users");
+                      databaseReference.remove();
+                      _stopForegroundTask();
+                      for (var member in widget.channel.state?.members ?? []) {
+                        usersRef.update({member.userId ?? "": "Ended"});
+                      }
+                      FlutterCallkitIncoming.endAllCalls();
+                      Utils.logAnswerOrCancelCall(
+                        context,
+                        context.currentUser?.id ?? "",
+                        "END",
+                        formatTime(_stats?.duration ?? 0),
+                      );
+                    },
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: Image.asset(
+                        R.images.closeCall,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
         ),
@@ -908,6 +955,43 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
     if (Platform.isAndroid) {
       await FlutterForegroundTask.stopService();
     }
+  }
+
+  void _startScreenShare() async {
+    print("Start Screen Sharing");
+    const ScreenAudioParameters parametersAudioParams = ScreenAudioParameters(
+      100,
+    );
+    VideoDimensions videoParamsDimensions = VideoDimensions(
+      width: MediaQuery.of(context).size.width.toInt(),
+      height: MediaQuery.of(context).size.height.toInt(),
+    );
+    ScreenVideoParameters parametersVideoParams = ScreenVideoParameters(
+      dimensions: videoParamsDimensions,
+      frameRate: 15,
+      bitrate: 1000,
+      contentHint: VideoContentHint.Motion,
+    );
+    ScreenCaptureParameters2 parameters = ScreenCaptureParameters2(
+      captureAudio: true,
+      audioParams: parametersAudioParams,
+      captureVideo: true,
+      videoParams: parametersVideoParams,
+    );
+
+    await agoraEngine?.startScreenCaptureMobile(parameters);
+
+    setState(() {
+      isSharingScreen = true;
+    });
+  }
+
+  void _stopScreenShare() async {
+    print("Stop Screen Sharing");
+    await agoraEngine?.stopScreenCapture();
+    setState(() {
+      isSharingScreen = false;
+    });
   }
 
   @override

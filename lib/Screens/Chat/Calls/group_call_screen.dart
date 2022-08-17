@@ -64,6 +64,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool didEndCall = false;
   rtc_local_view.SurfaceView? localView;
   List<rtc_remote_view.SurfaceView> remoteViews = [];
+  bool isSharingScreen = false;
 
   @override
   void initState() {
@@ -316,7 +317,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       bottom: 0,
       left: 0,
       right: 0,
-      height: 200,
+      //height: 250,
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -329,205 +330,247 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             ],
           ),
         ),
-        child: Row(
-          children: [
-            const SizedBox(width: 50),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (isVideoOn == true)
-                  InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      agoraEngine?.switchCamera();
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(30),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 35),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const SizedBox(width: 50),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (isVideoOn == true)
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          if (agoraEngine != null) {
+                            if (isSharingScreen == false) {
+                              _startScreenShare();
+                            } else {
+                              _stopScreenShare();
+                            }
+                          }
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Icon(
+                            isSharingScreen == false
+                                ? Icons.mobile_screen_share_rounded
+                                : Icons.mobile_off_rounded,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.switch_camera_rounded,
-                        color: Colors.white,
-                        size: 25,
+                    if (isVideoOn == true) const SizedBox(height: 13),
+                    if (isVideoOn == true)
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          agoraEngine?.switchCamera();
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Icon(
+                            Icons.switch_camera_rounded,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    if (isVideoOn == true) const SizedBox(height: 13),
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        setState(() {
+                          if (widget.isVideo) {
+                            isVideoOn = !isVideoOn;
+                            final ref = FirebaseDatabase.instance.ref(
+                                "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                            ref.update({"isVideoOn": isVideoOn});
+                          } else {
+                            isSpeakerOn = !isSpeakerOn;
+                          }
+                        });
+                        if (widget.isVideo == false) {
+                          await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
+                        }
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Icon(
+                              widget.isVideo
+                                  ? isVideoOn
+                                      ? Icons.videocam
+                                      : Icons.videocam_off
+                                  : isSpeakerOn
+                                      ? FontAwesomeIcons.volumeHigh
+                                      : FontAwesomeIcons.volumeLow,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            widget.isVideo ? "Video" : "Speaker",
+                            style: const TextStyle(color: Colors.white),
+                          ).tr()
+                        ],
                       ),
                     ),
-                  ),
-                if (isVideoOn == true) const SizedBox(height: 13),
-                InkWell(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () async {
-                    setState(() {
-                      if (widget.isVideo) {
-                        isVideoOn = !isVideoOn;
+                  ],
+                ),
+              ),
+              const Expanded(child: SizedBox()),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 85,
+                    height: 85,
+                    child: WaveButton(
+                      onPressed: (isMute) async {
+                        setState(() {
+                          this.isMute = isMute;
+                        });
                         final ref = FirebaseDatabase.instance.ref(
                             "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                        ref.update({"isVideoOn": isVideoOn});
-                      } else {
-                        isSpeakerOn = !isSpeakerOn;
-                      }
-                    });
-                    if (widget.isVideo == false) {
-                      await agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
-                    }
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
+                        ref.update({"isMicOn": !this.isMute});
+                        agoraEngine?.muteRemoteAudioStream(
+                          int.parse(context.currentUser?.id ?? "0"),
+                          this.isMute,
+                        );
+                        await agoraEngine?.muteLocalAudioStream(this.isMute);
+                      },
+                      initialIsPlaying: true,
+                      playIcon: const Icon(Icons.mic),
+                      pauseIcon: const Icon(
+                        Icons.mic_off_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isMute ? "Un Mute" : "Mute",
+                    style: const TextStyle(color: Colors.white, fontSize: 17),
+                  ).tr()
+                ],
+              ),
+              const Expanded(child: SizedBox()),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        final databaseReference = FirebaseDatabase.instance
+                            .ref("GroupCalls/${widget.channel.id}");
+                        showCupertinoModalPopup<void>(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              CupertinoActionSheet(
+                            title: Text(
+                                '${"Are You Sure  You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
+                            actions: <CupertinoActionSheetAction>[
+                              if (context.currentUser?.id == call?.ownerId)
+                                CupertinoActionSheetAction(
+                                  isDestructiveAction: true,
+                                  onPressed: () {
+                                    didEndCall = true;
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    databaseReference.remove();
+                                    _stopForegroundTask();
+                                    DatabaseReference userRef =
+                                        FirebaseDatabase.instance.ref("Users");
+                                    userRef.update({
+                                      context.currentUser?.id ?? "": "Ended"
+                                    });
+                                    agoraEngine?.destroy();
+                                  },
+                                  child: Text(
+                                      '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
+                                ),
+                              CupertinoActionSheetAction(
+                                onPressed: () {
+                                  didEndCall = true;
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  databaseReference
+                                      .child(
+                                          "members/${context.currentUser?.id}")
+                                      .remove();
+                                  _stopForegroundTask();
+                                  DatabaseReference userRef =
+                                      FirebaseDatabase.instance.ref("Users");
+                                  userRef.update(
+                                      {context.currentUser?.id ?? "": "Ended"});
+                                  agoraEngine?.destroy();
+                                },
+                                child: Text(
+                                    '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
+                              ),
+                            ],
+                            cancelButton: CupertinoActionSheetAction(
+                              child: const Text('Cancel').tr(),
+                              onPressed: () {
+                                Navigator.pop(context, 'Cancel'.tr());
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 55,
+                        width: 55,
                         decoration: BoxDecoration(
-                          color: Colors.white10,
+                          color: Colors.red.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: Icon(
-                          widget.isVideo
-                              ? isVideoOn
-                                  ? Icons.videocam
-                                  : Icons.videocam_off
-                              : isSpeakerOn
-                                  ? FontAwesomeIcons.volumeHigh
-                                  : FontAwesomeIcons.volumeLow,
+                        child: const Icon(
+                          Icons.close,
                           color: Colors.white,
-                          size: 25,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.isVideo ? "Video" : "Speaker",
-                        style: const TextStyle(color: Colors.white),
-                      ).tr()
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 60),
-              ],
-            ),
-            const Expanded(child: SizedBox()),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 85,
-                  height: 85,
-                  child: WaveButton(
-                    onPressed: (isMute) async {
-                      setState(() {
-                        this.isMute = isMute;
-                      });
-                      final ref = FirebaseDatabase.instance.ref(
-                          "GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                      ref.update({"isMicOn": !this.isMute});
-                      agoraEngine?.muteRemoteAudioStream(
-                        int.parse(context.currentUser?.id ?? "0"),
-                        this.isMute,
-                      );
-                      await agoraEngine?.muteLocalAudioStream(this.isMute);
-                    },
-                    initialIsPlaying: true,
-                    playIcon: const Icon(Icons.mic),
-                    pauseIcon: const Icon(
-                      Icons.mic_off_rounded,
-                      color: Colors.white,
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      "Leave",
+                      style: TextStyle(color: Colors.white),
+                    ).tr()
+                  ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  isMute ? "Un Mute" : "Mute",
-                  style: const TextStyle(color: Colors.white, fontSize: 17),
-                ).tr()
-              ],
-            ),
-            const Expanded(child: SizedBox()),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
-                    final databaseReference = FirebaseDatabase.instance
-                        .ref("GroupCalls/${widget.channel.id}");
-                    showCupertinoModalPopup<void>(
-                      context: context,
-                      builder: (BuildContext context) => CupertinoActionSheet(
-                        title: Text(
-                            '${"Are You Sure  You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
-                        actions: <CupertinoActionSheetAction>[
-                          if (context.currentUser?.id == call?.ownerId)
-                            CupertinoActionSheetAction(
-                              isDestructiveAction: true,
-                              onPressed: () {
-                                didEndCall = true;
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                databaseReference.remove();
-                                _stopForegroundTask();
-                                DatabaseReference userRef =
-                                    FirebaseDatabase.instance.ref("Users");
-                                userRef.update(
-                                    {context.currentUser?.id ?? "": "Ended"});
-                                agoraEngine?.destroy();
-                              },
-                              child: Text(
-                                  '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
-                            ),
-                          CupertinoActionSheetAction(
-                            onPressed: () {
-                              didEndCall = true;
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                              databaseReference
-                                  .child("members/${context.currentUser?.id}")
-                                  .remove();
-                              _stopForegroundTask();
-                              DatabaseReference userRef =
-                                  FirebaseDatabase.instance.ref("Users");
-                              userRef.update(
-                                  {context.currentUser?.id ?? "": "Ended"});
-                              agoraEngine?.destroy();
-                            },
-                            child: Text(
-                                '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
-                          ),
-                        ],
-                        cancelButton: CupertinoActionSheetAction(
-                          child: const Text('Cancel').tr(),
-                          onPressed: () {
-                            Navigator.pop(context, 'Cancel'.tr());
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  "Leave",
-                  style: TextStyle(color: Colors.white),
-                ).tr()
-              ],
-            ),
-            const SizedBox(width: 50)
-          ],
+              ),
+              const SizedBox(width: 50)
+            ],
+          ),
         ),
       ),
     );
@@ -658,13 +701,19 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     final databaseReference =
         FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
     onChangeListener = databaseReference.onChildChanged.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
     onDeleteListener = databaseReference.onChildRemoved.listen((event) {
-      getCall();
+      if (mounted) {
+        getCall();
+      }
     });
   }
 
@@ -825,6 +874,43 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           ?.isSpeaking = status;
     }
     Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
+  }
+
+  void _startScreenShare() async {
+    print("Start Screen Sharing");
+    const ScreenAudioParameters parametersAudioParams = ScreenAudioParameters(
+      100,
+    );
+    VideoDimensions videoParamsDimensions = VideoDimensions(
+      width: MediaQuery.of(context).size.width.toInt(),
+      height: MediaQuery.of(context).size.height.toInt(),
+    );
+    ScreenVideoParameters parametersVideoParams = ScreenVideoParameters(
+      dimensions: videoParamsDimensions,
+      frameRate: 15,
+      bitrate: 1000,
+      contentHint: VideoContentHint.Motion,
+    );
+    ScreenCaptureParameters2 parameters = ScreenCaptureParameters2(
+      captureAudio: true,
+      audioParams: parametersAudioParams,
+      captureVideo: true,
+      videoParams: parametersVideoParams,
+    );
+
+    await agoraEngine?.startScreenCaptureMobile(parameters);
+
+    setState(() {
+      isSharingScreen = true;
+    });
+  }
+
+  void _stopScreenShare() async {
+    print("Stop Screen Sharing");
+    await agoraEngine?.stopScreenCapture();
+    setState(() {
+      isSharingScreen = false;
+    });
   }
 
   @override
