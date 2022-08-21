@@ -90,6 +90,7 @@ dependencies:
   transparent_image: ^2.0.0
   wakelock: ^0.6.2
   flutter_foreground_task: ^3.8.1
+  replay_kit_launcher: ^1.0.0
 
   # Firebase
   firebase_core: ^1.20.0

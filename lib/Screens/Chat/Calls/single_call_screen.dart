@@ -14,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 import '../../../Extras/resources.dart';
@@ -958,7 +959,6 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   void _startScreenShare() async {
-    print("Start Screen Sharing");
     const ScreenAudioParameters parametersAudioParams = ScreenAudioParameters(
       100,
     );
@@ -981,6 +981,10 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
 
     await agoraEngine?.startScreenCaptureMobile(parameters);
 
+    if (Platform.isIOS) {
+      ReplayKitLauncher.launchReplayKitBroadcast('ScreenSharing');
+    }
+
     setState(() {
       isSharingScreen = true;
     });
@@ -989,6 +993,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   void _stopScreenShare() async {
     print("Stop Screen Sharing");
     await agoraEngine?.stopScreenCapture();
+    if (Platform.isIOS) {
+      ReplayKitLauncher.finishReplayKitBroadcast('');
+    }
     setState(() {
       isSharingScreen = false;
     });
