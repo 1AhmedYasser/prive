@@ -112,11 +112,11 @@ dependencies:
 
   # Agora
   agora_rtc_engine: ^5.3.0
-#  flutter_callkit_incoming: ^1.0.2+1
-  flutter_callkit_incoming:
-    git:
-      url: https://github.com/rohithmahesh3/flutter_callkit_incoming
-      ref: master
+  flutter_callkit_incoming: ^1.0.2+1
+#  flutter_callkit_incoming:
+#    git:
+#      url: https://github.com/rohithmahesh3/flutter_callkit_incoming
+#      ref: master
   connectycube_flutter_call_kit: ^2.0.5
 
   # Maps

@@ -70,8 +70,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   bool isSpeakerOn = false;
   bool isMute = false;
   CallMember? me;
-  rtc_remote_view.SurfaceView? remoteView;
-  rtc_local_view.SurfaceView? localView;
+  rtc_remote_view.TextureView? remoteView;
+  rtc_local_view.TextureView? localView;
   bool didJoinAgora = false;
   bool didEndCall = false;
   bool isSharingScreen = false;
@@ -361,7 +361,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         isSpeakerOn = await agoraEngine?.isSpeakerphoneEnabled() ?? false;
       }
       agoraEngine = widget.agoraEngine;
-      localView = const rtc_local_view.SurfaceView();
+      localView = const rtc_local_view.TextureView();
       setState(() {});
     }
   }
@@ -407,7 +407,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           [];
 
       if (widget.agoraEngine != null) {
-        remoteView = rtc_remote_view.SurfaceView(
+        remoteView = rtc_remote_view.TextureView(
           uid: int.parse(call?.members
                   ?.firstWhere((member) => member.id != context.currentUser?.id)
                   .id ??
@@ -494,7 +494,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             userJoined: (int uid, int elapsed) {
               print('userJoined $uid');
               timer?.cancel();
-              remoteView = rtc_remote_view.SurfaceView(
+              remoteView = rtc_remote_view.TextureView(
                 uid: int.parse(call?.members
                         ?.firstWhere(
                             (member) => member.id != context.currentUser?.id)
@@ -516,6 +516,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 } else {
                   setState(() {
                     isRemoteVideoOn = true;
+                    print("Remote Opened Camera");
                   });
                 }
               }
@@ -550,9 +551,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           int.parse(context.currentUser?.id ?? "0"),
         )
             .then((value) {
-          localView = const rtc_local_view.SurfaceView();
+          localView = const rtc_local_view.TextureView();
           if (call?.members?.length == 2) {
-            remoteView = rtc_remote_view.SurfaceView(
+            remoteView = rtc_remote_view.TextureView(
               uid: int.parse(call?.members
                       ?.firstWhere(
                           (member) => member.id != context.currentUser?.id)
@@ -671,8 +672,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     ?.firstWhere(
                         (member) => member.id == context.currentUser?.id)
                     .isVideoOn ==
-                true &&
-            isSharingScreen == false)
+                true)
           DraggableWidget(
             bottomMargin: 60,
             intialVisibility: true,
@@ -993,6 +993,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   void _stopScreenShare() async {
     print("Stop Screen Sharing");
     await agoraEngine?.stopScreenCapture();
+
     if (Platform.isIOS) {
       ReplayKitLauncher.finishReplayKitBroadcast('');
     }

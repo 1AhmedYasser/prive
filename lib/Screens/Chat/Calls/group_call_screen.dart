@@ -16,6 +16,7 @@ import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock/wakelock.dart';
@@ -900,6 +901,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
     await agoraEngine?.startScreenCaptureMobile(parameters);
 
+    if (Platform.isIOS) {
+      ReplayKitLauncher.launchReplayKitBroadcast('ScreenSharing');
+    }
+
     setState(() {
       isSharingScreen = true;
     });
@@ -908,6 +913,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   void _stopScreenShare() async {
     print("Stop Screen Sharing");
     await agoraEngine?.stopScreenCapture();
+
+    if (Platform.isIOS) {
+      ReplayKitLauncher.finishReplayKitBroadcast('');
+    }
+
     setState(() {
       isSharingScreen = false;
     });
