@@ -63,8 +63,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool showingInfo = false;
   CancelToken cancelToken = CancelToken();
   bool didEndCall = false;
-  rtc_local_view.SurfaceView? localView;
-  List<rtc_remote_view.SurfaceView> remoteViews = [];
+  rtc_local_view.TextureView? localView;
+  List<rtc_remote_view.TextureView> remoteViews = [];
   bool isSharingScreen = false;
 
   @override
@@ -627,7 +627,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       initAgora();
     } else {
       agoraEngine = widget.agoraEngine;
-      localView = const rtc_local_view.SurfaceView();
+      localView = const rtc_local_view.TextureView();
       setState(() {});
     }
   }
@@ -673,7 +673,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       if (agoraEngine != null) {
         remoteViews.clear();
         for (var member in videoMembers) {
-          remoteViews.add(rtc_remote_view.SurfaceView(
+          remoteViews.add(rtc_remote_view.TextureView(
             uid: int.parse(member.id ?? "0"),
             channelId: widget.channel.id ?? "",
           ));
@@ -761,10 +761,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             },
             userJoined: (int uid, int elapsed) {
               print('userJoined $uid');
-              localView = const rtc_local_view.SurfaceView();
+              localView = const rtc_local_view.TextureView();
               remoteViews.clear();
               for (var member in videoMembers) {
-                remoteViews.add(rtc_remote_view.SurfaceView(
+                remoteViews.add(rtc_remote_view.TextureView(
                   uid: int.parse(member.id ?? "0"),
                   channelId: widget.channel.id ?? "",
                 ));
@@ -802,11 +802,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 null, int.parse(context.currentUser?.id ?? "0"))
             .then(
           (value) {
-            localView = const rtc_local_view.SurfaceView();
+            localView = const rtc_local_view.TextureView();
             remoteViews.clear();
 
             for (var member in videoMembers) {
-              remoteViews.add(rtc_remote_view.SurfaceView(
+              remoteViews.add(rtc_remote_view.TextureView(
                 uid: int.parse(member.id ?? "0"),
                 channelId: widget.channel.id ?? "",
               ));
