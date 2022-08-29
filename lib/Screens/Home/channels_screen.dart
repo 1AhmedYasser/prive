@@ -161,7 +161,10 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                           left: context.locale.languageCode == "en" ? 0 : 23),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, R.routes.profileRoute);
+                          Navigator.pushNamed(context, R.routes.profileRoute)
+                              .then((value) {
+                            setState(() {});
+                          });
                         },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(100),
