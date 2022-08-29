@@ -23,7 +23,7 @@ class GroupInfoScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _GroupInfoScreenState createState() => _GroupInfoScreenState();
+  State<GroupInfoScreen> createState() => _GroupInfoScreenState();
 }
 
 class _GroupInfoScreenState extends State<GroupInfoScreen> {
@@ -440,18 +440,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
     return Column(
       children: [
-        // OptionListTile(
-        //   title: 'Notifications',
-        //   leading: StreamSvgIcon.Icon_notification(
-        //     size: 24.0,
-        //     color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-        //   ),
-        //   trailing: CupertinoSwitch(
-        //     value: true,
-        //     onChanged: (val) {},
-        //   ),
-        //   onTap: () {},
-        // ),
         StreamBuilder<bool>(
             stream: StreamChannel.of(context).channel.isMutedStream,
             builder: (context, snapshot) {
@@ -733,7 +721,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             _searchController!.clear();
 
                             await channel.addMembers([user.id]);
-                            Navigator.pop(context);
+                            if (mounted) {
+                              Navigator.pop(context);
+                            }
                             setState(() {});
                           },
                           crossAxisCount: 4,
@@ -900,7 +890,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: UserAvatar(
+                      child: StreamUserAvatar(
                         user: user,
                         constraints: const BoxConstraints.tightFor(
                           height: 64.0,
@@ -932,18 +922,20 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
                         await c.watch();
 
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StreamChannel(
-                              channel: c,
-                              child: ChatInfoScreen(
-                                messageTheme: widget.messageTheme,
-                                user: user,
+                        if (mounted) {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StreamChannel(
+                                channel: c,
+                                child: ChatInfoScreen(
+                                  messageTheme: widget.messageTheme,
+                                  user: user,
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     ),
                   if (StreamChat.of(context).currentUser!.id != user.id)
@@ -968,17 +960,19 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
                         await c.watch();
 
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StreamChannel(
-                              channel: c,
-                              child: ChatScreen(
+                        if (mounted) {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StreamChannel(
                                 channel: c,
+                                child: ChatScreen(
+                                  channel: c,
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     ),
                   // if (!channel.isDistinct &&
@@ -1016,7 +1010,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       if (res == true) {
                         await channel.removeMembers([user.id]);
                       }
-                      Navigator.pop(context);
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                         color:
                             StreamChatTheme.of(context).colorTheme.accentError),
@@ -1065,10 +1061,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         alternativeWidget = Text(
           '${"Last Seen".tr()} ${Jiffy(otherMember.lastActive).fromNow()}',
           style: TextStyle(
-              color: StreamChatTheme.of(context)
-                  .colorTheme
-                  .textHighEmphasis
-                  .withOpacity(0.5)),
+            color: StreamChatTheme.of(context)
+                .colorTheme
+                .textHighEmphasis
+                .withOpacity(0.5),
+          ),
         );
       }
     }

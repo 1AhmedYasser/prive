@@ -1,13 +1,19 @@
+import "dart:io";
+
+import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
-import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/Helpers/utils.dart';
-import 'package:prive/Screens/More/more_screen.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
-import "dart:io";
-import 'package:easy_localization/easy_localization.dart';
+
+import '../../Extras/resources.dart';
+import '../../Helpers/stream_manager.dart';
+import '../../Helpers/utils.dart';
+import '../../Models/Auth/login.dart';
+import '../../UltraNetwork/ultra_constants.dart';
+import '../../UltraNetwork/ultra_network.dart';
+import '../../Widgets/Common/cached_image.dart';
+import 'more_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -24,6 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late File profileImage = File("");
   final imagePicker = ImagePicker();
+  CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
@@ -46,17 +53,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              Utils.saveString(R.pref.token, "");
-              Utils.saveString(R.pref.userId, "");
-              Utils.saveString(R.pref.userName, "");
-              Utils.saveString(R.pref.userFirstName, "");
-              Utils.saveString(R.pref.userLastName, "");
-              Utils.saveString(R.pref.userEmail, "");
-              Utils.saveString(R.pref.userPhone, "");
-              Utils.saveBool(R.pref.isLoggedIn, false);
-              StreamManager.disconnectUserFromStream(context);
-              Navigator.pushNamedAndRemoveUntil(context, R.routes.loginRoute,
-                  (Route<dynamic> route) => false);
+              Utils.showAlert(
+                context,
+                withCancel: true,
+                message: "Are You Sure You Want to Log out ?".tr(),
+                okButtonText: "Yes".tr(),
+                cancelButtonText: "No".tr(),
+                onOkButtonPressed: () {
+                  _logout();
+                  Utils.saveString(R.pref.userId, "");
+                  Utils.saveString(R.pref.userName, "");
+                  Utils.saveString(R.pref.userFirstName, "");
+                  Utils.saveString(R.pref.userLastName, "");
+                  Utils.saveString(R.pref.userEmail, "");
+                  Utils.saveString(R.pref.userPhone, "");
+                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  StreamManager.disconnectUserFromStream(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    R.routes.loginRoute,
+                    (Route<dynamic> route) => false,
+                  );
+                },
+              );
             },
             style: ElevatedButton.styleFrom(
                 primary: Colors.transparent,
@@ -178,6 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     buildTextField(
                       "Phone Number".tr(),
                       phoneNumberController,
+                      enabled: false,
                       type: const TextInputType.numberWithOptions(
                         signed: true,
                         decimal: false,
@@ -185,17 +205,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       formatters: [FilteringTextInputFormatter.digitsOnly],
                       emptyValidatorMessage: "Please enter a phone number".tr(),
                     ),
-                    // const SizedBox(height: 20),
-                    // buildTextField(
-                    //   "Bio",
-                    //   bioController,
-                    //   maxLines: 4,
-                    //   emptyValidatorMessage: "Please enter a bio",
-                    // ),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {}
+                        if (_formKey.currentState!.validate()) {
+                          _updateProfile();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
@@ -254,11 +269,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget buildTextField(String hint, TextEditingController controller,
       {int maxLines = 1,
       TextInputType type = TextInputType.text,
+      bool enabled = true,
       List<TextInputFormatter> formatters = const [],
       String emptyValidatorMessage = ""}) {
     return TextFormField(
       maxLines: maxLines,
       controller: controller,
+      enabled: enabled,
       keyboardType: type,
       inputFormatters: formatters,
       decoration: InputDecoration(
@@ -303,6 +320,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return null;
       },
     );
+  }
+
+  Future<void> _updateProfile() async {
+    Map<String, dynamic> params = {
+      "UserID": context.currentUser?.id,
+      "UserFirstName": firstNameController.text,
+      "UserLastName": lastNameController.text,
+    };
+
+    if (profileImage.path.isNotEmpty) {
+      params["UserPhoto"] = await MultipartFile.fromFile(
+        profileImage.path,
+        filename: "UserPhoto",
+      );
+    }
+
+    if (mounted) {
+      UltraNetwork.request(
+        context,
+        updateProfile,
+        formData: FormData.fromMap(params),
+        cancelToken: cancelToken,
+      ).then((value) {
+        if (value != null) {
+          Login loginData = value;
+          Utils.saveString(R.pref.userName,
+              "${loginData.data?.first.userFirstName ?? ""} ${loginData.data?.first.userLastName ?? ""}");
+          Utils.saveString(
+              R.pref.userFirstName, loginData.data?.first.userFirstName ?? "");
+          Utils.saveString(
+              R.pref.userLastName, loginData.data?.first.userLastName ?? "");
+          Utils.saveString(
+              R.pref.userImage, loginData.data?.first.userPhoto ?? "");
+          StreamManager.updateUser(context);
+
+          Utils.showAlert(
+            context,
+            message: "Profile Updated Successfully".tr(),
+            okButtonText: "Ok".tr(),
+            onOkButtonPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+          );
+        }
+      });
+    }
+  }
+
+  void _logout() {
+    UltraNetwork.request(
+      context,
+      logout,
+      showLoadingIndicator: false,
+      showError: false,
+      formData: FormData.fromMap({"UserID": context.currentUser?.id}),
+      cancelToken: cancelToken,
+    ).then((value) {
+      Utils.saveString(R.pref.token, "");
+    });
   }
 
   void getUserInfo() async {

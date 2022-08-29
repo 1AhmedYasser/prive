@@ -15,6 +15,8 @@ const baseUrl = "https://sae-marketing.com/Prive/API/";
 final login = UltraRequest("${baseUrl}LogInUser.php", UMethods.post, Login());
 final signup =
     UltraRequest("${baseUrl}CompleteProfileUser.php", UMethods.post, Login());
+final logout =
+    UltraRequest("${baseUrl}LogoutUser.php", UMethods.post, StatusResponse());
 
 // Calls
 final makeACall = UltraRequest(
@@ -73,3 +75,7 @@ final addStory = UltraRequest(
     "${baseUrl}AddStoryUserAPI.php", UMethods.post, StatusResponse());
 final viewStory = UltraRequest(
     "${baseUrl}MakeReviewAPI.php", UMethods.post, StatusResponse());
+
+// Profile
+final updateProfile =
+    UltraRequest("${baseUrl}UpdateProfile.php", UMethods.post, Login());

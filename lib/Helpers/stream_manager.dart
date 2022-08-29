@@ -28,6 +28,24 @@ class StreamManager {
     }
   }
 
+  static Future<void> updateUser(BuildContext context) async {
+    try {
+      final client = StreamChatCore.of(context).client;
+      await client.updateUser(
+        User(
+          id: await Utils.getString(R.pref.userId) ?? "",
+          extraData: {
+            'name': await Utils.getString(R.pref.userName),
+            'image': await Utils.getString(R.pref.userImage),
+            'phone': await Utils.getString(R.pref.userPhone),
+          },
+        ),
+      );
+    } on Exception catch (_) {
+      print('Could not update user');
+    }
+  }
+
   static Future<void> disconnectUserFromStream(BuildContext context) async {
     try {
       await StreamChatCore.of(context).client.disconnectUser();
