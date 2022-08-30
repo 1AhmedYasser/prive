@@ -11,6 +11,7 @@ class Room {
   List<String>? roomContacts;
   List<RoomUser>? raisedHands;
   List<RoomUser>? kickedListeners;
+  List<RoomUser>? upgradedListeners;
 
   Room(
       {this.roomId,
@@ -21,7 +22,8 @@ class Room {
       this.listeners,
       this.roomContacts,
       this.raisedHands,
-      this.kickedListeners});
+      this.kickedListeners,
+      this.upgradedListeners});
 
   Room.fromJson(Map<String, dynamic> json) {
     roomId = json['roomId'] as String?;
@@ -33,6 +35,7 @@ class Room {
     roomContacts = json['roomContacts'] as List<String>?;
     raisedHands = json['raisedHands'] as List<RoomUser>?;
     kickedListeners = json['kickedListeners'] as List<RoomUser>?;
+    upgradedListeners = json['upgradedListeners'] as List<RoomUser>?;
   }
 
   Map<String, dynamic> toJson() {
@@ -46,6 +49,7 @@ class Room {
     json['roomContacts'] = roomContacts;
     json['raisedHands'] = raisedHands;
     json['kickedListeners'] = kickedListeners;
+    json['upgradedListeners'] = upgradedListeners;
     return json;
   }
 }

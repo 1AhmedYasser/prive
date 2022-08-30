@@ -18,7 +18,6 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:provider/provider.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../Models/Call/prive_call.dart';
@@ -45,15 +44,18 @@ class _RoomScreenState extends State<RoomScreen> {
   bool isMyMicOn = true;
   bool isNewRoomCreation = false;
   Room? room;
+  RoomUser? me;
   List<String> speakersIds = [];
   List<String> raisedHandsIds = [];
   List<String> kickedListenersIds = [];
+  List<String> invitedListenersIds = [];
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
   bool showingInfo = false;
   RtcEngine? agoraEngine;
   CancelToken cancelToken = CancelToken();
+  bool isShowingInvitation = false;
 
   @override
   void initState() {
@@ -360,8 +362,29 @@ class _RoomScreenState extends State<RoomScreen> {
                                     .contains(context.currentUser?.id ?? "")) {
                                   RoomMenuDialog.showListenerMenu(
                                       context, room?.listeners?[index],
-                                      onUpgradedPressed: () {
-                                    print("Upgrade Ya 3m");
+                                      onUpgradePressed: () {
+                                    RoomUser? listener =
+                                        room?.listeners?[index];
+                                    listener?.invitationSpeaker = me;
+                                    final ref = FirebaseDatabase.instance
+                                        .ref('rooms/${room?.owner?.id}');
+                                    ref
+                                        .child(
+                                            'upgradedListeners/${listener?.id}')
+                                        .update({
+                                      "id": listener?.id,
+                                      "name": listener?.name,
+                                      "image": listener?.image,
+                                      "isSpeaker": listener?.isSpeaker,
+                                      "isListener": listener?.isListener,
+                                      "phone": listener?.phone,
+                                      "isHandRaised": listener?.isHandRaised,
+                                      "hasPermissionToSpeak":
+                                          listener?.hasPermissionToSpeak,
+                                      "isOwner": listener?.isOwner,
+                                      "isMicOn": listener?.isMicOn,
+                                      "invitationSpeaker": me?.toJson()
+                                    });
                                   }, onKickPressed: () {
                                     RoomUser? listener =
                                         room?.listeners?[index];
@@ -648,6 +671,7 @@ class _RoomScreenState extends State<RoomScreen> {
       List<String>? contacts = [];
       List<RoomUser>? raisedHands = [];
       List<RoomUser>? kickedListeners = [];
+      List<RoomUser>? upgradedListeners = [];
 
       Map<dynamic, dynamic>? speakersList =
           (roomResponse?['speakers'] as Map<dynamic, dynamic>?) ?? {};
@@ -731,6 +755,38 @@ class _RoomScreenState extends State<RoomScreen> {
         );
       });
 
+      Map<dynamic, dynamic>? upgradedListenersList =
+          (roomResponse?['upgradedListeners'] as Map<dynamic, dynamic>?) ?? {};
+      upgradedListenersList.forEach((key, value) {
+        upgradedListeners.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            isMicOn: value['isMicOn'],
+            invitationSpeaker: RoomUser(
+              id: value['invitationSpeaker']['id'],
+              name: value['invitationSpeaker']['name'],
+              image: value['invitationSpeaker']['image'],
+              isOwner: value['invitationSpeaker']['isOwner'],
+              isSpeaker: value['invitationSpeaker']['isSpeaker'],
+              isListener: value['invitationSpeaker']['isListener'],
+              phone: value['invitationSpeaker']['phone'],
+              isHandRaised: value['invitationSpeaker']['isHandRaised'],
+              hasPermissionToSpeak: value['invitationSpeaker']
+                  ['hasPermissionToSpeak'],
+              isMicOn: value['invitationSpeaker']['isMicOn'],
+            ),
+          ),
+        );
+      });
+
       room = Room(
           roomId: roomId,
           topic: topic,
@@ -740,11 +796,87 @@ class _RoomScreenState extends State<RoomScreen> {
           listeners: listeners,
           roomContacts: contacts,
           raisedHands: raisedHands,
-          kickedListeners: kickedListeners);
+          kickedListeners: kickedListeners,
+          upgradedListeners: upgradedListeners);
       speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
       raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
       kickedListenersIds =
           room?.kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
+      invitedListenersIds =
+          room?.upgradedListeners?.map((e) => e.id ?? "").toList() ?? [];
+
+      // Get Me From Room Members
+      if (speakersIds.contains(context.currentUser?.id)) {
+        me = speakers.firstWhereOrNull(
+            (speaker) => speaker.id == context.currentUser?.id);
+      } else {
+        me = listeners.firstWhereOrNull(
+            (listener) => listener.id == context.currentUser?.id);
+      }
+
+      // Check if i am invited to be upgraded to speaker
+      if (invitedListenersIds.contains(context.currentUser?.id)) {
+        RoomUser? invitedListener = upgradedListeners.firstWhereOrNull(
+            (listener) => listener.id == context.currentUser?.id);
+        if (mounted) {
+          if (isShowingInvitation == false) {
+            isShowingInvitation = true;
+            Utils.showAlert(context,
+                withCancel: true,
+                message:
+                    "${invitedListener?.invitationSpeaker?.name} Invited You To Become A Speaker"
+                        .tr(),
+                okButtonText: "Accept".tr(),
+                cancelButtonText: "Decline".tr(), onOkButtonPressed: () async {
+              print("Accept");
+              // Accept Invitation To Be A Speaker
+              Navigator.pop(context);
+
+              // Remove From Listeners
+              final listenersRef = FirebaseDatabase.instance.ref(
+                  'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+              listenersRef.remove();
+
+              // Add To Speakers
+              final speakersRef = FirebaseDatabase.instance.ref(
+                  'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+              speakersRef.update({
+                "id": me?.id,
+                "name": me?.name,
+                "image": me?.image,
+                "isSpeaker": true,
+                "isListener": false,
+                "phone": me?.phone,
+                "isHandRaised": me?.isHandRaised,
+                "hasPermissionToSpeak": true,
+                "isOwner": me?.isOwner,
+                "isMicOn": me?.isMicOn,
+              });
+              isMyMicOn = me?.isMicOn ?? false;
+
+              // Remove Invitation
+              final ref = FirebaseDatabase.instance.ref(
+                  'rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+              ref.remove();
+
+              await agoraEngine?.setClientRole(ClientRole.Broadcaster);
+
+              agoraEngine?.muteRemoteAudioStream(
+                  int.parse(await Utils.getString(R.pref.userId) ?? "0"),
+                  !isMyMicOn);
+
+              await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
+            }, onCancelButtonPressed: () {
+              // Decline Invitation To Be A Speaker
+              final ref = FirebaseDatabase.instance.ref(
+                  'rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+              ref.remove();
+            }).then((value) {
+              isShowingInvitation = false;
+            });
+          }
+        }
+      }
 
       if (kickedListenersIds.contains(context.currentUser?.id)) {
         if (mounted) {

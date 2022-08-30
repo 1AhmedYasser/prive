@@ -543,6 +543,7 @@ class Utils {
     String okButtonText = "Ok",
     String cancelButtonText = "Cancel",
     Function? onOkButtonPressed,
+    Function? onCancelButtonPressed,
     bool withCancel = false,
   }) async {
     return showDialog(
@@ -562,6 +563,7 @@ class Utils {
             okButtonText: okButtonText.tr(),
             cancelButtonText: cancelButtonText.tr(),
             onOkButtonPressed: onOkButtonPressed,
+            onCancelButtonPressed: onCancelButtonPressed,
             withCancel: withCancel,
           ),
         );

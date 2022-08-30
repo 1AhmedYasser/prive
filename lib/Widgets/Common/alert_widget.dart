@@ -8,6 +8,7 @@ class AlertWidget extends StatefulWidget {
   final String okButtonText;
   final String cancelButtonText;
   final Function? onOkButtonPressed;
+  final Function? onCancelButtonPressed;
   final bool withCancel;
 
   const AlertWidget(
@@ -18,6 +19,7 @@ class AlertWidget extends StatefulWidget {
       this.okButtonText = "Ok",
       this.cancelButtonText = "Cancel",
       this.onOkButtonPressed,
+      this.onCancelButtonPressed,
       this.withCancel = false})
       : super(key: key);
 
@@ -92,7 +94,12 @@ class _AlertWidgetState extends State<AlertWidget> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
+                            if (widget.onCancelButtonPressed == null) {
+                              Navigator.pop(context);
+                            } else {
+                              widget.onCancelButtonPressed!();
+                              Navigator.pop(context);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.white,

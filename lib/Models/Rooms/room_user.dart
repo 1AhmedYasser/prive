@@ -10,6 +10,7 @@ class RoomUser {
   bool? isMicOn;
   bool? isSpeaking;
   bool? hasPermissionToSpeak;
+  RoomUser? invitationSpeaker;
 
   RoomUser(
       {required this.id,
@@ -21,6 +22,7 @@ class RoomUser {
       required this.phone,
       required this.isHandRaised,
       required this.isMicOn,
+      this.invitationSpeaker,
       this.isSpeaking = false,
       this.hasPermissionToSpeak});
 
@@ -34,6 +36,7 @@ class RoomUser {
     phone = json['phone'] as String?;
     isHandRaised = json['isHandRaised'] as bool?;
     isMicOn = json['isMicOn'] as bool?;
+    invitationSpeaker = json['invitationSpeaker'] as RoomUser?;
     hasPermissionToSpeak = json['hasPermissionToSpeak'] as bool?;
   }
 
@@ -48,6 +51,7 @@ class RoomUser {
     json['phone'] = phone;
     json['isHandRaised'] = isHandRaised;
     json['isMicOn'] = isMicOn;
+    json['invitationSpeaker'] = invitationSpeaker;
     json['hasPermissionToSpeak'] = hasPermissionToSpeak;
     return json;
   }

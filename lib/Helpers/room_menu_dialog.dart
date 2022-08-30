@@ -10,7 +10,7 @@ class RoomMenuDialog {
   static showListenerMenu(
     BuildContext context,
     RoomUser? listener, {
-    required Function onUpgradedPressed,
+    required Function onUpgradePressed,
     required Function onKickPressed,
   }) {
     Alert(
@@ -23,7 +23,7 @@ class RoomMenuDialog {
         children: [
           DialogButton(
             onPressed: () {
-              onUpgradedPressed();
+              onUpgradePressed();
               Navigator.pop(context);
             },
             radius: BorderRadius.circular(15),
