@@ -5,6 +5,7 @@ class CallMember {
   String? phone;
   bool? isMicOn;
   bool? isVideoOn;
+  bool? isHeadphonesOn;
   bool? isSpeaking;
 
   CallMember({
@@ -13,6 +14,7 @@ class CallMember {
     required this.image,
     required this.phone,
     required this.isMicOn,
+    required this.isHeadphonesOn,
     this.isVideoOn,
     this.isSpeaking = false,
   });
@@ -22,6 +24,7 @@ class CallMember {
     name = json['name'] as String?;
     image = json['image'] as String?;
     phone = json['phone'] as String?;
+    isHeadphonesOn = json['isHeadphonesOn'] as bool?;
     isMicOn = json['isMicOn'] as bool?;
     isVideoOn = json['isVideoOn'] as bool?;
   }
@@ -32,6 +35,7 @@ class CallMember {
     json['name'] = name;
     json['image'] = image;
     json['phone'] = phone;
+    json['isHeadphonesOn'] = isHeadphonesOn;
     json['isMicOn'] = isMicOn;
     json['isVideoOn'] = isVideoOn;
     return json;

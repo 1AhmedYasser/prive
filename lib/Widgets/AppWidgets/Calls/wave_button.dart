@@ -38,6 +38,7 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    print(widget.initialIsPlaying);
     isPlaying = widget.initialIsPlaying;
     _rotationController =
         AnimationController(vsync: this, duration: _kRotationDuration)
@@ -69,6 +70,8 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // print("hey");
+    isPlaying = widget.initialIsPlaying;
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       child: Stack(
@@ -95,8 +98,8 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
               color: isPlaying ? Colors.redAccent : Colors.white,
             ),
             child: AnimatedSwitcher(
-              child: _buildIcon(isPlaying),
               duration: _kToggleDuration,
+              child: _buildIcon(isPlaying),
             ),
           ),
         ],

@@ -1474,6 +1474,7 @@ class _ChatScreenState extends State<ChatScreen> {
             name: value['name'],
             image: value['image'],
             phone: value['phone'],
+            isHeadphonesOn: value['isHeadphonesOn'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
           ),

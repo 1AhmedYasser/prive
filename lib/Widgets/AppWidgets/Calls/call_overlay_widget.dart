@@ -13,7 +13,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'dart:io';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Screens/Chat/Calls/group_call_screen.dart';
@@ -48,6 +47,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   bool showingInfo = false;
   CallMember? me;
   bool isSpeakerOn = false;
+  bool isHeadphonesOn = true;
 
   @override
   void initState() {
@@ -77,7 +77,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
             dragController: remoteDragController,
             child: Container(
               width: 230,
-              height: 170,
+              //height: 170,
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColorDark,
                 borderRadius: BorderRadius.circular(25),
@@ -212,17 +212,19 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             me?.isMicOn == true ? Icons.mic : Icons.mic_off,
                             Colors.black38,
                             () async {
-                              bool isMicOn = me?.isMicOn == true;
-                              final ref = FirebaseDatabase.instance.ref(
-                                  "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
-                              ref.update({"isMicOn": !isMicOn});
-                              await widget.agoraEngine?.muteRemoteAudioStream(
-                                int.parse(context.currentUser?.id ?? "0"),
-                                isMicOn,
-                              );
-                              await widget.agoraEngine
-                                  ?.muteLocalAudioStream(isMicOn);
-                              setState(() {});
+                              if (isHeadphonesOn) {
+                                bool isMicOn = me?.isMicOn == true;
+                                final ref = FirebaseDatabase.instance.ref(
+                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
+                                ref.update({"isMicOn": !isMicOn});
+                                await widget.agoraEngine?.muteRemoteAudioStream(
+                                  int.parse(context.currentUser?.id ?? "0"),
+                                  isMicOn,
+                                );
+                                await widget.agoraEngine
+                                    ?.muteLocalAudioStream(isMicOn);
+                                setState(() {});
+                              }
                             },
                           ),
                           const SizedBox(width: 15),
@@ -316,7 +318,39 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                           ),
                         ],
                       ),
-                    )
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 25, right: 25, top: 10, bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 50,
+                            child: buildControl(
+                              isHeadphonesOn
+                                  ? Icons.headset_rounded
+                                  : Icons.headset_off_rounded,
+                              Colors.black38,
+                              () async {
+                                isHeadphonesOn = !isHeadphonesOn;
+                                final ref = FirebaseDatabase.instance.ref(
+                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
+                                if (isHeadphonesOn == false) {
+                                  ref.update({
+                                    "isMicOn": false,
+                                    "isHeadphonesOn": false
+                                  });
+                                } else {
+                                  ref.update({"isHeadphonesOn": true});
+                                }
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -388,6 +422,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
             phone: value['phone'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
+            isHeadphonesOn: value['isHeadphonesOn'],
           ),
         );
       });
@@ -399,6 +434,19 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       call = Call(ownerId: ownerId, type: type, members: members);
       me = call?.members
           ?.firstWhere((element) => element.id == context.currentUser?.id);
+
+      isHeadphonesOn = me?.isHeadphonesOn ?? true;
+      if (isHeadphonesOn == false) {
+        me?.isMicOn = false;
+        await widget.agoraEngine?.muteAllRemoteAudioStreams(true);
+        await widget.agoraEngine?.muteRemoteAudioStream(
+          int.parse(context.currentUser?.id ?? "0"),
+          false,
+        );
+        await widget.agoraEngine?.muteLocalAudioStream(true);
+      } else {
+        await widget.agoraEngine?.muteAllRemoteAudioStreams(false);
+      }
       print("My Mic is On ? : ${me?.isMicOn}");
       videoMembers = call?.members
               ?.where((element) => element.isVideoOn == true)

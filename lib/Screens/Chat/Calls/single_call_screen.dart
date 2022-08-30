@@ -68,6 +68,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   final FlipCardController _flipController = FlipCardController();
   bool isRemoteVideoOn = true;
   bool isSpeakerOn = false;
+  bool isHeadphonesOn = true;
   bool isMute = false;
   CallMember? me;
   rtc_remote_view.TextureView? remoteView;
@@ -292,6 +293,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
+      isHeadphonesOn: true,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: true,
       isVideoOn: widget.isVideo,
@@ -333,6 +335,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
+      isHeadphonesOn: true,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: widget.call != null
           ? widget.call?.members
@@ -388,6 +391,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             name: value['name'],
             image: value['image'],
             phone: value['phone'],
+            isHeadphonesOn: value['isHeadphonesOn'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
           ),
@@ -405,15 +409,30 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
           [];
+      isHeadphonesOn = me?.isHeadphonesOn ?? true;
+      if (isHeadphonesOn == false) {
+        isMute = true;
+        await agoraEngine?.muteAllRemoteAudioStreams(true);
+        await agoraEngine?.muteRemoteAudioStream(
+          int.parse(context.currentUser?.id ?? "0"),
+          false,
+        );
+        await agoraEngine?.muteLocalAudioStream(true);
+      } else {
+        await agoraEngine?.muteAllRemoteAudioStreams(false);
+      }
 
       if (widget.agoraEngine != null) {
-        remoteView = rtc_remote_view.TextureView(
-          uid: int.parse(call?.members
-                  ?.firstWhere((member) => member.id != context.currentUser?.id)
-                  .id ??
-              "0"),
-          channelId: widget.channel.id ?? "",
-        );
+        if (widget.isVideo) {
+          remoteView = rtc_remote_view.TextureView(
+            uid: int.parse(call?.members
+                    ?.firstWhere(
+                        (member) => member.id != context.currentUser?.id)
+                    .id ??
+                "0"),
+            channelId: widget.channel.id ?? "",
+          );
+        }
       }
 
       if (call?.members?.length == 2) {
@@ -701,6 +720,40 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              InkWell(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () async {
+                  isHeadphonesOn = !isHeadphonesOn;
+                  final ref = FirebaseDatabase.instance.ref(
+                      "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                  if (isHeadphonesOn == false) {
+                    ref.update({"isMicOn": false, "isHeadphonesOn": false});
+                  } else {
+                    ref.update({"isHeadphonesOn": true});
+                  }
+                  setState(() {});
+                },
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(23),
+                    color: Colors.grey.withOpacity(0.7),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Icon(
+                      isHeadphonesOn
+                          ? Icons.headset_rounded
+                          : Icons.headset_off_rounded,
+                      color: Colors.white,
+                      size: 27,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               if (isVideo)
                 InkWell(
                   splashColor: Colors.transparent,
@@ -730,7 +783,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
+              if (isVideo) const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -774,16 +827,18 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () async {
-                      bool isMicOn = me?.isMicOn == true;
-                      final ref = FirebaseDatabase.instance.ref(
-                          "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                      ref.update({"isMicOn": !isMicOn});
-                      await agoraEngine?.muteRemoteAudioStream(
-                        int.parse(context.currentUser?.id ?? "0"),
-                        isMicOn,
-                      );
-                      await agoraEngine?.muteLocalAudioStream(isMicOn);
-                      setState(() {});
+                      if (isHeadphonesOn) {
+                        bool isMicOn = me?.isMicOn == true;
+                        final ref = FirebaseDatabase.instance.ref(
+                            "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                        ref.update({"isMicOn": !isMicOn});
+                        await agoraEngine?.muteRemoteAudioStream(
+                          int.parse(context.currentUser?.id ?? "0"),
+                          isMicOn,
+                        );
+                        await agoraEngine?.muteLocalAudioStream(isMicOn);
+                        setState(() {});
+                      }
                     },
                     child: Container(
                       width: 60,
