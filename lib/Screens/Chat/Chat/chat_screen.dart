@@ -538,7 +538,8 @@ class _ChatScreenState extends State<ChatScreen> {
                             backgroundColor: Colors.transparent,
                             builder: (_) {
                               return DraggableScrollableSheet(
-                                minChildSize: 0.2,
+                                minChildSize: 0.5,
+                                initialChildSize: 0.6,
                                 maxChildSize: 0.95,
                                 builder: (_, controller) {
                                   return GroupCallScreen(
@@ -872,7 +873,8 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: Colors.transparent,
         builder: (_) {
           return DraggableScrollableSheet(
-            minChildSize: 0.2,
+            minChildSize: 0.5,
+            initialChildSize: 0.6,
             maxChildSize: 0.95,
             builder: (_, controller) {
               return GroupCallScreen(
