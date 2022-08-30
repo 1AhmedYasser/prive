@@ -47,6 +47,7 @@ class _RoomScreenState extends State<RoomScreen> {
   Room? room;
   List<String> speakersIds = [];
   List<String> raisedHandsIds = [];
+  List<String> kickedListenersIds = [];
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
@@ -362,7 +363,26 @@ class _RoomScreenState extends State<RoomScreen> {
                                       onUpgradedPressed: () {
                                     print("Upgrade Ya 3m");
                                   }, onKickPressed: () {
-                                    print("Kick Ya 3m");
+                                    RoomUser? listener =
+                                        room?.listeners?[index];
+                                    final ref = FirebaseDatabase.instance
+                                        .ref('rooms/${room?.owner?.id}');
+                                    ref
+                                        .child(
+                                            'kickedListeners/${listener?.id}')
+                                        .update({
+                                      "id": listener?.id,
+                                      "name": listener?.name,
+                                      "image": listener?.image,
+                                      "isSpeaker": listener?.isSpeaker,
+                                      "isListener": listener?.isListener,
+                                      "phone": listener?.phone,
+                                      "isHandRaised": listener?.isHandRaised,
+                                      "hasPermissionToSpeak":
+                                          listener?.hasPermissionToSpeak,
+                                      "isOwner": listener?.isOwner,
+                                      "isMicOn": listener?.isMicOn,
+                                    });
                                   });
                                 }
                               },
@@ -627,6 +647,7 @@ class _RoomScreenState extends State<RoomScreen> {
       List<RoomUser>? listeners = [];
       List<String>? contacts = [];
       List<RoomUser>? raisedHands = [];
+      List<RoomUser>? kickedListeners = [];
 
       Map<dynamic, dynamic>? speakersList =
           (roomResponse?['speakers'] as Map<dynamic, dynamic>?) ?? {};
@@ -691,18 +712,50 @@ class _RoomScreenState extends State<RoomScreen> {
         );
       });
 
+      Map<dynamic, dynamic>? kickedListenersList =
+          (roomResponse?['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
+      kickedListenersList.forEach((key, value) {
+        kickedListeners.add(
+          RoomUser(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            isOwner: value['isOwner'],
+            isSpeaker: value['isSpeaker'],
+            isListener: value['isListener'],
+            phone: value['phone'],
+            isHandRaised: value['isHandRaised'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            isMicOn: value['isMicOn'],
+          ),
+        );
+      });
+
       room = Room(
-        roomId: roomId,
-        topic: topic,
-        description: description,
-        owner: owner,
-        speakers: speakers,
-        listeners: listeners,
-        roomContacts: contacts,
-        raisedHands: raisedHands,
-      );
+          roomId: roomId,
+          topic: topic,
+          description: description,
+          owner: owner,
+          speakers: speakers,
+          listeners: listeners,
+          roomContacts: contacts,
+          raisedHands: raisedHands,
+          kickedListeners: kickedListeners);
       speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
       raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
+      kickedListenersIds =
+          room?.kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
+
+      if (kickedListenersIds.contains(context.currentUser?.id)) {
+        if (mounted) {
+          leaveRoom();
+          Utils.showAlert(
+            context,
+            message: "You Have Been Kicked Out Of This Room".tr(),
+            alertImage: R.images.alertInfoImage,
+          );
+        }
+      }
 
       room?.listeners?.forEach((listener) {
         if (listener.id == context.currentUser?.id) {
@@ -721,7 +774,11 @@ class _RoomScreenState extends State<RoomScreen> {
                   message: "The Room Has Ended".tr(),
                   alertImage: R.images.alertInfoImage)
               .then(
-            (value) => Navigator.pop(context),
+            (value) {
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            },
           );
         }
       }

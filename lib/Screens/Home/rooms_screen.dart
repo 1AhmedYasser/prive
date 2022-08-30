@@ -13,6 +13,7 @@ import 'package:prive/Screens/Rooms/upcoming_rooms_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/new_room_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../Helpers/utils.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
@@ -150,14 +151,31 @@ class _RoomsScreenState extends State<RoomsScreen>
                                     onTap: () {
                                       if (roomsList[index].roomId?.isNotEmpty ==
                                           true) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => RoomScreen(
-                                              room: roomsList[index],
+                                        List<String> kickedListenersIds =
+                                            roomsList[index]
+                                                    .kickedListeners
+                                                    ?.map((e) => e.id ?? "")
+                                                    .toList() ??
+                                                [];
+                                        if (kickedListenersIds.contains(
+                                            context.currentUser?.id)) {
+                                          Utils.showAlert(
+                                            context,
+                                            message:
+                                                "You Have Been Kicked Out Of This Room"
+                                                    .tr(),
+                                            alertImage: R.images.alertInfoImage,
+                                          );
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => RoomScreen(
+                                                room: roomsList[index],
+                                              ),
                                             ),
-                                          ),
-                                        );
+                                          );
+                                        }
                                       }
                                     },
                                     child: Padding(
@@ -370,6 +388,7 @@ class _RoomsScreenState extends State<RoomsScreen>
         List<RoomUser>? listeners = [];
         List<String> contacts = [];
         List<RoomUser>? raisedHands = [];
+        List<RoomUser>? kickedListeners = [];
         topic = rooms['topic'];
         owner = RoomUser(
           id: rooms['owner']['id'],
@@ -445,16 +464,35 @@ class _RoomsScreenState extends State<RoomsScreen>
             ),
           );
         });
+
+        Map<dynamic, dynamic>? kickedListenersList =
+            (value['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
+        kickedListenersList.forEach((key, value) {
+          kickedListeners.add(
+            RoomUser(
+              id: value['id'],
+              name: value['name'],
+              image: value['image'],
+              isOwner: value['isOwner'],
+              isSpeaker: value['isSpeaker'],
+              isListener: value['isListener'],
+              phone: value['phone'],
+              isHandRaised: value['isHandRaised'],
+              hasPermissionToSpeak: value['hasPermissionToSpeak'],
+              isMicOn: value['isMicOn'],
+            ),
+          );
+        });
         roomsList.add(
           Room(
-            roomId: roomId,
-            topic: topic,
-            owner: owner,
-            speakers: speakers,
-            listeners: listeners,
-            roomContacts: contacts,
-            raisedHands: raisedHands,
-          ),
+              roomId: roomId,
+              topic: topic,
+              owner: owner,
+              speakers: speakers,
+              listeners: listeners,
+              roomContacts: contacts,
+              raisedHands: raisedHands,
+              kickedListeners: kickedListeners),
         );
       });
 

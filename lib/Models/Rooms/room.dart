@@ -10,17 +10,18 @@ class Room {
   List<RoomUser>? listeners;
   List<String>? roomContacts;
   List<RoomUser>? raisedHands;
+  List<RoomUser>? kickedListeners;
 
-  Room({
-    this.roomId,
-    this.topic,
-    this.description,
-    this.owner,
-    this.speakers,
-    this.listeners,
-    this.roomContacts,
-    this.raisedHands,
-  });
+  Room(
+      {this.roomId,
+      this.topic,
+      this.description,
+      this.owner,
+      this.speakers,
+      this.listeners,
+      this.roomContacts,
+      this.raisedHands,
+      this.kickedListeners});
 
   Room.fromJson(Map<String, dynamic> json) {
     roomId = json['roomId'] as String?;
@@ -31,6 +32,7 @@ class Room {
     listeners = json['listeners'] as List<RoomUser>?;
     roomContacts = json['roomContacts'] as List<String>?;
     raisedHands = json['raisedHands'] as List<RoomUser>?;
+    kickedListeners = json['kickedListeners'] as List<RoomUser>?;
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +45,7 @@ class Room {
     json['listeners'] = listeners;
     json['roomContacts'] = roomContacts;
     json['raisedHands'] = raisedHands;
+    json['kickedListeners'] = kickedListeners;
     return json;
   }
 }
