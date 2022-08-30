@@ -854,6 +854,11 @@ class _RoomScreenState extends State<RoomScreen> {
               });
               isMyMicOn = me?.isMicOn ?? false;
 
+              // Remove From Raised Hands If He Is There
+              final raisedHandsRef = FirebaseDatabase.instance.ref(
+                  'rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
+              raisedHandsRef.remove();
+
               // Remove Invitation
               final ref = FirebaseDatabase.instance.ref(
                   'rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
