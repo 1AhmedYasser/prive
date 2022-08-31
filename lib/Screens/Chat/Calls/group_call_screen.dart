@@ -330,7 +330,24 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                                 });
                                               },
                                               onMutePressed: () {
-                                                print("Mute");
+                                                final ref = FirebaseDatabase
+                                                    .instance
+                                                    .ref(
+                                                        "GroupCalls/${widget.channel.id}/members/${call?.members?[index].id}");
+
+                                                if (call?.members?[index]
+                                                        .hasPermissionToSpeak ==
+                                                    true) {
+                                                  ref.update({
+                                                    "isMicOn": false,
+                                                    "hasPermissionToSpeak":
+                                                        false
+                                                  });
+                                                } else {
+                                                  ref.update({
+                                                    "hasPermissionToSpeak": true
+                                                  });
+                                                }
                                               },
                                             );
                                           },
@@ -542,7 +559,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     height: 85,
                     child: WaveButton(
                       onPressed: (isMute) async {
-                        if (isHeadphonesOn) {
+                        if (isHeadphonesOn &&
+                            (me?.hasPermissionToSpeak == true)) {
                           setState(() {
                             this.isMute = isMute;
                           });
@@ -817,6 +835,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         await agoraEngine?.muteLocalAudioStream(true);
       } else {
         await agoraEngine?.muteAllRemoteAudioStreams(false);
+      }
+
+      if (me?.hasPermissionToSpeak == false) {
+        await agoraEngine?.muteLocalAudioStream(true);
       }
 
       if (agoraEngine != null) {

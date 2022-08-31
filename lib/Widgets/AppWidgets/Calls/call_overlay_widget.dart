@@ -215,7 +215,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             me?.isMicOn == true ? Icons.mic : Icons.mic_off,
                             Colors.black38,
                             () async {
-                              if (isHeadphonesOn) {
+                              if (isHeadphonesOn &&
+                                  (me?.hasPermissionToSpeak == true)) {
                                 bool isMicOn = me?.isMicOn == true;
                                 final ref = FirebaseDatabase.instance.ref(
                                     "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
@@ -426,6 +427,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
             phone: value['phone'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isHeadphonesOn: value['isHeadphonesOn'],
           ),
         );
@@ -482,6 +484,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
             alertImage: R.images.alertInfoImage,
           );
         }
+      }
+
+      if (me?.hasPermissionToSpeak == false) {
+        await widget.agoraEngine?.muteLocalAudioStream(true);
       }
 
       isHeadphonesOn = me?.isHeadphonesOn ?? true;

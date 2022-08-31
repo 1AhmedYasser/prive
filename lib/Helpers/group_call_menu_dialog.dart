@@ -65,7 +65,7 @@ class GroupCallMenuDialog {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  "Mute ${callMember?.name?.split(" ").first}",
+                  "${callMember?.hasPermissionToSpeak == true ? "Mute" : "UnMute"} ${callMember?.name?.split(" ").first}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
