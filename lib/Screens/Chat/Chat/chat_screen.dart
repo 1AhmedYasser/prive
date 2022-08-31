@@ -87,6 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
   StreamSubscription? onAddListener;
   StreamSubscription? onChangeListener;
   StreamSubscription? onDeleteListener;
+  List<String> kickedCallMembersIds = [];
 
   @override
   void initState() {
@@ -531,29 +532,39 @@ class _ChatScreenState extends State<ChatScreen> {
                       const Expanded(child: SizedBox()),
                       ElevatedButton(
                         onPressed: () async {
-                          BotToast.removeAll("call_overlay");
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (_) {
-                              return DraggableScrollableSheet(
-                                minChildSize: 0.5,
-                                initialChildSize: 0.6,
-                                maxChildSize: 0.95,
-                                builder: (_, controller) {
-                                  return GroupCallScreen(
-                                    isVideo: groupCall?.type == "Video"
-                                        ? true
-                                        : false,
-                                    isJoining: true,
-                                    channel: channel,
-                                    scrollController: controller,
-                                  );
-                                },
-                              );
-                            },
-                          ).then((value) => checkForGroupCall());
+                          if (kickedCallMembersIds
+                              .contains(context.currentUser?.id)) {
+                            Utils.showAlert(
+                              context,
+                              message:
+                                  "You Have Been Kicked Out Of This Call".tr(),
+                              alertImage: R.images.alertInfoImage,
+                            );
+                          } else {
+                            BotToast.removeAll("call_overlay");
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) {
+                                return DraggableScrollableSheet(
+                                  minChildSize: 0.5,
+                                  initialChildSize: 0.6,
+                                  maxChildSize: 0.95,
+                                  builder: (_, controller) {
+                                    return GroupCallScreen(
+                                      isVideo: groupCall?.type == "Video"
+                                          ? true
+                                          : false,
+                                      isJoining: true,
+                                      channel: channel,
+                                      scrollController: controller,
+                                    );
+                                  },
+                                );
+                              },
+                            ).then((value) => checkForGroupCall());
+                          }
                           // await Future.delayed(
                           //     const Duration(milliseconds: 300), () {
                           //   setState(() {
@@ -1466,6 +1477,7 @@ class _ChatScreenState extends State<ChatScreen> {
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
       List<CallMember>? members = [];
+      List<CallMember>? kickedMembers = [];
 
       Map<dynamic, dynamic>? membersList =
           (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
@@ -1477,15 +1489,41 @@ class _ChatScreenState extends State<ChatScreen> {
             image: value['image'],
             phone: value['phone'],
             isHeadphonesOn: value['isHeadphonesOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
           ),
         );
       });
+
+      Map<dynamic, dynamic>? kickedMembersList =
+          (groupCallResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
+      kickedMembersList.forEach((key, value) {
+        kickedMembers.add(
+          CallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isHeadphonesOn: value['isHeadphonesOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+
       if (membersList.isEmpty == true) {
         groupCall = null;
       } else {
-        groupCall = Call(ownerId: ownerId, type: type, members: members);
+        groupCall = Call(
+          ownerId: ownerId,
+          type: type,
+          members: members,
+          kickedMembers: kickedMembers,
+        );
+        kickedCallMembersIds =
+            groupCall?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
       }
       setState(() {});
     } else {

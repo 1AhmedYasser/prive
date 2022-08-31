@@ -9,6 +9,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:prive/Helpers/group_call_menu_dialog.dart';
 import 'package:prive/Models/Call/call.dart';
 import 'package:prive/Models/Call/call_member.dart';
 import 'package:prive/Providers/volume_provider.dart';
@@ -68,6 +69,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isSharingScreen = false;
   bool isHeadphonesOn = true;
   CallMember? me;
+  List<String> kickedMembersIds = [];
 
   @override
   void initState() {
@@ -284,12 +286,64 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 },
                               ),
                               trailing: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Icon(
-                                  call?.members?[index].isMicOn == true
-                                      ? Icons.mic
-                                      : Icons.mic_off_rounded,
-                                  color: Colors.white,
+                                padding: const EdgeInsets.only(right: 5),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      call?.members?[index].isMicOn == true
+                                          ? Icons.mic
+                                          : Icons.mic_off_rounded,
+                                      color: Colors.white,
+                                    ),
+                                    if (context.currentUser?.id ==
+                                        call?.ownerId)
+                                      if (call?.members?[index].id !=
+                                          context.currentUser?.id)
+                                        GestureDetector(
+                                          onTap: () {
+                                            GroupCallMenuDialog.showMemberMenu(
+                                              context,
+                                              call?.members?[index],
+                                              onKickPressed: () {
+                                                CallMember? member =
+                                                    call?.members?[index];
+                                                final ref = FirebaseDatabase
+                                                    .instance
+                                                    .ref(
+                                                        "GroupCalls/${widget.channel.id}");
+                                                ref
+                                                    .child(
+                                                        'kickedMembers/${member?.id}')
+                                                    .update({
+                                                  "id": member?.id,
+                                                  "name": member?.name,
+                                                  "image": member?.image,
+                                                  "phone": member?.phone,
+                                                  "hasPermissionToSpeak": member
+                                                      ?.hasPermissionToSpeak,
+                                                  "isMicOn": member?.isMicOn,
+                                                  "isHeadphonesOn":
+                                                      member?.isHeadphonesOn,
+                                                  "isVideoOn":
+                                                      member?.isVideoOn,
+                                                });
+                                              },
+                                              onMutePressed: () {
+                                                print("Mute");
+                                              },
+                                            );
+                                          },
+                                          child: const Padding(
+                                            padding: EdgeInsets.only(left: 10),
+                                            child: Icon(
+                                              Icons.more_vert_rounded,
+                                              color: Colors.white,
+                                              size: 27,
+                                            ),
+                                          ),
+                                        )
+                                  ],
                                 ),
                               ),
                             ),
@@ -540,36 +594,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 CupertinoActionSheetAction(
                                   isDestructiveAction: true,
                                   onPressed: () {
-                                    didEndCall = true;
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    databaseReference.remove();
-                                    _stopForegroundTask();
-                                    DatabaseReference userRef =
-                                        FirebaseDatabase.instance.ref("Users");
-                                    userRef.update({
-                                      context.currentUser?.id ?? "": "Ended"
-                                    });
-                                    agoraEngine?.destroy();
+                                    endCall(context, databaseReference);
                                   },
                                   child: Text(
                                       '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
                                 ),
                               CupertinoActionSheetAction(
                                 onPressed: () {
-                                  didEndCall = true;
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  databaseReference
-                                      .child(
-                                          "members/${context.currentUser?.id}")
-                                      .remove();
-                                  _stopForegroundTask();
-                                  DatabaseReference userRef =
-                                      FirebaseDatabase.instance.ref("Users");
-                                  userRef.update(
-                                      {context.currentUser?.id ?? "": "Ended"});
-                                  agoraEngine?.destroy();
+                                  leaveCall(context, databaseReference);
                                 },
                                 child: Text(
                                     '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
@@ -613,12 +646,34 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     );
   }
 
+  void endCall(BuildContext context, DatabaseReference databaseReference) {
+    didEndCall = true;
+    Navigator.pop(context);
+    Navigator.pop(context);
+    databaseReference.remove();
+    _stopForegroundTask();
+    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+    userRef.update({context.currentUser?.id ?? "": "Ended"});
+    agoraEngine?.destroy();
+  }
+
+  void leaveCall(BuildContext context, DatabaseReference databaseReference) {
+    didEndCall = true;
+    Navigator.pop(context);
+    databaseReference.child("members/${context.currentUser?.id}").remove();
+    _stopForegroundTask();
+    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+    userRef.update({context.currentUser?.id ?? "": "Ended"});
+    agoraEngine?.destroy();
+  }
+
   Future<void> _createGroupCall() async {
     CallMember owner = CallMember(
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
       isHeadphonesOn: true,
+      hasPermissionToSpeak: true,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: false,
       isVideoOn: widget.isVideo,
@@ -642,6 +697,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       image: context.currentUser?.image,
       isHeadphonesOn: true,
       phone: context.currentUser?.extraData['phone'] as String,
+      hasPermissionToSpeak: true,
       isMicOn: widget.call != null
           ? widget.call?.members
                   ?.firstWhere((member) => member.id == context.currentUser?.id)
@@ -682,6 +738,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
       List<CallMember>? members = [];
+      List<CallMember>? kickedMembers = [];
 
       Map<dynamic, dynamic>? membersList =
           (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
@@ -694,6 +751,24 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             phone: value['phone'],
             isMicOn: value['isMicOn'],
             isHeadphonesOn: value['isHeadphonesOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+
+      Map<dynamic, dynamic>? kickedMembersList =
+          (groupCallResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
+      kickedMembersList.forEach((key, value) {
+        kickedMembers.add(
+          CallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isHeadphonesOn: value['isHeadphonesOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isVideoOn: value['isVideoOn'],
           ),
         );
@@ -703,9 +778,29 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         databaseReference.remove();
       }
 
-      call = Call(ownerId: ownerId, type: type, members: members);
-      me = call?.members
-          ?.firstWhere((element) => element.id == context.currentUser?.id);
+      call = Call(
+        ownerId: ownerId,
+        type: type,
+        members: members,
+        kickedMembers: kickedMembers,
+      );
+      me = call?.members?.firstWhereOrNull(
+          (element) => element.id == context.currentUser?.id);
+      kickedMembersIds =
+          call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+
+      // Check If Kicked Your Kicked Out From The Call
+      if (kickedMembersIds.contains(context.currentUser?.id)) {
+        if (mounted) {
+          leaveCall(context, databaseReference);
+          Utils.showAlert(
+            context,
+            message: "You Have Been Kicked Out Of This Call".tr(),
+            alertImage: R.images.alertInfoImage,
+          );
+        }
+      }
+
       videoMembers = call?.members
               ?.where((element) => element.isVideoOn == true)
               .toList() ??
@@ -924,17 +1019,19 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void changeVolumeStatus(int speakerId, bool status) {
-    if (speakerId == 0) {
-      call?.members
-          ?.firstWhereOrNull(
-              (member) => (member.id ?? 0) == context.currentUser?.id)
-          ?.isSpeaking = status;
-    } else {
-      call?.members
-          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
-          ?.isSpeaking = status;
+    if (mounted) {
+      if (speakerId == 0) {
+        call?.members
+            ?.firstWhereOrNull(
+                (member) => (member.id ?? 0) == context.currentUser?.id)
+            ?.isSpeaking = status;
+      } else {
+        call?.members
+            ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
+            ?.isSpeaking = status;
+      }
+      Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
     }
-    Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
   }
 
   void _startScreenShare() async {

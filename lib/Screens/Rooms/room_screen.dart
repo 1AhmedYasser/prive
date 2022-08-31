@@ -883,6 +883,7 @@ class _RoomScreenState extends State<RoomScreen> {
         }
       }
 
+      // Check If Kicked Your Kicked Out From The Room
       if (kickedListenersIds.contains(context.currentUser?.id)) {
         if (mounted) {
           leaveRoom();

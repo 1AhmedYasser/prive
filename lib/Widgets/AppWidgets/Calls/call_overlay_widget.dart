@@ -13,6 +13,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import '../../../Extras/resources.dart';
+import '../../../Helpers/utils.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Screens/Chat/Calls/group_call_screen.dart';
@@ -48,6 +50,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   CallMember? me;
   bool isSpeakerOn = false;
   bool isHeadphonesOn = true;
+  List<String> kickedMembersIds = [];
 
   @override
   void initState() {
@@ -410,6 +413,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       String? ownerId = callResponse['ownerId'];
       String? type = callResponse['type'];
       List<CallMember>? members = [];
+      List<CallMember>? kickedMembers = [];
 
       Map<dynamic, dynamic>? membersList =
           (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
@@ -427,13 +431,58 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         );
       });
 
+      Map<dynamic, dynamic>? kickedMembersList =
+          (callResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
+      kickedMembersList.forEach((key, value) {
+        kickedMembers.add(
+          CallMember(
+            id: value['id'],
+            name: value['name'],
+            image: value['image'],
+            phone: value['phone'],
+            isMicOn: value['isMicOn'],
+            isHeadphonesOn: value['isHeadphonesOn'],
+            hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            isVideoOn: value['isVideoOn'],
+          ),
+        );
+      });
+
       if (membersList.isEmpty == true) {
         databaseReference.remove();
       }
 
-      call = Call(ownerId: ownerId, type: type, members: members);
+      call = Call(
+        ownerId: ownerId,
+        type: type,
+        members: members,
+        kickedMembers: kickedMembers,
+      );
+
       me = call?.members
           ?.firstWhere((element) => element.id == context.currentUser?.id);
+      kickedMembersIds =
+          call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+
+      // Check If Kicked Your Kicked Out From The Call
+      if (kickedMembersIds.contains(context.currentUser?.id)) {
+        if (mounted) {
+          FlutterCallkitIncoming.endAllCalls();
+          BotToast.removeAll("call_overlay");
+          _stopForegroundTask();
+          databaseReference
+              .child("members/${context.currentUser?.id}")
+              .remove();
+          DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+          userRef.update({context.currentUser?.id ?? "": "Ended"});
+          widget.agoraEngine?.destroy();
+          Utils.showAlert(
+            navigatorKey.currentContext!,
+            message: "You Have Been Kicked Out Of This Room".tr(),
+            alertImage: R.images.alertInfoImage,
+          );
+        }
+      }
 
       isHeadphonesOn = me?.isHeadphonesOn ?? true;
       if (isHeadphonesOn == false) {
