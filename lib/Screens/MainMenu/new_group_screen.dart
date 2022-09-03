@@ -108,7 +108,12 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                               _selectedUsers.length > 1 ? "Group" : "Normal",
                           'is_important': false,
                           'is_archive': false,
-                          'name_colors': usersColors
+                          'name_colors': usersColors,
+                          'members_permissions': {
+                            "send_messages": true,
+                            "send_media": true,
+                            "add_members": true,
+                          }
                         },
                         id: Utils.generateRandomString(60),
                       );

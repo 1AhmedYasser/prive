@@ -184,6 +184,31 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                                         .inviteRejectedAt);
                                                 updatedMembers
                                                     .add(updatedMember);
+
+                                                widget.channel.state
+                                                    ?.updateChannelState(
+                                                  ChannelState(
+                                                    channel: ChannelModel(
+                                                        id: widget.channel.id,
+                                                        type:
+                                                            widget.channel.type,
+                                                        cid:
+                                                            widget.channel.cid),
+                                                    members: updatedMembers,
+                                                    messages: widget.channel
+                                                        .state?.messages,
+                                                    read: widget
+                                                        .channel.state?.read,
+                                                    watcherCount: widget.channel
+                                                        .state?.watcherCount,
+                                                    watchers: widget.channel
+                                                        .state?.watchers,
+                                                    pinnedMessages: widget
+                                                        .channel
+                                                        .state
+                                                        ?.pinnedMessages,
+                                                  ),
+                                                );
                                               } else {
                                                 updatedMembers.add(member);
                                               }

@@ -16,6 +16,16 @@ class MemberPermissionsScreen extends StatefulWidget {
 }
 
 class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
+  bool sendMessages = true;
+  bool sendMedia = true;
+  bool addMembers = true;
+
+  @override
+  void initState() {
+    _getMembersPermissions();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,8 +70,19 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
               fontSize: 14.5,
             ),
             trailing: CupertinoSwitch(
-              value: true,
-              onChanged: (val) {},
+              value: sendMessages,
+              onChanged: (val) {
+                setState(() {
+                  sendMessages = !sendMessages;
+                  widget.channel.updatePartial(set: {
+                    "members_permissions": {
+                      "send_messages": sendMessages,
+                      "send_media": sendMedia,
+                      "add_members": addMembers,
+                    }
+                  });
+                });
+              },
             ),
             onTap: () {},
           ),
@@ -74,8 +95,19 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
               fontSize: 14.5,
             ),
             trailing: CupertinoSwitch(
-              value: true,
-              onChanged: (val) {},
+              value: sendMedia,
+              onChanged: (val) {
+                setState(() {
+                  sendMedia = !sendMedia;
+                  widget.channel.updatePartial(set: {
+                    "members_permissions": {
+                      "send_messages": sendMessages,
+                      "send_media": sendMedia,
+                      "add_members": addMembers,
+                    }
+                  });
+                });
+              },
             ),
             onTap: () {},
           ),
@@ -88,8 +120,19 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
               fontSize: 14.5,
             ),
             trailing: CupertinoSwitch(
-              value: true,
-              onChanged: (val) {},
+              value: addMembers,
+              onChanged: (val) {
+                setState(() {
+                  addMembers = !addMembers;
+                  widget.channel.updatePartial(set: {
+                    "members_permissions": {
+                      "send_messages": sendMessages,
+                      "send_media": sendMedia,
+                      "add_members": addMembers,
+                    }
+                  });
+                });
+              },
             ),
             onTap: () {},
           ),
@@ -101,5 +144,15 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
         ],
       ),
     );
+  }
+
+  void _getMembersPermissions() {
+    Map<String, dynamic>? membersPermissions = widget.channel
+            .extraData['members_permissions'] as Map<String, dynamic>? ??
+        {};
+    sendMessages = membersPermissions['send_messages'] as bool? ?? true;
+    sendMedia = membersPermissions['send_media'] as bool? ?? true;
+    addMembers = membersPermissions['add_members'] as bool? ?? true;
+    setState(() {});
   }
 }
