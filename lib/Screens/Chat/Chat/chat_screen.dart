@@ -183,6 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   child: GroupInfoScreen(
                                     messageTheme: StreamChatTheme.of(context)
                                         .ownMessageTheme,
+                                    channel: channel,
                                   ),
                                 ),
                               ),

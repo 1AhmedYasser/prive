@@ -69,6 +69,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                               child: GroupInfoScreen(
                                 messageTheme:
                                     StreamChatTheme.of(context).ownMessageTheme,
+                                channel: channel,
                               ),
                             ),
                           ),
