@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:collection/collection.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Extras/resources.dart';
@@ -101,7 +102,8 @@ class _AdminsScreenState extends State<AdminsScreen> {
                 color: StreamChatTheme.of(context).colorTheme.appBg,
                 child: InkWell(
                   onTap: () {
-                    if (groupAdmins[index].groupRole == "admin") {
+                    if (groupAdmins[index].groupRole == "admin" &&
+                        userRole == "owner") {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -240,6 +242,12 @@ class _AdminsScreenState extends State<AdminsScreen> {
           GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
+    userRole = groupAdmins
+            .firstWhereOrNull(
+              (admin) => admin.id == context.currentUser?.id,
+            )
+            ?.groupRole ??
+        "member";
     setState(() {});
   }
 }

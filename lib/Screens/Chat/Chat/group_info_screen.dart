@@ -98,12 +98,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             );
           }
 
-          var userMember = snapshot.data!.firstWhereOrNull(
-            (e) => e.user!.id == StreamChat.of(context).currentUser!.id,
-          );
-
-          userRole = userMember?.role ?? "member";
-
           return Scaffold(
             backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
             appBar: AppBar(
@@ -360,128 +354,34 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     );
   }
 
-  Widget _buildNameTile() {
-    var channel = StreamChannel.of(context).channel;
-    var channelName = (channel.extraData['name'] as String?) ?? '';
-
-    return Material(
-      color: StreamChatTheme.of(context).colorTheme.appBg,
-      child: Container(
-        height: 56.0,
-        alignment: Alignment.center,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(7.0),
-              child: Text(
-                "Name",
-                style: StreamChatTheme.of(context).textTheme.footnote.copyWith(
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(0.5)),
-              ).tr(),
-            ),
-            const SizedBox(
-              width: 7.0,
-            ),
-            Expanded(
-              child: TextField(
-                focusNode: _focusNode,
-                controller: _nameController,
-                cursorColor:
-                    StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                decoration: InputDecoration.collapsed(
-                    hintText: "Add A Group Name".tr(),
-                    hintStyle: StreamChatTheme.of(context)
-                        .textTheme
-                        .bodyBold
-                        .copyWith(
-                            color: StreamChatTheme.of(context)
-                                .colorTheme
-                                .textHighEmphasis
-                                .withOpacity(0.5))),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  height: 0.82,
-                ),
-              ),
-            ),
-            if (channelName != _nameController!.text.trim())
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  InkWell(
-                    child: StreamSvgIcon.closeSmall(),
-                    onTap: () {
-                      setState(() {
-                        _nameController!.text = _getChannelName(
-                          2 * MediaQuery.of(context).size.width / 3,
-                          members: channel.state!.members,
-                          extraData: channel.extraData,
-                          maxFontSize: 16.0,
-                        )!;
-                        _focusNode.unfocus();
-                      });
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0, left: 8.0),
-                    child: InkWell(
-                      child: StreamSvgIcon.check(
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .accentPrimary,
-                        size: 24.0,
-                      ),
-                      onTap: () {
-                        StreamChannel.of(context).channel.update({
-                          'name': _nameController!.text.trim(),
-                        }).catchError((err) {
-                          setState(() {
-                            _nameController!.text = channelName;
-                            _focusNode.unfocus();
-                          });
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildOptionListTiles() {
     var channel = StreamChannel.of(context);
-
     return Column(
       children: [
-        StreamOptionListTile(
-          tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-          separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: "Add Members".tr(),
-          titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Icon(
-              Icons.person_add_rounded,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddMembersAdminsScreen(
-                  channel: widget.channel,
-                ),
+        if (userRole == "owner" || userRole == "admin")
+          StreamOptionListTile(
+            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+            title: "Add Members".tr(),
+            titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Icon(
+                Icons.person_add_rounded,
+                color: Theme.of(context).primaryColor,
               ),
-            );
-          },
-        ),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddMembersAdminsScreen(
+                    channel: widget.channel,
+                  ),
+                ),
+              );
+            },
+          ),
         StreamBuilder<bool>(
             stream: StreamChannel.of(context).channel.isMutedStream,
             builder: (context, snapshot) {
@@ -1364,6 +1264,12 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
+    userRole = groupAdmins
+            .firstWhereOrNull(
+              (admin) => admin.id == context.currentUser?.id,
+            )
+            ?.groupRole ??
+        "member";
     setState(() {});
   }
 }

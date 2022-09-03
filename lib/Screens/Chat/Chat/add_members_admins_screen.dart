@@ -11,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:collection/collection.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
@@ -468,7 +469,10 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
     List<String?> groupAdminsIds = groupAdmins.map((e) => e.id).toList();
     for (var userId in membersUsersIds) {
       if (!groupAdminsIds.contains(userId)) {
-        nonAdminUsers.add(users.firstWhere((user) => user.id == userId));
+        User? user = users.firstWhereOrNull((user) => user.id == userId);
+        if (user != null) {
+          nonAdminUsers.add(user);
+        }
       }
     }
   }
