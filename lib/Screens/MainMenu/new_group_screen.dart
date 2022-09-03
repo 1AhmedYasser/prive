@@ -109,6 +109,22 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                           'is_important': false,
                           'is_archive': false,
                           'name_colors': usersColors,
+                          'group_admins': [
+                            {
+                              "id": context.currentUser?.id,
+                              "name": context.currentUser?.name,
+                              "image": context.currentUser?.image,
+                              "group_role": "owner",
+                              "admin_permissions": {
+                                "pin_messages": true,
+                                "add_members": true,
+                                "add_admins": true,
+                                "change_group_info": true,
+                                "delete_others_messages": true,
+                                "delete_members": true
+                              },
+                            }
+                          ],
                           'members_permissions': {
                             "send_messages": true,
                             "send_media": true,

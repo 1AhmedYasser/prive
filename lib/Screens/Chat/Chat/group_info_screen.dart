@@ -12,6 +12,7 @@ import 'package:prive/Screens/Chat/Chat/member_permissions_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Models/Chat/group_admin.dart';
 import 'chat_info_screen.dart';
 import 'pinned_messages_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -47,6 +48,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   bool listExpanded = false;
   String userRole = "";
+  List<GroupAdmin> groupAdmins = [];
 
   ValueNotifier<bool?> mutedBool = ValueNotifier(false);
 
@@ -78,6 +80,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
       setState(() {});
     });
     mutedBool = ValueNotifier(StreamChannel.of(context).channel.isMuted);
+
+    _getGroupAdmins();
   }
 
   @override
@@ -97,6 +101,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           var userMember = snapshot.data!.firstWhereOrNull(
             (e) => e.user!.id == StreamChat.of(context).currentUser!.id,
           );
+
           userRole = userMember?.role ?? "member";
 
           return Scaffold(
@@ -188,6 +193,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
       groupMembersLength = groupMembers.length > 6 ? 6 : groupMembers.length;
     }
 
+    List<String?> groupAdminsIds = groupAdmins.map((e) => e.id).toList();
+
     return Column(
       children: [
         ListView.builder(
@@ -273,7 +280,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                   ? "Owner"
                                   : member.role == 'admin'
                                       ? "Admin"
-                                      : "Member",
+                                      : groupAdminsIds.contains(member.userId)
+                                          ? "Admin"
+                                          : "Member",
                               style: TextStyle(
                                 color: StreamChatTheme.of(context)
                                     .colorTheme
@@ -735,7 +744,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     channel: widget.channel,
                   ),
                 ),
-              );
+              ).then((value) => _getGroupAdmins());
             },
           ),
         if (!channel.channel.isDistinct)
@@ -1344,5 +1353,17 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     } else {
       return '${"Last Seen".tr()} ${Jiffy(user.lastActive).fromNow()}';
     }
+  }
+
+  void _getGroupAdmins() {
+    groupAdmins = [];
+    List<dynamic>? admins =
+        widget.channel.extraData['group_admins'] as List<dynamic>;
+    for (var admin in admins) {
+      GroupAdmin groupAdmin =
+          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      groupAdmins.add(groupAdmin);
+    }
+    setState(() {});
   }
 }

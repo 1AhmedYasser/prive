@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:collection/collection.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
+import '../../../Models/Chat/group_admin.dart';
 import 'add_members_admins_screen.dart';
+import 'admin_permissions_screen.dart';
 
 class AdminsScreen extends StatefulWidget {
   final Channel channel;
@@ -26,6 +28,13 @@ class _AdminsScreenState extends State<AdminsScreen> {
   List<String> usersPhoneNumbers = [];
   bool userInContacts = true;
   String userRole = "";
+  List<GroupAdmin> groupAdmins = [];
+
+  @override
+  void initState() {
+    _getGroupAdmins();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,218 +62,129 @@ class _AdminsScreenState extends State<AdminsScreen> {
       ),
       body: Column(
         children: [
-          StreamBuilder<List<Member>>(
-            stream: widget.channel.state!.membersStream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Container(
-                  color: StreamChatTheme.of(context).colorTheme.disabled,
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              var userMember = snapshot.data!.firstWhereOrNull(
-                (e) => e.user!.id == StreamChat.of(context).currentUser!.id,
-              );
-              userRole = userMember?.role ?? "member";
-              return _buildAdmins(snapshot.data!);
-            },
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAdmins(List<Member> members) {
-    List<Member> groupMembers =
-        members.where((e) => e.role == "owner" || e.role == "admin").toList();
-
-    int groupMembersLength = groupMembers.length > 6 ? 6 : groupMembers.length;
-
-    return Column(
-      children: [
-        StreamOptionListTile(
-          tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-          separatorColor: Colors.transparent,
-          title: "Add Admins".tr(),
-          titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Icon(
-              Icons.person_add_rounded,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddMembersAdminsScreen(
-                  channel: widget.channel,
-                  isAddingAdmin: true,
-                ),
+          StreamOptionListTile(
+            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+            separatorColor: Colors.transparent,
+            title: "Add Admins".tr(),
+            titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Icon(
+                Icons.person_add_rounded,
+                color: Theme.of(context).primaryColor,
               ),
-            );
-          },
-        ),
-        Divider(
-          thickness: 1,
-          height: 1,
-          color: StreamChatTheme.of(context).colorTheme.disabled,
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: groupMembersLength,
-          itemBuilder: (context, index) {
-            final member = groupMembers[index];
-            return Material(
-              color: StreamChatTheme.of(context).colorTheme.appBg,
-              child: InkWell(
-                onTap: () {
-                  final userMember = groupMembers.firstWhereOrNull(
-                    (e) => e.user!.id == StreamChat.of(context).currentUser!.id,
-                  );
-                },
-                child: SizedBox(
-                  height: 65.0,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 12.0,
-                            ),
-                            child: UserAvatar(
-                              user: member.user!,
-                              constraints: const BoxConstraints.tightFor(
-                                height: 40.0,
-                                width: 40.0,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Text(
-                                //   member.user!.name,
-                                //   style: const TextStyle(
-                                //     fontWeight: FontWeight.bold,
-                                //   ),
-                                // ),
-                                FutureBuilder(
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    } else {
-                                      return Text(
-                                        snapshot.data as String? ?? "",
-                                        style: const TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  future: _getUserName(member.user!),
-                                ),
-                                const SizedBox(
-                                  height: 1.0,
-                                ),
-                                Text(
-                                  _getLastSeen(member.user!),
-                                  style: TextStyle(
-                                      color: StreamChatTheme.of(context)
-                                          .colorTheme
-                                          .textHighEmphasis
-                                          .withOpacity(0.5)),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Text(
-                              member.role == 'owner'
-                                  ? "Owner"
-                                  : member.role == 'admin'
-                                      ? "Admin"
-                                      : "Member",
-                              style: TextStyle(
-                                color: StreamChatTheme.of(context)
-                                    .colorTheme
-                                    .textHighEmphasis
-                                    .withOpacity(0.5),
-                              ),
-                            ).tr(),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: 1.0,
-                        color: StreamChatTheme.of(context).colorTheme.disabled,
-                      ),
-                    ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddMembersAdminsScreen(
+                    channel: widget.channel,
+                    isAddingAdmin: true,
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-        if (groupMembersLength != groupMembers.length)
-          InkWell(
-            onTap: () {},
-            child: Material(
-              color: StreamChatTheme.of(context).colorTheme.appBg,
-              child: SizedBox(
-                height: 65.0,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 21.0, vertical: 12.0),
-                            child: StreamSvgIcon.down(
-                              color: StreamChatTheme.of(context)
-                                  .colorTheme
-                                  .textLowEmphasis,
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${members.length - groupMembersLength} ${"More".tr()}',
-                                  style: TextStyle(
-                                      color: StreamChatTheme.of(context)
-                                          .colorTheme
-                                          .textLowEmphasis),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      height: 1.0,
-                      color: StreamChatTheme.of(context).colorTheme.disabled,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+              ).then((value) => _getGroupAdmins());
+            },
           ),
-      ],
+          Divider(
+            thickness: 1,
+            height: 1,
+            color: StreamChatTheme.of(context).colorTheme.disabled,
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: groupAdmins.length,
+            itemBuilder: (context, index) {
+              GroupAdmin admin = groupAdmins[index];
+              return Material(
+                color: StreamChatTheme.of(context).colorTheme.appBg,
+                child: InkWell(
+                  onTap: () {
+                    if (groupAdmins[index].groupRole == "admin") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminPermissionsScreen(
+                            channel: widget.channel,
+                            admin: groupAdmins[index],
+                          ),
+                        ),
+                      ).then((value) => _getGroupAdmins());
+                    }
+                  },
+                  child: SizedBox(
+                    height: 65.0,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                                vertical: 12.0,
+                              ),
+                              child: SizedBox(
+                                height: 40.0,
+                                width: 40.0,
+                                child: CachedImage(
+                                  url: admin.image ?? "",
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Text(
+                                  //   member.user!.name,
+                                  //   style: const TextStyle(
+                                  //     fontWeight: FontWeight.bold,
+                                  //   ),
+                                  // ),
+                                  Text(
+                                    admin.name ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Text(
+                                admin.groupRole == "owner"
+                                    ? "Owner"
+                                    : admin.groupRole == "admin"
+                                        ? "Admin"
+                                        : "Member",
+                                style: TextStyle(
+                                  color: StreamChatTheme.of(context)
+                                      .colorTheme
+                                      .textHighEmphasis
+                                      .withOpacity(0.5),
+                                ),
+                              ).tr(),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: 1.0,
+                          color:
+                              StreamChatTheme.of(context).colorTheme.disabled,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -309,5 +229,17 @@ class _AdminsScreenState extends State<AdminsScreen> {
     } else {
       return '${"Last Seen".tr()} ${Jiffy(user.lastActive).fromNow()}';
     }
+  }
+
+  void _getGroupAdmins() {
+    groupAdmins = [];
+    List<dynamic>? admins =
+        widget.channel.extraData['group_admins'] as List<dynamic>;
+    for (var admin in admins) {
+      GroupAdmin groupAdmin =
+          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      groupAdmins.add(groupAdmin);
+    }
+    setState(() {});
   }
 }

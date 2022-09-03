@@ -13,6 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
+import '../../../Models/Chat/group_admin.dart';
 import '../../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../../Widgets/ChatWidgets/search_text_field.dart';
@@ -49,6 +50,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
   List<Member> admins = [];
   List<User> adminsUsers = [];
   List<User> nonAdminUsers = [];
+  List<GroupAdmin> groupAdmins = [];
 
   @override
   void initState() {
@@ -158,60 +160,74 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           if (widget.isAddingAdmin) {
-                                            List<Member> updatedMembers = [];
-                                            for (var member in members) {
-                                              if (member.userId ==
-                                                  nonAdminUsers[index].id) {
-                                                Member updatedMember = Member(
-                                                    user: member.user,
-                                                    role: "admin",
-                                                    invited: member.invited,
-                                                    channelRole:
-                                                        member.channelRole,
-                                                    shadowBanned:
-                                                        member.shadowBanned,
-                                                    isModerator:
-                                                        member.isModerator,
-                                                    banExpires:
-                                                        member.banExpires,
-                                                    banned: member.banned,
-                                                    createdAt: member.createdAt,
-                                                    updatedAt: member.updatedAt,
-                                                    userId: member.userId,
-                                                    inviteAcceptedAt:
-                                                        member.inviteAcceptedAt,
-                                                    inviteRejectedAt: member
-                                                        .inviteRejectedAt);
-                                                updatedMembers
-                                                    .add(updatedMember);
+                                            List<Map<String, dynamic>> admins =
+                                                [];
+                                            GroupAdmin newAdmin = GroupAdmin(
+                                              nonAdminUsers[index].id,
+                                              nonAdminUsers[index].name,
+                                              nonAdminUsers[index].image,
+                                              "admin",
+                                              AdminGroupPermissions(
+                                                pinMessages: true,
+                                                addAdmins: true,
+                                                addMembers: true,
+                                                changeGroupInfo: true,
+                                                deleteMembers: true,
+                                                deleteOthersMessages: true,
+                                              ),
+                                            );
 
-                                                widget.channel.state
-                                                    ?.updateChannelState(
-                                                  ChannelState(
-                                                    channel: ChannelModel(
-                                                        id: widget.channel.id,
-                                                        type:
-                                                            widget.channel.type,
-                                                        cid:
-                                                            widget.channel.cid),
-                                                    members: updatedMembers,
-                                                    messages: widget.channel
-                                                        .state?.messages,
-                                                    read: widget
-                                                        .channel.state?.read,
-                                                    watcherCount: widget.channel
-                                                        .state?.watcherCount,
-                                                    watchers: widget.channel
-                                                        .state?.watchers,
-                                                    pinnedMessages: widget
-                                                        .channel
-                                                        .state
-                                                        ?.pinnedMessages,
-                                                  ),
-                                                );
-                                              } else {
-                                                updatedMembers.add(member);
+                                            List<String?> groupAdminsIds =
+                                                groupAdmins
+                                                    .map((e) => e.id)
+                                                    .toList();
+
+                                            if (groupAdminsIds
+                                                    .contains(newAdmin.id) ==
+                                                false) {
+                                              groupAdmins.add(newAdmin);
+                                              for (var admin in groupAdmins) {
+                                                admins.add({
+                                                  "id": admin.id,
+                                                  "name": admin.name,
+                                                  "image": admin.image,
+                                                  "group_role": admin.groupRole,
+                                                  "admin_permissions": {
+                                                    "pin_messages": admin
+                                                            .groupPermissions
+                                                            ?.pinMessages ??
+                                                        true,
+                                                    "add_members": admin
+                                                            .groupPermissions
+                                                            ?.addMembers ??
+                                                        true,
+                                                    "add_admins": admin
+                                                            .groupPermissions
+                                                            ?.addAdmins ??
+                                                        true,
+                                                    "change_group_info": admin
+                                                            .groupPermissions
+                                                            ?.changeGroupInfo ??
+                                                        true,
+                                                    "delete_others_messages": admin
+                                                            .groupPermissions
+                                                            ?.deleteOthersMessages ??
+                                                        true,
+                                                    "delete_members": admin
+                                                            .groupPermissions
+                                                            ?.deleteMembers ??
+                                                        true
+                                                  },
+                                                });
                                               }
+                                              widget.channel.updatePartial(
+                                                  set: {
+                                                    "group_admins": admins
+                                                  }).then((value) {
+                                                if (mounted) {
+                                                  Navigator.pop(context);
+                                                }
+                                              });
                                             }
                                           } else {
                                             await widget.channel.addMembers(
@@ -220,10 +236,11 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                                 text:
                                                     "${context.currentUser?.name} Added ${nonMembersUsers[index].name}",
                                               ),
-                                            );
-                                          }
-                                          if (mounted) {
-                                            Navigator.pop(context);
+                                            ).then((value) {
+                                              if (mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                            });
                                           }
                                         },
                                         child: Padding(
@@ -434,8 +451,10 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
     }
 
     nonAdminUsers = [];
+    _getGroupAdmins();
+    List<String?> groupAdminsIds = groupAdmins.map((e) => e.id).toList();
     for (var userId in membersUsersIds) {
-      if (!adminUsersIds.contains(userId)) {
+      if (!groupAdminsIds.contains(userId)) {
         nonAdminUsers.add(users.firstWhere((user) => user.id == userId));
       }
     }
@@ -448,6 +467,18 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
         setState(() {});
       }
     });
+  }
+
+  void _getGroupAdmins() {
+    groupAdmins = [];
+    List<dynamic>? admins =
+        widget.channel.extraData['group_admins'] as List<dynamic>;
+    for (var admin in admins) {
+      GroupAdmin groupAdmin =
+          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      groupAdmins.add(groupAdmin);
+    }
+    setState(() {});
   }
 
   @override
