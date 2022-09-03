@@ -466,7 +466,9 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
 
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true) {
+    if (myContacts != null &&
+        myContacts.isNotEmpty == true &&
+        myContacts != "[]") {
       List<dynamic> usersMapList =
           jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];

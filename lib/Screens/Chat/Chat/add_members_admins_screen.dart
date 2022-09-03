@@ -411,7 +411,9 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
 
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true) {
+    if (myContacts != null &&
+        myContacts.isNotEmpty == true &&
+        myContacts != "[]") {
       List<dynamic> usersMapList =
           jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
@@ -428,16 +430,19 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
       phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
     } else {
+      print("No Contacts found");
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
         List contacts = [];
         if (mounted) {
           contacts = await Utils.fetchContacts(context);
+          print(users.length);
         }
         users = contacts.first;
         allUsers = users;
         phoneContacts = contacts[1];
+        print(users.length);
         setState(() {});
       }
     }
