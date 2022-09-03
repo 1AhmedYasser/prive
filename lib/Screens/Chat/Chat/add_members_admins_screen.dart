@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -160,6 +161,17 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           if (widget.isAddingAdmin) {
+                                            BotToast.removeAll("loading");
+                                            BotToast.showAnimationWidget(
+                                                toastBuilder: (context) {
+                                                  return const IgnorePointer(
+                                                      child:
+                                                          UltraLoadingIndicator());
+                                                },
+                                                animationDuration:
+                                                    const Duration(
+                                                        milliseconds: 0),
+                                                groupKey: "loading");
                                             List<Map<String, dynamic>> admins =
                                                 [];
                                             GroupAdmin newAdmin = GroupAdmin(
@@ -227,6 +239,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                                 if (mounted) {
                                                   Navigator.pop(context);
                                                 }
+                                                BotToast.removeAll("loading");
                                               });
                                             }
                                           } else {
