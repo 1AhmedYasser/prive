@@ -486,7 +486,10 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
-        List contacts = await Utils.fetchContacts(context);
+        List contacts = [];
+        if (mounted) {
+          contacts = await Utils.fetchContacts(context);
+        }
         users = contacts.first;
         allUsers = users;
         phoneContacts = contacts[1];

@@ -106,7 +106,7 @@ dependencies:
 #      url: https://github.com/1AhmedYasser/stream-chat-flutter.git
 #      ref: develop
   # Stream
-  stream_chat_flutter: ^4.4.0
+  stream_chat_flutter: ^4.5.0
   stream_chat_persistence: ^4.3.0
   stream_chat_localizations: ^3.3.0
 

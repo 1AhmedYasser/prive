@@ -1157,7 +1157,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       );
 
                       if (res == true) {
-                        await channel.removeMembers([user.id]);
+                        await channel.removeMembers(
+                          [user.id],
+                          Message(
+                            text:
+                                "${context.currentUser?.name} Removed ${user.name}",
+                          ),
+                        );
                       }
                       if (mounted) {
                         Navigator.pop(context);
