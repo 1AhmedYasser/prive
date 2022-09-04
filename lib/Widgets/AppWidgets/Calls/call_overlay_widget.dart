@@ -80,7 +80,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
             dragController: remoteDragController,
             child: Container(
               width: 230,
-              //height: 170,
+              height: 230,
               decoration: BoxDecoration(
                 color: Theme.of(context).primaryColorDark,
                 borderRadius: BorderRadius.circular(25),
