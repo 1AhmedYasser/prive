@@ -441,437 +441,453 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
         ),
       ),
-      body: StreamChannel(
-        channel: channel,
-        initialMessageId:
-            initialMessage != null ? initialMessage?.id ?? "" : null,
-        child: Column(
-          children: [
-            if (groupCall != null && groupCall?.members?.isNotEmpty == true)
-              Container(
-                height: 65,
-                color: Colors.grey.shade300.withOpacity(0.7),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 20, left: 30),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            groupCall?.type == "Video"
-                                ? "Video Call"
-                                : "Voice Call",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).popUntil(
+            (route) => route.isFirst,
+          );
+          return false;
+        },
+        child: StreamChannel(
+          channel: channel,
+          initialMessageId:
+              initialMessage != null ? initialMessage?.id ?? "" : null,
+          child: Column(
+            children: [
+              if (groupCall != null && groupCall?.members?.isNotEmpty == true)
+                Container(
+                  height: 65,
+                  color: Colors.grey.shade300.withOpacity(0.7),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20, left: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              groupCall?.type == "Video"
+                                  ? "Video Call"
+                                  : "Voice Call",
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ).tr(),
+                            const SizedBox(height: 5),
+                            Text(
+                              "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 12.5,
+                              ),
                             ),
-                          ).tr(),
-                          const SizedBox(height: 5),
-                          Text(
-                            "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 100,
-                      ),
-                      if (groupCall?.members?.isNotEmpty == true)
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: <Widget>[
-                            if ((groupCall?.members?.length ?? 0) >= 1)
-                              SizedBox(
-                                height: 44,
-                                width: 44,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: CachedImage(
-                                    url: groupCall?.members?.first.image ?? "",
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                            if ((groupCall?.members?.length ?? 0) > 1)
-                              Positioned(
-                                right: 25.0,
-                                child: SizedBox(
-                                  height: 44,
-                                  width: 44,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: CachedImage(
-                                      url: groupCall?.members?[1].image ?? "",
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if ((groupCall?.members?.length ?? 0) > 2)
-                              Positioned(
-                                right: 50.0,
-                                child: SizedBox(
-                                  height: 44,
-                                  width: 44,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: CachedImage(
-                                      url: groupCall?.members?[2].image ?? "",
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
-                      const Expanded(child: SizedBox()),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (kickedCallMembersIds
-                              .contains(context.currentUser?.id)) {
-                            Utils.showAlert(
-                              context,
-                              message:
-                                  "You Have Been Kicked Out Of This Call".tr(),
-                              alertImage: R.images.alertInfoImage,
-                            );
-                          } else {
-                            BotToast.removeAll("call_overlay");
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (_) {
-                                return DraggableScrollableSheet(
-                                  minChildSize: 0.5,
-                                  initialChildSize: 0.6,
-                                  maxChildSize: 0.95,
-                                  builder: (_, controller) {
-                                    return GroupCallScreen(
-                                      isVideo: groupCall?.type == "Video"
-                                          ? true
-                                          : false,
-                                      isJoining: true,
-                                      channel: channel,
-                                      scrollController: controller,
-                                    );
-                                  },
-                                );
-                              },
-                            ).then((value) => checkForGroupCall());
-                          }
-                          // await Future.delayed(
-                          //     const Duration(milliseconds: 300), () {
-                          //   setState(() {
-                          //     groupCall = null;
-                          //   });
-                          // });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                        const SizedBox(
+                          width: 100,
                         ),
-                        child: const Text("Join").tr(),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  MessageListCore(
-                    loadingBuilder: (context) {
-                      return const UltraLoadingIndicator();
-                    },
-                    emptyBuilder: (context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        decoration: BoxDecoration(
-                          image: isAFile == true
-                              ? DecorationImage(
-                                  image: FileImage(File(chatBackground)),
-                                  fit: BoxFit.fill,
-                                )
-                              : DecorationImage(
-                                  image: AssetImage(chatBackground),
-                                  fit: BoxFit.fill,
-                                ),
-                        ),
-                        child: isMessageSearchOn
-                            ? const SizedBox.shrink()
-                            : Center(
-                                child: IgnorePointer(
-                                  child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.8,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .primaryColorDark
-                                          .withOpacity(0.65),
-                                      borderRadius: BorderRadius.circular(17),
+                        if (groupCall?.members?.isNotEmpty == true)
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: <Widget>[
+                              if ((groupCall?.members?.length ?? 0) >= 1)
+                                SizedBox(
+                                  height: 44,
+                                  width: 44,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: CachedImage(
+                                      url:
+                                          groupCall?.members?.first.image ?? "",
+                                      fit: BoxFit.fill,
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                            "No Messages Yet!",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 18,
-                                            ),
-                                          ).tr(),
-                                          const SizedBox(height: 20),
-                                          SizedBox(
-                                            width: 120,
-                                            height: 120,
-                                            child: _buildLottieAnimation(),
-                                          ),
-                                        ],
+                                  ),
+                                ),
+                              if ((groupCall?.members?.length ?? 0) > 1)
+                                Positioned(
+                                  right: 25.0,
+                                  child: SizedBox(
+                                    height: 44,
+                                    width: 44,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: CachedImage(
+                                        url: groupCall?.members?[1].image ?? "",
+                                        fit: BoxFit.fill,
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                      );
-                    },
-                    errorBuilder: (context, error) => Container(),
-                    messageListBuilder: (context, messages) {
-                      return Directionality(
-                        textDirection: ui.TextDirection.ltr,
-                        child: StreamMessageListViewTheme(
-                          data: StreamMessageListViewTheme.of(context).copyWith(
-                            backgroundImage: isAFile == true
+                              if ((groupCall?.members?.length ?? 0) > 2)
+                                Positioned(
+                                  right: 50.0,
+                                  child: SizedBox(
+                                    height: 44,
+                                    width: 44,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: CachedImage(
+                                        url: groupCall?.members?[2].image ?? "",
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        const Expanded(child: SizedBox()),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (kickedCallMembersIds
+                                .contains(context.currentUser?.id)) {
+                              Utils.showAlert(
+                                context,
+                                message: "You Have Been Kicked Out Of This Call"
+                                    .tr(),
+                                alertImage: R.images.alertInfoImage,
+                              );
+                            } else {
+                              BotToast.removeAll("call_overlay");
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) {
+                                  return DraggableScrollableSheet(
+                                    minChildSize: 0.5,
+                                    initialChildSize: 0.6,
+                                    maxChildSize: 0.95,
+                                    builder: (_, controller) {
+                                      return GroupCallScreen(
+                                        isVideo: groupCall?.type == "Video"
+                                            ? true
+                                            : false,
+                                        isJoining: true,
+                                        channel: channel,
+                                        scrollController: controller,
+                                      );
+                                    },
+                                  );
+                                },
+                              ).then((value) => checkForGroupCall());
+                            }
+                            // await Future.delayed(
+                            //     const Duration(milliseconds: 300), () {
+                            //   setState(() {
+                            //     groupCall = null;
+                            //   });
+                            // });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text("Join").tr(),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    MessageListCore(
+                      loadingBuilder: (context) {
+                        return const UltraLoadingIndicator();
+                      },
+                      emptyBuilder: (context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                          decoration: BoxDecoration(
+                            image: isAFile == true
                                 ? DecorationImage(
                                     image: FileImage(File(chatBackground)),
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                   )
                                 : DecorationImage(
                                     image: AssetImage(chatBackground),
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                   ),
                           ),
-                          child: StreamMessageListView(
-                            key: isMessageSearchOn ? UniqueKey() : null,
-                            highlightInitialMessage: true,
-                            dateDividerBuilder: (date) {
-                              return SizedBox(
-                                height: 60,
-                                child: Align(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xff1293a8),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0),
+                          child: isMessageSearchOn
+                              ? const SizedBox.shrink()
+                              : Center(
+                                  child: IgnorePointer(
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.8,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .primaryColorDark
+                                            .withOpacity(0.65),
+                                        borderRadius: BorderRadius.circular(17),
                                       ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                          top: 7,
-                                          bottom: 7),
-                                      child: Text(
-                                        getHeaderDate(context, date),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            messageHighlightColor: Colors.grey.shade300,
-                            onMessageSwiped: _reply,
-                            messageFilter: defaultFilter,
-                            messageBuilder:
-                                (context, details, messages, defaultMessage) {
-                              return isMessageSelectionOn
-                                  ? Container(
-                                      color: selectedMessages
-                                              .contains(defaultMessage.message)
-                                          ? Colors.green.withOpacity(0.4)
-                                          : Colors.transparent,
-                                      child: Theme(
-                                        data: ThemeData(
-                                          checkboxTheme: CheckboxThemeData(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            IgnorePointer(
-                                              child: Checkbox(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                value: selectedMessages
-                                                        .contains(defaultMessage
-                                                            .message)
-                                                    ? true
-                                                    : false,
-                                                onChanged: (value) {},
+                                            const Text(
+                                              "No Messages Yet!",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 18,
                                               ),
-                                            ),
-                                            Expanded(
-                                              child: _buildChatMessage(
-                                                defaultMessage,
-                                                details,
-                                              ),
+                                            ).tr(),
+                                            const SizedBox(height: 20),
+                                            SizedBox(
+                                              width: 120,
+                                              height: 120,
+                                              child: _buildLottieAnimation(),
                                             ),
                                           ],
                                         ),
                                       ),
+                                    ),
+                                  ),
+                                ),
+                        );
+                      },
+                      errorBuilder: (context, error) => Container(),
+                      messageListBuilder: (context, messages) {
+                        return Directionality(
+                          textDirection: ui.TextDirection.ltr,
+                          child: StreamMessageListViewTheme(
+                            data:
+                                StreamMessageListViewTheme.of(context).copyWith(
+                              backgroundImage: isAFile == true
+                                  ? DecorationImage(
+                                      image: FileImage(File(chatBackground)),
+                                      fit: BoxFit.cover,
                                     )
-                                  : _buildChatMessage(defaultMessage, details);
-                            },
+                                  : DecorationImage(
+                                      image: AssetImage(chatBackground),
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                            child: StreamMessageListView(
+                              key: isMessageSearchOn ? UniqueKey() : null,
+                              highlightInitialMessage: true,
+                              dateDividerBuilder: (date) {
+                                return SizedBox(
+                                  height: 60,
+                                  child: Align(
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xff1293a8),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 7,
+                                            bottom: 7),
+                                        child: Text(
+                                          getHeaderDate(context, date),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              messageHighlightColor: Colors.grey.shade300,
+                              onMessageSwiped: _reply,
+                              messageFilter: defaultFilter,
+                              messageBuilder:
+                                  (context, details, messages, defaultMessage) {
+                                return isMessageSelectionOn
+                                    ? Container(
+                                        color: selectedMessages.contains(
+                                                defaultMessage.message)
+                                            ? Colors.green.withOpacity(0.4)
+                                            : Colors.transparent,
+                                        child: Theme(
+                                          data: ThemeData(
+                                            checkboxTheme: CheckboxThemeData(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              IgnorePointer(
+                                                child: Checkbox(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  value:
+                                                      selectedMessages.contains(
+                                                              defaultMessage
+                                                                  .message)
+                                                          ? true
+                                                          : false,
+                                                  onChanged: (value) {},
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _buildChatMessage(
+                                                  defaultMessage,
+                                                  details,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    : _buildChatMessage(
+                                        defaultMessage, details);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              if (isMessageSearchOn)
+                Container(
+                  height: 50,
+                  color: const Color(0xffd0d4da).withOpacity(0.7),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30, right: 15),
+                        child: GestureDetector(
+                          onTap: () {
+                            if (searchedMessages.isNotEmpty &&
+                                searchedMessages.length > 1) {
+                              if (initialMessage != null) {
+                                int index =
+                                    searchedMessages.indexOf(initialMessage!);
+                                if (index > 0) {
+                                  setState(() {
+                                    initialMessage =
+                                        searchedMessages[index - 1];
+                                  });
+                                }
+                              }
+                            }
+                          },
+                          child: Icon(
+                            FontAwesomeIcons.chevronUp,
+                            color: _messageSearchController.text.isNotEmpty
+                                ? Theme.of(context).primaryColorDark
+                                : Colors.grey.shade400,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            if (isMessageSearchOn)
-              Container(
-                height: 50,
-                color: const Color(0xffd0d4da).withOpacity(0.7),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30, right: 15),
-                      child: GestureDetector(
+                      ),
+                      GestureDetector(
                         onTap: () {
-                          if (searchedMessages.isNotEmpty &&
+                          if (_messageSearchController.text.isNotEmpty &&
                               searchedMessages.length > 1) {
-                            if (initialMessage != null) {
-                              int index =
-                                  searchedMessages.indexOf(initialMessage!);
-                              if (index > 0) {
-                                setState(() {
-                                  initialMessage = searchedMessages[index - 1];
-                                });
-                              }
+                            if (initialMessage != null) {}
+                            int index =
+                                searchedMessages.indexOf(initialMessage!);
+                            if (index < searchedMessages.length - 1) {
+                              setState(() {
+                                initialMessage = searchedMessages[index + 1];
+                              });
                             }
                           }
                         },
                         child: Icon(
-                          FontAwesomeIcons.chevronUp,
-                          color: _messageSearchController.text.isNotEmpty
+                          FontAwesomeIcons.chevronDown,
+                          color: _messageSearchController.text.isNotEmpty &&
+                                  searchedMessages.length > 1
                               ? Theme.of(context).primaryColorDark
                               : Colors.grey.shade400,
                         ),
                       ),
-                    ),
+                      if (searchedMessages.isNotEmpty)
+                        const SizedBox(width: 40),
+                      if (searchedMessages.isNotEmpty)
+                        Text(
+                          "${initialMessage != null ? searchedMessages.indexOf(initialMessage!) + 1 : 0} of ${searchedMessages.length} Matches",
+                          style: TextStyle(
+                              fontSize: 16, color: Colors.grey.shade700),
+                        )
+                    ],
+                  ),
+                ),
+              if (isMessageSearchOn == false)
+                MessageInput(
+                  showCommandsButton: false,
+                  key: _messageInputKey,
+                  focusNode: _focusNode,
+                  quotedMessage: _quotedMessage,
+                  actions: [
                     GestureDetector(
-                      onTap: () {
-                        if (_messageSearchController.text.isNotEmpty &&
-                            searchedMessages.length > 1) {
-                          if (initialMessage != null) {}
-                          int index = searchedMessages.indexOf(initialMessage!);
-                          if (index < searchedMessages.length - 1) {
-                            setState(() {
-                              initialMessage = searchedMessages[index + 1];
-                            });
-                          }
-                        }
-                      },
-                      child: Icon(
-                        FontAwesomeIcons.chevronDown,
-                        color: _messageSearchController.text.isNotEmpty &&
-                                searchedMessages.length > 1
-                            ? Theme.of(context).primaryColorDark
-                            : Colors.grey.shade400,
+                      onTap: () => onLocationRequestPressed(),
+                      child: const Icon(
+                        Icons.location_history,
                       ),
                     ),
-                    if (searchedMessages.isNotEmpty) const SizedBox(width: 40),
-                    if (searchedMessages.isNotEmpty)
-                      Text(
-                        "${initialMessage != null ? searchedMessages.indexOf(initialMessage!) + 1 : 0} of ${searchedMessages.length} Matches",
-                        style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade700),
-                      )
                   ],
-                ),
-              ),
-            if (isMessageSearchOn == false)
-              MessageInput(
-                showCommandsButton: false,
-                key: _messageInputKey,
-                focusNode: _focusNode,
-                quotedMessage: _quotedMessage,
-                actions: [
-                  GestureDetector(
-                    onTap: () => onLocationRequestPressed(),
-                    child: const Icon(
-                      Icons.location_history,
+                  onQuotedMessageCleared: () {
+                    if (_quotedMessage != null) {
+                      setState(() => _quotedMessage = null);
+                    }
+                  },
+                  idleSendButton: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: RecordButton(
+                      recordingFinishedCallback: _recordingFinishedCallback,
                     ),
                   ),
-                ],
-                onQuotedMessageCleared: () {
-                  if (_quotedMessage != null) {
-                    setState(() => _quotedMessage = null);
-                  }
-                },
-                idleSendButton: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: RecordButton(
-                    recordingFinishedCallback: _recordingFinishedCallback,
-                  ),
-                ),
-                preMessageSending: (message) {
-                  Utils.playSound(R.sounds.sendMessage);
-                  return message;
-                },
-                activeSendButton: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xff37dabc),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.only(
-                          left: 12, right: 8, top: 10, bottom: 10),
-                      child: Center(
-                        child: Icon(
-                          Icons.send,
-                          color: Colors.white,
+                  preMessageSending: (message) {
+                    Utils.playSound(R.sounds.sendMessage);
+                    return message;
+                  },
+                  activeSendButton: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xff37dabc),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.only(
+                            left: 12, right: 8, top: 10, bottom: 10),
+                        child: Center(
+                          child: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
+                  attachmentThumbnailBuilders: {
+                    'location': (context, attachment) => MapThumbnailWidget(
+                          lat: attachment.extraData['lat'] as double,
+                          long: attachment.extraData['long'] as double,
+                        ),
+                  },
                 ),
-                attachmentThumbnailBuilders: {
-                  'location': (context, attachment) => MapThumbnailWidget(
-                        lat: attachment.extraData['lat'] as double,
-                        long: attachment.extraData['long'] as double,
-                      ),
-                },
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
