@@ -1142,7 +1142,6 @@ class _ChatScreenState extends State<ChatScreen> {
       onReplyTap: _reply,
       showReplyMessage: true,
       showPinButton: true,
-      showDeleteMessage: false,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(7),
@@ -1218,24 +1217,24 @@ class _ChatScreenState extends State<ChatScreen> {
         return const StreamVisibleFootnote();
       },
       customActions: [
-        StreamMessageAction(
-          leading: Padding(
-            padding: const EdgeInsets.only(right: 3),
-            child: Image.asset(
-              R.images.deleteChatImage,
-              width: 15,
-              color: Colors.red,
-            ),
-          ),
-          title: const Text(
-            'Delete Message',
-            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
-          ).tr(),
-          onTap: (message) {
-            Navigator.pop(context);
-            showDeletePopup(message);
-          },
-        ),
+        // StreamMessageAction(
+        //   leading: Padding(
+        //     padding: const EdgeInsets.only(right: 3),
+        //     child: Image.asset(
+        //       R.images.deleteChatImage,
+        //       width: 15,
+        //       color: Colors.red,
+        //     ),
+        //   ),
+        //   title: const Text(
+        //     'Delete Message',
+        //     style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
+        //   ).tr(),
+        //   onTap: (message) {
+        //     Navigator.pop(context);
+        //     showDeletePopup(message);
+        //   },
+        // ),
         MessageAction(
           leading: const Icon(
             CommunityMaterialIcons.share_outline,
