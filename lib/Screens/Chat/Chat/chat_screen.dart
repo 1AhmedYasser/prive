@@ -32,6 +32,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
+import '../../../Models/Chat/group_admin.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
 import '../../../Widgets/Common/cached_image.dart';
 import 'chat_info_screen.dart';
@@ -89,6 +90,21 @@ class _ChatScreenState extends State<ChatScreen> {
   StreamSubscription? onDeleteListener;
   List<String> kickedCallMembersIds = [];
 
+  // Members Permissions
+  bool sendMessages = true;
+  bool sendMedia = true;
+  bool addMembers = true;
+
+  // Admin Permissions
+  bool pinMessages = true;
+  bool adminAddMembers = true;
+  bool addAdmins = true;
+  bool changeGroupInfo = true;
+  bool deleteOthersMessages = true;
+  bool deleteMembers = true;
+  List<GroupAdmin> groupAdmins = [];
+  GroupAdmin? adminSelf;
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +121,8 @@ class _ChatScreenState extends State<ChatScreen> {
         .unreadCountStream
         .listen(_unreadCountHandler);
     _listenToFirebaseChanges();
+    _getGroupAdmins();
+    _getMembersPermissions();
   }
 
   @override
@@ -832,58 +850,118 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               if (isMessageSearchOn == false)
-                MessageInput(
-                  showCommandsButton: false,
-                  key: _messageInputKey,
-                  focusNode: _focusNode,
-                  quotedMessage: _quotedMessage,
-                  actions: [
-                    GestureDetector(
-                      onTap: () => onLocationRequestPressed(),
-                      child: const Icon(
-                        Icons.location_history,
-                      ),
-                    ),
-                  ],
-                  onQuotedMessageCleared: () {
-                    if (_quotedMessage != null) {
-                      setState(() => _quotedMessage = null);
-                    }
-                  },
-                  idleSendButton: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: RecordButton(
-                      recordingFinishedCallback: _recordingFinishedCallback,
-                    ),
-                  ),
-                  preMessageSending: (message) {
-                    Utils.playSound(R.sounds.sendMessage);
-                    return message;
-                  },
-                  activeSendButton: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xff37dabc),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.only(
-                            left: 12, right: 8, top: 10, bottom: 10),
-                        child: Center(
-                          child: Icon(
-                            Icons.send,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  attachmentThumbnailBuilders: {
-                    'location': (context, attachment) => MapThumbnailWidget(
-                          lat: attachment.extraData['lat'] as double,
-                          long: attachment.extraData['long'] as double,
-                        ),
+                StreamBuilder<ChannelState>(
+                  stream: channel.state?.channelStateStream,
+                  builder: (context, state) {
+                    _getMembersPermissions();
+                    _getGroupAdmins();
+                    return MessageInput(
+                      showCommandsButton: false,
+                      key: _messageInputKey,
+                      focusNode: _focusNode,
+                      disableAttachments: adminSelf != null
+                          ? false
+                          : sendMedia
+                              ? false
+                              : true,
+                      quotedMessage: _quotedMessage,
+                      actions: [
+                        adminSelf != null
+                            ? GestureDetector(
+                                onTap: () => onLocationRequestPressed(),
+                                child: const Icon(
+                                  Icons.location_history,
+                                ))
+                            : sendMedia
+                                ? GestureDetector(
+                                    onTap: () => onLocationRequestPressed(),
+                                    child: const Icon(
+                                      Icons.location_history,
+                                    ),
+                                  )
+                                : const SizedBox.shrink()
+                      ],
+                      onQuotedMessageCleared: () {
+                        if (_quotedMessage != null) {
+                          setState(() => _quotedMessage = null);
+                        }
+                      },
+                      idleSendButton: adminSelf != null
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: RecordButton(
+                                recordingFinishedCallback:
+                                    _recordingFinishedCallback,
+                              ),
+                            )
+                          : sendMessages
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: RecordButton(
+                                    recordingFinishedCallback:
+                                        _recordingFinishedCallback,
+                                  ),
+                                )
+                              : const SizedBox(width: 15),
+                      preMessageSending: (message) {
+                        Utils.playSound(R.sounds.sendMessage);
+                        return message;
+                      },
+                      activeSendButton: adminSelf != null
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xff37dabc),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 12, right: 8, top: 10, bottom: 10),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.send,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : sendMessages
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff37dabc),
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 12,
+                                          right: 8,
+                                          top: 10,
+                                          bottom: 10),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.send,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(width: 15),
+                      attachmentThumbnailBuilders: {
+                        'location': (context, attachment) => MapThumbnailWidget(
+                              lat: attachment.extraData['lat'] as double,
+                              long: attachment.extraData['long'] as double,
+                            ),
+                      },
+                    );
                   },
                 ),
             ],
@@ -1561,5 +1639,41 @@ class _ChatScreenState extends State<ChatScreen> {
     onChangeListener = databaseReference.onChildRemoved.listen((event) {
       checkForGroupCall();
     });
+  }
+
+  void _getMembersPermissions() {
+    Map<String, dynamic>? membersPermissions = widget.channel
+            .extraData['members_permissions'] as Map<String, dynamic>? ??
+        {};
+    sendMessages = membersPermissions['send_messages'] as bool? ?? true;
+    sendMedia = membersPermissions['send_media'] as bool? ?? true;
+    addMembers = membersPermissions['add_members'] as bool? ?? true;
+  }
+
+  void _getGroupAdmins() {
+    groupAdmins = [];
+    List<dynamic>? admins =
+        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
+    for (var admin in admins) {
+      GroupAdmin groupAdmin =
+          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      groupAdmins.add(groupAdmin);
+    }
+    adminSelf = groupAdmins
+        .firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
+
+    if (adminSelf != null) {
+      _getAdminPermissions(adminSelf);
+    }
+  }
+
+  void _getAdminPermissions(GroupAdmin? admin) {
+    AdminGroupPermissions? permissions = admin?.groupPermissions;
+    pinMessages = permissions?.pinMessages ?? true;
+    addMembers = permissions?.addMembers ?? true;
+    addAdmins = permissions?.addAdmins ?? true;
+    changeGroupInfo = permissions?.changeGroupInfo ?? true;
+    deleteOthersMessages = permissions?.deleteOthersMessages ?? true;
+    deleteMembers = permissions?.deleteMembers ?? true;
   }
 }

@@ -49,6 +49,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   bool listExpanded = false;
   String userRole = "";
   List<GroupAdmin> groupAdmins = [];
+  bool sendMessages = true;
+  bool sendMedia = true;
+  bool addMembers = true;
 
   ValueNotifier<bool?> mutedBool = ValueNotifier(false);
 
@@ -80,7 +83,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
       setState(() {});
     });
     mutedBool = ValueNotifier(StreamChannel.of(context).channel.isMuted);
-
+    _getMembersPermissions();
     _getGroupAdmins();
   }
 
@@ -97,7 +100,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               child: const Center(child: CircularProgressIndicator()),
             );
           }
-
+          _getGroupAdmins();
+          _getMembersPermissions();
           return Scaffold(
             backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
             appBar: AppBar(
@@ -358,7 +362,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     var channel = StreamChannel.of(context);
     return Column(
       children: [
-        if (userRole == "owner" || userRole == "admin")
+        if ((userRole == "owner" || userRole == "admin") ||
+            (userRole == "member" && addMembers == true))
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
@@ -614,7 +619,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     channel: widget.channel,
                   ),
                 ),
-              );
+              ).then((value) => _getMembersPermissions());
             },
           ),
         if (userRole == "owner" || userRole == "admin")
@@ -1270,6 +1275,14 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             )
             ?.groupRole ??
         "member";
-    setState(() {});
+  }
+
+  void _getMembersPermissions() {
+    Map<String, dynamic>? membersPermissions = widget.channel
+            .extraData['members_permissions'] as Map<String, dynamic>? ??
+        {};
+    sendMessages = membersPermissions['send_messages'] as bool? ?? true;
+    sendMedia = membersPermissions['send_media'] as bool? ?? true;
+    addMembers = membersPermissions['add_members'] as bool? ?? true;
   }
 }
