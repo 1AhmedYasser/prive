@@ -48,10 +48,21 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   bool listExpanded = false;
   String userRole = "";
-  List<GroupAdmin> groupAdmins = [];
+
+  // Members Permissions
   bool sendMessages = true;
   bool sendMedia = true;
   bool addMembers = true;
+
+  // Admin Permissions
+  bool pinMessages = true;
+  bool adminAddMembers = true;
+  bool addAdmins = true;
+  bool changeGroupInfo = true;
+  bool deleteOthersMessages = true;
+  bool deleteMembers = true;
+  List<GroupAdmin> groupAdmins = [];
+  GroupAdmin? adminSelf;
 
   ValueNotifier<bool?> mutedBool = ValueNotifier(false);
 
@@ -169,6 +180,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   height: 8.0,
                   color: StreamChatTheme.of(context).colorTheme.disabled,
                 ),
+                _buildNameTile(),
                 _buildOptionListTiles(),
               ],
             ),
@@ -362,7 +374,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     var channel = StreamChannel.of(context);
     return Column(
       children: [
-        if ((userRole == "owner" || userRole == "admin") ||
+        if (userRole == "owner" ||
+            (userRole == "admin" &&
+                adminSelf?.groupPermissions?.addMembers == true) ||
             (userRole == "member" && addMembers == true))
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
@@ -1260,15 +1274,117 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     }
   }
 
+  Widget _buildNameTile() {
+    var channel = StreamChannel.of(context).channel;
+    var channelName = (channel.extraData['name'] as String?) ?? '';
+
+    return Material(
+      color: StreamChatTheme.of(context).colorTheme.appBg,
+      child: Container(
+        height: 56.0,
+        alignment: Alignment.center,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(7.0),
+              child: Text(
+                "Name",
+                style: StreamChatTheme.of(context).textTheme.footnote.copyWith(
+                    color: StreamChatTheme.of(context)
+                        .colorTheme
+                        .textHighEmphasis
+                        .withOpacity(0.5)),
+              ),
+            ),
+            const SizedBox(
+              width: 7.0,
+            ),
+            Expanded(
+              child: TextField(
+                focusNode: _focusNode,
+                controller: _nameController,
+                cursorColor:
+                    StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                decoration: InputDecoration.collapsed(
+                    hintText: "Add A Group Name",
+                    hintStyle: StreamChatTheme.of(context)
+                        .textTheme
+                        .bodyBold
+                        .copyWith(
+                            color: StreamChatTheme.of(context)
+                                .colorTheme
+                                .textHighEmphasis
+                                .withOpacity(0.5))),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  height: 0.82,
+                ),
+              ),
+            ),
+            if (channelName != _nameController!.text.trim())
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  InkWell(
+                    child: StreamSvgIcon.closeSmall(),
+                    onTap: () {
+                      setState(() {
+                        _nameController!.text = _getChannelName(
+                          2 * MediaQuery.of(context).size.width / 3,
+                          members: channel.state!.members,
+                          extraData: channel.extraData,
+                          maxFontSize: 16.0,
+                        )!;
+                        _focusNode.unfocus();
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0, left: 8.0),
+                    child: InkWell(
+                      child: StreamSvgIcon.check(
+                        color: StreamChatTheme.of(context)
+                            .colorTheme
+                            .accentPrimary,
+                        size: 24.0,
+                      ),
+                      onTap: () {
+                        widget.channel
+                            .updateName(_nameController!.text.trim())
+                            .then((value) {
+                          setState(() {
+                            _nameController!.text = channelName;
+                            _focusNode.unfocus();
+                          });
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _getGroupAdmins() {
     groupAdmins = [];
     List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>;
+        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
       GroupAdmin groupAdmin =
           GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
+
+    adminSelf = groupAdmins
+        .firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
+
+    if (adminSelf != null) {
+      _getAdminPermissions(adminSelf);
+    }
+
     userRole = groupAdmins
             .firstWhereOrNull(
               (admin) => admin.id == context.currentUser?.id,
@@ -1284,5 +1400,15 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     sendMessages = membersPermissions['send_messages'] as bool? ?? true;
     sendMedia = membersPermissions['send_media'] as bool? ?? true;
     addMembers = membersPermissions['add_members'] as bool? ?? true;
+  }
+
+  void _getAdminPermissions(GroupAdmin? admin) {
+    AdminGroupPermissions? permissions = admin?.groupPermissions;
+    pinMessages = permissions?.pinMessages ?? true;
+    addMembers = permissions?.addMembers ?? true;
+    addAdmins = permissions?.addAdmins ?? true;
+    changeGroupInfo = permissions?.changeGroupInfo ?? true;
+    deleteOthersMessages = permissions?.deleteOthersMessages ?? true;
+    deleteMembers = permissions?.deleteMembers ?? true;
   }
 }

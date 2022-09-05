@@ -279,7 +279,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
   void _getGroupAdmins() {
     groupAdmins = [];
     List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>;
+        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
       GroupAdmin groupAdmin =
           GroupAdmin.fromJson(admin as Map<String, dynamic>);

@@ -1136,168 +1136,180 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildChatMessage(
       MessageWidget defaultMessage, MessageDetails details) {
-    return defaultMessage.copyWith(
-      showUsername: true,
-      messageTheme: getMessageTheme(context, details),
-      onReplyTap: _reply,
-      showReplyMessage: true,
-      showPinButton: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(7),
-          topRight: const Radius.circular(7),
-          bottomLeft: Radius.circular(details.isMyMessage ? 7 : 0),
-          bottomRight: Radius.circular(details.isMyMessage ? 0 : 7),
-        ),
-        side: BorderSide(
-          color: defaultMessage.messageTheme.messageBorderColor ?? Colors.grey,
-          width: 0.3,
-        ),
-      ),
-      usernameBuilder: (context, message) {
-        if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
-          return Row(
-            children: [
-              Image.asset(
-                R.images.forwardIcon,
-                width: 15,
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                "Forwarded",
+    return StreamBuilder<ChannelState>(
+      stream: widget.channel.state?.channelStateStream,
+      builder: (context, state) {
+        _getGroupAdmins();
+        return defaultMessage.copyWith(
+          showUsername: true,
+          messageTheme: getMessageTheme(context, details),
+          onReplyTap: _reply,
+          showReplyMessage: true,
+          showPinButton: widget.channel.isGroup
+              ? adminSelf?.groupPermissions?.pinMessages == true
+                  ? true
+                  : false
+              : true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(7),
+              topRight: const Radius.circular(7),
+              bottomLeft: Radius.circular(details.isMyMessage ? 7 : 0),
+              bottomRight: Radius.circular(details.isMyMessage ? 0 : 7),
+            ),
+            side: BorderSide(
+              color:
+                  defaultMessage.messageTheme.messageBorderColor ?? Colors.grey,
+              width: 0.3,
+            ),
+          ),
+          usernameBuilder: (context, message) {
+            if (defaultMessage.message.extraData["isMessageForwarded"] ==
+                true) {
+              return Row(
+                children: [
+                  Image.asset(
+                    R.images.forwardIcon,
+                    width: 15,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Forwarded",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ).tr(),
+                ],
+              );
+            } else if (message.user?.id != context.currentUser?.id &&
+                widget.isChannel) {
+              return Text(
+                message.user?.name ?? "",
+                style: const TextStyle(fontSize: 11),
+              );
+            } else if (channel.isGroup) {
+              Map<String, dynamic>? nameColors =
+                  channel.extraData['name_colors'] as Map<String, dynamic>?;
+              return Text(
+                message.user?.name ?? "",
+                overflow: TextOverflow.ellipsis,
+                textWidthBasis: TextWidthBasis.longestLine,
+                textScaleFactor: 0.95,
                 style: TextStyle(
                   fontSize: 11,
-                  fontWeight: FontWeight.w500,
+                  color: nameColors != null
+                      ? parseColor(nameColors[message.user?.id] as String)
+                      : Colors.black,
                 ),
-              ).tr(),
-            ],
-          );
-        } else if (message.user?.id != context.currentUser?.id &&
-            widget.isChannel) {
-          return Text(
-            message.user?.name ?? "",
-            style: const TextStyle(fontSize: 11),
-          );
-        } else if (channel.isGroup) {
-          Map<String, dynamic>? nameColors =
-              channel.extraData['name_colors'] as Map<String, dynamic>?;
-          return Text(
-            message.user?.name ?? "",
-            overflow: TextOverflow.ellipsis,
-            textWidthBasis: TextWidthBasis.longestLine,
-            textScaleFactor: 0.95,
-            style: TextStyle(
-              fontSize: 11,
-              color: nameColors != null
-                  ? parseColor(nameColors[message.user?.id] as String)
-                  : Colors.black,
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
-      onMessageTap: (message) {
-        if (isMessageSelectionOn) {
-          setState(() {
-            if (selectedMessages.contains(defaultMessage.message)) {
-              selectedMessages.remove(defaultMessage.message);
+              );
             } else {
-              final isDeletedOrShadowed =
-                  defaultMessage.message.isDeleted == true ||
-                      defaultMessage.message.shadowed == true;
-              if (!isDeletedOrShadowed) {
-                selectedMessages.add(defaultMessage.message);
-              }
+              return const SizedBox.shrink();
             }
-          });
-        }
-      },
-      deletedBottomRowBuilder: (context, message) {
-        return const StreamVisibleFootnote();
-      },
-      customActions: [
-        // StreamMessageAction(
-        //   leading: Padding(
-        //     padding: const EdgeInsets.only(right: 3),
-        //     child: Image.asset(
-        //       R.images.deleteChatImage,
-        //       width: 15,
-        //       color: Colors.red,
-        //     ),
-        //   ),
-        //   title: const Text(
-        //     'Delete Message',
-        //     style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
-        //   ).tr(),
-        //   onTap: (message) {
-        //     Navigator.pop(context);
-        //     showDeletePopup(message);
-        //   },
-        // ),
-        MessageAction(
-          leading: const Icon(
-            CommunityMaterialIcons.share_outline,
-            color: Color(0xff7e7e7e),
-          ),
-          title: const Text(
-            'Forward',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ).tr(),
-          onTap: (message) {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ForwardScreen(
-                  selectedMessages: [message],
-                ),
+          },
+          onMessageTap: (message) {
+            if (isMessageSelectionOn) {
+              setState(() {
+                if (selectedMessages.contains(defaultMessage.message)) {
+                  selectedMessages.remove(defaultMessage.message);
+                } else {
+                  final isDeletedOrShadowed =
+                      defaultMessage.message.isDeleted == true ||
+                          defaultMessage.message.shadowed == true;
+                  if (!isDeletedOrShadowed) {
+                    selectedMessages.add(defaultMessage.message);
+                  }
+                }
+              });
+            }
+          },
+          deletedBottomRowBuilder: (context, message) {
+            return const StreamVisibleFootnote();
+          },
+          customActions: [
+            // StreamMessageAction(
+            //   leading: Padding(
+            //     padding: const EdgeInsets.only(right: 3),
+            //     child: Image.asset(
+            //       R.images.deleteChatImage,
+            //       width: 15,
+            //       color: Colors.red,
+            //     ),
+            //   ),
+            //   title: const Text(
+            //     'Delete Message',
+            //     style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
+            //   ).tr(),
+            //   onTap: (message) {
+            //     Navigator.pop(context);
+            //     showDeletePopup(message);
+            //   },
+            // ),
+            MessageAction(
+              leading: const Icon(
+                CommunityMaterialIcons.share_outline,
+                color: Color(0xff7e7e7e),
               ),
-            );
+              title: const Text(
+                'Forward',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ).tr(),
+              onTap: (message) {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ForwardScreen(
+                      selectedMessages: [message],
+                    ),
+                  ),
+                );
+              },
+            ),
+            StreamMessageAction(
+              leading: const Icon(
+                Icons.check_circle_outlined,
+                color: Color(0xff7e7e7e),
+              ),
+              title: const Text(
+                'Select',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ).tr(),
+              onTap: (message) {
+                Navigator.pop(context);
+                setState(() {
+                  selectedMessages.add(message);
+                  isMessageSelectionOn = true;
+                });
+              },
+            ),
+          ],
+          customAttachmentBuilders: {
+            'voicenote': (context, defaultMessage, attachments) {
+              final url = attachments.first.assetUrl;
+              if (url == null) {
+                return const AudioLoadingMessage();
+              }
+              return AudioPlayerMessage(
+                source: AudioSource.uri(Uri.parse(url)),
+                id: defaultMessage.id,
+              );
+            },
+            'location': _buildLocationMessage,
+            'product': (context, defaultMessage, attachments) {
+              return CatalogMessage(
+                context: context,
+                details: defaultMessage,
+              );
+            },
+            'catalog': (context, defaultMessage, attachments) {
+              return CatalogMessage(
+                context: context,
+                details: defaultMessage,
+              );
+            },
           },
-        ),
-        StreamMessageAction(
-          leading: const Icon(
-            Icons.check_circle_outlined,
-            color: Color(0xff7e7e7e),
-          ),
-          title: const Text(
-            'Select',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ).tr(),
-          onTap: (message) {
-            Navigator.pop(context);
-            setState(() {
-              selectedMessages.add(message);
-              isMessageSelectionOn = true;
-            });
-          },
-        ),
-      ],
-      customAttachmentBuilders: {
-        'voicenote': (context, defaultMessage, attachments) {
-          final url = attachments.first.assetUrl;
-          if (url == null) {
-            return const AudioLoadingMessage();
-          }
-          return AudioPlayerMessage(
-            source: AudioSource.uri(Uri.parse(url)),
-            id: defaultMessage.id,
-          );
-        },
-        'location': _buildLocationMessage,
-        'product': (context, defaultMessage, attachments) {
-          return CatalogMessage(
-            context: context,
-            details: defaultMessage,
-          );
-        },
-        'catalog': (context, defaultMessage, attachments) {
-          return CatalogMessage(
-            context: context,
-            details: defaultMessage,
-          );
-        },
+        );
       },
     );
   }
