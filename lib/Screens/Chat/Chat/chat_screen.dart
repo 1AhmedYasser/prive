@@ -228,49 +228,66 @@ class _ChatScreenState extends State<ChatScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            StreamManager.getChannelName(
-                              channel,
-                              context.currentUser!,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 15, color: Colors.black),
+                          StreamBuilder<ChannelState>(
+                            stream: widget.channel.state?.channelStateStream,
+                            builder: (context, state) {
+                              return Text(
+                                StreamManager.getChannelName(
+                                  channel,
+                                  context.currentUser!,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.black),
+                              );
+                            },
                           ),
                           const SizedBox(height: 2),
                           BetterStreamBuilder<List<Member>>(
-                            stream: channel.state!.membersStream,
-                            initialData: channel.state!.members,
-                            builder: (context, data) => ConnectionStatusBuilder(
-                              statusBuilder: (context, status) {
-                                switch (status) {
-                                  case ConnectionStatus.connected:
-                                    return _buildConnectedTitleState(
-                                        context, data);
-                                  case ConnectionStatus.connecting:
-                                    return const Text(
-                                      'Connecting',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                      ),
-                                    ).tr();
-                                  case ConnectionStatus.disconnected:
-                                    return const Text(
-                                      'Offline',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                      ),
-                                    ).tr();
-                                  default:
-                                    return const SizedBox.shrink();
+                              stream: channel.state!.membersStream,
+                              initialData: channel.state!.members,
+                              builder: (context, data) {
+                                if (widget.channel.isGroup) {
+                                  return Text(
+                                    "${data.length} Members",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                } else {
+                                  return ConnectionStatusBuilder(
+                                    statusBuilder: (context, status) {
+                                      switch (status) {
+                                        case ConnectionStatus.connected:
+                                          return _buildConnectedTitleState(
+                                              context, data);
+                                        case ConnectionStatus.connecting:
+                                          return const Text(
+                                            'Connecting',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                            ),
+                                          ).tr();
+                                        case ConnectionStatus.disconnected:
+                                          return const Text(
+                                            'Offline',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ).tr();
+                                        default:
+                                          return const SizedBox.shrink();
+                                      }
+                                    },
+                                  );
                                 }
-                              },
-                            ),
-                          ),
+                              }),
                         ],
                       ),
                     )

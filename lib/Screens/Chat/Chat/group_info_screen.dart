@@ -1270,6 +1270,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   }
 
   Widget _buildNameTile() {
+    if (!_focusNode.hasFocus) {
+      _nameController.text = widget.channel.name ?? "";
+    }
+
     return Material(
       color: StreamChatTheme.of(context).colorTheme.appBg,
       child: Container(
