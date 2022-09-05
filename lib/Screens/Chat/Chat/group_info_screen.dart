@@ -1058,8 +1058,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   //     // TODO: Add make owner implementation (Remaining from backend)
                   //   }),
                   if (!channel.isDistinct &&
-                      StreamChat.of(context).currentUser!.id != user.id &&
-                      isUserAdmin)
+                          StreamChat.of(context).currentUser!.id != user.id &&
+                          isUserAdmin ||
+                      (adminSelf?.groupPermissions?.deleteMembers == true &&
+                          StreamChat.of(context).currentUser!.id != user.id))
                     _buildModalListTile(
                         context,
                         StreamSvgIcon.userRemove(
