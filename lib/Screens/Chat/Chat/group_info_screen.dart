@@ -16,6 +16,7 @@ import '../../../Models/Chat/group_admin.dart';
 import 'chat_info_screen.dart';
 import 'pinned_messages_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
 class GroupInfoScreen extends StatefulWidget {
@@ -33,7 +34,7 @@ class GroupInfoScreen extends StatefulWidget {
 }
 
 class _GroupInfoScreenState extends State<GroupInfoScreen> {
-  TextEditingController? _nameController;
+  final TextEditingController _nameController = TextEditingController();
 
   TextEditingController? _searchController;
   String _userNameQuery = '';
@@ -83,16 +84,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   @override
   void initState() {
     super.initState();
-    var channel = StreamChannel.of(context);
-    _nameController = TextEditingController.fromValue(
-      TextEditingValue(
-          text: (channel.channel.extraData['name'] as String?) ?? ''),
-    );
-    _searchController = TextEditingController()..addListener(_userNameListener);
-
-    _nameController!.addListener(() {
-      setState(() {});
-    });
+    _nameController.text = widget.channel.name ?? "";
     mutedBool = ValueNotifier(StreamChannel.of(context).channel.isMuted);
     _getMembersPermissions();
     _getGroupAdmins();
@@ -113,6 +105,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           }
           _getGroupAdmins();
           _getMembersPermissions();
+
           return Scaffold(
             backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
             appBar: AppBar(
@@ -1275,9 +1268,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   }
 
   Widget _buildNameTile() {
-    var channel = StreamChannel.of(context).channel;
-    var channelName = (channel.extraData['name'] as String?) ?? '';
-
     return Material(
       color: StreamChatTheme.of(context).colorTheme.appBg,
       child: Container(
@@ -1286,25 +1276,25 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         child: Row(
           children: [
             Padding(
-              padding: const EdgeInsets.all(7.0),
-              child: Text(
-                "Name",
-                style: StreamChatTheme.of(context).textTheme.footnote.copyWith(
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(0.5)),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                FontAwesomeIcons.tag,
+                color: StreamChatTheme.of(context)
+                    .colorTheme
+                    .textHighEmphasis
+                    .withOpacity(0.5),
               ),
-            ),
-            const SizedBox(
-              width: 7.0,
             ),
             Expanded(
               child: TextField(
                 focusNode: _focusNode,
+                enabled: adminSelf?.groupPermissions?.changeGroupInfo == true,
                 controller: _nameController,
                 cursorColor:
                     StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                onChanged: (value) {
+                  setState(() {});
+                },
                 decoration: InputDecoration.collapsed(
                     hintText: "Add A Group Name",
                     hintStyle: StreamChatTheme.of(context)
@@ -1321,7 +1311,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 ),
               ),
             ),
-            if (channelName != _nameController!.text.trim())
+            if (_focusNode.hasFocus)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1329,12 +1319,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     child: StreamSvgIcon.closeSmall(),
                     onTap: () {
                       setState(() {
-                        _nameController!.text = _getChannelName(
-                          2 * MediaQuery.of(context).size.width / 3,
-                          members: channel.state!.members,
-                          extraData: channel.extraData,
-                          maxFontSize: 16.0,
-                        )!;
+                        _nameController.text = widget.channel.name ?? "";
                         _focusNode.unfocus();
                       });
                     },
@@ -1349,11 +1334,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                         size: 24.0,
                       ),
                       onTap: () {
-                        widget.channel
-                            .updateName(_nameController!.text.trim())
-                            .then((value) {
+                        widget.channel.updatePartial(set: {
+                          "name": _nameController.text.trim()
+                        }).then((value) {
                           setState(() {
-                            _nameController!.text = channelName;
+                            _nameController.text = widget.channel.name ?? "";
                             _focusNode.unfocus();
                           });
                         });
