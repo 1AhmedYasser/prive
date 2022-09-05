@@ -1150,6 +1150,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   ? true
                   : false
               : true,
+          showDeleteMessage: widget.channel.isGroup
+              ? adminSelf?.groupPermissions?.deleteOthersMessages == true
+                  ? true
+                  : null
+              : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(7),
