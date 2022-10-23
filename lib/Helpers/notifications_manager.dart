@@ -38,26 +38,23 @@ class NotificationsManager {
     FirebaseMessaging.instance.getToken().then((token) async {
       stream.StreamChat.of(notificationsContext)
           .client
-          .addDevice(token ?? "", stream.PushProvider.firebase,
-              pushProviderName: "prive_firebase")
+          .addDevice(token ?? "", stream.PushProvider.firebase, pushProviderName: "prive_firebase")
           .then((value) {
         print("Added Device to stream");
       });
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });
-    var devicePushTokenVoIP =
-        await FlutterCallkitIncoming.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
     print("Device Token $devicePushTokenVoIP");
   }
 
   static void initializeNotifications() {
     notificationPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: const IOSInitializationSettings(
+      iOS: const DarwinInitializationSettings(
         defaultPresentSound: true,
         defaultPresentAlert: true,
         defaultPresentBadge: true,
@@ -67,7 +64,8 @@ class NotificationsManager {
       ),
     );
     FlutterLocalNotificationsPlugin().initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
+        onDidReceiveNotificationResponse: onSelectNotification,
+        onDidReceiveBackgroundNotificationResponse: onSelectNotification);
   }
 
   static void requestPermissions() async {
@@ -79,8 +77,7 @@ class NotificationsManager {
       _firebaseMessagingHandler(message);
     });
 
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     print("do you have initial message ${initialMessage != null}");
     print("Initial Message Data ${initialMessage?.data}");
     if (initialMessage != null) {
@@ -114,11 +111,7 @@ class NotificationsManager {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("Notifications Message Opened App");
       stream.Channel? channel;
-      stream.StreamChatCore.of(notificationsContext)
-          .client
-          .state
-          .channels
-          .forEach((key, value) {
+      stream.StreamChatCore.of(notificationsContext).client.state.channels.forEach((key, value) {
         if (value.id == message.data['channel_id']) {
           channel = value;
         }
@@ -131,15 +124,11 @@ class NotificationsManager {
     });
   }
 
-  static Future<dynamic> onSelectNotification(String? notification) async {
-    Map selectedNotification = json.decode(notification ?? "");
+  static Future<dynamic> onSelectNotification(NotificationResponse? notification) async {
+    Map selectedNotification = json.decode(notification?.payload ?? "");
     if (selectedNotification.isNotEmpty) {
       stream.Channel? channel;
-      stream.StreamChatCore.of(notificationsContext)
-          .client
-          .state
-          .channels
-          .forEach((key, value) {
+      stream.StreamChatCore.of(notificationsContext).client.state.channels.forEach((key, value) {
         if (value.id == selectedNotification['channel_id']) {
           channel = value;
         }
@@ -154,12 +143,10 @@ class NotificationsManager {
     }
   }
 
-  static Future<void> firebaseMessagingBackgroundHandler(
-      RemoteMessage backgroundMessage) async {
+  static Future<void> firebaseMessagingBackgroundHandler(RemoteMessage backgroundMessage) async {
     storedBackgroundMessage = backgroundMessage;
     listenToCalls();
-    if (backgroundMessage.data['type'] != null &&
-        backgroundMessage.data['type'] != "call") {
+    if (backgroundMessage.data['type'] != null && backgroundMessage.data['type'] != "call") {
       final messageId = backgroundMessage.data['message_id'];
       final channelId = backgroundMessage.data['channel_id'];
       final channelType = backgroundMessage.data['channel_type'];
@@ -192,8 +179,7 @@ class NotificationsManager {
             'isShowLogo': false,
             'ringtonePath': "ringtone_default",
             'backgroundColor': '#1293a8',
-            'backgroundUrl':
-                'https://fv9-3.failiem.lv/thumb_show.php?i=yxvrrm7mr&view',
+            'backgroundUrl': 'https://fv9-3.failiem.lv/thumb_show.php?i=yxvrrm7mr&view',
             // 'actionColor': '#4CAF50'
           },
           'ios': <String, dynamic>{
@@ -261,10 +247,7 @@ class NotificationsManager {
   }
 
   static Future<void> _showLocalNotification(
-      {BaseNotification? notification,
-      String title = "",
-      String body = "",
-      String payload = ""}) async {
+      {BaseNotification? notification, String title = "", String body = "", String payload = ""}) async {
     if (Platform.isAndroid == true) {
       var androidDetails = const AndroidNotificationDetails("id", "channel",
           channelDescription: "description",
@@ -272,10 +255,7 @@ class NotificationsManager {
           importance: Importance.max,
           icon: "launcher_icon");
       await notificationPlugin.show(
-          0,
-          notification?.title ?? title,
-          notification?.body ?? body,
-          NotificationDetails(android: androidDetails),
+          0, notification?.title ?? title, notification?.body ?? body, NotificationDetails(android: androidDetails),
           payload: payload);
     } else {
       await notificationPlugin.show(
@@ -283,7 +263,7 @@ class NotificationsManager {
           notification?.title ?? title,
           notification?.body ?? body,
           const NotificationDetails(
-            iOS: IOSNotificationDetails(
+            iOS: DarwinNotificationDetails(
               presentAlert: true,
               presentBadge: true,
               presentSound: true,
@@ -306,15 +286,15 @@ class NotificationsManager {
           case CallEvent.ACTION_CALL_DECLINE:
             FlutterCallkitIncoming.endAllCalls();
             await Firebase.initializeApp();
-            final databaseReference = FirebaseDatabase.instance.ref(
-                "SingleCalls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
+            final databaseReference = FirebaseDatabase.instance
+                .ref("SingleCalls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
             DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
             databaseReference.remove();
             usersRef.update({
               await Utils.getString(R.pref.userId) ?? "": "Ended",
             });
-            Utils.logAnswerOrCancelCall(notificationsContext,
-                notificationsContext.currentUser?.id ?? "", "CANCELLED", "0");
+            Utils.logAnswerOrCancelCall(
+                notificationsContext, notificationsContext.currentUser?.id ?? "", "CANCELLED", "0");
             break;
           case CallEvent.ACTION_CALL_ENDED:
             break;
@@ -345,11 +325,9 @@ class NotificationsManager {
       print('initCurrentCall: $activeCalls');
       List<dynamic> calls = json.decode(activeCalls);
       if (calls.isNotEmpty) {
-        DatabaseReference ref = FirebaseDatabase.instance
-            .ref("Calls/${calls[0]['extra']['channelName']}");
+        DatabaseReference ref = FirebaseDatabase.instance.ref("Calls/${calls[0]['extra']['channelName']}");
         DatabaseEvent event = await ref.once();
-        Map<dynamic, dynamic> data =
-            event.snapshot.value as Map<dynamic, dynamic>;
+        Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
         data.remove(await Utils.getString(R.pref.userId));
         print(event.snapshot.value);
         if (data.isNotEmpty) {

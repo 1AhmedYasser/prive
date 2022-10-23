@@ -13,14 +13,13 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
 import '../../../Models/Chat/group_admin.dart';
-import 'chat_info_screen.dart';
 import 'pinned_messages_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
 class GroupInfoScreen extends StatefulWidget {
-  final MessageThemeData messageTheme;
+  final StreamMessageThemeData messageTheme;
   final Channel channel;
 
   const GroupInfoScreen({
@@ -122,9 +121,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                           return Text(
                             "Loading",
                             style: TextStyle(
-                              color: StreamChatTheme.of(context)
-                                  .colorTheme
-                                  .textHighEmphasis,
+                              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                               fontSize: 16,
                             ),
                             maxLines: 1,
@@ -140,9 +137,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             maxFontSize: 16.0,
                           )!,
                           style: TextStyle(
-                            color: StreamChatTheme.of(context)
-                                .colorTheme
-                                .textHighEmphasis,
+                            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                             fontSize: 16,
                           ),
                           maxLines: 1,
@@ -155,10 +150,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   Text(
                     '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
                     style: TextStyle(
-                      color: StreamChatTheme.of(context)
-                          .colorTheme
-                          .textHighEmphasis
-                          .withOpacity(0.5),
+                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                       fontSize: 12.0,
                     ),
                   ),
@@ -184,7 +176,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   Widget _buildMembers(List<Member> members) {
     final groupMembers = members
       ..sort((prev, curr) {
-        if (curr.role == 'owner') return 1;
+        if (curr.channelRole == 'owner') return 1;
         return 0;
       });
 
@@ -213,7 +205,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   final userMember = groupMembers.firstWhereOrNull(
                     (e) => e.user!.id == StreamChat.of(context).currentUser!.id,
                   );
-                  _showUserInfoModal(member.user, userMember?.role == 'owner');
+                  _showUserInfoModal(member.user, userMember?.channelRole == 'owner');
                 },
                 child: SizedBox(
                   height: 65.0,
@@ -226,7 +218,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               horizontal: 8.0,
                               vertical: 12.0,
                             ),
-                            child: UserAvatar(
+                            child: StreamUserAvatar(
                               user: member.user!,
                               constraints: const BoxConstraints.tightFor(
                                 height: 40.0,
@@ -247,8 +239,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                 // ),
                                 FutureBuilder(
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const SizedBox.shrink();
                                     } else {
                                       return Text(
@@ -268,10 +259,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                 Text(
                                   _getLastSeen(member.user!),
                                   style: TextStyle(
-                                      color: StreamChatTheme.of(context)
-                                          .colorTheme
-                                          .textHighEmphasis
-                                          .withOpacity(0.5)),
+                                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5)),
                                 ),
                               ],
                             ),
@@ -279,18 +267,15 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                           Padding(
                             padding: const EdgeInsets.only(right: 20),
                             child: Text(
-                              member.role == 'owner'
+                              member.channelRole == 'owner'
                                   ? "Owner"
-                                  : member.role == 'admin'
+                                  : member.channelRole == 'admin'
                                       ? "Admin"
                                       : groupAdminsIds.contains(member.userId)
                                           ? "Admin"
                                           : "Member",
                               style: TextStyle(
-                                color: StreamChatTheme.of(context)
-                                    .colorTheme
-                                    .textHighEmphasis
-                                    .withOpacity(0.5),
+                                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                               ),
                             ).tr(),
                           ),
@@ -324,12 +309,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 21.0, vertical: 12.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 12.0),
                             child: StreamSvgIcon.down(
-                              color: StreamChatTheme.of(context)
-                                  .colorTheme
-                                  .textLowEmphasis,
+                              color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                             ),
                           ),
                           Expanded(
@@ -339,10 +321,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               children: [
                                 Text(
                                   '${members.length - groupMembersLength} ${"More".tr()}',
-                                  style: TextStyle(
-                                      color: StreamChatTheme.of(context)
-                                          .colorTheme
-                                          .textLowEmphasis),
+                                  style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textLowEmphasis),
                                 ),
                               ],
                             ),
@@ -368,8 +347,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     return Column(
       children: [
         if (userRole == "owner" ||
-            (userRole == "admin" &&
-                adminSelf?.groupPermissions?.addMembers == true) ||
+            (userRole == "admin" && adminSelf?.groupPermissions?.addMembers == true) ||
             (userRole == "member" && addMembers == true))
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
@@ -408,10 +386,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: StreamSvgIcon.mute(
                     size: 24.0,
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(0.5),
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                   ),
                 ),
                 trailing: snapshot.data == null
@@ -443,10 +418,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: StreamSvgIcon.pin(
               size: 24.0,
-              color: StreamChatTheme.of(context)
-                  .colorTheme
-                  .textHighEmphasis
-                  .withOpacity(0.5),
+              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
             ),
           ),
           trailing: StreamSvgIcon.right(
@@ -460,35 +432,47 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: MessageSearchBloc(
-                    child: PinnedMessagesScreen(
-                      messageTheme: widget.messageTheme,
-                      sortOptions: const [
+                  child: StreamMessageSearchListView(
+                    controller: StreamMessageSearchListController(
+                      client: StreamChat.of(context).client,
+                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                      sort: const [
                         SortOption(
                           'created_at',
                           direction: SortOption.ASC,
                         ),
                       ],
-                      onShowMessage: (m, c) async {
-                        // final client = StreamChat.of(context).client;
-                        // final message = m;
-                        // final channel = client.channel(
-                        //   c.type,
-                        //   id: c.id,
-                        // );
-                        // if (channel.state == null) {
-                        //   await channel.watch();
-                        // }
-                        // Navigator.pushNamed(
-                        //   context,
-                        //   Routes.CHANNEL_PAGE,
-                        //   arguments: ChannelPageArgs(
-                        //     channel: channel,
-                        //     initialMessage: message,
-                        //   ),
-                        // );
-                      },
                     ),
+                    itemBuilder: (context, messages, index, tile) {
+                      return PinnedMessagesScreen(
+                        messageTheme: widget.messageTheme,
+                        sortOptions: const [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
+                        onShowMessage: (m, c) async {
+                          // final client = StreamChat.of(context).client;
+                          // final message = m;
+                          // final channel = client.channel(
+                          //   c.type,
+                          //   id: c.id,
+                          // );
+                          // if (channel.state == null) {
+                          //   await channel.watch();
+                          // }
+                          // Navigator.pushNamed(
+                          //   context,
+                          //   Routes.CHANNEL_PAGE,
+                          //   arguments: ChannelPageArgs(
+                          //     channel: channel,
+                          //     initialMessage: message,
+                          //   ),
+                          // );
+                        },
+                      );
+                    },
                   ),
                 ),
               ),
@@ -504,10 +488,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: StreamSvgIcon.pictures(
               size: 32.0,
-              color: StreamChatTheme.of(context)
-                  .colorTheme
-                  .textHighEmphasis
-                  .withOpacity(0.5),
+              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
             ),
           ),
           trailing: StreamSvgIcon.right(
@@ -521,36 +502,48 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: MessageSearchBloc(
-                    child: ChannelMediaDisplayScreen(
-                      messageTheme: widget.messageTheme,
-                      sortOptions: const [
+                  child: StreamMessageSearchListView(
+                    controller: StreamMessageSearchListController(
+                      client: StreamChat.of(context).client,
+                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                      sort: const [
                         SortOption(
                           'created_at',
                           direction: SortOption.ASC,
                         ),
                       ],
-                      paginationParams: const PaginationParams(limit: 20),
-                      onShowMessage: (m, c) async {
-                        // final client = StreamChat.of(context).client;
-                        // final message = m;
-                        // final channel = client.channel(
-                        //   c.type,
-                        //   id: c.id,
-                        // );
-                        // if (channel.state == null) {
-                        //   await channel.watch();
-                        // }
-                        // await Navigator.pushNamed(
-                        //   context,
-                        //   Routes.CHANNEL_PAGE,
-                        //   arguments: ChannelPageArgs(
-                        //     channel: channel,
-                        //     initialMessage: message,
-                        //   ),
-                        // );
-                      },
                     ),
+                    itemBuilder: (context, messages, index, tile) {
+                      return ChannelMediaDisplayScreen(
+                        messageTheme: widget.messageTheme,
+                        sortOptions: const [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
+                        paginationParams: const PaginationParams(limit: 20),
+                        onShowMessage: (m, c) async {
+                          // final client = StreamChat.of(context).client;
+                          // final message = m;
+                          // final channel = client.channel(
+                          //   c.type,
+                          //   id: c.id,
+                          // );
+                          // if (channel.state == null) {
+                          //   await channel.watch();
+                          // }
+                          // await Navigator.pushNamed(
+                          //   context,
+                          //   Routes.CHANNEL_PAGE,
+                          //   arguments: ChannelPageArgs(
+                          //     channel: channel,
+                          //     initialMessage: message,
+                          //   ),
+                          // );
+                        },
+                      );
+                    },
                   ),
                 ),
               ),
@@ -566,10 +559,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: StreamSvgIcon.files(
               size: 32.0,
-              color: StreamChatTheme.of(context)
-                  .colorTheme
-                  .textHighEmphasis
-                  .withOpacity(0.5),
+              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
             ),
           ),
           trailing: StreamSvgIcon.right(
@@ -583,16 +573,28 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: const MessageSearchBloc(
-                    child: ChannelFileDisplayScreen(
-                      sortOptions: [
+                  child: StreamMessageSearchListView(
+                    controller: StreamMessageSearchListController(
+                      client: StreamChat.of(context).client,
+                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                      sort: const [
                         SortOption(
                           'created_at',
                           direction: SortOption.ASC,
                         ),
                       ],
-                      paginationParams: PaginationParams(limit: 20),
                     ),
+                    itemBuilder: (context, messages, index, tile) {
+                      return const ChannelFileDisplayScreen(
+                        sortOptions: [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
+                        paginationParams: PaginationParams(limit: 20),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -609,10 +611,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Icon(
                 Icons.vpn_key_rounded,
-                color: StreamChatTheme.of(context)
-                    .colorTheme
-                    .textHighEmphasis
-                    .withOpacity(0.5),
+                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
               ),
             ),
             trailing: StreamSvgIcon.right(
@@ -639,10 +638,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Icon(
                 Icons.admin_panel_settings,
-                color: StreamChatTheme.of(context)
-                    .colorTheme
-                    .textHighEmphasis
-                    .withOpacity(0.5),
+                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
               ),
             ),
             trailing: StreamSvgIcon.right(
@@ -669,10 +665,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Icon(
                 Icons.exit_to_app_rounded,
-                color: StreamChatTheme.of(context)
-                    .colorTheme
-                    .textHighEmphasis
-                    .withOpacity(0.5),
+                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
               ),
             ),
             trailing: const SizedBox(
@@ -688,17 +681,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 cancelText: "Cancel".tr(),
                 icon: Icon(
                   Icons.exit_to_app_rounded,
-                  color: StreamChatTheme.of(context)
-                      .colorTheme
-                      .textHighEmphasis
-                      .withOpacity(0.5),
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
               );
               if (res == true) {
                 if (mounted) {
                   final channel = StreamChannel.of(context).channel;
-                  await channel
-                      .removeMembers([StreamChat.of(context).currentUser!.id]);
+                  await channel.removeMembers([StreamChat.of(context).currentUser!.id]);
                   if (mounted) {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   }
@@ -716,10 +705,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Icon(
                 Icons.delete_forever,
-                color: StreamChatTheme.of(context)
-                    .colorTheme
-                    .textHighEmphasis
-                    .withOpacity(0.5),
+                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
               ),
             ),
             onTap: () async {
@@ -731,10 +717,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 cancelText: "Cancel".tr(),
                 icon: Icon(
                   Icons.delete_forever,
-                  color: StreamChatTheme.of(context)
-                      .colorTheme
-                      .textHighEmphasis
-                      .withOpacity(0.5),
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
               );
               if (res == true) {
@@ -771,36 +754,25 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               ),
               clipBehavior: Clip.antiAlias,
               child: Scaffold(
-                body: UsersBloc(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: _buildTextInputSection(modalSetState),
-                      ),
-                      Expanded(
-                        child: UserListView(
-                          selectedUsers: const {},
-                          onUserTap: (user, _) async {
-                            _searchController!.clear();
-
-                            await channel.addMembers([user.id]);
-                            if (mounted) {
-                              Navigator.pop(context);
-                            }
-                            setState(() {});
-                          },
-                          crossAxisCount: 4,
+                body: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildTextInputSection(modalSetState),
+                    ),
+                    Expanded(
+                      child: StreamUserListView(
+                        controller: StreamUserListController(
+                          client: StreamChat.of(context).client,
                           limit: 25,
                           filter: Filter.and(
                             [
-                              if (_searchController!.text.isNotEmpty)
-                                Filter.autoComplete('name', _userNameQuery),
+                              if (_searchController!.text.isNotEmpty) Filter.autoComplete('name', _userNameQuery),
                               Filter.notIn(
                                 'id',
                                 [
                                   StreamChat.of(context).currentUser!.id,
-                                  ...channel.state!.members
+                                  widget.channel.state!.members
                                       .map<String?>(
                                         ((e) => e.userId),
                                       )
@@ -816,43 +788,47 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                               direction: 1,
                             ),
                           ],
-                          emptyBuilder: (_) {
-                            return LayoutBuilder(
-                              builder: (context, viewportConstraints) {
-                                return SingleChildScrollView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight: viewportConstraints.maxHeight,
-                                    ),
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(24),
-                                            child: StreamSvgIcon.search(
-                                              size: 96,
-                                              color: StreamChatTheme.of(context)
-                                                  .colorTheme
-                                                  .textLowEmphasis,
-                                            ),
+                        ),
+                        onUserTap: (user) async {
+                          _searchController!.clear();
+
+                          await channel.addMembers([user.id]);
+                          if (mounted) {
+                            Navigator.pop(context);
+                          }
+                          setState(() {});
+                        },
+                        emptyBuilder: (_) {
+                          return LayoutBuilder(
+                            builder: (context, viewportConstraints) {
+                              return SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight: viewportConstraints.maxHeight,
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(24),
+                                          child: StreamSvgIcon.search(
+                                            size: 96,
+                                            color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                                           ),
-                                          const Text(
-                                                  "No User Match this keyword")
-                                              .tr(),
-                                        ],
-                                      ),
+                                        ),
+                                        const Text("No User Match this keyword").tr(),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -881,8 +857,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     hintStyle: theme.textTheme.body.copyWith(
                       color: theme.colorTheme.textLowEmphasis,
                     ),
-                    prefixIconConstraints:
-                        BoxConstraints.tight(const Size(40, 24)),
+                    prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
                     prefixIcon: StreamSvgIcon.search(
                       color: theme.colorTheme.textHighEmphasis,
                       size: 24,
@@ -1012,9 +987,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     _buildModalListTile(
                       context,
                       StreamSvgIcon.message(
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .textLowEmphasis,
+                        color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                         size: 24.0,
                       ),
                       "Message".tr(),
@@ -1057,17 +1030,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   //       'Make Owner', () {
                   //     // TODO: Add make owner implementation (Remaining from backend)
                   //   }),
-                  if (!channel.isDistinct &&
-                          StreamChat.of(context).currentUser!.id != user.id &&
-                          isUserAdmin ||
+                  if (!channel.isDistinct && StreamChat.of(context).currentUser!.id != user.id && isUserAdmin ||
                       (adminSelf?.groupPermissions?.deleteMembers == true &&
                           StreamChat.of(context).currentUser!.id != user.id))
                     _buildModalListTile(
                         context,
                         StreamSvgIcon.userRemove(
-                          color: StreamChatTheme.of(context)
-                              .colorTheme
-                              .accentError,
+                          color: StreamChatTheme.of(context).colorTheme.accentError,
                           size: 24.0,
                         ),
                         "Remove From Group".tr(), () async {
@@ -1082,24 +1051,19 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       if (res == true) {
                         await channel.removeMembers(
                           [user.id],
-                          Message(
-                            text:
-                                "${context.currentUser?.name} Removed ${user.name}",
+                          message: Message(
+                            text: "${context.currentUser?.name} Removed ${user.name}",
                           ),
                         );
                       }
                       if (mounted) {
                         Navigator.pop(context);
                       }
-                    },
-                        color:
-                            StreamChatTheme.of(context).colorTheme.accentError),
+                    }, color: StreamChatTheme.of(context).colorTheme.accentError),
                   _buildModalListTile(
                       context,
                       StreamSvgIcon.closeSmall(
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .textLowEmphasis,
+                        color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                         size: 24.0,
                       ),
                       "Cancel".tr(), () {
@@ -1129,20 +1093,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
       if (otherMember.online) {
         alternativeWidget = Text(
           "Online".tr(),
-          style: TextStyle(
-              color: StreamChatTheme.of(context)
-                  .colorTheme
-                  .textHighEmphasis
-                  .withOpacity(0.5)),
+          style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5)),
         );
       } else {
         alternativeWidget = Text(
           '${"Last Seen".tr()} ${Jiffy(otherMember.lastActive).fromNow()}',
           style: TextStyle(
-            color: StreamChatTheme.of(context)
-                .colorTheme
-                .textHighEmphasis
-                .withOpacity(0.5),
+            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
           ),
         );
       }
@@ -1151,9 +1108,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     return alternativeWidget;
   }
 
-  Widget _buildModalListTile(
-      BuildContext context, Widget leading, String title, VoidCallback onTap,
-      {Color? color}) {
+  Widget _buildModalListTile(BuildContext context, Widget leading, String title, VoidCallback onTap, {Color? color}) {
     color ??= StreamChatTheme.of(context).colorTheme.textHighEmphasis;
 
     return Material(
@@ -1177,8 +1132,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   Expanded(
                     child: Text(
                       title,
-                      style:
-                          TextStyle(color: color, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: color, fontWeight: FontWeight.bold),
                     ),
                   )
                 ],
@@ -1204,8 +1158,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -1234,8 +1187,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     String? title;
     var client = StreamChat.of(context);
     if (extraData['name'] == null) {
-      final otherMembers =
-          members!.where((member) => member.user!.id != client.currentUser!.id);
+      final otherMembers = members!.where((member) => member.user!.id != client.currentUser!.id);
       if (otherMembers.isNotEmpty) {
         final maxWidth = width;
         final maxChars = maxWidth / maxFontSize!;
@@ -1285,10 +1237,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Icon(
                 FontAwesomeIcons.tag,
-                color: StreamChatTheme.of(context)
-                    .colorTheme
-                    .textHighEmphasis
-                    .withOpacity(0.5),
+                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
               ),
             ),
             Expanded(
@@ -1296,21 +1245,16 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 focusNode: _focusNode,
                 enabled: adminSelf?.groupPermissions?.changeGroupInfo == true,
                 controller: _nameController,
-                cursorColor:
-                    StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                cursorColor: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                 onChanged: (value) {
                   setState(() {});
                 },
                 decoration: InputDecoration.collapsed(
-                    hintText: "Add A Group Name",
-                    hintStyle: StreamChatTheme.of(context)
-                        .textTheme
-                        .bodyBold
-                        .copyWith(
-                            color: StreamChatTheme.of(context)
-                                .colorTheme
-                                .textHighEmphasis
-                                .withOpacity(0.5))),
+                  hintText: "Add A Group Name",
+                  hintStyle: StreamChatTheme.of(context).textTheme.bodyBold.copyWith(
+                        color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                      ),
+                ),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   height: 0.82,
@@ -1334,15 +1278,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     padding: const EdgeInsets.only(right: 16.0, left: 8.0),
                     child: InkWell(
                       child: StreamSvgIcon.check(
-                        color: StreamChatTheme.of(context)
-                            .colorTheme
-                            .accentPrimary,
+                        color: StreamChatTheme.of(context).colorTheme.accentPrimary,
                         size: 24.0,
                       ),
                       onTap: () {
-                        widget.channel.updatePartial(set: {
-                          "name": _nameController.text.trim()
-                        }).then((value) {
+                        widget.channel.updatePartial(set: {"name": _nameController.text.trim()}).then((value) {
                           setState(() {
                             _nameController.text = widget.channel.name ?? "";
                             _focusNode.unfocus();
@@ -1361,16 +1301,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   void _getGroupAdmins() {
     groupAdmins = [];
-    List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
+    List<dynamic>? admins = widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
-      GroupAdmin groupAdmin =
-          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
 
-    adminSelf = groupAdmins
-        .firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
+    adminSelf = groupAdmins.firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
 
     if (adminSelf != null) {
       _getAdminPermissions(adminSelf);
@@ -1385,9 +1322,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   }
 
   void _getMembersPermissions() {
-    Map<String, dynamic>? membersPermissions = widget.channel
-            .extraData['members_permissions'] as Map<String, dynamic>? ??
-        {};
+    Map<String, dynamic>? membersPermissions =
+        widget.channel.extraData['members_permissions'] as Map<String, dynamic>? ?? {};
     sendMessages = membersPermissions['send_messages'] as bool? ?? true;
     sendMedia = membersPermissions['send_media'] as bool? ?? true;
     addMembers = membersPermissions['add_members'] as bool? ?? true;

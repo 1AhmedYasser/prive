@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
@@ -25,9 +25,6 @@ import '../../../Models/Call/call_member.dart';
 import '../../../Models/Call/prive_call.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
 import '../../../UltraNetwork/ultra_network.dart';
-import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
-import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
-import 'dart:math';
 
 class SingleCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -71,8 +68,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   bool isHeadphonesOn = true;
   bool isMute = false;
   CallMember? me;
-  rtc_remote_view.TextureView? remoteView;
-  rtc_local_view.TextureView? localView;
+  VideoViewController? remoteView;
+  VideoViewController? localView;
   bool didJoinAgora = false;
   bool didEndCall = false;
   bool isSharingScreen = false;
@@ -134,9 +131,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   setState(() {});
                 },
                 child: Icon(
-                  isSpeakerOn
-                      ? FontAwesomeIcons.volumeHigh
-                      : FontAwesomeIcons.volumeLow,
+                  isSpeakerOn ? FontAwesomeIcons.volumeHigh : FontAwesomeIcons.volumeLow,
                   color: Colors.white,
                   size: 25,
                 ),
@@ -271,10 +266,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 ),
                 onPressed: () async {
                   didEndCall = true;
-                  final databaseReference = FirebaseDatabase.instance
-                      .ref("SingleCalls/${widget.channel.id}");
-                  DatabaseReference usersRef =
-                      FirebaseDatabase.instance.ref("Users");
+                  final databaseReference = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+                  DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
                   databaseReference.remove();
                   _stopForegroundTask();
                   for (var member in widget.channel.state?.members ?? []) {
@@ -298,8 +291,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       isMicOn: true,
       isVideoOn: widget.isVideo,
     );
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+    DatabaseReference ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
     await ref.set({
       "ownerId": context.currentUser?.id ?? "",
       "type": widget.isVideo ? "Video" : "Voice",
@@ -311,8 +303,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
       if (mounted) {
         getCall();
@@ -338,21 +329,14 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       isHeadphonesOn: true,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: widget.call != null
-          ? widget.call?.members
-                  ?.firstWhere((member) => member.id == context.currentUser?.id)
-                  .isMicOn ==
-              true
+          ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isMicOn == true
           : true,
       isVideoOn: widget.call != null
-          ? widget.call?.members
-                  ?.firstWhere((member) => member.id == context.currentUser?.id)
-                  .isVideoOn ==
-              true
+          ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isVideoOn == true
           : widget.isVideo,
     );
 
-    final ref = FirebaseDatabase.instance
-        .ref("SingleCalls/${widget.channel.id}/members");
+    final ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}/members");
     ref.update({joiningUser.id ?? "": joiningUser.toJson()});
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "In Call"});
@@ -364,14 +348,16 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         isSpeakerOn = await agoraEngine?.isSpeakerphoneEnabled() ?? false;
       }
       agoraEngine = widget.agoraEngine;
-      localView = const rtc_local_view.TextureView();
+      localView = VideoViewController(
+        rtcEngine: agoraEngine!,
+        canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+      );
       setState(() {});
     }
   }
 
   void getCall() async {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
@@ -382,8 +368,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       String? type = callResponse['type'];
       List<CallMember>? members = [];
 
-      Map<dynamic, dynamic>? membersList =
-          (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? membersList = (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
           CallMember(
@@ -403,19 +388,15 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       }
 
       call = Call(ownerId: ownerId, type: type, members: members);
-      me = call?.members
-          ?.firstWhere((element) => element.id == context.currentUser?.id);
-      videoMembers = call?.members
-              ?.where((element) => element.isVideoOn == true)
-              .toList() ??
-          [];
+      me = call?.members?.firstWhere((element) => element.id == context.currentUser?.id);
+      videoMembers = call?.members?.where((element) => element.isVideoOn == true).toList() ?? [];
       isHeadphonesOn = me?.isHeadphonesOn ?? true;
       if (isHeadphonesOn == false) {
         isMute = true;
         await agoraEngine?.muteAllRemoteAudioStreams(true);
         await agoraEngine?.muteRemoteAudioStream(
-          int.parse(context.currentUser?.id ?? "0"),
-          false,
+          uid: int.parse(context.currentUser?.id ?? "0"),
+          mute: false,
         );
         await agoraEngine?.muteLocalAudioStream(true);
       } else {
@@ -424,13 +405,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
 
       if (widget.agoraEngine != null) {
         if (widget.isVideo) {
-          remoteView = rtc_remote_view.TextureView(
-            uid: int.parse(call?.members
-                    ?.firstWhere(
-                        (member) => member.id != context.currentUser?.id)
-                    .id ??
-                "0"),
-            channelId: widget.channel.id ?? "",
+          remoteView = VideoViewController.remote(
+            rtcEngine: agoraEngine!,
+            canvas: VideoCanvas(
+              uid: int.parse(call?.members?.firstWhere((member) => member.id != context.currentUser?.id).id ?? "0"),
+            ),
+            connection: RtcConnection(channelId: widget.channel.id),
           );
         }
       }
@@ -452,7 +432,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             context.currentUser?.id ?? "": "Ended",
           });
         }
-        agoraEngine?.destroy();
+        agoraEngine?.leaveChannel();
         if (mounted) {
           Utils.showAlert(
             context,
@@ -482,10 +462,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         "caller_name": context.currentUser?.name,
         "ids": widget.isJoining
             ? {}
-            : widget.channel.state?.members
-                .firstWhere(
-                    (element) => element.userId != context.currentUser?.id)
-                .userId,
+            : widget.channel.state?.members.firstWhere((element) => element.userId != context.currentUser?.id).userId,
         "has_video": widget.isVideo,
       }),
       showLoadingIndicator: false,
@@ -499,33 +476,31 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           await [Permission.microphone].request();
         }
 
-        agoraEngine = await RtcEngine.createWithContext(
-            RtcEngineContext(R.constants.agoraAppId));
+        await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
 
-        agoraEngine?.setEventHandler(
+        agoraEngine?.registerEventHandler(
           RtcEngineEventHandler(
-            joinChannelSuccess: (String channel, int uid, int elapsed) async {
-              print('joinChannelSuccess $channel $uid');
+            onJoinChannelSuccess: (connection, uid) async {
+              print('joinChannelSuccess $uid');
               if (mounted) {
                 setState(() {});
               }
             },
-            userJoined: (int uid, int elapsed) {
+            onUserJoined: (connection, uid, elapsed) {
               print('userJoined $uid');
               timer?.cancel();
-              remoteView = rtc_remote_view.TextureView(
-                uid: int.parse(call?.members
-                        ?.firstWhere(
-                            (member) => member.id != context.currentUser?.id)
-                        .id ??
-                    "0"),
-                channelId: widget.channel.id ?? "",
+              remoteView = VideoViewController.remote(
+                rtcEngine: agoraEngine!,
+                canvas: VideoCanvas(
+                  uid: int.parse(call?.members?.firstWhere((member) => member.id != context.currentUser?.id).id ?? "0"),
+                ),
+                connection: RtcConnection(channelId: widget.channel.id),
               );
               if (mounted) {
                 setState(() {});
               }
             },
-            remoteVideoStateChanged: (uid, state, reason, time) {
+            onRemoteVideoStateChanged: (connection, uid, state, reason, time) {
               if (mounted) {
                 if (state.index == 0) {
                   setState(() {
@@ -540,13 +515,13 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 }
               }
             },
-            rtcStats: (stats) {
+            onRtcStats: (connection, stats) {
               _stats = stats;
               if (mounted) {
                 setState(() {});
               }
             },
-            cameraReady: () {
+            onCameraReady: () {
               if (mounted) {
                 setState(() {});
               }
@@ -562,23 +537,25 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           setState(() {});
         }
         userAgoraToken = tokenResponse.data ?? "";
-        agoraEngine
+        await agoraEngine
             ?.joinChannel(
-          tokenResponse.data ?? "",
-          widget.channel.id ?? "",
-          null,
-          int.parse(context.currentUser?.id ?? "0"),
+          token: tokenResponse.data ?? "",
+          channelId: widget.channel.id ?? "",
+          uid: int.parse(context.currentUser?.id ?? "0"),
+          options: const ChannelMediaOptions(),
         )
             .then((value) {
-          localView = const rtc_local_view.TextureView();
+          localView = VideoViewController(
+            rtcEngine: agoraEngine!,
+            canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+          );
           if (call?.members?.length == 2) {
-            remoteView = rtc_remote_view.TextureView(
-              uid: int.parse(call?.members
-                      ?.firstWhere(
-                          (member) => member.id != context.currentUser?.id)
-                      .id ??
-                  "0"),
-              channelId: widget.channel.id ?? "",
+            remoteView = VideoViewController.remote(
+              rtcEngine: agoraEngine!,
+              canvas: VideoCanvas(
+                uid: int.parse(call?.members?.firstWhere((member) => member.id != context.currentUser?.id).id ?? "0"),
+              ),
+              connection: RtcConnection(channelId: widget.channel.id),
             );
           }
           didJoinAgora = true;
@@ -687,11 +664,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           ),
         if (isVideo &&
             call?.members?.length == 2 &&
-            call?.members
-                    ?.firstWhere(
-                        (member) => member.id == context.currentUser?.id)
-                    .isVideoOn ==
-                true)
+            call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isVideoOn == true)
           DraggableWidget(
             bottomMargin: 60,
             intialVisibility: true,
@@ -725,8 +698,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                 highlightColor: Colors.transparent,
                 onTap: () async {
                   isHeadphonesOn = !isHeadphonesOn;
-                  final ref = FirebaseDatabase.instance.ref(
-                      "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                  final ref = FirebaseDatabase.instance
+                      .ref("SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
                   if (isHeadphonesOn == false) {
                     ref.update({"isMicOn": false, "isHeadphonesOn": false});
                   } else {
@@ -744,9 +717,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(6),
                     child: Icon(
-                      isHeadphonesOn
-                          ? Icons.headset_rounded
-                          : Icons.headset_off_rounded,
+                      isHeadphonesOn ? Icons.headset_rounded : Icons.headset_off_rounded,
                       color: Colors.white,
                       size: 27,
                     ),
@@ -775,9 +746,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                       color: Colors.grey.withOpacity(0.7),
                     ),
                     child: Icon(
-                      isSharingScreen == false
-                          ? Icons.mobile_screen_share_rounded
-                          : Icons.mobile_off_rounded,
+                      isSharingScreen == false ? Icons.mobile_screen_share_rounded : Icons.mobile_off_rounded,
                       size: 28,
                       color: Colors.white,
                     ),
@@ -792,13 +761,11 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
-                        bool isVideoOn = !(call?.members
-                                ?.firstWhere((element) =>
-                                    element.id == context.currentUser?.id)
-                                .isVideoOn ??
-                            false);
-                        final ref = FirebaseDatabase.instance.ref(
-                            "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                        bool isVideoOn =
+                            !(call?.members?.firstWhere((element) => element.id == context.currentUser?.id).isVideoOn ??
+                                false);
+                        final ref = FirebaseDatabase.instance
+                            .ref("SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
                         ref.update({"isVideoOn": isVideoOn});
                         agoraEngine?.enableLocalVideo(isVideoOn);
                       },
@@ -810,10 +777,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                           color: Colors.grey.withOpacity(0.7),
                         ),
                         child: Icon(
-                          call?.members
-                                      ?.firstWhere((element) =>
-                                          element.id == context.currentUser?.id)
-                                      .isVideoOn ==
+                          call?.members?.firstWhere((element) => element.id == context.currentUser?.id).isVideoOn ==
                                   true
                               ? Icons.videocam
                               : Icons.videocam_off,
@@ -829,12 +793,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     onTap: () async {
                       if (isHeadphonesOn) {
                         bool isMicOn = me?.isMicOn == true;
-                        final ref = FirebaseDatabase.instance.ref(
-                            "SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                        final ref = FirebaseDatabase.instance
+                            .ref("SingleCalls/${widget.channel.id}/members/${context.currentUser?.id}");
                         ref.update({"isMicOn": !isMicOn});
                         await agoraEngine?.muteRemoteAudioStream(
-                          int.parse(context.currentUser?.id ?? "0"),
-                          isMicOn,
+                          uid: int.parse(context.currentUser?.id ?? "0"),
+                          mute: isMicOn,
                         );
                         await agoraEngine?.muteLocalAudioStream(isMicOn);
                         setState(() {});
@@ -848,9 +812,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                         color: Colors.grey.withOpacity(0.7),
                       ),
                       child: Icon(
-                        me?.isMicOn == false
-                            ? Icons.mic_off_rounded
-                            : Icons.mic,
+                        me?.isMicOn == false ? Icons.mic_off_rounded : Icons.mic,
                         size: 28,
                         color: Colors.white,
                       ),
@@ -876,9 +838,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(6),
                           child: Icon(
-                            isSpeakerOn
-                                ? FontAwesomeIcons.volumeHigh
-                                : FontAwesomeIcons.volumeLow,
+                            isSpeakerOn ? FontAwesomeIcons.volumeHigh : FontAwesomeIcons.volumeLow,
                             color: Colors.white,
                             size: 25,
                           ),
@@ -914,10 +874,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                     highlightColor: Colors.transparent,
                     onTap: () {
                       didEndCall = true;
-                      final databaseReference = FirebaseDatabase.instance
-                          .ref("SingleCalls/${widget.channel.id}");
-                      DatabaseReference usersRef =
-                          FirebaseDatabase.instance.ref("Users");
+                      final databaseReference = FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+                      DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
                       databaseReference.remove();
                       _stopForegroundTask();
                       for (var member in widget.channel.state?.members ?? []) {
@@ -959,7 +917,11 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: localView ?? const SizedBox.shrink(),
+          child: localView != null
+              ? AgoraVideoView(
+                  controller: localView!,
+                )
+              : const SizedBox.shrink(),
         ),
       ),
     );
@@ -967,11 +929,10 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
 
   Widget _renderRemoteVideo() {
     if (remoteView != null) {
-      if (call?.members
-              ?.firstWhere((member) => member.id != context.currentUser?.id)
-              .isVideoOn ==
-          true) {
-        return remoteView!;
+      if (call?.members?.firstWhere((member) => member.id != context.currentUser?.id).isVideoOn == true) {
+        return AgoraVideoView(
+          controller: remoteView!,
+        );
       } else {
         return _buildCallingState(isRemoteVideoOn: false);
       }
@@ -981,7 +942,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   Future<void> _initForegroundTask() async {
-    await FlutterForegroundTask.init(
+    FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'call_channel_id',
         channelName: 'Prive',
@@ -1003,8 +964,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         allowWifiLock: true,
       ),
     );
-    await FlutterForegroundTask.startService(
-        notificationTitle: "Prive", notificationText: "Call In Progress");
+    await FlutterForegroundTask.startService(notificationTitle: "Prive", notificationText: "Call In Progress");
   }
 
   Future<void> _stopForegroundTask() async {
@@ -1014,31 +974,24 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   void _startScreenShare() async {
-    const ScreenAudioParameters parametersAudioParams = ScreenAudioParameters(
-      100,
-    );
-    VideoDimensions videoParamsDimensions = VideoDimensions(
-      width: MediaQuery.of(context).size.width.toInt(),
-      height: MediaQuery.of(context).size.height.toInt(),
-    );
-    ScreenVideoParameters parametersVideoParams = ScreenVideoParameters(
-      dimensions: videoParamsDimensions,
-      frameRate: 15,
-      bitrate: 1000,
-      contentHint: VideoContentHint.Motion,
-    );
-    ScreenCaptureParameters2 parameters = ScreenCaptureParameters2(
-      captureAudio: true,
-      audioParams: parametersAudioParams,
-      captureVideo: true,
-      videoParams: parametersVideoParams,
-    );
-
-    await agoraEngine?.startScreenCaptureMobile(parameters);
+    agoraEngine?.startScreenCaptureByScreenRect(
+        screenRect: const Rectangle(x: 0, y: 0, width: 640, height: 400),
+        regionRect: const Rectangle(),
+        captureParams: const ScreenCaptureParameters(
+          captureMouseCursor: true,
+          frameRate: 30,
+        ));
 
     if (Platform.isIOS) {
       ReplayKitLauncher.launchReplayKitBroadcast('ScreenSharing');
     }
+
+    ChannelMediaOptions options = ChannelMediaOptions(
+      publishScreenTrack: isSharingScreen,
+      publishCameraTrack: !isSharingScreen,
+    );
+
+    agoraEngine?.updateChannelMediaOptions(options);
 
     setState(() {
       isSharingScreen = true;

@@ -4,7 +4,7 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Providers/channels_provider.dart';
 
@@ -12,12 +12,10 @@ class PriveChannelsTab extends StatefulWidget {
   const PriveChannelsTab({Key? key}) : super(key: key);
 
   @override
-  _PriveChannelsTabState createState() => _PriveChannelsTabState();
+  State<PriveChannelsTab> createState() => _PriveChannelsTabState();
 }
 
-class _PriveChannelsTabState extends State<PriveChannelsTab>
-    with TickerProviderStateMixin {
-  final channelListController = ChannelListController();
+class _PriveChannelsTabState extends State<PriveChannelsTab> with TickerProviderStateMixin {
   late final AnimationController _animationController;
 
   @override
@@ -29,16 +27,18 @@ class _PriveChannelsTabState extends State<PriveChannelsTab>
   @override
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
-      return ChannelListCore(
-        channelListController: channelListController,
-        filter: Filter.and(
-          [
-            Filter.equal('type', 'messaging'),
-            Filter.equal('channel_type', 'Public_Channels'),
-          ],
+      return StreamChannelListView(
+        controller: StreamChannelListController(
+          client: StreamChat.of(context).client,
+          filter: Filter.and(
+            [
+              Filter.equal('type', 'messaging'),
+              Filter.equal('channel_type', 'Public_Channels'),
+            ],
+          ),
+          sort: const [SortOption('last_message_at')],
         ),
-        emptyBuilder: (context) =>
-            ChannelsEmptyState(animationController: _animationController),
+        emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
         errorBuilder: (context, widget) {
           Utils.checkForInternetConnection(context);
           return const SizedBox.shrink();
@@ -47,7 +47,7 @@ class _PriveChannelsTabState extends State<PriveChannelsTab>
           context,
         ) =>
             const UltraLoadingIndicator(),
-        listBuilder: (context, channels) {
+        itemBuilder: (context, channels, index, tile) {
           return channels.isEmpty
               ? ChannelsEmptyState(animationController: _animationController)
               : ChannelsListWidget(

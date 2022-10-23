@@ -20,7 +20,6 @@ import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../Widgets/Common/cached_image.dart';
 import '../MainMenu/new_group_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
   final String roomName;
@@ -28,19 +27,14 @@ class PeopleChooserScreen extends StatefulWidget {
   final bool isNow;
   final DateTime? selectedDateTime;
   const PeopleChooserScreen(
-      {Key? key,
-      this.roomName = "",
-      this.roomDescription = "",
-      this.isNow = true,
-      this.selectedDateTime})
+      {Key? key, this.roomName = "", this.roomDescription = "", this.isNow = true, this.selectedDateTime})
       : super(key: key);
 
   @override
   State<PeopleChooserScreen> createState() => _PeopleChooserScreenState();
 }
 
-class _PeopleChooserScreenState extends State<PeopleChooserScreen>
-    with TickerProviderStateMixin {
+class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerProviderStateMixin {
   TextEditingController? _controller;
   final _selectedUsers = <User>{};
   bool _permissionDenied = false;
@@ -86,9 +80,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               icon: const Icon(Icons.done),
-              color: _selectedUsers.isNotEmpty
-                  ? Theme.of(context).primaryColor
-                  : Colors.grey,
+              color: _selectedUsers.isNotEmpty ? Theme.of(context).primaryColor : Colors.grey,
               onPressed: () async {
                 RoomUser owner = RoomUser(
                   id: context.currentUser?.id ?? "",
@@ -118,12 +110,10 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                     isMicOn: false,
                   ).toJson();
                 }
-                String roomId = DateFormat('yyyyMMddhhmmmss', "en")
-                    .format(widget.selectedDateTime ?? DateTime.now())
-                    .toString();
+                String roomId =
+                    DateFormat('yyyyMMddhhmmmss', "en").format(widget.selectedDateTime ?? DateTime.now()).toString();
                 if (widget.isNow) {
-                  DatabaseReference ref = FirebaseDatabase.instance
-                      .ref("rooms/${context.currentUser?.id ?? ""}");
+                  DatabaseReference ref = FirebaseDatabase.instance.ref("rooms/${context.currentUser?.id ?? ""}");
                   await ref.set({
                     "topic": widget.roomName,
                     "description": widget.roomDescription,
@@ -178,7 +168,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
           ),
         ],
       ),
-      body: ConnectionStatusBuilder(
+      body: StreamConnectionStatusBuilder(
         statusBuilder: (context, status) {
           String statusString = '';
           bool showStatus = true;
@@ -195,20 +185,18 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
               statusString = "Disconnected".tr();
               break;
           }
-          return InfoTile(
+          return StreamInfoTile(
             showMessage: showStatus,
             tileAnchor: Alignment.topCenter,
             childAnchor: Alignment.topCenter,
             message: statusString,
             child: NestedScrollView(
               floatHeaderSlivers: true,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 20, left: 25, right: 25, bottom: 0),
+                      padding: const EdgeInsets.only(top: 20, left: 25, right: 25, bottom: 0),
                       child: Center(
                         child: Text(
                           widget.roomName,
@@ -223,8 +211,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 10, left: 15, right: 15, bottom: 10),
+                      padding: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
                       child: SearchTextField(
                         controller: _controller,
                         hintText: "Search".tr(),
@@ -238,11 +225,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                             setState(() {
                               users = allUsers
                                   .where(
-                                    (element) => element.name
-                                        .toLowerCase()
-                                        .contains(
-                                            _controller?.text.toLowerCase() ??
-                                                ""),
+                                    (element) =>
+                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
                                   )
                                   .toList();
                             });
@@ -258,8 +242,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                       child: Container(
                         width: double.maxFinite,
                         decoration: BoxDecoration(
-                          gradient:
-                              StreamChatTheme.of(context).colorTheme.bgGradient,
+                          gradient: StreamChatTheme.of(context).colorTheme.bgGradient,
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -271,9 +254,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                 ? '${"Matches For".tr()} "${_controller?.text.trim()}"'
                                 : "Start The Room With".tr(),
                             style: TextStyle(
-                              color: StreamChatTheme.of(context)
-                                  .colorTheme
-                                  .textLowEmphasis,
+                              color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                             ),
                           ),
                         ),
@@ -299,48 +280,38 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                         highlightColor: Colors.transparent,
                                         onTap: () {
                                           setState(() {
-                                            if (_selectedUsers
-                                                .contains(users[index])) {
-                                              _selectedUsers
-                                                  .remove(users[index]);
+                                            if (_selectedUsers.contains(users[index])) {
+                                              _selectedUsers.remove(users[index]);
                                             } else {
                                               _selectedUsers.add(users[index]);
                                             }
                                           });
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10, bottom: 0),
+                                          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 0),
                                           child: Column(
                                             children: [
                                               const SizedBox(height: 10),
                                               Row(
                                                 children: [
                                                   ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
+                                                    borderRadius: BorderRadius.circular(50),
                                                     child: SizedBox(
                                                       height: 50,
                                                       width: 50,
                                                       child: CachedImage(
-                                                        url: users[index]
-                                                                .image ??
-                                                            "",
+                                                        url: users[index].image ?? "",
                                                       ),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 13),
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         users[index].name,
                                                         style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                       const SizedBox(height: 3),
@@ -348,38 +319,26 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                                         users[index].online
                                                             ? "Online".tr()
                                                             : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
-                                                                users[index]
-                                                                        .lastActive ??
-                                                                    DateTime
-                                                                        .now(),
+                                                                users[index].lastActive ?? DateTime.now(),
                                                               )}",
                                                         style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          color: users[index]
-                                                                  .online
-                                                              ? Colors.green
-                                                              : Colors.grey,
+                                                          fontWeight: FontWeight.w400,
+                                                          color: users[index].online ? Colors.green : Colors.grey,
                                                           fontSize: 13,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  if (_selectedUsers
-                                                      .contains(users[index]))
+                                                  if (_selectedUsers.contains(users[index]))
                                                     const Expanded(
                                                       child: SizedBox(),
                                                     ),
-                                                  if (_selectedUsers
-                                                      .contains(users[index]))
+                                                  if (_selectedUsers.contains(users[index]))
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 20),
+                                                      padding: const EdgeInsets.only(right: 20),
                                                       child: Icon(
                                                         Icons.check_circle,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
+                                                        color: Theme.of(context).primaryColor,
                                                       ),
                                                     )
                                                 ],
@@ -449,9 +408,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
                                 ),
                                 child: const Text(
                                   "Go To Settings",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
                             ],
@@ -466,11 +423,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen>
 
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null &&
-        myContacts.isNotEmpty == true &&
-        myContacts != "[]") {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

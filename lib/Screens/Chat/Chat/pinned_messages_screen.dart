@@ -22,7 +22,7 @@ class PinnedMessagesScreen extends StatefulWidget {
 
   final ShowMessageCallback? onShowMessage;
 
-  final MessageThemeData messageTheme;
+  final StreamMessageThemeData messageTheme;
 
   const PinnedMessagesScreen({
     Key? key,
@@ -34,28 +34,27 @@ class PinnedMessagesScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PinnedMessagesScreenState createState() => _PinnedMessagesScreenState();
+  State<PinnedMessagesScreen> createState() => _PinnedMessagesScreenState();
 }
 
 class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
   Map<String?, VideoPlayerController?> controllerCache = {};
+  late final StreamMessageSearchListController _messageSearchListController = StreamMessageSearchListController(
+    client: StreamChat.of(context).client,
+    filter: Filter.in_(
+      'cid',
+      [StreamChannel.of(context).channel.cid!],
+    ),
+    messageFilter: Filter.equal(
+      'pinned',
+      true,
+    ),
+    sort: widget.sortOptions,
+  );
 
-  @override
-  void initState() {
-    super.initState();
-    final messageSearchBloc = MessageSearchBloc.of(context);
-    messageSearchBloc.search(
-      filter: Filter.in_(
-        'cid',
-        [StreamChannel.of(context).channel.cid!],
-      ),
-      messageFilter: Filter.equal(
-        'pinned',
-        true,
-      ),
-      sort: widget.sortOptions,
-      pagination: widget.paginationParams,
-    );
+  search() {
+    _messageSearchListController.searchQuery = 'search-value';
+    _messageSearchListController.doInitialLoad();
   }
 
   @override
@@ -85,106 +84,84 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
   }
 
   Widget _buildMediaGrid() {
-    final messageSearchBloc = MessageSearchBloc.of(context);
+    // final messageSearchBloc = MessageSearchBloc.of(context);
 
-    return StreamBuilder<List<GetMessageResponse>>(
-      builder: (context, snapshot) {
-        if (snapshot.data == null) {
-          return const Center(
-            child: UltraLoadingIndicator(),
-          );
+    return StreamBuilder<List<GetMessageResponse>>(builder: (context, snapshot) {
+      if (snapshot.data == null) {
+        return const Center(
+          child: UltraLoadingIndicator(),
+        );
+      }
+
+      if (snapshot.data!.isEmpty) {
+        if (widget.emptyBuilder != null) {
+          return widget.emptyBuilder!(context);
         }
-
-        if (snapshot.data!.isEmpty) {
-          if (widget.emptyBuilder != null) {
-            return widget.emptyBuilder!(context);
-          }
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StreamSvgIcon.pin(
-                  size: 136.0,
-                  color: StreamChatTheme.of(context).colorTheme.disabled,
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StreamSvgIcon.pin(
+                size: 136.0,
+                color: StreamChatTheme.of(context).colorTheme.disabled,
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                "No Pinned Messages",
+                style: TextStyle(
+                  fontSize: 17.0,
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 16.0),
-                Text(
-                  "No Pinned Messages",
-                  style: TextStyle(
-                    fontSize: 17.0,
-                    color:
-                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ).tr(),
-              ],
-            ),
-          );
-        }
-
-        var data = snapshot.data ?? [];
-
-        return LazyLoadScrollView(
-          onEndOfPage: () => messageSearchBloc.search(
-            filter: Filter.in_(
-              'cid',
-              [StreamChannel.of(context).channel.cid!],
-            ),
-            messageFilter: Filter.equal(
-              'pinned',
-              true,
-            ),
-            sort: widget.sortOptions,
-            pagination: widget.paginationParams.copyWith(
-              offset: messageSearchBloc.messageResponses?.length ?? 0,
-            ),
-          ),
-          child: ListView.builder(
-            itemBuilder: (context, position) {
-              var user = data[position].message.user!;
-              var attachments = data[position].message.attachments;
-              var text = data[position].message.text ?? '';
-
-              return ListTile(
-                leading: UserAvatar(
-                  user: user,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 40.0,
-                    height: 40.0,
-                  ),
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                title: Text(
-                  user.name,
-                  style: TextStyle(
-                      color: StreamChatTheme.of(context)
-                          .colorTheme
-                          .textHighEmphasis,
-                      fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  text != ''
-                      ? text
-                      : (attachments.isNotEmpty
-                          ? '${attachments.length} ${attachments.length > 1 ? "Attachments".tr() : "Attachment".tr()}'
-                          : ''),
-                ),
-                onTap: () {
-                  widget.onShowMessage?.call(data[position].message,
-                      StreamChannel.of(context).channel);
-                },
-              );
-            },
-            itemCount: snapshot.data!.length,
+              ).tr(),
+            ],
           ),
         );
-      },
-      stream: messageSearchBloc.messagesStream,
-    );
+      }
+
+      var data = snapshot.data ?? [];
+
+      return StreamMessageSearchListView(
+        controller: _messageSearchListController,
+        emptyBuilder: (context) => const Text('Nothing to show'),
+        itemBuilder: (context, messageResponses, index, defaultWidget) {
+          var user = data[index].message.user!;
+          var attachments = data[index].message.attachments;
+          var text = data[index].message.text ?? '';
+
+          return ListTile(
+            leading: StreamUserAvatar(
+              user: user,
+              constraints: const BoxConstraints.tightFor(
+                width: 40.0,
+                height: 40.0,
+              ),
+              borderRadius: BorderRadius.circular(28),
+            ),
+            title: Text(
+              user.name,
+              style: TextStyle(
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              text != ''
+                  ? text
+                  : (attachments.isNotEmpty
+                      ? '${attachments.length} ${attachments.length > 1 ? "Attachments".tr() : "Attachment".tr()}'
+                      : ''),
+            ),
+            onTap: () {
+              widget.onShowMessage?.call(data[index].message, StreamChannel.of(context).channel);
+            },
+          );
+        },
+      );
+    });
   }
 
   @override
   void dispose() {
+    _messageSearchListController.dispose();
     super.dispose();
     for (var c in controllerCache.values) {
       c!.dispose();

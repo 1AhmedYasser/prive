@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:draggable_widget/draggable_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -27,12 +27,7 @@ class CallOverlayWidget extends StatefulWidget {
   final RtcEngine? agoraEngine;
   final Channel channel;
   const CallOverlayWidget(
-      {Key? key,
-      this.isGroup = false,
-      this.isVideo = false,
-      this.callId = "",
-      this.agoraEngine,
-      required this.channel})
+      {Key? key, this.isGroup = false, this.isVideo = false, this.callId = "", this.agoraEngine, required this.channel})
       : super(key: key);
 
   @override
@@ -107,8 +102,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                           ),
                         ),
                         title: Text(
-                          StreamManager.getChannelName(
-                              widget.channel, context.currentUser!),
+                          StreamManager.getChannelName(widget.channel, context.currentUser!),
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
@@ -129,9 +123,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                     maxChildSize: 0.95,
                                     builder: (_, controller) {
                                       return GroupCallScreen(
-                                        isVideo: call?.type == "Video"
-                                            ? true
-                                            : false,
+                                        isVideo: call?.type == "Video" ? true : false,
                                         isJoining: true,
                                         call: call,
                                         channel: widget.channel,
@@ -154,10 +146,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                       call: call,
                                     );
                                   },
-                                  transitionsBuilder: (_,
-                                      Animation<double> animation,
-                                      __,
-                                      Widget child) {
+                                  transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
                                     return FadeTransition(
                                       opacity: animation,
                                       child: child,
@@ -190,21 +179,17 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             () async {
                               if (widget.isVideo) {
                                 bool isVideoOn = !(call?.members
-                                        ?.firstWhere((element) =>
-                                            element.id ==
-                                            context.currentUser?.id)
+                                        ?.firstWhere((element) => element.id == context.currentUser?.id)
                                         .isVideoOn ??
                                     false);
                                 final ref = FirebaseDatabase.instance.ref(
                                     "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
                                 ref.update({"isVideoOn": isVideoOn});
-                                await widget.agoraEngine
-                                    ?.enableLocalVideo(isVideoOn);
+                                await widget.agoraEngine?.enableLocalVideo(isVideoOn);
                               } else {
                                 if (widget.isVideo == false) {
                                   isSpeakerOn = !isSpeakerOn;
-                                  await widget.agoraEngine
-                                      ?.setEnableSpeakerphone(isSpeakerOn);
+                                  await widget.agoraEngine?.setEnableSpeakerphone(isSpeakerOn);
                                   setState(() {});
                                 }
                               }
@@ -215,18 +200,16 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             me?.isMicOn == true ? Icons.mic : Icons.mic_off,
                             Colors.black38,
                             () async {
-                              if (isHeadphonesOn &&
-                                  (me?.hasPermissionToSpeak == true)) {
+                              if (isHeadphonesOn && (me?.hasPermissionToSpeak == true)) {
                                 bool isMicOn = me?.isMicOn == true;
                                 final ref = FirebaseDatabase.instance.ref(
                                     "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
                                 ref.update({"isMicOn": !isMicOn});
                                 await widget.agoraEngine?.muteRemoteAudioStream(
-                                  int.parse(context.currentUser?.id ?? "0"),
-                                  isMicOn,
+                                  uid: int.parse(context.currentUser?.id ?? "0"),
+                                  mute: isMicOn,
                                 );
-                                await widget.agoraEngine
-                                    ?.muteLocalAudioStream(isMicOn);
+                                await widget.agoraEngine?.muteLocalAudioStream(isMicOn);
                                 setState(() {});
                               }
                             },
@@ -236,36 +219,27 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                             Icons.call_end,
                             const Color(0xffff2d55),
                             () {
-                              final databaseReference =
-                                  FirebaseDatabase.instance.ref(
-                                      "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
+                              final databaseReference = FirebaseDatabase.instance
+                                  .ref("${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
                               if (widget.isGroup) {
                                 showCupertinoModalPopup<void>(
                                   context: navigatorKey.currentContext!,
-                                  builder: (BuildContext context) =>
-                                      CupertinoActionSheet(
+                                  builder: (BuildContext context) => CupertinoActionSheet(
                                     title: Text(
                                         '${"Are You Sure You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
                                     actions: <CupertinoActionSheetAction>[
-                                      if (context.currentUser?.id ==
-                                          call?.ownerId)
+                                      if (context.currentUser?.id == call?.ownerId)
                                         CupertinoActionSheetAction(
                                           isDestructiveAction: true,
                                           onPressed: () {
                                             Navigator.pop(context);
                                             BotToast.removeAll("call_overlay");
-                                            FlutterCallkitIncoming
-                                                .endAllCalls();
+                                            FlutterCallkitIncoming.endAllCalls();
                                             databaseReference.remove();
                                             _stopForegroundTask();
-                                            DatabaseReference userRef =
-                                                FirebaseDatabase.instance
-                                                    .ref("Users");
-                                            userRef.update({
-                                              context.currentUser?.id ?? "":
-                                                  "Ended"
-                                            });
-                                            widget.agoraEngine?.destroy();
+                                            DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+                                            userRef.update({context.currentUser?.id ?? "": "Ended"});
+                                            widget.agoraEngine?.leaveChannel();
                                           },
                                           child: Text(
                                             '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}',
@@ -277,18 +251,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           FlutterCallkitIncoming.endAllCalls();
                                           BotToast.removeAll("call_overlay");
                                           _stopForegroundTask();
-                                          databaseReference
-                                              .child(
-                                                  "members/${context.currentUser?.id}")
-                                              .remove();
-                                          DatabaseReference userRef =
-                                              FirebaseDatabase.instance
-                                                  .ref("Users");
-                                          userRef.update({
-                                            context.currentUser?.id ?? "":
-                                                "Ended"
-                                          });
-                                          widget.agoraEngine?.destroy();
+                                          databaseReference.child("members/${context.currentUser?.id}").remove();
+                                          DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
+                                          userRef.update({context.currentUser?.id ?? "": "Ended"});
+                                          widget.agoraEngine?.leaveChannel();
                                         },
                                         child: Text(
                                             '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
@@ -305,17 +271,13 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                               } else {
                                 BotToast.removeAll("call_overlay");
                                 FlutterCallkitIncoming.endAllCalls();
-                                final databaseReference = FirebaseDatabase
-                                    .instance
-                                    .ref("SingleCalls/${widget.channel.id}");
-                                DatabaseReference usersRef =
-                                    FirebaseDatabase.instance.ref("Users");
+                                final databaseReference =
+                                    FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
+                                DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
                                 databaseReference.remove();
                                 _stopForegroundTask();
-                                for (var member
-                                    in widget.channel.state?.members ?? []) {
-                                  usersRef
-                                      .update({member.userId ?? "": "Ended"});
+                                for (var member in widget.channel.state?.members ?? []) {
+                                  usersRef.update({member.userId ?? "": "Ended"});
                                 }
                               }
                             },
@@ -324,27 +286,21 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 25, right: 25, top: 10, bottom: 10),
+                      padding: const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           SizedBox(
                             width: 50,
                             child: buildControl(
-                              isHeadphonesOn
-                                  ? Icons.headset_rounded
-                                  : Icons.headset_off_rounded,
+                              isHeadphonesOn ? Icons.headset_rounded : Icons.headset_off_rounded,
                               Colors.black38,
                               () async {
                                 isHeadphonesOn = !isHeadphonesOn;
                                 final ref = FirebaseDatabase.instance.ref(
                                     "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
                                 if (isHeadphonesOn == false) {
-                                  ref.update({
-                                    "isMicOn": false,
-                                    "isHeadphonesOn": false
-                                  });
+                                  ref.update({"isMicOn": false, "isHeadphonesOn": false});
                                 } else {
                                   ref.update({"isHeadphonesOn": true});
                                 }
@@ -389,8 +345,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference = FirebaseDatabase.instance.ref(
-        "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
+    final databaseReference =
+        FirebaseDatabase.instance.ref("${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
       getCall();
     });
@@ -403,8 +359,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
   }
 
   void getCall() async {
-    final databaseReference = FirebaseDatabase.instance.ref(
-        "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
+    final databaseReference =
+        FirebaseDatabase.instance.ref("${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.callId}");
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
@@ -416,8 +372,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       List<CallMember>? members = [];
       List<CallMember>? kickedMembers = [];
 
-      Map<dynamic, dynamic>? membersList =
-          (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? membersList = (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
           CallMember(
@@ -433,8 +388,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         );
       });
 
-      Map<dynamic, dynamic>? kickedMembersList =
-          (callResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? kickedMembersList = (callResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
       kickedMembersList.forEach((key, value) {
         kickedMembers.add(
           CallMember(
@@ -461,10 +415,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         kickedMembers: kickedMembers,
       );
 
-      me = call?.members
-          ?.firstWhere((element) => element.id == context.currentUser?.id);
-      kickedMembersIds =
-          call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+      me = call?.members?.firstWhere((element) => element.id == context.currentUser?.id);
+      kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
 
       // Check If Kicked Your Kicked Out From The Call
       if (kickedMembersIds.contains(context.currentUser?.id)) {
@@ -472,12 +424,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
           FlutterCallkitIncoming.endAllCalls();
           BotToast.removeAll("call_overlay");
           _stopForegroundTask();
-          databaseReference
-              .child("members/${context.currentUser?.id}")
-              .remove();
+          databaseReference.child("members/${context.currentUser?.id}").remove();
           DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
           userRef.update({context.currentUser?.id ?? "": "Ended"});
-          widget.agoraEngine?.destroy();
+          widget.agoraEngine?.leaveChannel();
           Utils.showAlert(
             navigatorKey.currentContext!,
             message: "You Have Been Kicked Out Of This Room".tr(),
@@ -495,18 +445,15 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         me?.isMicOn = false;
         await widget.agoraEngine?.muteAllRemoteAudioStreams(true);
         await widget.agoraEngine?.muteRemoteAudioStream(
-          int.parse(context.currentUser?.id ?? "0"),
-          false,
+          uid: int.parse(context.currentUser?.id ?? "0"),
+          mute: false,
         );
         await widget.agoraEngine?.muteLocalAudioStream(true);
       } else {
         await widget.agoraEngine?.muteAllRemoteAudioStreams(false);
       }
       print("My Mic is On ? : ${me?.isMicOn}");
-      videoMembers = call?.members
-              ?.where((element) => element.isVideoOn == true)
-              .toList() ??
-          [];
+      videoMembers = call?.members?.where((element) => element.isVideoOn == true).toList() ?? [];
       setState(() {});
     } else {
       if (showingInfo == false) {

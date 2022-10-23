@@ -74,8 +74,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             color: Theme.of(context).primaryColorDark,
                           ),
                         ),
-                        child: Lottie.asset(R.animations.groupCallIndicator,
-                            repeat: true, reverse: true),
+                        child: Lottie.asset(R.animations.groupCallIndicator, repeat: true, reverse: true),
                       ),
                     )
                 ],
@@ -103,8 +102,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             noDataBuilder: (context) {
                               return FutureBuilder(
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const SizedBox.shrink();
                                   } else {
                                     return Text(
@@ -164,18 +162,13 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             builder: (context, data) {
                               return BetterStreamBuilder<int>(
                                 stream: widget.channel.state!.unreadCountStream,
-                                initialData:
-                                    widget.channel.state?.unreadCount ?? 0,
+                                initialData: widget.channel.state?.unreadCount ?? 0,
                                 builder: (context, count) {
                                   return Text(
                                     Utils.getLatestMessageDate(data),
                                     style: TextStyle(
-                                      color: count > 0
-                                          ? Theme.of(context).primaryColorDark
-                                          : Colors.black,
-                                      fontWeight: count > 0
-                                          ? FontWeight.w500
-                                          : FontWeight.w400,
+                                      color: count > 0 ? Theme.of(context).primaryColorDark : Colors.black,
+                                      fontWeight: count > 0 ? FontWeight.w500 : FontWeight.w400,
                                     ),
                                   );
                                 },
@@ -197,8 +190,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             stream: widget.channel.state!.lastMessageStream,
                             initialData: widget.channel.state!.lastMessage,
                             builder: (context, lastMessage) {
-                              final lastMessage = widget.channel.state?.messages
-                                  .lastWhereOrNull(
+                              final lastMessage = widget.channel.state?.messages.lastWhereOrNull(
                                 (m) => !m.isDeleted && !m.shadowed,
                               );
                               return Row(
@@ -206,22 +198,17 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                   Expanded(
                                     child: TypingIndicatorWidget(
                                       alternativeWidget: Align(
-                                        alignment:
-                                            context.locale.languageCode == "en"
-                                                ? Alignment.centerLeft
-                                                : Alignment.centerRight,
+                                        alignment: context.locale.languageCode == "en"
+                                            ? Alignment.centerLeft
+                                            : Alignment.centerRight,
                                         child: Text(
                                           lastMessage?.text ?? "",
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 14.5,
-                                            fontWeight: count > 0
-                                                ? FontWeight.w500
-                                                : FontWeight.w400,
-                                            color: count > 0
-                                                ? const Color(0xff1293a8)
-                                                : Colors.grey,
+                                            fontWeight: count > 0 ? FontWeight.w500 : FontWeight.w400,
+                                            color: count > 0 ? const Color(0xff1293a8) : Colors.grey,
                                           ),
                                         ),
                                       ),
@@ -242,11 +229,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                       ),
                                       child: Center(
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8,
-                                              right: 8,
-                                              top: 3.5,
-                                              bottom: 3.5),
+                                          padding: const EdgeInsets.only(left: 8, right: 8, top: 3.5, bottom: 3.5),
                                           child: Text(
                                             "$count",
                                             style: const TextStyle(
@@ -258,39 +241,26 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                         ),
                                       ),
                                     ),
-                                  if (lastMessage?.user?.id ==
-                                      context.currentUser?.id)
+                                  if (lastMessage?.user?.id == context.currentUser?.id)
                                     Padding(
                                       padding: EdgeInsets.only(
-                                        right:
-                                            context.locale.languageCode == "en"
-                                                ? 18
-                                                : 0,
-                                        left:
-                                            context.locale.languageCode == "en"
-                                                ? 0
-                                                : 18,
+                                        right: context.locale.languageCode == "en" ? 18 : 0,
+                                        left: context.locale.languageCode == "en" ? 0 : 18,
                                       ),
                                       child: StreamChatTheme(
                                         data: StreamChatThemeData.fromTheme(
                                           ThemeData.from(
-                                            colorScheme:
-                                                const ColorScheme.dark(),
+                                            colorScheme: const ColorScheme.dark(),
                                           ),
                                         ),
-                                        child: SendingIndicator(
+                                        child: StreamSendingIndicator(
                                           message: lastMessage ?? Message(),
                                           size: 22.5,
-                                          isMessageRead: widget
-                                              .channel.state!.read
+                                          isMessageRead: widget.channel.state!.read
                                               .where((element) =>
-                                                  element.user.id !=
-                                                  widget.channel.client.state
-                                                      .currentUser!.id)
+                                                  element.user.id != widget.channel.client.state.currentUser!.id)
                                               .where((element) =>
-                                                  element.lastRead.isAfter(
-                                                      lastMessage?.createdAt ??
-                                                          DateTime.now()))
+                                                  element.lastRead.isAfter(lastMessage?.createdAt ?? DateTime.now()))
                                               .isNotEmpty,
                                         ),
                                       ),
@@ -319,8 +289,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         (member) => member.userId != context.currentUser?.id,
       );
       await _getContacts();
-      if (usersPhoneNumbers
-          .contains(otherMember.user?.extraData["phone"] as String?)) {
+      if (usersPhoneNumbers.contains(otherMember.user?.extraData["phone"] as String?)) {
         return otherMember.user?.name ?? "";
       } else {
         return otherMember.user?.extraData["phone"] as String? ?? "";
@@ -331,8 +300,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -353,8 +321,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   }
 
   void checkForGroupCall() async {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {

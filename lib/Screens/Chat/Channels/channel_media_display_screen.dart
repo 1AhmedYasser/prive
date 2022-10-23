@@ -22,7 +22,7 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
 
   final ShowMessageCallback? onShowMessage;
 
-  final MessageThemeData messageTheme;
+  final StreamMessageThemeData messageTheme;
 
   const ChannelMediaDisplayScreen({
     Key? key,
@@ -34,30 +34,24 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ChannelMediaDisplayScreen> createState() =>
-      _ChannelMediaDisplayScreenState();
+  State<ChannelMediaDisplayScreen> createState() => _ChannelMediaDisplayScreenState();
 }
 
 class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
   Map<String?, VideoPlayerController?> controllerCache = {};
 
-  @override
-  void initState() {
-    super.initState();
-    final messageSearchBloc = MessageSearchBloc.of(context);
-    messageSearchBloc.search(
-      filter: Filter.in_(
-        'cid',
-        [StreamChannel.of(context).channel.cid!],
-      ),
-      messageFilter: Filter.in_(
-        'attachments.type',
-        const ['image', 'video'],
-      ),
-      sort: widget.sortOptions,
-      pagination: widget.paginationParams,
-    );
-  }
+  late final messageSearchListController = StreamMessageSearchListController(
+    client: StreamChatCore.of(context).client,
+    filter: Filter.in_(
+      'cid',
+      [StreamChannel.of(context).channel.cid!],
+    ),
+    messageFilter: Filter.in_(
+      'attachments.type',
+      const ['image', 'video'],
+    ),
+    sort: widget.sortOptions,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +80,6 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
   }
 
   Widget _buildMediaGrid() {
-    final messageSearchBloc = MessageSearchBloc.of(context);
-
     return StreamBuilder<List<GetMessageResponse>>(
       builder: (context, snapshot) {
         if (snapshot.data == null) {
@@ -113,8 +105,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                   "No Media",
                   style: TextStyle(
                     fontSize: 14.0,
-                    color:
-                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                   ),
                 ).tr(),
                 const SizedBox(height: 8.0),
@@ -123,10 +114,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.0,
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(0.5),
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                   ),
                 ).tr(),
               ],
@@ -138,9 +126,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
 
         for (var item in snapshot.data!) {
           item.message.attachments
-              .where((e) =>
-                  (e.type == 'image' || e.type == 'video') &&
-                  e.ogScrapeUrl == null)
+              .where((e) => (e.type == 'image' || e.type == 'video') && e.ogScrapeUrl == null)
               .forEach((e) {
             VideoPlayerController? controller;
             if (e.type == 'video') {
@@ -159,23 +145,9 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
         }
 
         return LazyLoadScrollView(
-          onEndOfPage: () => messageSearchBloc.search(
-            filter: Filter.in_(
-              'cid',
-              [StreamChannel.of(context).channel.cid!],
-            ),
-            messageFilter: Filter.in_(
-              'attachments.type',
-              const ['image', 'video'],
-            ),
-            sort: widget.sortOptions,
-            pagination: widget.paginationParams.copyWith(
-              offset: messageSearchBloc.messageResponses?.length ?? 0,
-            ),
-          ),
+          onEndOfPage: () => search(),
           child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
             itemBuilder: (context, position) {
               var channel = StreamChannel.of(context).channel;
               return Padding(
@@ -187,14 +159,14 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                       MaterialPageRoute(
                         builder: (context) => StreamChannel(
                           channel: channel,
-                          child: FullScreenMedia(
+                          child: StreamFullScreenMedia(
                             // mediaAttachments:
                             //     media.map((e) => e.attachment).toList(),
                             startIndex: position,
                             //message: media[position].message,
                             userName: media[position].message.user!.name,
                             onShowMessage: widget.onShowMessage,
-                            mediaAttachmentPackages: [],
+                            mediaAttachmentPackages: const [],
                           ),
                         ),
                       ),
@@ -202,11 +174,11 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                   },
                   child: media[position].attachment.type == 'image'
                       ? IgnorePointer(
-                          child: ImageAttachment(
+                          child: StreamImageAttachment(
                             attachment: media[position].attachment,
                             message: media[position].message,
                             showTitle: false,
-                            size: Size(
+                            imageThumbnailSize: Size(
                               MediaQuery.of(context).size.width * 0.8,
                               MediaQuery.of(context).size.height * 0.3,
                             ),
@@ -221,12 +193,17 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
           ),
         );
       },
-      stream: messageSearchBloc.messagesStream,
     );
+  }
+
+  search() {
+    messageSearchListController.searchQuery = 'search-value';
+    messageSearchListController.doInitialLoad();
   }
 
   @override
   void dispose() {
+    messageSearchListController.dispose();
     super.dispose();
     for (var c in controllerCache.values) {
       c!.dispose();

@@ -8,11 +8,10 @@ import 'package:easy_localization/easy_localization.dart';
 class ForwardScreen extends StatefulWidget {
   final List<Message> selectedMessages;
 
-  const ForwardScreen({Key? key, required this.selectedMessages})
-      : super(key: key);
+  const ForwardScreen({Key? key, required this.selectedMessages}) : super(key: key);
 
   @override
-  _ForwardScreenState createState() => _ForwardScreenState();
+  State<ForwardScreen> createState() => _ForwardScreenState();
 }
 
 class _ForwardScreenState extends State<ForwardScreen> {
@@ -41,8 +40,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
             padding: const EdgeInsets.only(right: 10),
             child: TextButton(
               style: ButtonStyle(
-                overlayColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.transparent),
+                overlayColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
               ),
               onPressed: () {
                 setState(() {
@@ -67,8 +65,9 @@ class _ForwardScreenState extends State<ForwardScreen> {
           //   },
           // ),
           Expanded(
-            child: ChannelsBloc(
-              child: ChannelListView(
+            child: StreamChannelListView(
+              controller: StreamChannelListController(
+                client: StreamChat.of(context).client,
                 filter: Filter.and(
                   [
                     Filter.equal('type', 'messaging'),
@@ -78,97 +77,86 @@ class _ForwardScreenState extends State<ForwardScreen> {
                         StreamChatCore.of(context).currentUser!.id,
                       ],
                     ),
-                    if (searchController.text.isNotEmpty)
-                      Filter.autoComplete('name', searchController.text)
+                    if (searchController.text.isNotEmpty) Filter.autoComplete('name', searchController.text)
                   ],
                 ),
                 sort: const [SortOption('last_message_at')],
                 presence: true,
-                emptyBuilder: (context) => const SizedBox.shrink(),
                 limit: 20,
-                swipeToAction: true,
-                separatorBuilder: (context, index) => const SizedBox.shrink(),
-                errorBuilder: (context, error) => Center(
-                  child: Text(
-                    'Error: $error',
-                    textAlign: TextAlign.center,
-                  ),
+              ),
+              emptyBuilder: (context) => const SizedBox.shrink(),
+              separatorBuilder: (context, list, index) => const SizedBox.shrink(),
+              errorBuilder: (context, error) => Center(
+                child: Text(
+                  'Error: $error',
+                  textAlign: TextAlign.center,
                 ),
-                loadingBuilder: (context) => const UltraLoadingIndicator(),
-                channelPreviewBuilder: (context, channel) {
-                  // print(channel.createdBy?.name);
-                  // if (channel.name == null) {
-                  //   print(
-                  //       "Channel Name: ${channel.state?.members.firstWhere((element) => element.userId != StreamChatCore.of(context).currentUser?.id).user?.name}");
-                  // } else {
-                  //   print("Channel Name: ${channel.name}");
-                  // }
-                  return InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      if (isSelectedEnabled) {
-                        setState(() {
-                          if (selectedChannels.contains(channel)) {
-                            selectedChannels.remove(channel);
-                          } else {
-                            selectedChannels.add(channel);
-                          }
-                        });
-                      } else {
-                        for (var message in widget.selectedMessages) {
-                          channel.sendMessage(
-                            Message(
-                              text: message.text,
-                              type: message.type,
-                              attachments: message.attachments,
-                              mentionedUsers: message.mentionedUsers,
-                              quotedMessage: message.quotedMessage,
-                              quotedMessageId: message.quotedMessageId,
-                              extraData: const {
-                                'isMessageForwarded': true,
-                              },
-                            ),
-                          );
+              ),
+              loadingBuilder: (context) => const UltraLoadingIndicator(),
+              itemBuilder: (context, channels, index, tile) {
+                return InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () async {
+                    if (isSelectedEnabled) {
+                      setState(() {
+                        if (selectedChannels.contains(channels[index])) {
+                          selectedChannels.remove(channels[index]);
+                        } else {
+                          selectedChannels.add(channels[index]);
                         }
-                        Navigator.pop(context);
+                      });
+                    } else {
+                      for (var message in widget.selectedMessages) {
+                        channels[index].sendMessage(
+                          Message(
+                            text: message.text,
+                            type: message.type,
+                            attachments: message.attachments,
+                            mentionedUsers: message.mentionedUsers,
+                            quotedMessage: message.quotedMessage,
+                            quotedMessageId: message.quotedMessageId,
+                            extraData: const {
+                              'isMessageForwarded': true,
+                            },
+                          ),
+                        );
                       }
-                    },
-                    child: isSelectedEnabled
-                        ? Row(
-                            children: [
-                              Expanded(
-                                child: ChannelItemWidget(
-                                  channel: channel,
-                                  isForward: true,
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: isSelectedEnabled
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: ChannelItemWidget(
+                                channel: channels[index],
+                                isForward: true,
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 23, right: 10),
+                                child: Checkbox(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  value: selectedChannels.contains(channels[index]) ? true : false,
+                                  onChanged: (value) {},
                                 ),
                               ),
-                              IgnorePointer(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 23, right: 10),
-                                  child: Checkbox(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    value: selectedChannels.contains(channel)
-                                        ? true
-                                        : false,
-                                    onChanged: (value) {},
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : ChannelItemWidget(
-                            channel: channel,
-                            isForward: true,
-                          ),
-                  );
-                },
-              ),
+                            )
+                          ],
+                        )
+                      : ChannelItemWidget(
+                          channel: channels[index],
+                          isForward: true,
+                        ),
+                );
+              },
             ),
           ),
+
           if (isSelectedEnabled)
             Padding(
               padding: const EdgeInsets.only(bottom: 45),
@@ -177,12 +165,9 @@ class _ForwardScreenState extends State<ForwardScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  backgroundColor: selectedChannels.isNotEmpty ? Theme.of(context).primaryColorDark : Colors.grey,
                   elevation: 0,
-                  primary: selectedChannels.isNotEmpty
-                      ? Theme.of(context).primaryColorDark
-                      : Colors.grey,
-                  minimumSize:
-                      Size(MediaQuery.of(context).size.width - 100, 50),
+                  minimumSize: Size(MediaQuery.of(context).size.width - 100, 50),
                 ),
                 onPressed: () {
                   if (selectedChannels.isNotEmpty) {

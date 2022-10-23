@@ -98,15 +98,10 @@ class _PriveState extends State<Prive> {
           child = botToastBuilder(context, child);
           return StreamChat(
             client: widget.client,
-            streamChatThemeData:
-                StreamChatThemeData.fromTheme(theme).copyWith(),
+            streamChatThemeData: StreamChatThemeData.fromTheme(theme).copyWith(),
             child: StreamChatCore(
               client: widget.client,
-              child: ChannelsBloc(
-                child: UsersBloc(
-                  child: child,
-                ),
-              ),
+              child: child,
             ),
           );
         },
@@ -125,8 +120,7 @@ class _PriveState extends State<Prive> {
           R.routes.chatSettingsRoute: (ctx) => const ChatSettingsScreen(),
           R.routes.chatBackgroundRoute: (ctx) => const ChatBackgroundsScreen(),
           R.routes.contactsRoute: (ctx) => const ContactsScreen(),
-          R.routes.notificationsSoundsRoute: (ctx) =>
-              const NotificationsSoundsScreen(),
+          R.routes.notificationsSoundsRoute: (ctx) => const NotificationsSoundsScreen(),
           R.routes.addContactScreen: (ctx) => const AddContactScreen(),
           R.routes.newGroupScreen: (ctx) => const NewGroupScreen(),
           R.routes.catalogScreen: (ctx) => const CatalogScreen(),

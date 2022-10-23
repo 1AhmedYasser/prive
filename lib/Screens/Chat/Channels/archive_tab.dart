@@ -4,7 +4,7 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Providers/channels_provider.dart';
 
@@ -16,7 +16,6 @@ class ArchiveTab extends StatefulWidget {
 }
 
 class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {
-  final channelListController = ChannelListController();
   late final AnimationController _animationController;
 
   @override
@@ -28,22 +27,24 @@ class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
-      return ChannelListCore(
-        channelListController: channelListController,
-        filter: Filter.and(
-          [
-            Filter.equal('type', 'messaging'),
-            Filter.in_(
-              'members',
-              [
-                StreamChatCore.of(context).currentUser!.id,
-              ],
-            ),
-            Filter.equal('is_archive', true),
-          ],
+      return StreamChannelListView(
+        controller: StreamChannelListController(
+          client: StreamChat.of(context).client,
+          filter: Filter.and(
+            [
+              Filter.equal('type', 'messaging'),
+              Filter.in_(
+                'members',
+                [
+                  StreamChatCore.of(context).currentUser!.id,
+                ],
+              ),
+              Filter.equal('is_archive', true),
+            ],
+          ),
+          sort: const [SortOption('last_message_at')],
         ),
-        emptyBuilder: (context) =>
-            ChannelsEmptyState(animationController: _animationController),
+        emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
         errorBuilder: (context, widget) {
           Utils.checkForInternetConnection(context);
           return const SizedBox.shrink();
@@ -52,10 +53,8 @@ class _ArchiveTabState extends State<ArchiveTab> with TickerProviderStateMixin {
           context,
         ) =>
             const UltraLoadingIndicator(),
-        listBuilder: (context, channels) {
-          channels = channels
-              .where((element) => element.lastMessageAt != null)
-              .toList();
+        itemBuilder: (context, channels, index, tile) {
+          channels = channels.where((element) => element.lastMessageAt != null).toList();
           return channels.isEmpty
               ? ChannelsEmptyState(animationController: _animationController)
               : ChannelsListWidget(

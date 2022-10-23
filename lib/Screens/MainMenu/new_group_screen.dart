@@ -25,8 +25,7 @@ class NewGroupScreen extends StatefulWidget {
   State<NewGroupScreen> createState() => _NewGroupScreenState();
 }
 
-class _NewGroupScreenState extends State<NewGroupScreen>
-    with TickerProviderStateMixin {
+class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStateMixin {
   TextEditingController? _controller;
   TextEditingController groupNameController = TextEditingController();
   final _selectedUsers = <User>{};
@@ -74,13 +73,11 @@ class _NewGroupScreenState extends State<NewGroupScreen>
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               icon: const Icon(Icons.done),
-              color: _selectedUsers.isNotEmpty &&
-                      groupNameController.text.isNotEmpty
+              color: _selectedUsers.isNotEmpty && groupNameController.text.isNotEmpty
                   ? Theme.of(context).primaryColor
                   : Colors.grey,
               onPressed: () async {
-                if (groupNameController.text.isNotEmpty &&
-                    _selectedUsers.isNotEmpty) {
+                if (groupNameController.text.isNotEmpty && _selectedUsers.isNotEmpty) {
                   if (_selectedUsers.length < 2) {
                     Utils.showAlert(
                       context,
@@ -88,8 +85,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                     );
                   } else {
                     Map<String, String> usersColors = {};
-                    usersColors[context.currentUser?.id ?? "0"] =
-                        generateRandomColorHex();
+                    usersColors[context.currentUser?.id ?? "0"] = generateRandomColorHex();
                     for (var user in _selectedUsers) {
                       usersColors[user.id] = generateRandomColorHex();
                     }
@@ -104,8 +100,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                             ..._selectedUsers.map((e) => e.id),
                           ],
                           'name': groupName,
-                          'channel_type':
-                              _selectedUsers.length > 1 ? "Group" : "Normal",
+                          'channel_type': _selectedUsers.length > 1 ? "Group" : "Normal",
                           'is_important': false,
                           'is_archive': false,
                           'name_colors': usersColors,
@@ -149,7 +144,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
           ),
         ],
       ),
-      body: ConnectionStatusBuilder(
+      body: StreamConnectionStatusBuilder(
         statusBuilder: (context, status) {
           String statusString = '';
           bool showStatus = true;
@@ -166,20 +161,18 @@ class _NewGroupScreenState extends State<NewGroupScreen>
               statusString = "Disconnected".tr();
               break;
           }
-          return InfoTile(
+          return StreamInfoTile(
             showMessage: showStatus,
             tileAnchor: Alignment.topCenter,
             childAnchor: Alignment.topCenter,
             message: statusString,
             child: NestedScrollView(
               floatHeaderSlivers: true,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, left: 15, right: 15, bottom: 10),
+                      padding: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
                       child: TextField(
                         controller: groupNameController,
                         onChanged: (value) {
@@ -214,11 +207,8 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                           setState(() {
                             users = allUsers
                                 .where(
-                                  (element) => element.name
-                                      .toLowerCase()
-                                      .contains(
-                                          _controller?.text.toLowerCase() ??
-                                              ""),
+                                  (element) =>
+                                      element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
                                 )
                                 .toList();
                           });
@@ -234,22 +224,19 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                           scrollDirection: Axis.horizontal,
                           itemCount: _selectedUsers.length,
                           padding: const EdgeInsets.all(8),
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 16),
+                          separatorBuilder: (_, __) => const SizedBox(width: 16),
                           itemBuilder: (_, index) {
                             final user = _selectedUsers.elementAt(index);
                             return Column(
                               children: [
                                 Stack(
                                   children: [
-                                    UserAvatar(
-                                      onlineIndicatorAlignment:
-                                          const Alignment(0.9, 0.9),
+                                    StreamUserAvatar(
+                                      onlineIndicatorAlignment: const Alignment(0.9, 0.9),
                                       user: user,
                                       showOnlineStatus: true,
                                       borderRadius: BorderRadius.circular(32),
-                                      constraints:
-                                          const BoxConstraints.tightFor(
+                                      constraints: const BoxConstraints.tightFor(
                                         height: 64,
                                         width: 64,
                                       ),
@@ -260,26 +247,19 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                                       child: GestureDetector(
                                         onTap: () {
                                           if (_selectedUsers.contains(user)) {
-                                            setState(() =>
-                                                _selectedUsers.remove(user));
+                                            setState(() => _selectedUsers.remove(user));
                                           }
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: StreamChatTheme.of(context)
-                                                .colorTheme
-                                                .appBg,
+                                            color: StreamChatTheme.of(context).colorTheme.appBg,
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: StreamChatTheme.of(context)
-                                                  .colorTheme
-                                                  .appBg,
+                                              color: StreamChatTheme.of(context).colorTheme.appBg,
                                             ),
                                           ),
                                           child: StreamSvgIcon.close(
-                                            color: StreamChatTheme.of(context)
-                                                .colorTheme
-                                                .textHighEmphasis,
+                                            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                                             size: 24,
                                           ),
                                         ),
@@ -308,8 +288,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                       child: Container(
                         width: double.maxFinite,
                         decoration: BoxDecoration(
-                          gradient:
-                              StreamChatTheme.of(context).colorTheme.bgGradient,
+                          gradient: StreamChatTheme.of(context).colorTheme.bgGradient,
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -321,9 +300,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                                 ? '${"Matches For".tr()} "${_controller?.text.trim()}"'
                                 : "On the platform".tr(),
                             style: TextStyle(
-                              color: StreamChatTheme.of(context)
-                                  .colorTheme
-                                  .textLowEmphasis,
+                              color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                             ),
                           ),
                         ),
@@ -349,48 +326,38 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                                         highlightColor: Colors.transparent,
                                         onTap: () {
                                           setState(() {
-                                            if (_selectedUsers
-                                                .contains(users[index])) {
-                                              _selectedUsers
-                                                  .remove(users[index]);
+                                            if (_selectedUsers.contains(users[index])) {
+                                              _selectedUsers.remove(users[index]);
                                             } else {
                                               _selectedUsers.add(users[index]);
                                             }
                                           });
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10, bottom: 0),
+                                          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 0),
                                           child: Column(
                                             children: [
                                               const SizedBox(height: 10),
                                               Row(
                                                 children: [
                                                   ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
+                                                    borderRadius: BorderRadius.circular(50),
                                                     child: SizedBox(
                                                       height: 50,
                                                       width: 50,
                                                       child: CachedImage(
-                                                        url: users[index]
-                                                                .image ??
-                                                            "",
+                                                        url: users[index].image ?? "",
                                                       ),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 13),
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         users[index].name,
                                                         style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                       const SizedBox(height: 3),
@@ -398,38 +365,26 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                                                         users[index].online
                                                             ? "Online".tr()
                                                             : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
-                                                                users[index]
-                                                                        .lastActive ??
-                                                                    DateTime
-                                                                        .now(),
+                                                                users[index].lastActive ?? DateTime.now(),
                                                               )}",
                                                         style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          color: users[index]
-                                                                  .online
-                                                              ? Colors.green
-                                                              : Colors.grey,
+                                                          fontWeight: FontWeight.w400,
+                                                          color: users[index].online ? Colors.green : Colors.grey,
                                                           fontSize: 13,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  if (_selectedUsers
-                                                      .contains(users[index]))
+                                                  if (_selectedUsers.contains(users[index]))
                                                     const Expanded(
                                                       child: SizedBox(),
                                                     ),
-                                                  if (_selectedUsers
-                                                      .contains(users[index]))
+                                                  if (_selectedUsers.contains(users[index]))
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 20),
+                                                      padding: const EdgeInsets.only(right: 20),
                                                       child: Icon(
                                                         Icons.check_circle,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
+                                                        color: Theme.of(context).primaryColor,
                                                       ),
                                                     )
                                                 ],
@@ -499,9 +454,7 @@ class _NewGroupScreenState extends State<NewGroupScreen>
                                 ),
                                 child: const Text(
                                   "Go To Settings",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
                             ],
@@ -525,11 +478,8 @@ class _NewGroupScreenState extends State<NewGroupScreen>
 
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null &&
-        myContacts.isNotEmpty == true &&
-        myContacts != "[]") {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -584,8 +534,7 @@ class HeaderDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       color: StreamChatTheme.of(context).colorTheme.barsBg,
       child: child,

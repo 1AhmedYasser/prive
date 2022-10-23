@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,8 +11,7 @@ import '../../Common/cached_image.dart';
 class RaisedHandsWidget extends StatefulWidget {
   final String roomRef;
   final RtcEngine? agoraEngine;
-  const RaisedHandsWidget({Key? key, required this.roomRef, this.agoraEngine})
-      : super(key: key);
+  const RaisedHandsWidget({Key? key, required this.roomRef, this.agoraEngine}) : super(key: key);
 
   @override
   State<RaisedHandsWidget> createState() => _RaisedHandsWidgetState();
@@ -89,35 +88,19 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                 if (raisedHands[index].isMicOn == true) {
                                   raisedHands[index].isMicOn = false;
                                   FirebaseDatabase.instance
-                                      .ref(
-                                          "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({
-                                    "isMicOn": false,
-                                    "hasPermissionToSpeak": false
-                                  });
+                                      .ref("${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                      .update({"isMicOn": false, "hasPermissionToSpeak": false});
                                   FirebaseDatabase.instance
-                                      .ref(
-                                          "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({
-                                    "isMicOn": false,
-                                    "hasPermissionToSpeak": false
-                                  });
+                                      .ref("${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                      .update({"isMicOn": false, "hasPermissionToSpeak": false});
                                 } else {
                                   raisedHands[index].isMicOn = true;
                                   FirebaseDatabase.instance
-                                      .ref(
-                                          "${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({
-                                    "isMicOn": true,
-                                    "hasPermissionToSpeak": true
-                                  });
+                                      .ref("${widget.roomRef}/raisedHands/${raisedHands[index].id}")
+                                      .update({"isMicOn": true, "hasPermissionToSpeak": true});
                                   FirebaseDatabase.instance
-                                      .ref(
-                                          "${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({
-                                    "isMicOn": true,
-                                    "hasPermissionToSpeak": true
-                                  });
+                                      .ref("${widget.roomRef}/listeners/${raisedHands[index].id}")
+                                      .update({"isMicOn": true, "hasPermissionToSpeak": true});
                                 }
                                 setState(() {});
                               },
@@ -148,9 +131,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                       raisedHands[index].isMicOn == true
                                           ? FontAwesomeIcons.microphone
                                           : FontAwesomeIcons.microphoneSlash,
-                                      color: raisedHands[index].isMicOn == true
-                                          ? const Color(0xff7a8fa6)
-                                          : Colors.red,
+                                      color: raisedHands[index].isMicOn == true ? const Color(0xff7a8fa6) : Colors.red,
                                       size: 20,
                                     ),
                                   ),
@@ -162,18 +143,15 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color:
-                                            raisedHands[index].isMicOn == true
-                                                ? Theme.of(context).primaryColor
-                                                : const Color(0xff7a8fa6),
+                                        color: raisedHands[index].isMicOn == true
+                                            ? Theme.of(context).primaryColor
+                                            : const Color(0xff7a8fa6),
                                       ),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(5),
                                       child: Icon(
-                                        raisedHands[index].isMicOn == true
-                                            ? FontAwesomeIcons.check
-                                            : null,
+                                        raisedHands[index].isMicOn == true ? FontAwesomeIcons.check : null,
                                         color: Colors.white,
                                         size: 12,
                                       ),
@@ -199,8 +177,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
     raisedHands.clear();
     if (res.snapshot.exists) {
       print(res.snapshot.value);
-      Map<dynamic, dynamic>? response =
-          (res.snapshot.value as Map<dynamic, dynamic>? ?? {});
+      Map<dynamic, dynamic>? response = (res.snapshot.value as Map<dynamic, dynamic>? ?? {});
       response.forEach((key, value) {
         raisedHands.add(
           RoomUser(

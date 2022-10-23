@@ -27,28 +27,23 @@ class ChannelFileDisplayScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ChannelFileDisplayScreen> createState() =>
-      _ChannelFileDisplayScreenState();
+  State<ChannelFileDisplayScreen> createState() => _ChannelFileDisplayScreenState();
 }
 
 class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
-  @override
-  void initState() {
-    super.initState();
-    final messageSearchBloc = MessageSearchBloc.of(context);
-    messageSearchBloc.search(
-      filter: Filter.in_(
-        'cid',
-        [StreamChannel.of(context).channel.cid!],
-      ),
-      messageFilter: Filter.in_(
-        'attachments.type',
-        const ['file'],
-      ),
-      sort: widget.sortOptions,
-      pagination: widget.paginationParams,
-    );
-  }
+  late final messageSearchListController = StreamMessageSearchListController(
+    client: StreamChatCore.of(context).client,
+    filter: Filter.in_(
+      'cid',
+      [StreamChannel.of(context).channel.cid!],
+    ),
+    messageFilter: Filter.in_(
+      'attachments.type',
+      const ['file'],
+    ),
+    sort: widget.sortOptions,
+    limit: 30,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +54,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
         centerTitle: true,
         title: Text(
           "Files",
-          style: TextStyle(
-              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-              fontSize: 16.0),
+          style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textHighEmphasis, fontSize: 16.0),
         ).tr(),
         leading: const Padding(
           padding: EdgeInsets.only(left: 10),
@@ -76,8 +69,6 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
   }
 
   Widget _buildMediaGrid() {
-    final messageSearchBloc = MessageSearchBloc.of(context);
-
     return StreamBuilder<List<GetMessageResponse>>(
       builder: (context, snapshot) {
         if (snapshot.data == null) {
@@ -103,8 +94,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                   "No Files",
                   style: TextStyle(
                     fontSize: 14.0,
-                    color:
-                        StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                   ),
                 ).tr(),
                 const SizedBox(height: 8.0),
@@ -113,10 +103,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.0,
-                    color: StreamChatTheme.of(context)
-                        .colorTheme
-                        .textHighEmphasis
-                        .withOpacity(0.5),
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                   ),
                 ).tr(),
               ],
@@ -133,27 +120,14 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
         }
 
         return LazyLoadScrollView(
-          onEndOfPage: () => messageSearchBloc.search(
-            filter: Filter.in_(
-              'cid',
-              [StreamChannel.of(context).channel.cid!],
-            ),
-            messageFilter: Filter.in_(
-              'attachments.type',
-              const ['file'],
-            ),
-            sort: widget.sortOptions,
-            pagination: widget.paginationParams.copyWith(
-              offset: messageSearchBloc.messageResponses?.length ?? 0,
-            ),
-          ),
+          onEndOfPage: () => search(),
           child: ListView.builder(
             itemBuilder: (context, position) {
               return Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: FileAttachment(
+                  child: StreamFileAttachment(
                     message: media.values.toList()[position],
                     attachment: media.keys.toList()[position],
                   ),
@@ -164,7 +138,17 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
           ),
         );
       },
-      stream: messageSearchBloc.messagesStream,
     );
+  }
+
+  search() {
+    messageSearchListController.searchQuery = 'search-value';
+    messageSearchListController.doInitialLoad();
+  }
+
+  @override
+  dispose() {
+    messageSearchListController.dispose();
+    super.dispose();
   }
 }

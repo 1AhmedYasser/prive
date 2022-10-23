@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
@@ -28,8 +28,7 @@ import '../Widgets/Common/alert_widget.dart';
 class Utils {
   static final player = AudioPlayer();
 
-  static Future<void> showImagePickerSelector(
-      BuildContext context, Function getImage,
+  static Future<void> showImagePickerSelector(BuildContext context, Function getImage,
       {String title = "Pick an Image", bool withVideo = false}) async {
     return showDialog(
       context: context,
@@ -37,8 +36,7 @@ class Utils {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              side: BorderSide(color: Colors.white, width: 1.0)),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)), side: BorderSide(color: Colors.white, width: 1.0)),
           title: Center(
             child: Text(
               title.tr(),
@@ -217,14 +215,11 @@ class Utils {
     };
     return showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+          borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30))),
       context: context,
-      builder: (context) =>
-          StatefulBuilder(builder: (BuildContext context, setState) {
+      builder: (context) => StatefulBuilder(builder: (BuildContext context, setState) {
         return Padding(
-          padding:
-              const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 30),
+          padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 30),
           child: MediaQuery.removePadding(
             context: context,
             removeBottom: true,
@@ -270,10 +265,8 @@ class Utils {
                         ),
                         const SizedBox(height: 11),
                         Text(
-                          mainMenuItems[mainMenuItems.keys.toList()[index]] ??
-                              "",
-                          style: const TextStyle(
-                              color: Color(0xff7a8fa6), fontSize: 15),
+                          mainMenuItems[mainMenuItems.keys.toList()[index]] ?? "",
+                          style: const TextStyle(color: Color(0xff7a8fa6), fontSize: 15),
                         )
                       ],
                     ),
@@ -400,16 +393,14 @@ class Utils {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    final messageDateFormatted =
-        DateTime(messageDate.year, messageDate.month, messageDate.day);
+    final messageDateFormatted = DateTime(messageDate.year, messageDate.month, messageDate.day);
 
     if (messageDateFormatted == today) {
       return DateFormat('hh:mm a').format(messageDate);
     } else if (messageDateFormatted == yesterday) {
       return "Yesterday".tr();
     } else {
-      DateTime firstDayOfTheCurrentWeek =
-          now.subtract(Duration(days: now.weekday - 1));
+      DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
         return DateFormat('d/MM/yyyy').format(messageDate);
       } else {
@@ -425,18 +416,14 @@ class Utils {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    final lastSeenDateFormatted =
-        DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
+    final lastSeenDateFormatted = DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
 
     if (lastSeenDateFormatted == today) {
-      lastSeen +=
-          "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else if (lastSeenDateFormatted == yesterday) {
-      lastSeen +=
-          "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else {
-      DateTime firstDayOfTheCurrentWeek =
-          now.subtract(Duration(days: now.weekday - 1));
+      DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (lastSeenDate.isBefore(firstDayOfTheCurrentWeek)) {
         lastSeen +=
             "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} ${"at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
@@ -461,29 +448,22 @@ class Utils {
           if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
               phone.number.trim().replaceAll(" ", "").startsWith("010") ||
               phone.number.trim().replaceAll(" ", "").startsWith("012")) {
-            String dialCode = deviceDialCode.dialCode == "+20"
-                ? "+2"
-                : deviceDialCode.dialCode;
+            String dialCode = deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
             if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-              phoneNumbers.add(
-                  "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+              phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
             } else {
-              phoneNumbers
-                  .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+              phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
             }
           } else {
             phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
           }
         } catch (e) {
-          String dialCode =
-              deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
+          String dialCode = deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
 
           if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
-            phoneNumbers.add(
-                "$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
+            phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
           } else {
-            phoneNumbers
-                .add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
+            phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
           }
         }
       }
@@ -493,8 +473,7 @@ class Utils {
     List<List<String>> dividedPhoneNumbers = [];
     dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
     for (var phoneNumbers in dividedPhoneNumbers) {
-      QueryUsersResponse usersResponse =
-          await StreamChatCore.of(context).client.queryUsers(
+      QueryUsersResponse usersResponse = await StreamChatCore.of(context).client.queryUsers(
         filter: Filter.and([
           Filter.notEqual("id", context.currentUser!.id),
           Filter.notEqual("role", "admin"),
@@ -516,21 +495,17 @@ class Utils {
   }
 
   static Future<CountryDialCode> _getCountry() async {
-    String? deviceCountryCode =
-        WidgetsBinding.instance.window.locale.countryCode;
+    String? deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
     CountryDialCode? deviceDialCode;
     try {
-      deviceCountryCode =
-          (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
+      deviceCountryCode = (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
       if (deviceCountryCode.isEmpty == true) {
         deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
       }
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     } catch (e) {
       deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
-      deviceDialCode =
-          CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
     }
     return deviceDialCode;
   }
@@ -571,8 +546,7 @@ class Utils {
     );
   }
 
-  static void openMapsSheet(
-      context, double lat, double long, Function priveChosen) async {
+  static void openMapsSheet(context, double lat, double long, Function priveChosen) async {
     try {
       final cords = Coords(lat, long);
       final availableMaps = await MapLauncher.installedMaps;
@@ -592,12 +566,10 @@ class Utils {
               child: Wrap(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, top: 20, bottom: 10, right: 20),
+                    padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
                     child: Text(
                       "Open Via".tr(),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
                   ListTile(
@@ -672,10 +644,8 @@ class Utils {
 
   static String generateRandomString(int len) {
     var r = Random();
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
   }
 }
 

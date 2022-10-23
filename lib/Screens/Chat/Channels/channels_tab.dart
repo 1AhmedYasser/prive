@@ -12,12 +12,10 @@ class ChannelsTab extends StatefulWidget {
   const ChannelsTab({Key? key}) : super(key: key);
 
   @override
-  _ChannelsTabState createState() => _ChannelsTabState();
+  State<ChannelsTab> createState() => _ChannelsTabState();
 }
 
-class _ChannelsTabState extends State<ChannelsTab>
-    with TickerProviderStateMixin {
-  final channelListController = ChannelListController();
+class _ChannelsTabState extends State<ChannelsTab> with TickerProviderStateMixin {
   late final AnimationController _animationController;
 
   @override
@@ -31,9 +29,9 @@ class _ChannelsTabState extends State<ChannelsTab>
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(
       builder: (context, provider, ch) {
-        return ChannelsBloc(
-          child: ChannelListView(
-            channelListController: channelListController,
+        return StreamChannelListView(
+          controller: StreamChannelListController(
+            client: StreamChat.of(context).client,
             filter: Filter.and(
               [
                 Filter.equal('type', 'messaging'),
@@ -49,34 +47,27 @@ class _ChannelsTabState extends State<ChannelsTab>
             sort: const [SortOption('last_message_at')],
             presence: true,
             limit: 20,
-            watch: true,
-            swipeToAction: true,
-            separatorBuilder: (context, index) => const SizedBox.shrink(),
-            emptyBuilder: (context) =>
-                ChannelsEmptyState(animationController: _animationController),
-            errorBuilder: (context, widget) {
-              Utils.checkForInternetConnection(context);
-              return const SizedBox.shrink();
-            },
-            loadingBuilder: (context) => const UltraLoadingIndicator(),
-            onChannelTap: (channel, w) {
-              Navigator.of(context).push(
-                ChatScreen.routeWithChannel(channel),
-              );
-            },
-            listBuilder: (context, channels) {
-              channels = channels
-                  .where(
-                      (channel) => channel.state?.messages.isNotEmpty ?? false)
-                  .toList();
-              return channels.isNotEmpty
-                  ? ChannelsListWidget(
-                      channels: channels,
-                    )
-                  : ChannelsEmptyState(
-                      animationController: _animationController);
-            },
           ),
+          separatorBuilder: (context, channels, index) => const SizedBox.shrink(),
+          emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
+          errorBuilder: (context, widget) {
+            Utils.checkForInternetConnection(context);
+            return const SizedBox.shrink();
+          },
+          loadingBuilder: (context) => const UltraLoadingIndicator(),
+          onChannelTap: (channel) {
+            Navigator.of(context).push(
+              ChatScreen.routeWithChannel(channel),
+            );
+          },
+          itemBuilder: (context, channels, index, tile) {
+            channels = channels.where((channel) => channel.state?.messages.isNotEmpty ?? false).toList();
+            return channels.isNotEmpty
+                ? ChannelsListWidget(
+                    channels: channels,
+                  )
+                : ChannelsEmptyState(animationController: _animationController);
+          },
         );
       },
     );

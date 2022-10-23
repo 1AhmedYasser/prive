@@ -27,7 +27,6 @@ import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Models/Call/call.dart';
@@ -44,8 +43,7 @@ class ChatScreen extends StatefulWidget {
   final Channel channel;
   final bool isChannel;
 
-  static Route routeWithChannel(Channel channel, {bool isChannel = false}) =>
-      MaterialPageRoute(
+  static Route routeWithChannel(Channel channel, {bool isChannel = false}) => MaterialPageRoute(
         builder: (context) => StreamChannel(
           channel: channel,
           child: ChatScreen(
@@ -55,11 +53,10 @@ class ChatScreen extends StatefulWidget {
         ),
       );
 
-  const ChatScreen({Key? key, required this.channel, this.isChannel = false})
-      : super(key: key);
+  const ChatScreen({Key? key, required this.channel, this.isChannel = false}) : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
@@ -72,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
   FocusNode? _focusNode;
   loc.Location location = loc.Location();
   StreamSubscription<loc.LocationData>? locationSubscription;
-  final GlobalKey<MessageInputState> _messageInputKey = GlobalKey();
+  final GlobalKey<StreamMessageInputState> _messageInputKey = GlobalKey();
   bool isMessageSelectionOn = false;
   List<Message> selectedMessages = [];
   List<Message> searchedMessages = [];
@@ -81,8 +78,8 @@ class _ChatScreenState extends State<ChatScreen> {
   late Channel channel;
   int randomNumber = Random().nextInt(15);
   bool isMessageSearchOn = false;
-  final TextEditingController _messageSearchController =
-      TextEditingController();
+  final TextEditingController _messageSearchController = TextEditingController();
+  final StreamMessageInputController _messageInputController = StreamMessageInputController();
   Member? otherMember;
   Call? groupCall;
   StreamSubscription? onAddListener;
@@ -109,17 +106,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     channel = StreamChannel.of(context).channel;
-    otherMember = widget.channel.state?.members
-        .where((element) => element.userId != context.currentUser?.id)
-        .firstOrNull;
+    otherMember =
+        widget.channel.state?.members.where((element) => element.userId != context.currentUser?.id).firstOrNull;
     Utils.checkForInternetConnection(context);
     _focusNode = FocusNode();
     _getChatBackground();
-    unreadCountSubscription = StreamChannel.of(context)
-        .channel
-        .state!
-        .unreadCountStream
-        .listen(_unreadCountHandler);
+    unreadCountSubscription = StreamChannel.of(context).channel.state!.unreadCountStream.listen(_unreadCountHandler);
     _listenToFirebaseChanges();
     _getGroupAdmins();
     _getMembersPermissions();
@@ -167,10 +159,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           var channel = StreamChannel.of(context).channel;
 
                           if (channel.isGroup == false) {
-                            final currentUser =
-                                StreamChat.of(context).currentUser;
-                            final otherUser =
-                                channel.state!.members.firstWhereOrNull(
+                            final currentUser = StreamChat.of(context).currentUser;
+                            final otherUser = channel.state!.members.firstWhereOrNull(
                               (element) => element.user!.id != currentUser!.id,
                             );
                             if (otherUser != null) {
@@ -180,15 +170,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                   builder: (context) => StreamChannel(
                                     channel: channel,
                                     child: ChatInfoScreen(
-                                      messageTheme: StreamChatTheme.of(context)
-                                          .ownMessageTheme,
+                                      messageTheme: StreamChatTheme.of(context).ownMessageTheme,
                                       user: otherUser.user,
                                     ),
                                   ),
                                 ),
                               );
 
-                              if (pop == true) {
+                              if (pop == true && mounted) {
                                 Navigator.pop(context);
                               }
                             }
@@ -199,8 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 builder: (context) => StreamChannel(
                                   channel: channel,
                                   child: GroupInfoScreen(
-                                    messageTheme: StreamChatTheme.of(context)
-                                        .ownMessageTheme,
+                                    messageTheme: StreamChatTheme.of(context).ownMessageTheme,
                                     channel: channel,
                                   ),
                                 ),
@@ -237,8 +225,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   context.currentUser!,
                                 ),
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.black),
+                                style: const TextStyle(fontSize: 15, color: Colors.black),
                               );
                             },
                           ),
@@ -257,12 +244,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                   );
                                 } else {
-                                  return ConnectionStatusBuilder(
+                                  return StreamConnectionStatusBuilder(
                                     statusBuilder: (context, status) {
                                       switch (status) {
                                         case ConnectionStatus.connected:
-                                          return _buildConnectedTitleState(
-                                              context, data);
+                                          return _buildConnectedTitleState(context, data);
                                         case ConnectionStatus.connecting:
                                           return const Text(
                                             'Connecting',
@@ -304,23 +290,18 @@ class _ChatScreenState extends State<ChatScreen> {
                             onChanged: (keyword) async {
                               searchedMessages.clear();
                               if (keyword.isNotEmpty) {
-                                SearchMessagesResponse response =
-                                    await channel.search(query: keyword);
+                                SearchMessagesResponse response = await channel.search(query: keyword);
                                 for (var value in response.results) {
                                   searchedMessages.add(value.message);
                                 }
                                 if (searchedMessages.isNotEmpty) {
-                                  searchedMessages
-                                      .sortBy((element) => element.createdAt);
+                                  searchedMessages.sortBy((element) => element.createdAt);
                                   initialMessage = searchedMessages.last;
                                   setState(() {});
                                 }
                               }
                             },
-                            showCloseButton:
-                                _messageSearchController.text.isNotEmpty
-                                    ? true
-                                    : false,
+                            showCloseButton: _messageSearchController.text.isNotEmpty ? true : false,
                           ),
                         ),
                       ],
@@ -330,8 +311,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             Text(
                               "${selectedMessages.length}",
-                              style: const TextStyle(
-                                  color: Colors.black, fontSize: 17),
+                              style: const TextStyle(color: Colors.black, fontSize: 17),
                             ),
                           ],
                         )
@@ -409,9 +389,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       GestureDetector(
                         child: Icon(
                           Icons.ios_share,
-                          color: selectedMessages.isEmpty
-                              ? Colors.grey.withOpacity(0.4)
-                              : const Color(0xff7a8fa6),
+                          color: selectedMessages.isEmpty ? Colors.grey.withOpacity(0.4) : const Color(0xff7a8fa6),
                         ),
                         onTap: () {
                           if (selectedMessages.isNotEmpty) {
@@ -428,9 +406,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       GestureDetector(
                         child: Image.asset(
                           R.images.forwardIcon,
-                          color: selectedMessages.isEmpty
-                              ? Colors.grey.withOpacity(0.4)
-                              : null,
+                          color: selectedMessages.isEmpty ? Colors.grey.withOpacity(0.4) : null,
                           width: 20.5,
                         ),
                         onTap: () {
@@ -455,9 +431,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       GestureDetector(
                         child: Image.asset(
                           R.images.deleteChatImage,
-                          color: selectedMessages.isEmpty
-                              ? Colors.grey.withOpacity(0.4)
-                              : null,
+                          color: selectedMessages.isEmpty ? Colors.grey.withOpacity(0.4) : null,
                           width: 16.5,
                         ),
                         onTap: () {
@@ -485,8 +459,7 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         child: StreamChannel(
           channel: channel,
-          initialMessageId:
-              initialMessage != null ? initialMessage?.id ?? "" : null,
+          initialMessageId: initialMessage != null ? initialMessage?.id ?? "" : null,
           child: Column(
             children: [
               if (groupCall != null && groupCall?.members?.isNotEmpty == true)
@@ -502,9 +475,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              groupCall?.type == "Video"
-                                  ? "Video Call"
-                                  : "Voice Call",
+                              groupCall?.type == "Video" ? "Video Call" : "Voice Call",
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
@@ -535,8 +506,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50),
                                     child: CachedImage(
-                                      url:
-                                          groupCall?.members?.first.image ?? "",
+                                      url: groupCall?.members?.first.image ?? "",
                                       fit: BoxFit.fill,
                                     ),
                                   ),
@@ -576,12 +546,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         const Expanded(child: SizedBox()),
                         ElevatedButton(
                           onPressed: () async {
-                            if (kickedCallMembersIds
-                                .contains(context.currentUser?.id)) {
+                            if (kickedCallMembersIds.contains(context.currentUser?.id)) {
                               Utils.showAlert(
                                 context,
-                                message: "You Have Been Kicked Out Of This Call"
-                                    .tr(),
+                                message: "You Have Been Kicked Out Of This Call".tr(),
                                 alertImage: R.images.alertInfoImage,
                               );
                             } else {
@@ -597,9 +565,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     maxChildSize: 0.95,
                                     builder: (_, controller) {
                                       return GroupCallScreen(
-                                        isVideo: groupCall?.type == "Video"
-                                            ? true
-                                            : false,
+                                        isVideo: groupCall?.type == "Video" ? true : false,
                                         isJoining: true,
                                         channel: channel,
                                         scrollController: controller,
@@ -657,12 +623,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               : Center(
                                   child: IgnorePointer(
                                     child: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          1.8,
+                                      width: MediaQuery.of(context).size.width / 1.8,
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .primaryColorDark
-                                            .withOpacity(0.65),
+                                        color: Theme.of(context).primaryColorDark.withOpacity(0.65),
                                         borderRadius: BorderRadius.circular(17),
                                       ),
                                       child: Padding(
@@ -697,8 +660,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         return Directionality(
                           textDirection: ui.TextDirection.ltr,
                           child: StreamMessageListViewTheme(
-                            data:
-                                StreamMessageListViewTheme.of(context).copyWith(
+                            data: StreamMessageListViewTheme.of(context).copyWith(
                               backgroundImage: isAFile == true
                                   ? DecorationImage(
                                       image: FileImage(File(chatBackground)),
@@ -724,11 +686,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10,
-                                            right: 10,
-                                            top: 7,
-                                            bottom: 7),
+                                        padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 7),
                                         child: Text(
                                           getHeaderDate(context, date),
                                           textAlign: TextAlign.center,
@@ -745,20 +703,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               messageHighlightColor: Colors.grey.shade300,
                               onMessageSwiped: _reply,
                               messageFilter: defaultFilter,
-                              messageBuilder:
-                                  (context, details, messages, defaultMessage) {
+                              messageBuilder: (context, details, messages, defaultMessage) {
                                 return isMessageSelectionOn
                                     ? Container(
-                                        color: selectedMessages.contains(
-                                                defaultMessage.message)
+                                        color: selectedMessages.contains(defaultMessage.message)
                                             ? Colors.green.withOpacity(0.4)
                                             : Colors.transparent,
                                         child: Theme(
                                           data: ThemeData(
                                             checkboxTheme: CheckboxThemeData(
                                               shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
+                                                borderRadius: BorderRadius.circular(5),
                                               ),
                                             ),
                                           ),
@@ -767,16 +722,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                               IgnorePointer(
                                                 child: Checkbox(
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                    borderRadius: BorderRadius.circular(5),
                                                   ),
                                                   value:
-                                                      selectedMessages.contains(
-                                                              defaultMessage
-                                                                  .message)
-                                                          ? true
-                                                          : false,
+                                                      selectedMessages.contains(defaultMessage.message) ? true : false,
                                                   onChanged: (value) {},
                                                 ),
                                               ),
@@ -790,8 +739,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ),
                                         ),
                                       )
-                                    : _buildChatMessage(
-                                        defaultMessage, details);
+                                    : _buildChatMessage(defaultMessage, details);
                               },
                             ),
                           ),
@@ -811,15 +759,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.only(left: 30, right: 15),
                         child: GestureDetector(
                           onTap: () {
-                            if (searchedMessages.isNotEmpty &&
-                                searchedMessages.length > 1) {
+                            if (searchedMessages.isNotEmpty && searchedMessages.length > 1) {
                               if (initialMessage != null) {
-                                int index =
-                                    searchedMessages.indexOf(initialMessage!);
+                                int index = searchedMessages.indexOf(initialMessage!);
                                 if (index > 0) {
                                   setState(() {
-                                    initialMessage =
-                                        searchedMessages[index - 1];
+                                    initialMessage = searchedMessages[index - 1];
                                   });
                                 }
                               }
@@ -835,11 +780,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          if (_messageSearchController.text.isNotEmpty &&
-                              searchedMessages.length > 1) {
+                          if (_messageSearchController.text.isNotEmpty && searchedMessages.length > 1) {
                             if (initialMessage != null) {}
-                            int index =
-                                searchedMessages.indexOf(initialMessage!);
+                            int index = searchedMessages.indexOf(initialMessage!);
                             if (index < searchedMessages.length - 1) {
                               setState(() {
                                 initialMessage = searchedMessages[index + 1];
@@ -849,19 +792,16 @@ class _ChatScreenState extends State<ChatScreen> {
                         },
                         child: Icon(
                           FontAwesomeIcons.chevronDown,
-                          color: _messageSearchController.text.isNotEmpty &&
-                                  searchedMessages.length > 1
+                          color: _messageSearchController.text.isNotEmpty && searchedMessages.length > 1
                               ? Theme.of(context).primaryColorDark
                               : Colors.grey.shade400,
                         ),
                       ),
-                      if (searchedMessages.isNotEmpty)
-                        const SizedBox(width: 40),
+                      if (searchedMessages.isNotEmpty) const SizedBox(width: 40),
                       if (searchedMessages.isNotEmpty)
                         Text(
                           "${initialMessage != null ? searchedMessages.indexOf(initialMessage!) + 1 : 0} of ${searchedMessages.length} Matches",
-                          style: TextStyle(
-                              fontSize: 16, color: Colors.grey.shade700),
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                         )
                     ],
                   ),
@@ -872,7 +812,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, state) {
                     _getMembersPermissions();
                     _getGroupAdmins();
-                    return MessageInput(
+                    return StreamMessageInput(
+                      messageInputController: _messageInputController,
                       showCommandsButton: false,
                       key: _messageInputKey,
                       focusNode: _focusNode,
@@ -881,7 +822,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           : sendMedia
                               ? false
                               : true,
-                      quotedMessage: _quotedMessage,
                       actions: [
                         adminSelf != null
                             ? GestureDetector(
@@ -905,20 +845,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       idleSendButton: adminSelf != null
                           ? Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 10, right: 10),
+                              padding: const EdgeInsets.only(left: 10, right: 10),
                               child: RecordButton(
-                                recordingFinishedCallback:
-                                    _recordingFinishedCallback,
+                                recordingFinishedCallback: _recordingFinishedCallback,
                               ),
                             )
                           : sendMessages
                               ? Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
+                                  padding: const EdgeInsets.only(left: 10, right: 10),
                                   child: RecordButton(
-                                    recordingFinishedCallback:
-                                        _recordingFinishedCallback,
+                                    recordingFinishedCallback: _recordingFinishedCallback,
                                   ),
                                 )
                               : const SizedBox(width: 15),
@@ -928,16 +864,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       activeSendButton: adminSelf != null
                           ? Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 10, right: 10),
+                              padding: const EdgeInsets.only(left: 10, right: 10),
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xff37dabc),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                                 child: const Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 12, right: 8, top: 10, bottom: 10),
+                                  padding: EdgeInsets.only(left: 12, right: 8, top: 10, bottom: 10),
                                   child: Center(
                                     child: Icon(
                                       Icons.send,
@@ -949,19 +883,14 @@ class _ChatScreenState extends State<ChatScreen> {
                             )
                           : sendMessages
                               ? Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
+                                  padding: const EdgeInsets.only(left: 10, right: 10),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: const Color(0xff37dabc),
                                       borderRadius: BorderRadius.circular(50),
                                     ),
                                     child: const Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 12,
-                                          right: 8,
-                                          top: 10,
-                                          bottom: 10),
+                                      padding: EdgeInsets.only(left: 12, right: 8, top: 10, bottom: 10),
                                       child: Center(
                                         child: Icon(
                                           Icons.send,
@@ -1014,6 +943,47 @@ class _ChatScreenState extends State<ChatScreen> {
       final snapshot = await ref.get();
       if (snapshot.exists) {
         if (snapshot.value as String == "Ended") {
+          if (mounted) {
+            Utils.logCallStart(
+              context,
+              context.currentUser?.id ?? "",
+              otherMember?.userId ?? "",
+              isVideo,
+            );
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (BuildContext context, _, __) {
+                  return SingleCallScreen(
+                    channel: channel,
+                    isVideo: isVideo,
+                  );
+                },
+                transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+          }
+        } else {
+          showDialog(
+            context: context,
+            builder: (_) => CupertinoAlertDialog(
+              title: const Text("Prive"),
+              content: Text("${otherMember?.user?.name ?? "Member".tr()} ${"is on another call".tr()}"),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text("Ok").tr(),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
           Utils.logCallStart(
             context,
             context.currentUser?.id ?? "",
@@ -1028,8 +998,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   isVideo: isVideo,
                 );
               },
-              transitionsBuilder:
-                  (_, Animation<double> animation, __, Widget child) {
+              transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
                 return FadeTransition(
                   opacity: animation,
                   child: child,
@@ -1037,46 +1006,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           );
-        } else {
-          showDialog(
-            context: context,
-            builder: (_) => CupertinoAlertDialog(
-              title: const Text("Prive"),
-              content: Text(
-                  "${otherMember?.user?.name ?? "Member".tr()} ${"is on another call".tr()}"),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text("Ok").tr(),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
-            ),
-          );
         }
-      } else {
-        Utils.logCallStart(
-          context,
-          context.currentUser?.id ?? "",
-          otherMember?.userId ?? "",
-          isVideo,
-        );
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (BuildContext context, _, __) {
-              return SingleCallScreen(
-                channel: channel,
-                isVideo: isVideo,
-              );
-            },
-            transitionsBuilder:
-                (_, Animation<double> animation, __, Widget child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
       }
     }
   }
@@ -1118,11 +1048,9 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  MessageThemeData getMessageTheme(
-      BuildContext context, MessageDetails details) {
+  StreamMessageThemeData getMessageTheme(BuildContext context, MessageDetails details) {
     return StreamChatTheme.of(context).ownMessageTheme.copyWith(
-          messageBackgroundColor:
-              details.isMyMessage ? const Color(0xff7a8fa6) : Colors.white,
+          messageBackgroundColor: details.isMyMessage ? const Color(0xff7a8fa6) : Colors.white,
           messageTextStyle: TextStyle(
             color: details.isMyMessage ? Colors.white : Colors.black,
           ),
@@ -1151,8 +1079,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildChatMessage(
-      MessageWidget defaultMessage, MessageDetails details) {
+  Widget _buildChatMessage(StreamMessageWidget defaultMessage, MessageDetails details) {
     return StreamBuilder<ChannelState>(
       stream: widget.channel.state?.channelStateStream,
       builder: (context, state) {
@@ -1180,14 +1107,12 @@ class _ChatScreenState extends State<ChatScreen> {
               bottomRight: Radius.circular(details.isMyMessage ? 0 : 7),
             ),
             side: BorderSide(
-              color:
-                  defaultMessage.messageTheme.messageBorderColor ?? Colors.grey,
+              color: defaultMessage.messageTheme.messageBorderColor ?? Colors.grey,
               width: 0.3,
             ),
           ),
           usernameBuilder: (context, message) {
-            if (defaultMessage.message.extraData["isMessageForwarded"] ==
-                true) {
+            if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
               return Row(
                 children: [
                   Image.asset(
@@ -1204,15 +1129,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   ).tr(),
                 ],
               );
-            } else if (message.user?.id != context.currentUser?.id &&
-                widget.isChannel) {
+            } else if (message.user?.id != context.currentUser?.id && widget.isChannel) {
               return Text(
                 message.user?.name ?? "",
                 style: const TextStyle(fontSize: 11),
               );
             } else if (channel.isGroup) {
-              Map<String, dynamic>? nameColors =
-                  channel.extraData['name_colors'] as Map<String, dynamic>?;
+              Map<String, dynamic>? nameColors = channel.extraData['name_colors'] as Map<String, dynamic>?;
               return Text(
                 message.user?.name ?? "",
                 overflow: TextOverflow.ellipsis,
@@ -1220,9 +1143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 textScaleFactor: 0.95,
                 style: TextStyle(
                   fontSize: 11,
-                  color: nameColors != null
-                      ? parseColor(nameColors[message.user?.id] as String)
-                      : Colors.black,
+                  color: nameColors != null ? parseColor(nameColors[message.user?.id] as String) : Colors.black,
                 ),
               );
             } else {
@@ -1236,8 +1157,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   selectedMessages.remove(defaultMessage.message);
                 } else {
                   final isDeletedOrShadowed =
-                      defaultMessage.message.isDeleted == true ||
-                          defaultMessage.message.shadowed == true;
+                      defaultMessage.message.isDeleted == true || defaultMessage.message.shadowed == true;
                   if (!isDeletedOrShadowed) {
                     selectedMessages.add(defaultMessage.message);
                   }
@@ -1267,7 +1187,7 @@ class _ChatScreenState extends State<ChatScreen> {
             //     showDeletePopup(message);
             //   },
             // ),
-            MessageAction(
+            StreamMessageAction(
               leading: const Icon(
                 CommunityMaterialIcons.share_outline,
                 color: Color(0xff7e7e7e),
@@ -1414,8 +1334,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ).tr();
         } else {
           alternativeWidget = Text(
-            getLastSeenDate(
-                otherMember.user?.lastActive?.toLocal() ?? DateTime.now()),
+            getLastSeenDate(otherMember.user?.lastActive?.toLocal() ?? DateTime.now()),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -1438,24 +1357,19 @@ class _ChatScreenState extends State<ChatScreen> {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    final lastSeenDateFormatted =
-        DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
+    final lastSeenDateFormatted = DateTime(lastSeenDate.year, lastSeenDate.month, lastSeenDate.day);
 
     if (lastSeenDateFormatted == today) {
-      lastSeen +=
-          "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"today at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else if (lastSeenDateFormatted == yesterday) {
-      lastSeen +=
-          "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
+      lastSeen += "${"yesterday at".tr()} ${DateFormat('hh:mm a').format(lastSeenDate)}";
     } else {
-      DateTime firstDayOfTheCurrentWeek =
-          now.subtract(Duration(days: now.weekday - 1));
+      DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (lastSeenDate.isBefore(firstDayOfTheCurrentWeek)) {
         lastSeen +=
             "${DateFormat.MMMd(context.locale.languageCode).format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
       } else {
-        lastSeen +=
-            "${DateFormat('EEEE').format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
+        lastSeen += "${DateFormat('EEEE').format(lastSeenDate)} at ${DateFormat('hh:mm a').format(lastSeenDate)}";
       }
     }
     return lastSeen;
@@ -1463,8 +1377,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _getChatBackground() async {
     isAFile = await Utils.getBool(R.pref.isChosenChatBackgroundAFile);
-    chatBackground = await Utils.getString(R.pref.chosenChatBackground) ??
-        R.images.chatBackground1;
+    chatBackground = await Utils.getString(R.pref.chosenChatBackground) ?? R.images.chatBackground1;
     setState(() {});
   }
 
@@ -1474,16 +1387,14 @@ class _ChatScreenState extends State<ChatScreen> {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    final messageDateFormatted =
-        DateTime(element.year, element.month, element.day);
+    final messageDateFormatted = DateTime(element.year, element.month, element.day);
 
     if (messageDateFormatted == today) {
       return "Today".tr();
     } else if (messageDateFormatted == yesterday) {
       return "Yesterday".tr();
     } else {
-      DateTime firstDayOfTheCurrentWeek =
-          now.subtract(Duration(days: now.weekday - 1));
+      DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
         return DateFormat.MMMd(context.locale.languageCode).format(messageDate);
       } else {
@@ -1493,15 +1404,15 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _reply(Message message) {
-    setState(() => _quotedMessage = message);
+    _messageInputController.quotedMessage = message;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _focusNode!.requestFocus();
     });
   }
 
   bool defaultFilter(Message m) {
-    var _currentUser = StreamChat.of(context).currentUser;
-    final isMyMessage = m.user?.id == _currentUser?.id;
+    var currentUser = StreamChat.of(context).currentUser;
+    final isMyMessage = m.user?.id == currentUser?.id;
     final isDeletedOrShadowed = m.isDeleted == true || m.shadowed == true;
     if (isDeletedOrShadowed && !isMyMessage) return false;
     return true;
@@ -1520,7 +1431,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> onLocationRequestPressed() async {
     LocationData _locationData = await location.getLocation();
-    _messageInputKey.currentState?.addAttachment(
+    _messageInputController.addAttachment(
       Attachment(
         type: 'location',
         uploadState: const UploadState.success(),
@@ -1581,21 +1492,18 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         });
       },
-      child: wrapAttachmentWidget(
-        context,
-        MapThumbnailWidget(
+      child: WrapAttachmentWidget(
+        attachmentWidget: MapThumbnailWidget(
           lat: lat,
           long: long,
         ),
-        const RoundedRectangleBorder(),
-        true,
+        attachmentShape: const RoundedRectangleBorder(),
       ),
     );
   }
 
   void checkForGroupCall() async {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
@@ -1607,8 +1515,7 @@ class _ChatScreenState extends State<ChatScreen> {
       List<CallMember>? members = [];
       List<CallMember>? kickedMembers = [];
 
-      Map<dynamic, dynamic>? membersList =
-          (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? membersList = (groupCallResponse['members'] as Map<dynamic, dynamic>?) ?? {};
       membersList.forEach((key, value) {
         members.add(
           CallMember(
@@ -1624,8 +1531,7 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       });
 
-      Map<dynamic, dynamic>? kickedMembersList =
-          (groupCallResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? kickedMembersList = (groupCallResponse['kickedMembers'] as Map<dynamic, dynamic>?) ?? {};
       kickedMembersList.forEach((key, value) {
         kickedMembers.add(
           CallMember(
@@ -1650,8 +1556,7 @@ class _ChatScreenState extends State<ChatScreen> {
           members: members,
           kickedMembers: kickedMembers,
         );
-        kickedCallMembersIds =
-            groupCall?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+        kickedCallMembersIds = groupCall?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
       }
       setState(() {});
     } else {
@@ -1661,8 +1566,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference =
-        FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
     onAddListener = databaseReference.onChildAdded.listen((event) {
       checkForGroupCall();
     });
@@ -1675,9 +1579,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _getMembersPermissions() {
-    Map<String, dynamic>? membersPermissions = widget.channel
-            .extraData['members_permissions'] as Map<String, dynamic>? ??
-        {};
+    Map<String, dynamic>? membersPermissions =
+        widget.channel.extraData['members_permissions'] as Map<String, dynamic>? ?? {};
     sendMessages = membersPermissions['send_messages'] as bool? ?? true;
     sendMedia = membersPermissions['send_media'] as bool? ?? true;
     addMembers = membersPermissions['add_members'] as bool? ?? true;
@@ -1685,15 +1588,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _getGroupAdmins() {
     groupAdmins = [];
-    List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
+    List<dynamic>? admins = widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
-      GroupAdmin groupAdmin =
-          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
-    adminSelf = groupAdmins
-        .firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
+    adminSelf = groupAdmins.firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
 
     if (adminSelf != null) {
       _getAdminPermissions(adminSelf);

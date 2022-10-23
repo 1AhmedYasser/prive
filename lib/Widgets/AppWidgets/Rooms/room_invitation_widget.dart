@@ -26,19 +26,14 @@ class RoomInvitationWidget extends StatefulWidget {
   final String roomRef;
   final Room? room;
   const RoomInvitationWidget(
-      {Key? key,
-      this.roomContacts = const [],
-      this.isSpeaker = false,
-      required this.roomRef,
-      this.room})
+      {Key? key, this.roomContacts = const [], this.isSpeaker = false, required this.roomRef, this.room})
       : super(key: key);
 
   @override
   State<RoomInvitationWidget> createState() => _RoomInvitationWidgetState();
 }
 
-class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
-    with TickerProviderStateMixin {
+class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with TickerProviderStateMixin {
   TextEditingController? _controller;
   final _selectedUsers = <User>{};
   bool _permissionDenied = false;
@@ -67,7 +62,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
         ),
       ),
       height: MediaQuery.of(context).size.height / 1.5,
-      child: ConnectionStatusBuilder(
+      child: StreamConnectionStatusBuilder(
         statusBuilder: (context, status) {
           String statusString = '';
           bool showStatus = true;
@@ -86,7 +81,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
           }
           return Stack(
             children: [
-              InfoTile(
+              StreamInfoTile(
                 showMessage: showStatus,
                 tileAnchor: Alignment.topCenter,
                 childAnchor: Alignment.topCenter,
@@ -99,12 +94,9 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(
-                            top: 30, left: 30, right: 30, bottom: 0),
+                        padding: const EdgeInsets.only(top: 30, left: 30, right: 30, bottom: 0),
                         child: Text(
-                          widget.isSpeaker
-                              ? "Invite A Speaker"
-                              : "Invite People To The Room",
+                          widget.isSpeaker ? "Invite A Speaker" : "Invite People To The Room",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18,
@@ -113,8 +105,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                         ).tr(),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 15, right: 15),
+                        padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
                         child: SizedBox(
                           height: 60,
                           child: SearchTextField(
@@ -131,11 +122,8 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                 setState(() {
                                   users = allUsers
                                       .where(
-                                        (element) => element.name
-                                            .toLowerCase()
-                                            .contains(_controller?.text
-                                                    .toLowerCase() ??
-                                                ""),
+                                        (element) =>
+                                            element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
                                       )
                                       .toList();
                                 });
@@ -147,11 +135,9 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                       phoneContacts.isNotEmpty
                           ? users.isNotEmpty
                               ? SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height / 2.5,
+                                  height: MediaQuery.of(context).size.height / 2.5,
                                   child: RefreshIndicator(
-                                    onRefresh: () =>
-                                        Future.sync(() => _getContacts()),
+                                    onRefresh: () => Future.sync(() => _getContacts()),
                                     child: AnimationLimiter(
                                       child: MediaQuery.removePadding(
                                         context: context,
@@ -159,130 +145,82 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                         removeBottom: true,
                                         child: ListView.separated(
                                           itemBuilder: (context, index) {
-                                            return AnimationConfiguration
-                                                .staggeredList(
+                                            return AnimationConfiguration.staggeredList(
                                               position: index,
                                               child: SlideAnimation(
                                                 horizontalOffset: 50.0,
                                                 child: FadeInAnimation(
                                                   child: InkWell(
-                                                    splashColor:
-                                                        Colors.transparent,
-                                                    highlightColor:
-                                                        Colors.transparent,
+                                                    splashColor: Colors.transparent,
+                                                    highlightColor: Colors.transparent,
                                                     onTap: () {
                                                       setState(() {
-                                                        if (_selectedUsers
-                                                            .contains(
-                                                                users[index])) {
-                                                          _selectedUsers.remove(
-                                                              users[index]);
+                                                        if (_selectedUsers.contains(users[index])) {
+                                                          _selectedUsers.remove(users[index]);
                                                         } else {
-                                                          _selectedUsers.add(
-                                                              users[index]);
+                                                          _selectedUsers.add(users[index]);
                                                         }
                                                       });
                                                     },
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 25,
-                                                              right: 25,
-                                                              bottom: 0),
+                                                      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 0),
                                                       child: Column(
                                                         children: [
-                                                          const SizedBox(
-                                                              height: 10),
+                                                          const SizedBox(height: 10),
                                                           Row(
                                                             children: [
                                                               ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            50),
+                                                                borderRadius: BorderRadius.circular(50),
                                                                 child: SizedBox(
                                                                   height: 50,
                                                                   width: 50,
-                                                                  child:
-                                                                      CachedImage(
-                                                                    url: users[index]
-                                                                            .image ??
-                                                                        "",
+                                                                  child: CachedImage(
+                                                                    url: users[index].image ?? "",
                                                                   ),
                                                                 ),
                                                               ),
-                                                              const SizedBox(
-                                                                  width: 13),
+                                                              const SizedBox(width: 13),
                                                               Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Text(
-                                                                    users[index]
-                                                                        .name,
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
+                                                                    users[index].name,
+                                                                    style: const TextStyle(
+                                                                      fontWeight: FontWeight.w500,
                                                                     ),
                                                                   ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          3),
+                                                                  const SizedBox(height: 3),
                                                                   Text(
-                                                                    users[index]
-                                                                            .online
-                                                                        ? "Online"
-                                                                            .tr()
+                                                                    users[index].online
+                                                                        ? "Online".tr()
                                                                         : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
-                                                                            users[index].lastActive ??
-                                                                                DateTime.now(),
+                                                                            users[index].lastActive ?? DateTime.now(),
                                                                           )}",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
+                                                                    style: TextStyle(
+                                                                      fontWeight: FontWeight.w400,
                                                                       color: users[index].online
-                                                                          ? Colors
-                                                                              .green
-                                                                          : Colors
-                                                                              .grey,
-                                                                      fontSize:
-                                                                          13,
+                                                                          ? Colors.green
+                                                                          : Colors.grey,
+                                                                      fontSize: 13,
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
-                                                              if (_selectedUsers
-                                                                  .contains(users[
-                                                                      index]))
+                                                              if (_selectedUsers.contains(users[index]))
                                                                 const Expanded(
-                                                                  child:
-                                                                      SizedBox(),
+                                                                  child: SizedBox(),
                                                                 ),
-                                                              if (_selectedUsers
-                                                                  .contains(users[
-                                                                      index]))
+                                                              if (_selectedUsers.contains(users[index]))
                                                                 Padding(
-                                                                  padding: const EdgeInsets
-                                                                          .only(
-                                                                      right:
-                                                                          20),
+                                                                  padding: const EdgeInsets.only(right: 20),
                                                                   child: Icon(
-                                                                    Icons
-                                                                        .check_circle,
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .primaryColor,
+                                                                    Icons.check_circle,
+                                                                    color: Theme.of(context).primaryColor,
                                                                   ),
                                                                 )
                                                             ],
                                                           ),
-                                                          const SizedBox(
-                                                              height: 10),
+                                                          const SizedBox(height: 10),
                                                         ],
                                                       ),
                                                     ),
@@ -335,27 +273,21 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
                                       ),
                                       const SizedBox(height: 20),
                                       ElevatedButton(
-                                        onPressed: () =>
-                                            AppSettings.openAppSettings(),
+                                        onPressed: () => AppSettings.openAppSettings(),
                                         style: ElevatedButton.styleFrom(
-                                          primary:
-                                              Theme.of(context).primaryColor,
+                                          primary: Theme.of(context).primaryColor,
                                           elevation: 0,
                                           minimumSize: Size(
-                                            MediaQuery.of(context).size.width /
-                                                2.5,
+                                            MediaQuery.of(context).size.width / 2.5,
                                             50,
                                           ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
                                         ),
                                         child: const Text(
                                           "Go To Settings",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500),
+                                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                         ).tr(),
                                       )
                                     ],
@@ -428,8 +360,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -440,9 +371,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
         ));
       }
       users = myUsers;
-      users = users
-          .where((user) => widget.roomContacts.contains(user.id) == false)
-          .toList();
+      users = users.where((user) => widget.roomContacts.contains(user.id) == false).toList();
       allUsers = users;
       phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
@@ -452,9 +381,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget>
       } else {
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
-        users = users
-            .where((user) => widget.roomContacts.contains(user.id) == false)
-            .toList();
+        users = users.where((user) => widget.roomContacts.contains(user.id) == false).toList();
         allUsers = users;
         phoneContacts = contacts[1];
         setState(() {});

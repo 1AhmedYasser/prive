@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:badges/badges.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
@@ -32,9 +32,7 @@ import '../../Widgets/Common/cached_image.dart';
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
   final Room room;
-  const RoomScreen(
-      {Key? key, this.isNewRoomCreation = false, required this.room})
-      : super(key: key);
+  const RoomScreen({Key? key, this.isNewRoomCreation = false, required this.room}) : super(key: key);
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -90,17 +88,14 @@ class _RoomScreenState extends State<RoomScreen> {
                     statusBarBrightness: Brightness.light,
                   ),
                   actions: [
-                    if (speakersIds.contains(context.currentUser?.id ?? ""))
-                      _buildRoomUserMic(true),
+                    if (speakersIds.contains(context.currentUser?.id ?? "")) _buildRoomUserMic(true),
                     if (room?.listeners
-                            ?.firstWhereOrNull((listener) =>
-                                listener.id == context.currentUser?.id)
+                            ?.firstWhereOrNull((listener) => listener.id == context.currentUser?.id)
                             ?.hasPermissionToSpeak ==
                         true)
                       _buildRoomUserMic(false),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          right: 20, left: 15, top: 15, bottom: 5),
+                      padding: const EdgeInsets.only(right: 20, left: 15, top: 15, bottom: 5),
                       child: ElevatedButton(
                         onPressed: () {
                           leaveRoom();
@@ -139,8 +134,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 automaticallyImplyLeading: false,
                 elevation: 0,
                 bottom: PreferredSize(
-                  preferredSize: Size(MediaQuery.of(context).size.width,
-                      MediaQuery.of(context).size.height / 20),
+                  preferredSize: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 20),
                   child: Container(
                     color: const Color(0xff5856d6),
                     child: Row(
@@ -148,12 +142,10 @@ class _RoomScreenState extends State<RoomScreen> {
                       children: [
                         Flexible(
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 25, right: 50, top: 30, bottom: 20),
+                            padding: const EdgeInsets.only(left: 25, right: 50, top: 30, bottom: 20),
                             child: const Text(
                               "Let's Go! You Have Created A Room For This Topic Invite Your Friends For Your Room",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 15),
+                              style: TextStyle(color: Colors.white, fontSize: 15),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ).tr(),
@@ -183,8 +175,7 @@ class _RoomScreenState extends State<RoomScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 20, top: 18, right: 20),
+                      padding: const EdgeInsets.only(left: 20, top: 18, right: 20),
                       child: Text(
                         room?.topic ?? "",
                         style: const TextStyle(
@@ -195,8 +186,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       ),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 20, top: 10, right: 20),
+                      padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
                       child: Text(
                         room?.description ?? "",
                         style: TextStyle(
@@ -214,21 +204,17 @@ class _RoomScreenState extends State<RoomScreen> {
                       "Speakers".tr(),
                       "${room?.speakers?.length ?? "0"}",
                       true,
-                      withInvite: room?.owner?.id == context.currentUser?.id
-                          ? true
-                          : false,
+                      withInvite: room?.owner?.id == context.currentUser?.id ? true : false,
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 20, right: 20, top: 20),
+                      padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
                       child: MediaQuery.removePadding(
                         context: context,
                         removeBottom: true,
                         removeTop: true,
                         child: GridView.builder(
                             shrinkWrap: true,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 4,
                               mainAxisSpacing: 10,
                               childAspectRatio: 1 / 1.4,
@@ -241,38 +227,30 @@ class _RoomScreenState extends State<RoomScreen> {
                                 children: [
                                   Stack(
                                     children: [
-                                      Consumer<VolumeProvider>(
-                                          builder: (context, provider, ch) {
+                                      Consumer<VolumeProvider>(builder: (context, provider, ch) {
                                         return Container(
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: room?.speakers?[index]
-                                                          .isSpeaking ==
-                                                      true
+                                              color: room?.speakers?[index].isSpeaking == true
                                                   ? Colors.green
                                                   : Colors.transparent,
                                               width: 1.5,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(25),
+                                            borderRadius: BorderRadius.circular(25),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(25),
+                                            borderRadius: BorderRadius.circular(25),
                                             child: SizedBox(
                                               height: 78,
                                               width: 80,
                                               child: CachedImage(
-                                                url: room?.speakers?[index]
-                                                        .image ??
-                                                    "",
+                                                url: room?.speakers?[index].image ?? "",
                                               ),
                                             ),
                                           ),
                                         );
                                       }),
-                                      if (room?.speakers?[index].isOwner ==
-                                          true)
+                                      if (room?.speakers?[index].isOwner == true)
                                         const Positioned(
                                           right: 8,
                                           child: Icon(
@@ -287,20 +265,13 @@ class _RoomScreenState extends State<RoomScreen> {
                                     children: [
                                       SizedBox(
                                         width: 20,
-                                        child: Consumer<VolumeProvider>(
-                                            builder: (context, provider, ch) {
+                                        child: Consumer<VolumeProvider>(builder: (context, provider, ch) {
                                           return Icon(
-                                            room?.speakers?[index].isMicOn ==
-                                                    true
+                                            room?.speakers?[index].isMicOn == true
                                                 ? FontAwesomeIcons.microphone
-                                                : FontAwesomeIcons
-                                                    .microphoneSlash,
-                                            color: room?.speakers?[index]
-                                                        .isMicOn ==
-                                                    true
-                                                ? (room?.speakers?[index]
-                                                            .isSpeaking ==
-                                                        true
+                                                : FontAwesomeIcons.microphoneSlash,
+                                            color: room?.speakers?[index].isMicOn == true
+                                                ? (room?.speakers?[index].isSpeaking == true
                                                     ? Colors.green
                                                     : const Color(0xff7a8fa6))
                                                 : Colors.red,
@@ -311,11 +282,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                       const SizedBox(width: 3),
                                       Expanded(
                                         child: Text(
-                                          (room?.speakers?[index].name
-                                                      ?.split(" ")
-                                                      .first ??
-                                                  "")
-                                              .trim(),
+                                          (room?.speakers?[index].name?.split(" ").first ?? "").trim(),
                                           style: const TextStyle(
                                             color: Colors.black,
                                           ),
@@ -336,16 +303,14 @@ class _RoomScreenState extends State<RoomScreen> {
                       withInvite: true,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 20, top: 20, bottom: 30),
+                      padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 30),
                       child: MediaQuery.removePadding(
                         context: context,
                         removeBottom: true,
                         removeTop: true,
                         child: GridView.builder(
                           shrinkWrap: true,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             mainAxisSpacing: 10,
                             childAspectRatio: 1 / 1.4,
@@ -358,20 +323,13 @@ class _RoomScreenState extends State<RoomScreen> {
                               highlightColor: Colors.transparent,
                               splashColor: Colors.transparent,
                               onTap: () {
-                                if (speakersIds
-                                    .contains(context.currentUser?.id ?? "")) {
-                                  RoomMenuDialog.showListenerMenu(
-                                      context, room?.listeners?[index],
+                                if (speakersIds.contains(context.currentUser?.id ?? "")) {
+                                  RoomMenuDialog.showListenerMenu(context, room?.listeners?[index],
                                       onUpgradePressed: () {
-                                    RoomUser? listener =
-                                        room?.listeners?[index];
+                                    RoomUser? listener = room?.listeners?[index];
                                     listener?.invitationSpeaker = me;
-                                    final ref = FirebaseDatabase.instance
-                                        .ref('rooms/${room?.owner?.id}');
-                                    ref
-                                        .child(
-                                            'upgradedListeners/${listener?.id}')
-                                        .update({
+                                    final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+                                    ref.child('upgradedListeners/${listener?.id}').update({
                                       "id": listener?.id,
                                       "name": listener?.name,
                                       "image": listener?.image,
@@ -379,21 +337,15 @@ class _RoomScreenState extends State<RoomScreen> {
                                       "isListener": listener?.isListener,
                                       "phone": listener?.phone,
                                       "isHandRaised": listener?.isHandRaised,
-                                      "hasPermissionToSpeak":
-                                          listener?.hasPermissionToSpeak,
+                                      "hasPermissionToSpeak": listener?.hasPermissionToSpeak,
                                       "isOwner": listener?.isOwner,
                                       "isMicOn": listener?.isMicOn,
                                       "invitationSpeaker": me?.toJson()
                                     });
                                   }, onKickPressed: () {
-                                    RoomUser? listener =
-                                        room?.listeners?[index];
-                                    final ref = FirebaseDatabase.instance
-                                        .ref('rooms/${room?.owner?.id}');
-                                    ref
-                                        .child(
-                                            'kickedListeners/${listener?.id}')
-                                        .update({
+                                    RoomUser? listener = room?.listeners?[index];
+                                    final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+                                    ref.child('kickedListeners/${listener?.id}').update({
                                       "id": listener?.id,
                                       "name": listener?.name,
                                       "image": listener?.image,
@@ -401,8 +353,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                       "isListener": listener?.isListener,
                                       "phone": listener?.phone,
                                       "isHandRaised": listener?.isHandRaised,
-                                      "hasPermissionToSpeak":
-                                          listener?.hasPermissionToSpeak,
+                                      "hasPermissionToSpeak": listener?.hasPermissionToSpeak,
                                       "isOwner": listener?.isOwner,
                                       "isMicOn": listener?.isMicOn,
                                     });
@@ -411,14 +362,11 @@ class _RoomScreenState extends State<RoomScreen> {
                               },
                               child: Column(
                                 children: [
-                                  Consumer<VolumeProvider>(
-                                      builder: (context, provider, ch) {
+                                  Consumer<VolumeProvider>(builder: (context, provider, ch) {
                                     return Container(
                                       decoration: BoxDecoration(
                                         border: Border.all(
-                                          color: room?.listeners?[index]
-                                                      .isSpeaking ==
-                                                  true
+                                          color: room?.listeners?[index].isSpeaking == true
                                               ? Colors.green
                                               : Colors.transparent,
                                           width: 1.5,
@@ -431,9 +379,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                           height: 78,
                                           width: 80,
                                           child: CachedImage(
-                                            url:
-                                                room?.listeners?[index].image ??
-                                                    "",
+                                            url: room?.listeners?[index].image ?? "",
                                           ),
                                         ),
                                       ),
@@ -447,17 +393,11 @@ class _RoomScreenState extends State<RoomScreen> {
                                         child: Consumer<VolumeProvider>(
                                           builder: (context, provider, ch) {
                                             return Icon(
-                                              room?.listeners?[index].isMicOn ==
-                                                      true
+                                              room?.listeners?[index].isMicOn == true
                                                   ? FontAwesomeIcons.microphone
-                                                  : FontAwesomeIcons
-                                                      .microphoneSlash,
-                                              color: room?.listeners?[index]
-                                                          .isMicOn ==
-                                                      true
-                                                  ? (room?.listeners?[index]
-                                                              .isSpeaking ==
-                                                          true
+                                                  : FontAwesomeIcons.microphoneSlash,
+                                              color: room?.listeners?[index].isMicOn == true
+                                                  ? (room?.listeners?[index].isSpeaking == true
                                                       ? Colors.green
                                                       : const Color(0xff7a8fa6))
                                                   : Colors.red,
@@ -469,11 +409,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                       const SizedBox(width: 3),
                                       Expanded(
                                         child: Text(
-                                          (room?.listeners?[index].name
-                                                      ?.split(" ")
-                                                      .first ??
-                                                  "")
-                                              .trim(),
+                                          (room?.listeners?[index].name?.split(" ").first ?? "").trim(),
                                           style: const TextStyle(
                                             color: Colors.black,
                                           ),
@@ -526,23 +462,18 @@ class _RoomScreenState extends State<RoomScreen> {
                       );
                     } else {
                       if (raisedHandsIds.contains(context.currentUser?.id)) {
-                        final ref = FirebaseDatabase.instance.ref(
-                            'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+                        final ref = FirebaseDatabase.instance
+                            .ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
                         isMyMicOn = false;
-                        ref.update(
-                            {"isMicOn": false, "hasPermissionToSpeak": false});
+                        ref.update({"isMicOn": false, "hasPermissionToSpeak": false});
                         FirebaseDatabase.instance
-                            .ref(
-                                'rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}')
+                            .ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}')
                             .remove();
                         setState(() {});
                       } else {
-                        final ref = FirebaseDatabase.instance
-                            .ref('rooms/${room?.owner?.id}');
+                        final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
 
-                        ref
-                            .child('raisedHands/${context.currentUser?.id}')
-                            .update({
+                        ref.child('raisedHands/${context.currentUser?.id}').update({
                           "id": context.currentUser?.id,
                           "name": context.currentUser?.name,
                           "image": context.currentUser?.image,
@@ -565,12 +496,11 @@ class _RoomScreenState extends State<RoomScreen> {
                           : raisedHandsIds.contains(context.currentUser?.id)
                               ? null
                               : Colors.grey.shade300,
-                      colorBlendMode:
-                          speakersIds.contains(context.currentUser?.id)
+                      colorBlendMode: speakersIds.contains(context.currentUser?.id)
+                          ? null
+                          : raisedHandsIds.contains(context.currentUser?.id)
                               ? null
-                              : raisedHandsIds.contains(context.currentUser?.id)
-                                  ? null
-                                  : BlendMode.lighten,
+                              : BlendMode.lighten,
                     ),
                   ),
                 ),
@@ -582,8 +512,7 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Padding buildRoomSectionInfo(String title, String value, bool isSpeaker,
-      {bool withInvite = false}) {
+  Padding buildRoomSectionInfo(String title, String value, bool isSpeaker, {bool withInvite = false}) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, top: 14, right: 20),
       child: Row(
@@ -637,15 +566,13 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   void getRoom() async {
-    final databaseReference =
-        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+    final databaseReference = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
       Map<dynamic, dynamic>? roomResponse = {};
       if (Platform.isIOS) {
-        roomResponse =
-            (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
+        roomResponse = (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
       } else {
         roomResponse = (snapshot.value as Map<dynamic, dynamic>);
       }
@@ -673,8 +600,7 @@ class _RoomScreenState extends State<RoomScreen> {
       List<RoomUser>? kickedListeners = [];
       List<RoomUser>? upgradedListeners = [];
 
-      Map<dynamic, dynamic>? speakersList =
-          (roomResponse?['speakers'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? speakersList = (roomResponse?['speakers'] as Map<dynamic, dynamic>?) ?? {};
       speakersList.forEach((key, value) {
         speakers.add(
           RoomUser(
@@ -692,8 +618,7 @@ class _RoomScreenState extends State<RoomScreen> {
         );
       });
 
-      Map<dynamic, dynamic>? listenersList =
-          (roomResponse?['listeners'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? listenersList = (roomResponse?['listeners'] as Map<dynamic, dynamic>?) ?? {};
       listenersList.forEach((key, value) {
         listeners.add(
           RoomUser(
@@ -711,14 +636,12 @@ class _RoomScreenState extends State<RoomScreen> {
         );
       });
 
-      Map<dynamic, dynamic>? roomContacts =
-          (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? roomContacts = (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
       roomContacts.forEach((key, value) {
         contacts.add(key);
       });
 
-      Map<dynamic, dynamic>? raisedHandsList =
-          (roomResponse?['raisedHands'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? raisedHandsList = (roomResponse?['raisedHands'] as Map<dynamic, dynamic>?) ?? {};
       raisedHandsList.forEach((key, value) {
         raisedHands.add(
           RoomUser(
@@ -736,8 +659,7 @@ class _RoomScreenState extends State<RoomScreen> {
         );
       });
 
-      Map<dynamic, dynamic>? kickedListenersList =
-          (roomResponse?['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? kickedListenersList = (roomResponse?['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
       kickedListenersList.forEach((key, value) {
         kickedListeners.add(
           RoomUser(
@@ -779,8 +701,7 @@ class _RoomScreenState extends State<RoomScreen> {
               isListener: value['invitationSpeaker']['isListener'],
               phone: value['invitationSpeaker']['phone'],
               isHandRaised: value['invitationSpeaker']['isHandRaised'],
-              hasPermissionToSpeak: value['invitationSpeaker']
-                  ['hasPermissionToSpeak'],
+              hasPermissionToSpeak: value['invitationSpeaker']['hasPermissionToSpeak'],
               isMicOn: value['invitationSpeaker']['isMicOn'],
             ),
           ),
@@ -800,32 +721,26 @@ class _RoomScreenState extends State<RoomScreen> {
           upgradedListeners: upgradedListeners);
       speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
       raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
-      kickedListenersIds =
-          room?.kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
-      invitedListenersIds =
-          room?.upgradedListeners?.map((e) => e.id ?? "").toList() ?? [];
+      kickedListenersIds = room?.kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
+      invitedListenersIds = room?.upgradedListeners?.map((e) => e.id ?? "").toList() ?? [];
 
       // Get Me From Room Members
       if (speakersIds.contains(context.currentUser?.id)) {
-        me = speakers.firstWhereOrNull(
-            (speaker) => speaker.id == context.currentUser?.id);
+        me = speakers.firstWhereOrNull((speaker) => speaker.id == context.currentUser?.id);
       } else {
-        me = listeners.firstWhereOrNull(
-            (listener) => listener.id == context.currentUser?.id);
+        me = listeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
       }
 
       // Check if i am invited to be upgraded to speaker
       if (invitedListenersIds.contains(context.currentUser?.id)) {
-        RoomUser? invitedListener = upgradedListeners.firstWhereOrNull(
-            (listener) => listener.id == context.currentUser?.id);
+        RoomUser? invitedListener =
+            upgradedListeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
         if (mounted) {
           if (isShowingInvitation == false) {
             isShowingInvitation = true;
             Utils.showAlert(context,
                 withCancel: true,
-                message:
-                    "${invitedListener?.invitationSpeaker?.name} Invited You To Become A Speaker"
-                        .tr(),
+                message: "${invitedListener?.invitationSpeaker?.name} Invited You To Become A Speaker".tr(),
                 okButtonText: "Accept".tr(),
                 cancelButtonText: "Decline".tr(), onOkButtonPressed: () async {
               print("Accept");
@@ -833,13 +748,13 @@ class _RoomScreenState extends State<RoomScreen> {
               Navigator.pop(context);
 
               // Remove From Listeners
-              final listenersRef = FirebaseDatabase.instance.ref(
-                  'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+              final listenersRef =
+                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
               listenersRef.remove();
 
               // Add To Speakers
-              final speakersRef = FirebaseDatabase.instance.ref(
-                  'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+              final speakersRef =
+                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
               speakersRef.update({
                 "id": me?.id,
                 "name": me?.name,
@@ -855,26 +770,25 @@ class _RoomScreenState extends State<RoomScreen> {
               isMyMicOn = me?.isMicOn ?? false;
 
               // Remove From Raised Hands If He Is There
-              final raisedHandsRef = FirebaseDatabase.instance.ref(
-                  'rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
+              final raisedHandsRef =
+                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
               raisedHandsRef.remove();
 
               // Remove Invitation
-              final ref = FirebaseDatabase.instance.ref(
-                  'rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+              final ref = FirebaseDatabase.instance
+                  .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
               ref.remove();
 
-              await agoraEngine?.setClientRole(ClientRole.Broadcaster);
+              await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
               agoraEngine?.muteRemoteAudioStream(
-                  int.parse(await Utils.getString(R.pref.userId) ?? "0"),
-                  !isMyMicOn);
+                  uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
 
               await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
             }, onCancelButtonPressed: () {
               // Decline Invitation To Be A Speaker
-              final ref = FirebaseDatabase.instance.ref(
-                  'rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+              final ref = FirebaseDatabase.instance
+                  .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
               ref.remove();
             }).then((value) {
               isShowingInvitation = false;
@@ -898,9 +812,9 @@ class _RoomScreenState extends State<RoomScreen> {
       room?.listeners?.forEach((listener) {
         if (listener.id == context.currentUser?.id) {
           if (listener.isMicOn == true) {
-            agoraEngine?.setClientRole(ClientRole.Broadcaster);
+            agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
           } else {
-            agoraEngine?.setClientRole(ClientRole.Audience);
+            agoraEngine?.setClientRole(role: ClientRoleType.clientRoleAudience);
           }
         }
       });
@@ -908,10 +822,7 @@ class _RoomScreenState extends State<RoomScreen> {
     } else {
       if (showingInfo == false) {
         if (mounted) {
-          Utils.showAlert(context,
-                  message: "The Room Has Ended".tr(),
-                  alertImage: R.images.alertInfoImage)
-              .then(
+          Utils.showAlert(context, message: "The Room Has Ended".tr(), alertImage: R.images.alertInfoImage).then(
             (value) {
               if (mounted) {
                 Navigator.pop(context);
@@ -925,8 +836,7 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference =
-        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+    final databaseReference = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
     onAddListener = databaseReference.onChildAdded.listen((event) {
       getRoom();
     });
@@ -944,14 +854,12 @@ class _RoomScreenState extends State<RoomScreen> {
     if (snapshot.exists) {
       Map<dynamic, dynamic>? roomResponse = {};
       if (Platform.isIOS) {
-        roomResponse =
-            (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
+        roomResponse = (snapshot.value as Map<dynamic, dynamic>)['${room?.owner?.id}'];
       } else {
         roomResponse = (snapshot.value as Map<dynamic, dynamic>);
       }
       List<RoomUser> contacts = [];
-      Map<dynamic, dynamic>? roomContactsList =
-          (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+      Map<dynamic, dynamic>? roomContactsList = (roomResponse?['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
       roomContactsList.forEach((key, value) {
         contacts.add(
           RoomUser(
@@ -968,8 +876,7 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
         );
       });
-      RoomUser currentUser = contacts
-          .firstWhere((contact) => contact.id == context.currentUser?.id);
+      RoomUser currentUser = contacts.firstWhere((contact) => contact.id == context.currentUser?.id);
 
       if (currentUser.isSpeaker == true) {
         ref.child('speakers/${context.currentUser?.id}').update({
@@ -1032,40 +939,39 @@ class _RoomScreenState extends State<RoomScreen> {
         PriveCall tokenResponse = response;
         await [Permission.microphone].request();
 
-        agoraEngine = await RtcEngine.createWithContext(
-            RtcEngineContext(R.constants.agoraAppId));
+        agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
 
-        await agoraEngine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
-        await agoraEngine?.enableAudioVolumeIndication(250, 6, true);
-        agoraEngine?.setEventHandler(RtcEngineEventHandler(
-          joinChannelSuccess: (String channel, int uid, int elapsed) {
-            print('joinChannelSuccess $channel $uid');
+        await agoraEngine?.setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+        await agoraEngine?.enableAudioVolumeIndication(interval: 250, smooth: 6, reportVad: true);
+        agoraEngine?.registerEventHandler(RtcEngineEventHandler(
+          onJoinChannelSuccess: (connection, uid) {
+            print('joinChannelSuccess $uid');
           },
-          userJoined: (int uid, int elapsed) {
+          onUserJoined: (connection, uid, elapsed) {
             print('userJoined $uid');
           },
-          audioVolumeIndication: (volumeInfo, v) {
+          onAudioVolumeIndication: (connection, volumeInfo, v, k) {
             for (var speaker in volumeInfo) {
-              if (speaker.volume > 5) {
+              if ((speaker.volume ?? 0) > 5) {
                 print("User Speaking ${speaker.uid}");
                 try {
-                  changeVolumeStatus(speaker.uid, true);
+                  changeVolumeStatus(speaker.uid ?? 0, true);
                 } catch (error) {
                   print('Error:${error.toString()}');
                 }
               } else {
-                changeVolumeStatus(speaker.uid, false);
+                changeVolumeStatus(speaker.uid ?? 0, false);
               }
             }
           },
         ));
         await agoraEngine?.setClientRole(
-            isSpeaker ? ClientRole.Broadcaster : ClientRole.Audience);
+            role: isSpeaker ? ClientRoleType.clientRoleBroadcaster : ClientRoleType.clientRoleAudience);
         await agoraEngine?.joinChannel(
-            tokenResponse.data ?? "",
-            room?.roomId ?? "",
-            null,
-            int.parse(await Utils.getString(R.pref.userId) ?? "0"));
+            token: tokenResponse.data ?? "",
+            channelId: room?.roomId ?? "",
+            uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"),
+            options: const ChannelMediaOptions());
         agoraEngine?.setParameters('{"che.audio.opensl":true}');
         setState(() {});
       }
@@ -1074,21 +980,11 @@ class _RoomScreenState extends State<RoomScreen> {
 
   void changeVolumeStatus(int speakerId, bool status) {
     if (speakerId == 0) {
-      room?.speakers
-          ?.firstWhereOrNull(
-              (member) => (member.id ?? 0) == context.currentUser?.id)
-          ?.isSpeaking = status;
-      room?.listeners
-          ?.firstWhereOrNull(
-              (member) => (member.id ?? 0) == context.currentUser?.id)
-          ?.isSpeaking = status;
+      room?.speakers?.firstWhereOrNull((member) => (member.id ?? 0) == context.currentUser?.id)?.isSpeaking = status;
+      room?.listeners?.firstWhereOrNull((member) => (member.id ?? 0) == context.currentUser?.id)?.isSpeaking = status;
     } else {
-      room?.speakers
-          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
-          ?.isSpeaking = status;
-      room?.listeners
-          ?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")
-          ?.isSpeaking = status;
+      room?.speakers?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")?.isSpeaking = status;
+      room?.listeners?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")?.isSpeaking = status;
     }
     Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
   }
@@ -1102,22 +998,18 @@ class _RoomScreenState extends State<RoomScreen> {
             isMyMicOn = !isMyMicOn;
           });
           agoraEngine?.muteRemoteAudioStream(
-              int.parse(await Utils.getString(R.pref.userId) ?? "0"),
-              !isMyMicOn);
+              uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
 
           await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
           if (isSpeaker) {
             if (room?.owner?.id == context.currentUser?.id) {
-              final ref = FirebaseDatabase.instance
-                  .ref('rooms/${room?.owner?.id}/owner');
+              final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/owner');
               ref.update({"isMicOn": isMyMicOn});
             }
-            final ref = FirebaseDatabase.instance.ref(
-                'rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+            final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
             ref.update({"isMicOn": isMyMicOn});
           } else {
-            final ref = FirebaseDatabase.instance.ref(
-                'rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+            final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
             ref.update({"isMicOn": isMyMicOn});
           }
         },
@@ -1128,10 +1020,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 ? isMyMicOn
                     ? FontAwesomeIcons.microphone
                     : FontAwesomeIcons.microphoneSlash
-                : room?.listeners
-                            ?.firstWhereOrNull((listener) =>
-                                listener.id == context.currentUser?.id)
-                            ?.isMicOn ==
+                : room?.listeners?.firstWhereOrNull((listener) => listener.id == context.currentUser?.id)?.isMicOn ==
                         true
                     ? FontAwesomeIcons.microphone
                     : FontAwesomeIcons.microphoneSlash,
@@ -1139,10 +1028,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 ? isMyMicOn
                     ? const Color(0xff7a8fa6)
                     : Colors.red
-                : room?.listeners
-                            ?.firstWhereOrNull((listener) =>
-                                listener.id == context.currentUser?.id)
-                            ?.isMicOn ==
+                : room?.listeners?.firstWhereOrNull((listener) => listener.id == context.currentUser?.id)?.isMicOn ==
                         true
                     ? const Color(0xff7a8fa6)
                     : Colors.red,
@@ -1158,7 +1044,7 @@ class _RoomScreenState extends State<RoomScreen> {
     onAddListener?.cancel();
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
-    agoraEngine?.destroy();
+    agoraEngine?.leaveChannel();
     super.dispose();
   }
 }

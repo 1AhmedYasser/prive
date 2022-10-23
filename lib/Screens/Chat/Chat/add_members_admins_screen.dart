@@ -34,8 +34,7 @@ class AddMembersAdminsScreen extends StatefulWidget {
   State<AddMembersAdminsScreen> createState() => _AddMembersAdminsScreenState();
 }
 
-class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
-    with TickerProviderStateMixin {
+class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with TickerProviderStateMixin {
   TextEditingController? _controller;
   List<Contact> phoneContacts = [];
   List<User> users = [];
@@ -86,7 +85,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
         ),
         centerTitle: true,
       ),
-      body: ConnectionStatusBuilder(
+      body: StreamConnectionStatusBuilder(
         statusBuilder: (context, status) {
           String statusString = '';
           bool showStatus = true;
@@ -103,20 +102,18 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
               statusString = "Disconnected".tr();
               break;
           }
-          return InfoTile(
+          return StreamInfoTile(
             showMessage: showStatus,
             tileAnchor: Alignment.topCenter,
             childAnchor: Alignment.topCenter,
             message: statusString,
             child: NestedScrollView(
               floatHeaderSlivers: true,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, left: 15, right: 15, bottom: 10),
+                      padding: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
                       child: SearchTextField(
                         controller: _controller,
                         hintText: "Search".tr(),
@@ -130,11 +127,8 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                             setState(() {
                               users = allUsers
                                   .where(
-                                    (element) => element.name
-                                        .toLowerCase()
-                                        .contains(
-                                            _controller?.text.toLowerCase() ??
-                                                ""),
+                                    (element) =>
+                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
                                   )
                                   .toList();
                             });
@@ -165,16 +159,11 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                             BotToast.removeAll("loading");
                                             BotToast.showAnimationWidget(
                                                 toastBuilder: (context) {
-                                                  return const IgnorePointer(
-                                                      child:
-                                                          UltraLoadingIndicator());
+                                                  return const IgnorePointer(child: UltraLoadingIndicator());
                                                 },
-                                                animationDuration:
-                                                    const Duration(
-                                                        milliseconds: 0),
+                                                animationDuration: const Duration(milliseconds: 0),
                                                 groupKey: "loading");
-                                            List<Map<String, dynamic>> admins =
-                                                [];
+                                            List<Map<String, dynamic>> admins = [];
                                             GroupAdmin newAdmin = GroupAdmin(
                                               nonAdminUsers[index].id,
                                               nonAdminUsers[index].name,
@@ -190,14 +179,9 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                               ),
                                             );
 
-                                            List<String?> groupAdminsIds =
-                                                groupAdmins
-                                                    .map((e) => e.id)
-                                                    .toList();
+                                            List<String?> groupAdminsIds = groupAdmins.map((e) => e.id).toList();
 
-                                            if (groupAdminsIds
-                                                    .contains(newAdmin.id) ==
-                                                false) {
+                                            if (groupAdminsIds.contains(newAdmin.id) == false) {
                                               groupAdmins.add(newAdmin);
                                               for (var admin in groupAdmins) {
                                                 admins.add({
@@ -206,37 +190,18 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                                   "image": admin.image,
                                                   "group_role": admin.groupRole,
                                                   "admin_permissions": {
-                                                    "pin_messages": admin
-                                                            .groupPermissions
-                                                            ?.pinMessages ??
-                                                        true,
-                                                    "add_members": admin
-                                                            .groupPermissions
-                                                            ?.addMembers ??
-                                                        true,
-                                                    "add_admins": admin
-                                                            .groupPermissions
-                                                            ?.addAdmins ??
-                                                        true,
-                                                    "change_group_info": admin
-                                                            .groupPermissions
-                                                            ?.changeGroupInfo ??
-                                                        true,
-                                                    "delete_others_messages": admin
-                                                            .groupPermissions
-                                                            ?.deleteOthersMessages ??
-                                                        true,
-                                                    "delete_members": admin
-                                                            .groupPermissions
-                                                            ?.deleteMembers ??
-                                                        true
+                                                    "pin_messages": admin.groupPermissions?.pinMessages ?? true,
+                                                    "add_members": admin.groupPermissions?.addMembers ?? true,
+                                                    "add_admins": admin.groupPermissions?.addAdmins ?? true,
+                                                    "change_group_info":
+                                                        admin.groupPermissions?.changeGroupInfo ?? true,
+                                                    "delete_others_messages":
+                                                        admin.groupPermissions?.deleteOthersMessages ?? true,
+                                                    "delete_members": admin.groupPermissions?.deleteMembers ?? true
                                                   },
                                                 });
                                               }
-                                              widget.channel.updatePartial(
-                                                  set: {
-                                                    "group_admins": admins
-                                                  }).then((value) {
+                                              widget.channel.updatePartial(set: {"group_admins": admins}).then((value) {
                                                 if (mounted) {
                                                   Navigator.pop(context);
                                                 }
@@ -246,7 +211,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                           } else {
                                             await widget.channel.addMembers(
                                               [nonMembersUsers[index].id],
-                                              Message(
+                                              message: Message(
                                                 text:
                                                     "${context.currentUser?.name} Added ${nonMembersUsers[index].name}",
                                               ),
@@ -258,51 +223,34 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                           }
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10, bottom: 0),
+                                          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 0),
                                           child: Column(
                                             children: [
                                               const SizedBox(height: 10),
                                               Row(
                                                 children: [
                                                   ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
+                                                    borderRadius: BorderRadius.circular(50),
                                                     child: SizedBox(
                                                       height: 50,
                                                       width: 50,
                                                       child: CachedImage(
-                                                        url: widget
-                                                                .isAddingAdmin
-                                                            ? nonAdminUsers[
-                                                                        index]
-                                                                    .image ??
-                                                                ""
-                                                            : nonMembersUsers[
-                                                                        index]
-                                                                    .image ??
-                                                                "",
+                                                        url: widget.isAddingAdmin
+                                                            ? nonAdminUsers[index].image ?? ""
+                                                            : nonMembersUsers[index].image ?? "",
                                                       ),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 13),
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         widget.isAddingAdmin
-                                                            ? nonAdminUsers[
-                                                                    index]
-                                                                .name
-                                                            : nonMembersUsers[
-                                                                    index]
-                                                                .name,
+                                                            ? nonAdminUsers[index].name
+                                                            : nonMembersUsers[index].name,
                                                         style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
+                                                          fontWeight: FontWeight.w500,
                                                         ),
                                                       ),
                                                       const SizedBox(height: 3),
@@ -342,9 +290,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                   color: Colors.grey.shade300,
                                 );
                               },
-                              itemCount: widget.isAddingAdmin
-                                  ? nonAdminUsers.length
-                                  : nonMembersUsers.length,
+                              itemCount: widget.isAddingAdmin ? nonAdminUsers.length : nonMembersUsers.length,
                             ),
                           ),
                         )
@@ -394,9 +340,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
                                 ),
                                 child: const Text(
                                   "Go To Settings",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
                             ],
@@ -411,11 +355,8 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
 
   _getContacts() async {
     String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null &&
-        myContacts.isNotEmpty == true &&
-        myContacts != "[]") {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -448,15 +389,9 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
     }
 
     members = widget.channel.state?.members ?? [];
-    membersUsers = members
-        .map((e) => e.user ?? User(id: context.currentUser?.id ?? ""))
-        .toList();
-    admins = members
-        .where((member) => member.role == "owner" || member.role == "admin")
-        .toList();
-    adminsUsers = admins
-        .map((e) => e.user ?? User(id: context.currentUser?.id ?? ""))
-        .toList();
+    membersUsers = members.map((e) => e.user ?? User(id: context.currentUser?.id ?? "")).toList();
+    admins = members.where((member) => member.channelRole == "owner" || member.channelRole == "admin").toList();
+    adminsUsers = admins.map((e) => e.user ?? User(id: context.currentUser?.id ?? "")).toList();
 
     List<String> membersUsersIds = membersUsers.map((e) => e.id).toList();
     List<String> adminUsersIds = adminsUsers.map((e) => e.id).toList();
@@ -493,11 +428,9 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen>
 
   void _getGroupAdmins() {
     groupAdmins = [];
-    List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
+    List<dynamic>? admins = widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
-      GroupAdmin groupAdmin =
-          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
     setState(() {});

@@ -10,16 +10,13 @@ import '../../Widgets/ChatWidgets/channel_item_widget.dart';
 class CatalogProductSenderScreen extends StatefulWidget {
   final CatalogData? catalog;
   final CatalogProductData? product;
-  const CatalogProductSenderScreen({Key? key, this.catalog, this.product})
-      : super(key: key);
+  const CatalogProductSenderScreen({Key? key, this.catalog, this.product}) : super(key: key);
 
   @override
-  State<CatalogProductSenderScreen> createState() =>
-      _CatalogProductSenderScreenState();
+  State<CatalogProductSenderScreen> createState() => _CatalogProductSenderScreenState();
 }
 
-class _CatalogProductSenderScreenState
-    extends State<CatalogProductSenderScreen> {
+class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen> {
   bool isSelectedEnabled = false;
   List<Channel> selectedChannels = [];
   TextEditingController searchController = TextEditingController();
@@ -45,8 +42,7 @@ class _CatalogProductSenderScreenState
             padding: const EdgeInsets.only(right: 10),
             child: TextButton(
               style: ButtonStyle(
-                overlayColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.transparent),
+                overlayColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
               ),
               onPressed: () {
                 setState(() {
@@ -71,8 +67,9 @@ class _CatalogProductSenderScreenState
           //   },
           // ),
           Expanded(
-            child: ChannelsBloc(
-              child: ChannelListView(
+            child: StreamChannelListView(
+              controller: StreamChannelListController(
+                client: StreamChat.of(context).client,
                 filter: Filter.and(
                   [
                     Filter.equal('type', 'messaging'),
@@ -82,123 +79,118 @@ class _CatalogProductSenderScreenState
                         StreamChatCore.of(context).currentUser!.id,
                       ],
                     ),
-                    if (searchController.text.isNotEmpty)
-                      Filter.autoComplete('name', searchController.text)
+                    if (searchController.text.isNotEmpty) Filter.autoComplete('name', searchController.text)
                   ],
                 ),
                 sort: const [SortOption('last_message_at')],
                 presence: true,
-                emptyBuilder: (context) => const SizedBox.shrink(),
                 limit: 20,
-                swipeToAction: true,
-                separatorBuilder: (context, index) => const SizedBox.shrink(),
-                errorBuilder: (context, error) => Center(
-                  child: Text(
-                    'Error: $error',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                loadingBuilder: (context) => const UltraLoadingIndicator(),
-                channelPreviewBuilder: (context, channel) {
-                  // print(channel.createdBy?.name);
-                  // if (channel.name == null) {
-                  //   print(
-                  //       "Channel Name: ${channel.state?.members.firstWhere((element) => element.userId != StreamChatCore.of(context).currentUser?.id).user?.name}");
-                  // } else {
-                  //   print("Channel Name: ${channel.name}");
-                  // }
-                  return InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      if (isSelectedEnabled) {
-                        setState(() {
-                          if (selectedChannels.contains(channel)) {
-                            selectedChannels.remove(channel);
-                          } else {
-                            selectedChannels.add(channel);
-                          }
-                        });
-                      } else {
-                        if (widget.product != null) {
-                          channel.sendMessage(
-                            Message(text: "", type: "product", attachments: [
-                              Attachment(
-                                type: 'product',
-                                uploadState: const UploadState.success(),
-                                title: widget.product?.itemName,
-                                imageUrl: widget.product?.photo1,
-                                extraData: {
-                                  "id": widget.product?.itemID,
-                                  "name": widget.product?.itemName,
-                                  "description": widget.product?.description,
-                                  "price": widget.product?.price,
-                                  "photo1": widget.product?.photo1,
-                                  "photo2": widget.product?.photo2,
-                                  "photo3": widget.product?.photo3,
-                                  "ownerId": widget.product?.userID,
-                                  "ctype": "product"
-                                },
-                              )
-                            ]),
-                          );
-                        } else if (widget.catalog != null) {
-                          channel.sendMessage(
-                            Message(text: "", type: "catalog", attachments: [
-                              Attachment(
-                                type: 'catalog',
-                                title: widget.catalog?.catalogeName,
-                                imageUrl: widget.catalog?.catalogePhoto,
-                                thumbUrl: widget.catalog?.catalogePhoto,
-                                uploadState: const UploadState.success(),
-                                extraData: {
-                                  "cid": widget.catalog?.catalogeID,
-                                  "name": widget.catalog?.catalogeName,
-                                  "photo": widget.catalog?.catalogePhoto,
-                                  "ownerId": widget.catalog?.userID,
-                                  "ctype": "catalog"
-                                },
-                              ),
-                            ]),
-                          );
-                        }
-
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: isSelectedEnabled
-                        ? Row(
-                            children: [
-                              Expanded(
-                                child: ChannelItemWidget(
-                                  channel: channel,
-                                  isForward: true,
-                                ),
-                              ),
-                              IgnorePointer(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 23, right: 10),
-                                  child: Checkbox(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    value: selectedChannels.contains(channel)
-                                        ? true
-                                        : false,
-                                    onChanged: (value) {},
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : ChannelItemWidget(
-                            channel: channel,
-                            isForward: true,
-                          ),
-                  );
-                },
               ),
+              emptyBuilder: (context) => const SizedBox.shrink(),
+              separatorBuilder: (context, channels, index) => const SizedBox.shrink(),
+              errorBuilder: (context, error) => Center(
+                child: Text(
+                  'Error: $error',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              loadingBuilder: (context) => const UltraLoadingIndicator(),
+              itemBuilder: (context, channels, index, tile) {
+                // print(channel.createdBy?.name);
+                // if (channel.name == null) {
+                //   print(
+                //       "Channel Name: ${channel.state?.members.firstWhere((element) => element.userId != StreamChatCore.of(context).currentUser?.id).user?.name}");
+                // } else {
+                //   print("Channel Name: ${channel.name}");
+                // }
+                return InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onTap: () async {
+                    if (isSelectedEnabled) {
+                      setState(() {
+                        if (selectedChannels.contains(channels[index])) {
+                          selectedChannels.remove(channels[index]);
+                        } else {
+                          selectedChannels.add(channels[index]);
+                        }
+                      });
+                    } else {
+                      if (widget.product != null) {
+                        channels[index].sendMessage(
+                          Message(text: "", type: "product", attachments: [
+                            Attachment(
+                              type: 'product',
+                              uploadState: const UploadState.success(),
+                              title: widget.product?.itemName,
+                              imageUrl: widget.product?.photo1,
+                              extraData: {
+                                "id": widget.product?.itemID,
+                                "name": widget.product?.itemName,
+                                "description": widget.product?.description,
+                                "price": widget.product?.price,
+                                "photo1": widget.product?.photo1,
+                                "photo2": widget.product?.photo2,
+                                "photo3": widget.product?.photo3,
+                                "ownerId": widget.product?.userID,
+                                "ctype": "product"
+                              },
+                            )
+                          ]),
+                        );
+                      } else if (widget.catalog != null) {
+                        channels[index].sendMessage(
+                          Message(text: "", type: "catalog", attachments: [
+                            Attachment(
+                              type: 'catalog',
+                              title: widget.catalog?.catalogeName,
+                              imageUrl: widget.catalog?.catalogePhoto,
+                              thumbUrl: widget.catalog?.catalogePhoto,
+                              uploadState: const UploadState.success(),
+                              extraData: {
+                                "cid": widget.catalog?.catalogeID,
+                                "name": widget.catalog?.catalogeName,
+                                "photo": widget.catalog?.catalogePhoto,
+                                "ownerId": widget.catalog?.userID,
+                                "ctype": "catalog"
+                              },
+                            ),
+                          ]),
+                        );
+                      }
+
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: isSelectedEnabled
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: ChannelItemWidget(
+                                channel: channels[index],
+                                isForward: true,
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 23, right: 10),
+                                child: Checkbox(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  value: selectedChannels.contains(channels[index]) ? true : false,
+                                  onChanged: (value) {},
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : ChannelItemWidget(
+                          channel: channels[index],
+                          isForward: true,
+                        ),
+                );
+              },
             ),
           ),
           if (isSelectedEnabled)
@@ -209,12 +201,9 @@ class _CatalogProductSenderScreenState
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  backgroundColor: selectedChannels.isNotEmpty ? Theme.of(context).primaryColorDark : Colors.grey,
                   elevation: 0,
-                  primary: selectedChannels.isNotEmpty
-                      ? Theme.of(context).primaryColorDark
-                      : Colors.grey,
-                  minimumSize:
-                      Size(MediaQuery.of(context).size.width - 100, 50),
+                  minimumSize: Size(MediaQuery.of(context).size.width - 100, 50),
                 ),
                 onPressed: () {
                   if (selectedChannels.isNotEmpty) {

@@ -4,6 +4,7 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 import '../../../Providers/channels_provider.dart';
@@ -12,11 +13,10 @@ class GroupsTab extends StatefulWidget {
   const GroupsTab({Key? key}) : super(key: key);
 
   @override
-  _GroupsTabState createState() => _GroupsTabState();
+  State<GroupsTab> createState() => _GroupsTabState();
 }
 
 class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
-  final channelListController = ChannelListController();
   late final AnimationController _animationController;
 
   @override
@@ -28,22 +28,24 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
-      return ChannelListCore(
-        channelListController: channelListController,
-        filter: Filter.and(
-          [
-            Filter.equal('type', 'messaging'),
-            Filter.in_(
-              'members',
-              [
-                StreamChatCore.of(context).currentUser!.id,
-              ],
-            ),
-            Filter.equal('channel_type', 'Group'),
-          ],
+      return StreamChannelListView(
+        controller: StreamChannelListController(
+          client: StreamChat.of(context).client,
+          filter: Filter.and(
+            [
+              Filter.equal('type', 'messaging'),
+              Filter.in_(
+                'members',
+                [
+                  StreamChatCore.of(context).currentUser!.id,
+                ],
+              ),
+              Filter.equal('channel_type', 'Group'),
+            ],
+          ),
+          sort: const [SortOption('last_message_at')],
         ),
-        emptyBuilder: (context) =>
-            ChannelsEmptyState(animationController: _animationController),
+        emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
         errorBuilder: (context, widget) {
           Utils.checkForInternetConnection(context);
           return const SizedBox.shrink();
@@ -52,7 +54,7 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
           context,
         ) =>
             const UltraLoadingIndicator(),
-        listBuilder: (context, channels) {
+        itemBuilder: (context, channels, index, tile) {
           // channels =
           //     channels.where((element) => element.lastMessageAt != null).toList();
           return channels.isEmpty
