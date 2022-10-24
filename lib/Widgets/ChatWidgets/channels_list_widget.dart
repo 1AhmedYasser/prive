@@ -9,9 +9,7 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 class ChannelsListWidget extends StatefulWidget {
   final List<Channel> channels;
   final bool isChannel;
-  const ChannelsListWidget(
-      {Key? key, required this.channels, this.isChannel = false})
-      : super(key: key);
+  const ChannelsListWidget({Key? key, required this.channels, this.isChannel = false}) : super(key: key);
 
   @override
   _ChannelsListWidgetState createState() => _ChannelsListWidgetState();
@@ -21,6 +19,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      shrinkWrap: true,
       scrollDirection: Axis.vertical,
       itemCount: widget.channels.length,
       itemBuilder: (BuildContext context, int index) {
@@ -35,9 +34,8 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                 child: InkWell(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onTap: () => Navigator.of(context).push(
-                      ChatScreen.routeWithChannel(widget.channels[index],
-                          isChannel: widget.isChannel)),
+                  onTap: () => Navigator.of(context)
+                      .push(ChatScreen.routeWithChannel(widget.channels[index], isChannel: widget.isChannel)),
                   onLongPress: () {
                     if (!widget.isChannel) {
                       Channel channel = widget.channels[index];
@@ -48,12 +46,9 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                             builder: (context) => StreamChannel(
                               channel: channel,
                               child: ChatInfoScreen(
-                                messageTheme:
-                                    StreamChatTheme.of(context).ownMessageTheme,
+                                messageTheme: StreamChatTheme.of(context).ownMessageTheme,
                                 user: channel.state!.members
-                                    .where((m) =>
-                                        m.userId !=
-                                        channel.client.state.currentUser!.id)
+                                    .where((m) => m.userId != channel.client.state.currentUser!.id)
                                     .first
                                     .user,
                               ),
@@ -67,8 +62,7 @@ class _ChannelsListWidgetState extends State<ChannelsListWidget> {
                             builder: (context) => StreamChannel(
                               channel: channel,
                               child: GroupInfoScreen(
-                                messageTheme:
-                                    StreamChatTheme.of(context).ownMessageTheme,
+                                messageTheme: StreamChatTheme.of(context).ownMessageTheme,
                                 channel: channel,
                               ),
                             ),

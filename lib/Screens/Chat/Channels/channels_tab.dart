@@ -30,6 +30,7 @@ class _ChannelsTabState extends State<ChannelsTab> with TickerProviderStateMixin
     return Consumer<ChannelsProvider>(
       builder: (context, provider, ch) {
         return StreamChannelListView(
+          shrinkWrap: true,
           controller: StreamChannelListController(
             client: StreamChat.of(context).client,
             filter: Filter.and(

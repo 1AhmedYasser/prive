@@ -28,6 +28,7 @@ class _PriveChannelsTabState extends State<PriveChannelsTab> with TickerProvider
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
       return StreamChannelListView(
+        shrinkWrap: true,
         controller: StreamChannelListController(
           client: StreamChat.of(context).client,
           filter: Filter.and(
