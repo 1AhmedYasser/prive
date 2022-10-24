@@ -221,7 +221,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  backgroundColor: Theme.of(context).primaryColor,
                   elevation: 0,
                   minimumSize: Size(
                     MediaQuery.of(context).size.width - 50,

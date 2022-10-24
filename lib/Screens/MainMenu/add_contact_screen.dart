@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter_contacts/properties/phone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Providers/channels_provider.dart';
@@ -142,7 +139,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
+                        backgroundColor: Theme.of(context).primaryColor,
                         minimumSize:
                             Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,

@@ -10,6 +10,6 @@ class NewChannelScreen extends StatefulWidget {
 class _NewChannelScreenState extends State<NewChannelScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold();
   }
 }

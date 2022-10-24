@@ -13,7 +13,6 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:intl/intl.dart';
 
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 
@@ -150,7 +149,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                           loadContacts();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
+                          backgroundColor: Theme.of(context).primaryColor,
                           elevation: 0,
                           minimumSize: Size(
                             MediaQuery.of(context).size.width - 50,
@@ -205,7 +204,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                       ElevatedButton(
                         onPressed: () => AppSettings.openAppSettings(),
                         style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
+                          backgroundColor: Theme.of(context).primaryColor,
                           elevation: 0,
                           minimumSize: Size(
                             MediaQuery.of(context).size.width / 2.5,

@@ -275,7 +275,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                       ElevatedButton(
                                         onPressed: () => AppSettings.openAppSettings(),
                                         style: ElevatedButton.styleFrom(
-                                          primary: Theme.of(context).primaryColor,
+                                          backgroundColor: Theme.of(context).primaryColor,
                                           elevation: 0,
                                           minimumSize: Size(
                                             MediaQuery.of(context).size.width / 2.5,
@@ -321,7 +321,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                     _sendInvitations();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
+                    backgroundColor: Theme.of(context).primaryColor,
                     minimumSize: const Size(0, 50),
                     elevation: 0,
                     shape: RoundedRectangleBorder(

@@ -25,8 +25,7 @@ class RoomsScreen extends StatefulWidget {
   State<RoomsScreen> createState() => _RoomsScreenState();
 }
 
-class _RoomsScreenState extends State<RoomsScreen>
-    with TickerProviderStateMixin {
+class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin {
   late final AnimationController _animationController;
   List<Room> roomsList = [];
   final databaseReference = FirebaseDatabase.instance.ref('rooms');
@@ -111,7 +110,7 @@ class _RoomsScreenState extends State<RoomsScreen>
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
+                        backgroundColor: Theme.of(context).primaryColor,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -149,21 +148,13 @@ class _RoomsScreenState extends State<RoomsScreen>
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () {
-                                      if (roomsList[index].roomId?.isNotEmpty ==
-                                          true) {
+                                      if (roomsList[index].roomId?.isNotEmpty == true) {
                                         List<String> kickedListenersIds =
-                                            roomsList[index]
-                                                    .kickedListeners
-                                                    ?.map((e) => e.id ?? "")
-                                                    .toList() ??
-                                                [];
-                                        if (kickedListenersIds.contains(
-                                            context.currentUser?.id)) {
+                                            roomsList[index].kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
+                                        if (kickedListenersIds.contains(context.currentUser?.id)) {
                                           Utils.showAlert(
                                             context,
-                                            message:
-                                                "You Have Been Kicked Out Of This Room"
-                                                    .tr(),
+                                            message: "You Have Been Kicked Out Of This Room".tr(),
                                             alertImage: R.images.alertInfoImage,
                                           );
                                         } else {
@@ -179,26 +170,18 @@ class _RoomsScreenState extends State<RoomsScreen>
                                       }
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20,
-                                          right: 20,
-                                          bottom: 0,
-                                          top: 25),
+                                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 25),
                                       child: Container(
                                         height: 150,
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade200
-                                              .withOpacity(0.5),
-                                          borderRadius:
-                                              BorderRadius.circular(17),
+                                          color: Colors.grey.shade200.withOpacity(0.5),
+                                          borderRadius: BorderRadius.circular(17),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20, top: 20, right: 20),
+                                              padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
                                               child: Text(
                                                 roomsList[index].topic ?? "",
                                                 style: const TextStyle(
@@ -215,39 +198,19 @@ class _RoomsScreenState extends State<RoomsScreen>
                                                 right: 20,
                                               ),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
                                                 children: [
-                                                  if (roomsList[index]
-                                                          .speakers
-                                                          ?.isNotEmpty ==
-                                                      true)
-                                                    buildSpeaker(
-                                                        roomsList[index]
-                                                            .speakers
-                                                            ?.first),
-                                                  if ((roomsList[index]
-                                                              .speakers
-                                                              ?.length ??
-                                                          0) >
-                                                      1)
-                                                    buildSpeaker(
-                                                        roomsList[index]
-                                                            .speakers?[1]),
-                                                  if ((roomsList[index]
-                                                              .speakers
-                                                              ?.length ??
-                                                          0) >
-                                                      2)
-                                                    buildSpeaker(
-                                                        roomsList[index]
-                                                            .speakers?[2]),
+                                                  if (roomsList[index].speakers?.isNotEmpty == true)
+                                                    buildSpeaker(roomsList[index].speakers?.first),
+                                                  if ((roomsList[index].speakers?.length ?? 0) > 1)
+                                                    buildSpeaker(roomsList[index].speakers?[1]),
+                                                  if ((roomsList[index].speakers?.length ?? 0) > 2)
+                                                    buildSpeaker(roomsList[index].speakers?[2]),
                                                   buildInfo(
                                                       "${(roomsList[index].speakers?.length ?? 0) > 3 ? "+${((roomsList[index].speakers?.length ?? 0) - 3)}" : roomsList[index].speakers?.length ?? 0}",
                                                       "speakers".tr()),
                                                   buildInfo(
-                                                      "${roomsList[index].listeners?.length ?? 0}",
-                                                      "listeners".tr())
+                                                      "${roomsList[index].listeners?.length ?? 0}", "listeners".tr())
                                                 ],
                                               ),
                                             )
@@ -341,9 +304,7 @@ class _RoomsScreenState extends State<RoomsScreen>
           ),
           const SizedBox(height: 5),
           Text(
-            int.parse(value) != 1
-                ? title
-                : title.substring(0, title.length - 1),
+            int.parse(value) != 1 ? title : title.substring(0, title.length - 1),
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w400,
@@ -376,8 +337,7 @@ class _RoomsScreenState extends State<RoomsScreen>
   void getRooms() async {
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
-      Map<dynamic, dynamic>? roomsResponse =
-          snapshot.value as Map<dynamic, dynamic>? ?? {};
+      Map<dynamic, dynamic>? roomsResponse = snapshot.value as Map<dynamic, dynamic>? ?? {};
       roomsList.clear();
       roomsResponse.forEach((key, value) {
         Map<dynamic, dynamic> rooms = value as Map<dynamic, dynamic>;
@@ -402,14 +362,12 @@ class _RoomsScreenState extends State<RoomsScreen>
           isHandRaised: rooms['owner']['isHandRaised'],
           isMicOn: rooms['owner']['isMicOn'],
         );
-        Map<dynamic, dynamic>? roomContacts =
-            (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? roomContacts = (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
         roomContacts.forEach((key, value) {
           contacts.add(key);
         });
 
-        Map<dynamic, dynamic>? speakersList =
-            (value['speakers'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? speakersList = (value['speakers'] as Map<dynamic, dynamic>?) ?? {};
         speakersList.forEach((key, value) {
           speakers.add(
             RoomUser(
@@ -427,8 +385,7 @@ class _RoomsScreenState extends State<RoomsScreen>
           );
         });
 
-        Map<dynamic, dynamic>? listenersList =
-            (value['listeners'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? listenersList = (value['listeners'] as Map<dynamic, dynamic>?) ?? {};
         listenersList.forEach((key, value) {
           listeners.add(
             RoomUser(
@@ -446,8 +403,7 @@ class _RoomsScreenState extends State<RoomsScreen>
           );
         });
 
-        Map<dynamic, dynamic>? raisedHandsList =
-            (value['raisedHands'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? raisedHandsList = (value['raisedHands'] as Map<dynamic, dynamic>?) ?? {};
         raisedHandsList.forEach((key, value) {
           raisedHands.add(
             RoomUser(
@@ -465,8 +421,7 @@ class _RoomsScreenState extends State<RoomsScreen>
           );
         });
 
-        Map<dynamic, dynamic>? kickedListenersList =
-            (value['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? kickedListenersList = (value['kickedListeners'] as Map<dynamic, dynamic>?) ?? {};
         kickedListenersList.forEach((key, value) {
           kickedListeners.add(
             RoomUser(

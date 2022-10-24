@@ -78,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-                primary: Colors.transparent,
+                backgroundColor: Colors.transparent,
                 elevation: 0,
                 shadowColor: Colors.transparent),
             child: Row(
@@ -213,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
+                        backgroundColor: Theme.of(context).primaryColor,
                         minimumSize:
                             Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,
@@ -240,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ).then((value) => setState(() {}));
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColorDark,
+                        backgroundColor: Theme.of(context).primaryColorDark,
                         minimumSize:
                             Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,

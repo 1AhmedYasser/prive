@@ -27,7 +27,6 @@ import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
-import 'package:intl/intl.dart';
 import 'dart:io';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 

@@ -49,7 +49,7 @@ class StreamManager {
   static Future<void> disconnectUserFromStream(BuildContext context) async {
     try {
       await StreamChatCore.of(context).client.disconnectUser();
-    } on Exception catch (e, st) {
+    } on Exception {
       print('Could not sign out');
     }
   }
@@ -111,6 +111,7 @@ class StreamManager {
     } else {
       return null;
     }
+    return null;
   }
 }
 

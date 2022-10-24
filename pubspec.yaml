@@ -41,7 +41,6 @@ dependencies:
   pin_code_fields: ^7.4.0
   bot_toast: ^4.0.3
   flutter_staggered_animations: ^1.1.1
-  modal_bottom_sheet: ^2.1.2
   flutter_rating_bar: ^4.0.1
   lottie: ^1.4.3
   smooth_page_indicator: ^1.0.0+2
@@ -73,6 +72,11 @@ dependencies:
   awesome_dialog: ^3.0.2
   flutter_staggered_grid_view: ^0.4.0
   rflutter_alert: ^2.0.4
+  modal_bottom_sheet:
+    git:
+      url: https://github.com/1AhmedYasser/modal_bottom_sheet
+      ref: main
+      path: modal_bottom_sheet
   flutter_svg:
 
   # Utils

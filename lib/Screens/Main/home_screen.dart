@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -7,7 +6,6 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
-import 'package:prive/main.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../Chat/Calls/single_call_screen.dart';

@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:app_settings/app_settings.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
@@ -328,7 +327,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                               ElevatedButton(
                                 onPressed: () => AppSettings.openAppSettings(),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Theme.of(context).primaryColor,
+                                  backgroundColor: Theme.of(context).primaryColor,
                                   elevation: 0,
                                   minimumSize: Size(
                                     MediaQuery.of(context).size.width / 2.5,

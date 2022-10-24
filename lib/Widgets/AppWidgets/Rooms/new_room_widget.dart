@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Extras/resources.dart';
-import 'package:intl/intl.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
@@ -315,7 +314,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
+                    backgroundColor: Theme.of(context).primaryColor,
                     minimumSize: Size(MediaQuery.of(context).size.width, 50),
                     elevation: 0,
                     shape: RoundedRectangleBorder(

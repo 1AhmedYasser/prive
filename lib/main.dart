@@ -53,7 +53,7 @@ void main() async {
 }
 
 class Prive extends StatefulWidget {
-  Prive({Key? key, required this.client}) : super(key: key);
+  const Prive({Key? key, required this.client}) : super(key: key);
 
   final StreamChatClient client;
 

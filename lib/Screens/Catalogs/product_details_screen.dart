@@ -271,7 +271,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  backgroundColor: Theme.of(context).primaryColor,
                   minimumSize: Size(MediaQuery.of(context).size.width, 55),
                   elevation: 0,
                   shape: RoundedRectangleBorder(

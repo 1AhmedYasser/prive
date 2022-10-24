@@ -20,13 +20,7 @@ class ChatMenuWidget extends StatefulWidget {
 
 class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   List<Map> chatMoreMenu = [];
-  List<String> chatMoreMenuTitles = [
-    "Search",
-    "Clear History",
-    "Mute",
-    "Delete Chat",
-    "Send Catalog"
-  ];
+  List<String> chatMoreMenuTitles = ["Search", "Clear History", "Mute", "Delete Chat", "Send Catalog"];
   List<String> chatMoreMenuIcons = [
     R.images.searchChatImage,
     R.images.clearHistoryImage,
@@ -117,9 +111,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
         fontSize: 15,
         color: Color(0xff232323),
       ),
-      dropdownItemMainAxis: context.locale.languageCode == "en"
-          ? MainAxisAlignment.start
-          : MainAxisAlignment.end,
+      dropdownItemMainAxis: context.locale.languageCode == "en" ? MainAxisAlignment.start : MainAxisAlignment.end,
       isResultLabel: false,
       dropdownItemAlign: Alignment.centerRight,
       isResultIconLabel: false,
@@ -155,7 +147,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   }
 
   void _showDeleteChatDialog() async {
-    final res = await showConfirmationDialog(
+    final res = await showConfirmationBottomSheet(
       context,
       title: "Delete Conversation".tr(),
       okText: "Delete".tr(),
@@ -165,11 +157,13 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
         color: StreamChatTheme.of(context).colorTheme.accentError,
       ),
     );
-    var channel = StreamChannel.of(context).channel;
-    if (res == true) {
-      await channel.delete().then((value) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      });
+    if (mounted) {
+      var channel = StreamChannel.of(context).channel;
+      if (res == true) {
+        await channel.delete().then((value) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        });
+      }
     }
   }
 }

@@ -86,7 +86,7 @@ class _IntroScreenState extends State<IntroScreen> {
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, R.routes.loginRoute),
               style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).primaryColor,
                 elevation: 0,
                 minimumSize: Size(
                   MediaQuery.of(context).size.width - 50,

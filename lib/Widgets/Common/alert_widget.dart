@@ -102,7 +102,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.white,
+                            backgroundColor: Colors.white,
                             minimumSize:
                                 Size(MediaQuery.of(context).size.width, 50),
                             elevation: 0,
@@ -134,7 +134,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
+                          backgroundColor: Theme.of(context).primaryColor,
                           minimumSize:
                               Size(MediaQuery.of(context).size.width, 50),
                           elevation: 0,

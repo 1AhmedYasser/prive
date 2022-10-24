@@ -583,7 +583,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             // });
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).primaryColor,
+                            backgroundColor: Theme.of(context).primaryColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -1430,14 +1430,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> onLocationRequestPressed() async {
-    LocationData _locationData = await location.getLocation();
+    LocationData locationData = await location.getLocation();
     _messageInputController.addAttachment(
       Attachment(
         type: 'location',
         uploadState: const UploadState.success(),
         extraData: {
-          'lat': _locationData.latitude,
-          'long': _locationData.longitude,
+          'lat': locationData.latitude,
+          'long': locationData.longitude,
         },
       ),
     );

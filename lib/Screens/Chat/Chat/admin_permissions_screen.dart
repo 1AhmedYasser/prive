@@ -199,7 +199,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                   updateAdmins(context, goBackAfterUpdate: true);
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
+                  backgroundColor: Theme.of(context).primaryColor,
                   elevation: 0,
                   minimumSize: Size(
                     MediaQuery.of(context).size.width / 2.5,

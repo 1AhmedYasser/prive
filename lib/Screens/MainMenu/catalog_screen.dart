@@ -52,9 +52,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             color: Color(0xff7a8fa6),
           ),
           title: Text(
-            catalogs.isEmpty && isLoading == false
-                ? "Create A Catalog"
-                : "Catalogs",
+            catalogs.isEmpty && isLoading == false ? "Create A Catalog" : "Catalogs",
             style: const TextStyle(
               fontSize: 23,
               color: Colors.black,
@@ -108,8 +106,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         ),
                       ).tr(),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(left: 50, right: 50, top: 15),
+                        padding: const EdgeInsets.only(left: 50, right: 50, top: 15),
                         child: Text(
                           "Send Products And Services To Your Customers And Save Space On Your Phone",
                           textAlign: TextAlign.center,
@@ -121,8 +118,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         ).tr(),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(left: 28, right: 28, top: 45),
+                        padding: const EdgeInsets.only(left: 28, right: 28, top: 45),
                         child: ElevatedButton(
                           onPressed: () {
                             setState(() {
@@ -146,9 +142,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).primaryColor,
-                            minimumSize:
-                                Size(MediaQuery.of(context).size.width, 55),
+                            backgroundColor: Theme.of(context).primaryColor,
+                            minimumSize: Size(MediaQuery.of(context).size.width, 55),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -177,6 +172,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       isEditing = false;
                       controller.closeAllOpenCell();
                     });
+
                     showMaterialModalBottomSheet(
                       context: context,
                       backgroundColor: Colors.transparent,
@@ -194,8 +190,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     });
                   },
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 20, bottom: 20, left: 18, right: 18),
+                    padding: const EdgeInsets.only(top: 20, bottom: 20, left: 18, right: 18),
                     child: Row(
                       children: [
                         Image.asset(
@@ -246,8 +241,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       style: const TextStyle(fontSize: 0),
                                       onTap: (handler) async {
                                         await handler(true);
-                                        _removeCatalog(
-                                            catalogs[index].catalogeID ?? "");
+                                        _removeCatalog(catalogs[index].catalogeID ?? "");
                                         setState(() {
                                           catalogs.removeAt(index);
                                         });
@@ -256,21 +250,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     SwipeAction(
                                       content: Icon(
                                         Icons.edit,
-                                        color:
-                                            Theme.of(context).primaryColorDark,
+                                        color: Theme.of(context).primaryColorDark,
                                       ),
                                       color: Colors.transparent,
                                       style: const TextStyle(fontSize: 0),
                                       onTap: (handler) async {
                                         await handler(false);
+
                                         showMaterialModalBottomSheet(
                                           context: context,
                                           backgroundColor: Colors.transparent,
-                                          builder: (context) =>
-                                              SingleChildScrollView(
-                                            controller:
-                                                ModalScrollController.of(
-                                                    context),
+                                          builder: (context) => SingleChildScrollView(
+                                            controller: ModalScrollController.of(context),
                                             child: NewCatalogCollectionWidget(
                                               title: "Edit Catalog".tr(),
                                               type: "Catalog".tr(),
@@ -288,8 +279,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     SwipeAction(
                                       content: Icon(
                                         Icons.send,
-                                        color:
-                                            Theme.of(context).primaryColorDark,
+                                        color: Theme.of(context).primaryColorDark,
                                       ),
                                       color: Colors.transparent,
                                       style: const TextStyle(fontSize: 0),
@@ -299,8 +289,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CatalogProductSenderScreen(
+                                              builder: (context) => CatalogProductSenderScreen(
                                                 catalog: catalogs[index],
                                               ),
                                             ),
@@ -321,12 +310,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           padding: EdgeInsets.zero,
                                           minSize: 0,
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 15),
+                                            padding: const EdgeInsets.only(bottom: 15),
                                             child: Icon(
                                               Icons.edit,
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
+                                              color: Theme.of(context).primaryColorDark,
                                             ),
                                           ),
                                           onPressed: () {
@@ -345,38 +332,29 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CatalogManagerScreen(
+                                                builder: (context) => CatalogManagerScreen(
                                                   catalog: catalogs[index],
                                                 ),
                                               ),
                                             );
                                           },
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 20),
+                                            padding: const EdgeInsets.only(bottom: 20),
                                             child: ListTile(
-                                              leading: catalogs[index]
-                                                          .catalogePhoto ==
-                                                      "NONE"
+                                              leading: catalogs[index].catalogePhoto == "NONE"
                                                   ? Container(
                                                       decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
+                                                        borderRadius: BorderRadius.circular(10),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: Colors.grey
-                                                                .withOpacity(
-                                                                    0.5),
+                                                            color: Colors.grey.withOpacity(0.5),
                                                             spreadRadius: 0.3,
                                                             blurRadius: 2,
                                                           ),
                                                         ],
                                                       ),
                                                       child: Image.asset(
-                                                        R.images
-                                                            .collectionsImage,
+                                                        R.images.collectionsImage,
                                                         fit: BoxFit.fill,
                                                         height: 70,
                                                         width: 73,
@@ -384,37 +362,28 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                     )
                                                   : Container(
                                                       decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
+                                                        borderRadius: BorderRadius.circular(10),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: Colors.grey
-                                                                .withOpacity(
-                                                                    0.5),
+                                                            color: Colors.grey.withOpacity(0.5),
                                                             spreadRadius: 0.3,
                                                             blurRadius: 2,
                                                           ),
                                                         ],
                                                       ),
                                                       child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
+                                                        borderRadius: BorderRadius.circular(10),
                                                         child: SizedBox(
                                                           height: 70,
                                                           width: 73,
                                                           child: CachedImage(
-                                                            url: catalogs[index]
-                                                                    .catalogePhoto ??
-                                                                "",
+                                                            url: catalogs[index].catalogePhoto ?? "",
                                                           ),
                                                         ),
                                                       ),
                                                     ),
                                               title: Text(
-                                                catalogs[index].catalogeName ??
-                                                    "",
+                                                catalogs[index].catalogeName ?? "",
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 17,

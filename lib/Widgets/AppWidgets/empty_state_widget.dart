@@ -76,7 +76,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
             child: ElevatedButton(
               onPressed: () => widget.onButtonPressed(),
               style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).primaryColor,
                 minimumSize: Size(MediaQuery.of(context).size.width, 53),
                 elevation: 0,
                 shape: RoundedRectangleBorder(

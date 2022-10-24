@@ -153,8 +153,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.transparent,
-                        onPrimary: Colors.transparent,
+                        foregroundColor: Colors.transparent, backgroundColor: Colors.transparent,
                         elevation: 0,
                       ),
                       child: Row(
@@ -194,8 +193,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                         BotToast.cleanAll();
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.transparent,
-                        onPrimary: Colors.transparent,
+                        foregroundColor: Colors.transparent, backgroundColor: Colors.transparent,
                         elevation: 0,
                       ),
                       child: Row(

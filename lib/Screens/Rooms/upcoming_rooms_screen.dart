@@ -12,7 +12,6 @@ import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import '../../Extras/resources.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
-import 'package:intl/intl.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
 class UpComingRoomsScreen extends StatefulWidget {

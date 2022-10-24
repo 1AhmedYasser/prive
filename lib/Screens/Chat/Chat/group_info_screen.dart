@@ -673,7 +673,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               width: 24.0,
             ),
             onTap: () async {
-              final res = await showConfirmationDialog(
+              final res = await showConfirmationBottomSheet(
                 context,
                 title: "Leave Group".tr(),
                 okText: "Leave".tr(),
@@ -709,7 +709,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               ),
             ),
             onTap: () async {
-              final res = await showConfirmationDialog(
+              final res = await showConfirmationBottomSheet(
                 context,
                 title: "Delete Group".tr(),
                 okText: "Delete".tr(),
@@ -1040,7 +1040,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                           size: 24.0,
                         ),
                         "Remove From Group".tr(), () async {
-                      final res = await showConfirmationDialog(
+                      final res = await showConfirmationBottomSheet(
                         context,
                         title: "Remove Member".tr(),
                         okText: "Remove".tr(),
@@ -1085,7 +1085,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   }
 
   Widget? _buildConnectedTitleState(User? user) {
-    var alternativeWidget;
+    Text alternativeWidget = const Text('');
 
     final otherMember = user;
 

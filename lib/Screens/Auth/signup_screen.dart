@@ -12,7 +12,6 @@ import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class SignUpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -256,7 +255,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
+                    backgroundColor: Theme.of(context).primaryColor,
                     elevation: 0,
                     minimumSize: Size(
                       MediaQuery.of(context).size.width - 50,

@@ -21,21 +21,21 @@ class _ScreenSliderState extends State<ScreenSlider> {
       children: <Widget>[
         Container(
           color: Colors.white,
+          margin: const EdgeInsets.only(bottom: 0),
           child: PageIndicatorContainer(
-            child: PageView(
-              onPageChanged: (page) {
-                widget.onChange(page);
-              },
-              children: widget._list,
-              controller: widget._controller,
-              allowImplicitScrolling: true,
-            ),
             length: widget._list.length,
             indicatorColor: Colors.transparent,
             shape: IndicatorShape.circle(size: 13),
             indicatorSelectorColor: Colors.transparent,
+            child: PageView(
+              onPageChanged: (page) {
+                widget.onChange(page);
+              },
+              controller: widget._controller,
+              allowImplicitScrolling: true,
+              children: widget._list,
+            ),
           ),
-          margin: const EdgeInsets.only(bottom: 0),
         ),
       ],
     );

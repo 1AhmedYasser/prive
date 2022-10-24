@@ -46,19 +46,19 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
   }
 
   void _updateHandler(Event event) {
-    double _newLat = event.extraData['lat'] as double;
-    double _newLong = event.extraData['long'] as double;
+    double newLat = event.extraData['lat'] as double;
+    double newLong = event.extraData['long'] as double;
 
     setState(() {
-      lat = _newLat;
-      long = _newLong;
+      lat = newLat;
+      long = newLong;
     });
 
     mapController?.animateCamera(
       CameraUpdate.newLatLng(
         LatLng(
-          _newLat,
-          _newLong,
+          newLat,
+          newLong,
         ),
       ),
     );
@@ -66,7 +66,7 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var _pos = LatLng(lat, long);
+    var pos = LatLng(lat, long);
     return WillPopScope(
       onWillPop: () async {
         widget.onBack();
@@ -92,15 +92,15 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
             constraints: BoxConstraints.loose(MediaQuery.of(context).size),
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _pos,
+                target: pos,
                 zoom: 18,
               ),
-              onMapCreated: (_controller) =>
-                  setState(() => mapController = _controller),
+              onMapCreated: (controller) =>
+                  setState(() => mapController = controller),
               markers: {
                 Marker(
                   markerId: const MarkerId("user-location-marker-id"),
-                  position: _pos,
+                  position: pos,
                 )
               },
             ),

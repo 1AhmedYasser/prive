@@ -10,7 +10,6 @@ import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:timeago/timeago.dart' as time_ago;
-import 'package:intl/intl.dart';
 import '../../Extras/resources.dart';
 import '../../Models/Stories/stories.dart';
 import '../../UltraNetwork/ultra_constants.dart';
