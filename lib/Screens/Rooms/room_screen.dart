@@ -83,6 +83,15 @@ class _RoomScreenState extends State<RoomScreen> {
                 child: AppBar(
                   automaticallyImplyLeading: false,
                   backgroundColor: Colors.grey.shade100,
+                  title: Padding(
+                    padding: const EdgeInsets.only(top: 13),
+                    child: Text(
+                      widget.room.topic ?? '',
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
                   elevation: 0,
                   systemOverlayStyle: const SystemUiOverlayStyle(
                     statusBarBrightness: Brightness.light,
@@ -174,19 +183,20 @@ class _RoomScreenState extends State<RoomScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, top: 18, right: 20),
-                      child: Text(
-                        room?.topic ?? "",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                    if (isNewRoomCreation)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, top: 18, right: 20),
+                        child: Text(
+                          room?.topic ?? "",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
+                      padding: EdgeInsets.only(left: 20, top: isNewRoomCreation ? 10 : 20, right: 20),
                       child: Text(
                         room?.description ?? "",
                         style: TextStyle(
