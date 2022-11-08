@@ -189,10 +189,16 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
             isListener: value['isListener'],
             phone: value['phone'],
             isHandRaised: value['isHandRaised'],
+            timeOfRaisingHands: value['timeOfRaisingHands'],
             hasPermissionToSpeak: value['hasPermissionToSpeak'],
             isMicOn: value['isMicOn'],
           ),
         );
+      });
+      raisedHands.sort((a, b) {
+        DateTime aDate = DateTime.parse(a.timeOfRaisingHands ?? '');
+        DateTime bDate = DateTime.parse(b.timeOfRaisingHands ?? '');
+        return aDate.compareTo(bDate);
       });
       setState(() {});
     } else {

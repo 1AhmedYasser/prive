@@ -11,6 +11,7 @@ class RoomUser {
   bool? isSpeaking;
   bool? hasPermissionToSpeak;
   RoomUser? invitationSpeaker;
+  String? timeOfRaisingHands;
 
   RoomUser(
       {required this.id,
@@ -24,6 +25,7 @@ class RoomUser {
       required this.isMicOn,
       this.invitationSpeaker,
       this.isSpeaking = false,
+      this.timeOfRaisingHands,
       this.hasPermissionToSpeak});
 
   RoomUser.fromJson(Map<String, dynamic> json) {

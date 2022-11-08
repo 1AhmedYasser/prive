@@ -571,6 +571,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           "isListener": true,
                           "phone": context.currentUser?.extraData['phone'],
                           "isHandRaised": true,
+                          "timeOfRaisingHands": DateTime.now().toString(),
                           "isOwner": false,
                           "isMicOn": false,
                         });
@@ -897,14 +898,16 @@ class _RoomScreenState extends State<RoomScreen> {
       }
 
       // Check If Kicked Your Kicked Out From The Room
-      if (kickedListenersIds.contains(context.currentUser?.id)) {
-        if (mounted) {
-          leaveRoom();
-          Utils.showAlert(
-            context,
-            message: "You Have Been Kicked Out Of This Room".tr(),
-            alertImage: R.images.alertInfoImage,
-          );
+      if (mounted) {
+        if (kickedListenersIds.contains(context.currentUser?.id)) {
+          if (mounted) {
+            leaveRoom();
+            Utils.showAlert(
+              context,
+              message: "You Have Been Kicked Out Of This Room".tr(),
+              alertImage: R.images.alertInfoImage,
+            );
+          }
         }
       }
 
