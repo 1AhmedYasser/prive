@@ -54,12 +54,16 @@ class _RoomScreenState extends State<RoomScreen> {
   RtcEngine? agoraEngine;
   CancelToken cancelToken = CancelToken();
   bool isShowingInvitation = false;
+  bool isEditingDescription = false;
+  TextEditingController descriptionController = TextEditingController();
+  FocusNode descriptionFocusNode = FocusNode();
 
   @override
   void initState() {
     isNewRoomCreation = widget.isNewRoomCreation;
     setState(() {
       room = widget.room;
+      descriptionController.text = room?.description ?? '';
     });
     speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
     raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
@@ -196,18 +200,94 @@ class _RoomScreenState extends State<RoomScreen> {
                         ),
                       ),
                     Padding(
-                      padding: EdgeInsets.only(left: 20, top: isNewRoomCreation ? 10 : 20, right: 20),
-                      child: Text(
-                        room?.description ?? "",
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      padding: const EdgeInsets.only(top: 10, right: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20, left: 20),
+                              child: TextField(
+                                controller: descriptionController,
+                                focusNode: descriptionFocusNode,
+                                enabled: isEditingDescription,
+                                keyboardType: TextInputType.multiline,
+                                minLines: 1,
+                                maxLines: null,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                style: TextStyle(
+                                  color: Colors.grey.shade700,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (room?.owner?.id == context.currentUser?.id && isEditingDescription)
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (descriptionController.text.isNotEmpty) {
+                                      setState(() {
+                                        isEditingDescription = false;
+                                      });
+                                      if (descriptionController.text != room?.description) {
+                                        final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
+                                        ref.update({'description': descriptionController.text});
+                                      }
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(40, 40),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                  child: const Icon(Icons.done),
+                                ),
+                                const SizedBox(
+                                  width: 7,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    descriptionController.text = room?.description ?? '';
+                                    setState(() {
+                                      isEditingDescription = false;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(40, 40),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: const Icon(Icons.close),
+                                )
+                              ],
+                            ),
+                          if (room?.owner?.id == context.currentUser?.id && !isEditingDescription)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isEditingDescription = true;
+                                });
+                                Future.delayed(const Duration(milliseconds: 50), () {
+                                  descriptionFocusNode.requestFocus();
+                                });
+                              },
+                              child: Text(
+                                'Edit',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            )
+                        ],
                       ),
                     ),
                     const Padding(
-                      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+                      padding: EdgeInsets.only(left: 20, right: 20),
                       child: Divider(),
                     ),
                     buildRoomSectionInfo(
@@ -734,75 +814,84 @@ class _RoomScreenState extends State<RoomScreen> {
       kickedListenersIds = room?.kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
       invitedListenersIds = room?.upgradedListeners?.map((e) => e.id ?? "").toList() ?? [];
 
+      // Check if the room description changed
+      if (room?.description != descriptionController.text) {
+        descriptionController.text = room?.description ?? '';
+      }
+
       // Get Me From Room Members
-      if (speakersIds.contains(context.currentUser?.id)) {
-        me = speakers.firstWhereOrNull((speaker) => speaker.id == context.currentUser?.id);
-      } else {
-        me = listeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
+      if (mounted) {
+        if (speakersIds.contains(context.currentUser?.id)) {
+          me = speakers.firstWhereOrNull((speaker) => speaker.id == context.currentUser?.id);
+        } else {
+          me = listeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
+        }
       }
 
       // Check if i am invited to be upgraded to speaker
-      if (invitedListenersIds.contains(context.currentUser?.id)) {
-        RoomUser? invitedListener =
-            upgradedListeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
-        if (mounted) {
-          if (isShowingInvitation == false) {
-            isShowingInvitation = true;
-            Utils.showAlert(context,
-                withCancel: true,
-                message: "${invitedListener?.invitationSpeaker?.name} Invited You To Become A Speaker".tr(),
-                okButtonText: "Accept".tr(),
-                cancelButtonText: "Decline".tr(), onOkButtonPressed: () async {
-              print("Accept");
-              // Accept Invitation To Be A Speaker
-              Navigator.pop(context);
+      if (mounted) {
+        if (invitedListenersIds.contains(context.currentUser?.id)) {
+          RoomUser? invitedListener =
+              upgradedListeners.firstWhereOrNull((listener) => listener.id == context.currentUser?.id);
+          if (mounted) {
+            if (isShowingInvitation == false) {
+              isShowingInvitation = true;
+              Utils.showAlert(context,
+                  withCancel: true,
+                  message: "${invitedListener?.invitationSpeaker?.name} Invited You To Become A Speaker".tr(),
+                  okButtonText: "Accept".tr(),
+                  cancelButtonText: "Decline".tr(), onOkButtonPressed: () async {
+                print("Accept");
+                // Accept Invitation To Be A Speaker
+                Navigator.pop(context);
 
-              // Remove From Listeners
-              final listenersRef =
-                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
-              listenersRef.remove();
+                // Remove From Listeners
+                final listenersRef =
+                    FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+                listenersRef.remove();
 
-              // Add To Speakers
-              final speakersRef =
-                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
-              speakersRef.update({
-                "id": me?.id,
-                "name": me?.name,
-                "image": me?.image,
-                "isSpeaker": true,
-                "isListener": false,
-                "phone": me?.phone,
-                "isHandRaised": me?.isHandRaised,
-                "hasPermissionToSpeak": true,
-                "isOwner": me?.isOwner,
-                "isMicOn": me?.isMicOn,
+                // Add To Speakers
+                final speakersRef =
+                    FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+                speakersRef.update({
+                  "id": me?.id,
+                  "name": me?.name,
+                  "image": me?.image,
+                  "isSpeaker": true,
+                  "isListener": false,
+                  "phone": me?.phone,
+                  "isHandRaised": me?.isHandRaised,
+                  "hasPermissionToSpeak": true,
+                  "isOwner": me?.isOwner,
+                  "isMicOn": me?.isMicOn,
+                });
+                isMyMicOn = me?.isMicOn ?? false;
+
+                // Remove From Raised Hands If He Is There
+                final raisedHandsRef =
+                    FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
+                raisedHandsRef.remove();
+
+                // Remove Invitation
+                final ref = FirebaseDatabase.instance
+                    .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+                ref.remove();
+
+                await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+
+                agoraEngine?.muteRemoteAudioStream(
+                    uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
+
+                await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
+              }, onCancelButtonPressed: () {
+                // Decline Invitation To Be A Speaker
+                final ref = FirebaseDatabase.instance
+                    .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
+                ref.remove();
+              }).then((value) {
+                isShowingInvitation = false;
               });
-              isMyMicOn = me?.isMicOn ?? false;
-
-              // Remove From Raised Hands If He Is There
-              final raisedHandsRef =
-                  FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
-              raisedHandsRef.remove();
-
-              // Remove Invitation
-              final ref = FirebaseDatabase.instance
-                  .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
-              ref.remove();
-
-              await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-
-              agoraEngine?.muteRemoteAudioStream(
-                  uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
-
-              await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
-            }, onCancelButtonPressed: () {
-              // Decline Invitation To Be A Speaker
-              final ref = FirebaseDatabase.instance
-                  .ref('rooms/${room?.owner?.id}/upgradedListeners/${context.currentUser?.id}');
-              ref.remove();
-            }).then((value) {
-              isShowingInvitation = false;
-            });
+            }
           }
         }
       }
