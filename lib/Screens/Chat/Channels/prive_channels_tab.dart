@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
-import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/channels_list_item_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -28,7 +28,6 @@ class _PriveChannelsTabState extends State<PriveChannelsTab> with TickerProvider
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
       return StreamChannelListView(
-        shrinkWrap: true,
         controller: StreamChannelListController(
           client: StreamChat.of(context).client,
           filter: Filter.and(
@@ -37,7 +36,7 @@ class _PriveChannelsTabState extends State<PriveChannelsTab> with TickerProvider
               Filter.equal('channel_type', 'Public_Channels'),
             ],
           ),
-          sort: const [SortOption('last_message_at')],
+          channelStateSort: const [SortOption('last_message_at')],
         ),
         emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
         errorBuilder: (context, widget) {
@@ -49,12 +48,20 @@ class _PriveChannelsTabState extends State<PriveChannelsTab> with TickerProvider
         ) =>
             const UltraLoadingIndicator(),
         itemBuilder: (context, channels, index, tile) {
-          return channels.isEmpty
-              ? ChannelsEmptyState(animationController: _animationController)
-              : ChannelsListWidget(
-                  channels: channels,
-                  isChannel: true,
-                );
+          List<Channel> emptyChannels = channels.where((e) => e.lastMessageAt == null).toList();
+          if (emptyChannels.length != channels.length) {
+            return channels[index].lastMessageAt != null
+                ? ChannelListItemWidget(
+                    channel: channels[index],
+                    isChannel: true,
+                  )
+                : const SizedBox.shrink();
+          } else {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height / 1.45,
+              child: ChannelsEmptyState(animationController: _animationController),
+            );
+          }
         },
       );
     });

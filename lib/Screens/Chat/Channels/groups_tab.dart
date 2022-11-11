@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
-import 'package:prive/Widgets/ChatWidgets/channels_list_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/channels_list_item_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -28,7 +28,6 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Consumer<ChannelsProvider>(builder: (context, provider, ch) {
       return StreamChannelListView(
-        shrinkWrap: true,
         controller: StreamChannelListController(
           client: StreamChat.of(context).client,
           filter: Filter.and(
@@ -43,7 +42,7 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
               Filter.equal('channel_type', 'Group'),
             ],
           ),
-          sort: const [SortOption('last_message_at')],
+          channelStateSort: const [SortOption('last_message_at')],
         ),
         emptyBuilder: (context) => ChannelsEmptyState(animationController: _animationController),
         errorBuilder: (context, widget) {
@@ -55,13 +54,9 @@ class _GroupsTabState extends State<GroupsTab> with TickerProviderStateMixin {
         ) =>
             const UltraLoadingIndicator(),
         itemBuilder: (context, channels, index, tile) {
-          // channels =
-          //     channels.where((element) => element.lastMessageAt != null).toList();
-          return channels.isEmpty
-              ? ChannelsEmptyState(animationController: _animationController)
-              : ChannelsListWidget(
-                  channels: channels,
-                );
+          return ChannelListItemWidget(
+            channel: channels[index],
+          );
         },
       );
     });
