@@ -35,12 +35,14 @@ class NotificationsManager {
 
   static void getToken() async {
     FirebaseMessaging.instance.getToken().then((token) async {
-      stream.StreamChat.of(notificationsContext)
-          .client
-          .addDevice(token ?? "", stream.PushProvider.firebase, pushProviderName: "prive_firebase")
-          .then((value) {
-        print("Added Device to stream");
-      });
+      if (stream.StreamChat.of(notificationsContext).currentUser != null) {
+        stream.StreamChat.of(notificationsContext)
+            .client
+            .addDevice(token ?? "", stream.PushProvider.firebase, pushProviderName: "prive_firebase")
+            .then((value) {
+          print("Added Device to stream");
+        });
+      }
       print("Firebase token: $token");
       Utils.saveString(R.pref.firebaseToken, token ?? "");
     });

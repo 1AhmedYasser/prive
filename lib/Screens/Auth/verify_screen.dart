@@ -17,8 +17,7 @@ class VerifyAccountScreen extends StatefulWidget {
   final String phoneNumber;
   final LoginData? loginData;
 
-  const VerifyAccountScreen({Key? key, this.phoneNumber = "", this.loginData})
-      : super(key: key);
+  const VerifyAccountScreen({Key? key, this.phoneNumber = "", this.loginData}) : super(key: key);
 
   @override
   State<VerifyAccountScreen> createState() => _VerifyAccountScreenState();
@@ -61,8 +60,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
             children: [
               Text(
                 "Verify".tr(),
-                style:
-                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 29),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 29),
               ),
               const SizedBox(height: 20),
               Text(
@@ -77,8 +75,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               Form(
                 key: _formKey,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
                   child: PinCodeTextField(
                     appContext: context,
                     pastedTextStyle: TextStyle(
@@ -107,8 +104,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                     enableActiveFill: true,
                     errorAnimationController: errorController,
                     controller: codeController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        signed: true, decimal: false),
+                    keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: false),
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     boxShadows: const [
                       BoxShadow(
@@ -160,13 +156,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           });
                         }
                       },
-                      style:
-                          TextButton.styleFrom(shadowColor: Colors.transparent),
+                      style: TextButton.styleFrom(shadowColor: Colors.transparent),
                       child: Text(
                         "Resend Code".tr(),
                         style: TextStyle(
-                          color:
-                              isTimerOn ? Colors.grey : const Color(0xff1293a8),
+                          color: isTimerOn ? Colors.grey : const Color(0xff1293a8),
                           fontWeight: FontWeight.w400,
                           fontSize: 17,
                         ),
@@ -181,13 +175,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   if (_formKey.currentState!.validate()) {
                     BotToast.showAnimationWidget(
                         toastBuilder: (context) {
-                          return const IgnorePointer(
-                              child: UltraLoadingIndicator());
+                          return const IgnorePointer(child: UltraLoadingIndicator());
                         },
                         animationDuration: const Duration(milliseconds: 0),
                         groupKey: "loading");
-                    PhoneAuthCredential credential =
-                        PhoneAuthProvider.credential(
+                    PhoneAuthCredential credential = PhoneAuthProvider.credential(
                       verificationId: verificationId ?? "",
                       smsCode: codeController.text,
                     );
@@ -204,19 +196,15 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                           ),
                         );
                       } else {
-                        StreamManager.connectUserToStream(this.context)
-                            .then((value) {
+                        StreamManager.connectUserToStream(this.context).then((value) {
                           Navigator.pushNamedAndRemoveUntil(
-                              this.context,
-                              R.routes.navigatorRoute,
-                              (Route<dynamic> route) => false);
+                              this.context, R.routes.navigatorRoute, (Route<dynamic> route) => false);
                           Utils.saveBool(R.pref.isLoggedIn, true);
                         });
                       }
                     }).catchError((error) {
                       Utils.showAlert(context,
-                          message: "You Entered An Invalid Code".tr(),
-                          alertImage: R.images.alertInfoImage);
+                          message: "You Entered An Invalid Code".tr(), alertImage: R.images.alertInfoImage);
                     });
                   }
                 },
@@ -233,8 +221,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 ),
                 child: Text(
                   "Verify Account".tr(),
-                  style: const TextStyle(
-                      fontSize: 21, fontWeight: FontWeight.w400),
+                  style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
                 ),
               ),
             ],
