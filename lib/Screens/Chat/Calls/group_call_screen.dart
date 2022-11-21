@@ -624,6 +624,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "Ended"});
     agoraEngine?.leaveChannel();
+    agoraEngine?.release();
   }
 
   void leaveCall(BuildContext context, DatabaseReference databaseReference) {
@@ -634,6 +635,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "Ended"});
     agoraEngine?.leaveChannel();
+    agoraEngine?.release();
   }
 
   Future<void> _createGroupCall() async {
@@ -853,18 +855,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         PriveCall tokenResponse = response;
         await [Permission.camera, Permission.microphone].request();
 
+        agoraEngine = createAgoraRtcEngine();
         await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
 
         if (widget.isVideo) {
           await agoraEngine?.enableVideo();
-          await agoraEngine?.setEnableSpeakerphone(true);
           agoraEngine?.muteLocalAudioStream(true);
           if (mounted) {
             setState(() {});
           }
         } else {
           agoraEngine?.muteLocalAudioStream(true);
-          await agoraEngine?.setEnableSpeakerphone(false);
           if (mounted) {
             setState(() {});
           }
@@ -922,13 +923,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           ),
         );
         await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-
+        await agoraEngine?.startPreview();
         await agoraEngine
             ?.joinChannel(
           token: tokenResponse.data ?? "",
           channelId: widget.channel.id ?? "",
           uid: int.parse(context.currentUser?.id ?? "0"),
-          options: const ChannelMediaOptions(),
+          options: ChannelMediaOptions(
+            token: tokenResponse.data ?? "",
+            clientRoleType: ClientRoleType.clientRoleBroadcaster,
+            channelProfile: ChannelProfileType.channelProfileCommunication1v1,
+          ),
         )
             .then(
           (value) {

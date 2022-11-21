@@ -433,6 +433,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           });
         }
         agoraEngine?.leaveChannel();
+        agoraEngine?.release();
         if (mounted) {
           Utils.showAlert(
             context,
@@ -475,8 +476,12 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         } else {
           await [Permission.microphone].request();
         }
-
+        agoraEngine = createAgoraRtcEngine();
         await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
+
+        if (widget.isVideo) {
+          await agoraEngine?.enableVideo();
+        }
 
         agoraEngine?.registerEventHandler(
           RtcEngineEventHandler(
@@ -528,21 +533,20 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             },
           ),
         );
-        if (widget.isVideo) {
-          await agoraEngine?.enableVideo();
-          await agoraEngine?.setEnableSpeakerphone(true);
-          setState(() {});
-        } else {
-          await agoraEngine?.setEnableSpeakerphone(false);
-          setState(() {});
-        }
         userAgoraToken = tokenResponse.data ?? "";
+
+        await agoraEngine?.startPreview();
+
         await agoraEngine
             ?.joinChannel(
           token: tokenResponse.data ?? "",
           channelId: widget.channel.id ?? "",
           uid: int.parse(context.currentUser?.id ?? "0"),
-          options: const ChannelMediaOptions(),
+          options: ChannelMediaOptions(
+            token: tokenResponse.data ?? "",
+            clientRoleType: ClientRoleType.clientRoleBroadcaster,
+            channelProfile: ChannelProfileType.channelProfileCommunication1v1,
+          ),
         )
             .then((value) {
           localView = VideoViewController(

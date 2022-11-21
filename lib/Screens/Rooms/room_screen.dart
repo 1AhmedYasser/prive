@@ -1041,10 +1041,9 @@ class _RoomScreenState extends State<RoomScreen> {
         PriveCall tokenResponse = response;
         await [Permission.microphone].request();
 
-        agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
+        agoraEngine = createAgoraRtcEngine();
+        await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
 
-        await agoraEngine?.setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
-        await agoraEngine?.enableAudioVolumeIndication(interval: 250, smooth: 6, reportVad: true);
         agoraEngine?.registerEventHandler(RtcEngineEventHandler(
           onJoinChannelSuccess: (connection, uid) {
             print('joinChannelSuccess $uid');
@@ -1067,14 +1066,21 @@ class _RoomScreenState extends State<RoomScreen> {
             }
           },
         ));
+        await agoraEngine?.startPreview();
         await agoraEngine?.setClientRole(
             role: isSpeaker ? ClientRoleType.clientRoleBroadcaster : ClientRoleType.clientRoleAudience);
         await agoraEngine?.joinChannel(
             token: tokenResponse.data ?? "",
             channelId: room?.roomId ?? "",
             uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"),
-            options: const ChannelMediaOptions());
+            options: ChannelMediaOptions(
+              token: tokenResponse.data ?? "",
+              clientRoleType: isSpeaker ? ClientRoleType.clientRoleBroadcaster : ClientRoleType.clientRoleAudience,
+              channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+            ));
+
         agoraEngine?.setParameters('{"che.audio.opensl":true}');
+        await agoraEngine?.enableAudioVolumeIndication(interval: 250, smooth: 6, reportVad: true);
         setState(() {});
       }
     });
@@ -1147,6 +1153,7 @@ class _RoomScreenState extends State<RoomScreen> {
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
     agoraEngine?.leaveChannel();
+    agoraEngine?.release();
     super.dispose();
   }
 }

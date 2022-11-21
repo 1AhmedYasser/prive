@@ -42,8 +42,7 @@ class _CallingWidgetState extends State<CallingWidget> {
   @override
   void initState() {
     _setupRingingTone();
-    timer = Timer.periodic(
-        const Duration(seconds: 5), (Timer t) => _setupRingingTone());
+    timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => _setupRingingTone());
     ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
     usersRef = FirebaseDatabase.instance.ref("Users");
     listener = ref.onValue.listen((DatabaseEvent event) async {
@@ -101,9 +100,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          widget.isVideoCall
-                              ? "Video Call".tr()
-                              : "Voice Call".tr(),
+                          widget.isVideoCall ? "Video Call".tr() : "Voice Call".tr(),
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w600,
@@ -139,10 +136,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                                   channel: channel!,
                                 );
                               },
-                              transitionsBuilder: (_,
-                                  Animation<double> animation,
-                                  __,
-                                  Widget child) {
+                              transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
                                 return FadeTransition(
                                   opacity: animation,
                                   child: child,
@@ -153,7 +147,8 @@ class _CallingWidgetState extends State<CallingWidget> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.transparent, backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.transparent,
+                        backgroundColor: Colors.transparent,
                         elevation: 0,
                       ),
                       child: Row(
@@ -180,20 +175,18 @@ class _CallingWidgetState extends State<CallingWidget> {
                     child: ElevatedButton(
                       onPressed: () async {
                         FlutterCallkitIncoming.endAllCalls();
-                        Utils.logAnswerOrCancelCall(context,
-                            context.currentUser?.id ?? "", "CANCELLED", "0");
-                        DatabaseReference ref = FirebaseDatabase.instance
-                            .ref("SingleCalls/${widget.channelName}");
+                        Utils.logAnswerOrCancelCall(context, context.currentUser?.id ?? "", "CANCELLED", "0");
+                        DatabaseReference ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
                         ref.remove();
-                        DatabaseReference usersRef =
-                            FirebaseDatabase.instance.ref("Users");
+                        DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
                         await usersRef.update({
                           await Utils.getString(R.pref.userId) ?? "": "Ended",
                         });
                         BotToast.cleanAll();
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.transparent, backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.transparent,
+                        backgroundColor: Colors.transparent,
                         elevation: 0,
                       ),
                       child: Row(
