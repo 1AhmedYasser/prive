@@ -476,4 +476,12 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
     isSpeakerOn = await widget.agoraEngine?.isSpeakerphoneEnabled() ?? false;
     setState(() {});
   }
+
+  @override
+  void dispose() {
+    onAddListener?.cancel();
+    onChangeListener?.cancel();
+    onDeleteListener?.cancel();
+    super.dispose();
+  }
 }

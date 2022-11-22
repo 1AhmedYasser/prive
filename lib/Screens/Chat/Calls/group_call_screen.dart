@@ -105,16 +105,59 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, bottom: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 30),
-                        child: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.transparent,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 87, minWidth: 87),
+                          child: call?.ownerId == context.currentUser?.id && (call?.members?.length ?? 1) > 1
+                              ? ElevatedButton(
+                                  onPressed: () {
+                                    if ((call?.members?.length ?? 0) > 1) {
+                                      if (call?.isMuteAllEnabled == false) {
+                                        // Mute All
+                                        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+                                        ref.update({"isMuteAllEnabled": true});
+                                        call?.members?.forEach((member) {
+                                          if (member.id != context.currentUser?.id) {
+                                            final userRef = FirebaseDatabase.instance
+                                                .ref("GroupCalls/${widget.channel.id}/members/${member.id}");
+                                            userRef.update({"isMicOn": false, "hasPermissionToSpeak": false});
+                                          }
+                                        });
+                                      } else {
+                                        // UnMute All
+                                        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+                                        ref.update({"isMuteAllEnabled": false});
+                                        call?.members?.forEach((member) {
+                                          if (member.id != context.currentUser?.id) {
+                                            final userRef = FirebaseDatabase.instance
+                                                .ref("GroupCalls/${widget.channel.id}/members/${member.id}");
+                                            userRef.update({"hasPermissionToSpeak": true});
+                                          }
+                                        });
+                                      }
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.grey.shade800,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      )),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(3),
+                                    child: Text(
+                                      call?.isMuteAllEnabled == true ? 'UnMute All' : 'Mute All',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ),
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.only(right: 50),
                         child: Column(
                           children: [
                             Text(
@@ -275,7 +318,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                   children: [
                                     Icon(
                                       call?.members?[index].isMicOn == true ? Icons.mic : Icons.mic_off_rounded,
-                                      color: Colors.white,
+                                      color: call?.members?[index].hasPermissionToSpeak == true
+                                          ? Colors.white
+                                          : Colors.red,
                                     ),
                                     if (context.currentUser?.id == call?.ownerId)
                                       if (call?.members?[index].id != context.currentUser?.id)
@@ -653,6 +698,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       "ownerId": context.currentUser?.id ?? "",
       "type": widget.isVideo ? "Video" : "Voice",
       "members": {owner.id: owner.toJson()},
+      "isMuteAllEnabled": false
     });
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "In Call"});
@@ -664,9 +710,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       id: context.currentUser?.id,
       name: context.currentUser?.name,
       image: context.currentUser?.image,
-      isHeadphonesOn: true,
+      isHeadphonesOn: widget.call != null
+          ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isHeadphonesOn
+          : true,
       phone: context.currentUser?.extraData['phone'] as String,
-      hasPermissionToSpeak: true,
+      hasPermissionToSpeak: widget.call != null
+          ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).hasPermissionToSpeak
+          : true,
       isMicOn: widget.call != null
           ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isMicOn == true
           : false,
@@ -701,6 +751,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
       String? ownerId = groupCallResponse['ownerId'];
       String? type = groupCallResponse['type'];
+      bool? isMuteAllEnabled = groupCallResponse['isMuteAllEnabled'];
       List<CallMember>? members = [];
       List<CallMember>? kickedMembers = [];
 
@@ -745,6 +796,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         type: type,
         members: members,
         kickedMembers: kickedMembers,
+        isMuteAllEnabled: isMuteAllEnabled,
       );
       me = call?.members?.firstWhereOrNull((element) => element.id == context.currentUser?.id);
       kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
@@ -758,6 +810,24 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             message: "You Have Been Kicked Out Of This Call".tr(),
             alertImage: R.images.alertInfoImage,
           );
+        }
+      }
+
+      // Handle Mute All
+      if (members.length == 1 && isMuteAllEnabled == true && ownerId == context.currentUser?.id) {
+        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+        ref.update({"isMuteAllEnabled": false});
+      }
+
+      // Handle Mute All When All Members has permissions to speak
+      if (members.length > 1 && isMuteAllEnabled == true && ownerId == context.currentUser?.id) {
+        List<CallMember> callMembersWhoCanSpeak =
+            call?.members?.where((e) => e.hasPermissionToSpeak == true && e.id != context.currentUser?.id).toList() ??
+                [];
+
+        if (callMembersWhoCanSpeak.length == (call?.members?.length ?? 1) - 1) {
+          final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+          ref.update({"isMuteAllEnabled": false});
         }
       }
 
