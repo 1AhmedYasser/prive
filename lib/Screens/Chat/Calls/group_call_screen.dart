@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:badges/badges.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Helpers/group_call_menu_dialog.dart';
 import 'package:prive/Models/Call/call.dart';
@@ -16,7 +18,6 @@ import 'package:prive/Providers/volume_provider.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import 'package:prive/main.dart';
 import 'package:provider/provider.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -25,10 +26,10 @@ import 'package:wakelock/wakelock.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
-import '../../../Providers/call_provider.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
 import 'package:collection/collection.dart';
 import '../../../UltraNetwork/ultra_network.dart';
+import '../../../Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
 
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -145,10 +146,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
-                                      primary: Colors.grey.shade800,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      )),
+                                    backgroundColor: Colors.grey.shade800,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(3),
                                     child: Text(
@@ -601,6 +603,50 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (call?.ownerId == context.currentUser?.id && call?.kickedMembers?.isNotEmpty == true)
+                      Badge(
+                        badgeContent: Text(
+                          "${call?.kickedMembers?.length}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        showBadge: call?.kickedMembers?.isNotEmpty == true ? true : false,
+                        position: BadgePosition.topEnd(end: -4),
+                        padding: const EdgeInsets.all(7),
+                        badgeColor: Theme.of(context).primaryColorDark,
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            showMaterialModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => SingleChildScrollView(
+                                controller: ModalScrollController.of(context),
+                                child: KickedMembersWidget(
+                                  ref: 'GroupCalls/${widget.channel.id}/kickedMembers',
+                                  agoraEngine: agoraEngine,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Container(
+                              height: 55,
+                              width: 55,
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Icon(
+                                FontAwesomeIcons.ban,
+                                size: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     InkWell(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

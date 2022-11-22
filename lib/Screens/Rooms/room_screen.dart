@@ -643,7 +643,6 @@ class _RoomScreenState extends State<RoomScreen> {
                         setState(() {});
                       } else {
                         final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
-
                         ref.child('raisedHands/${context.currentUser?.id}').update({
                           "id": context.currentUser?.id,
                           "name": context.currentUser?.name,
@@ -695,19 +694,17 @@ class _RoomScreenState extends State<RoomScreen> {
                     elevation: 1,
                     backgroundColor: Theme.of(context).primaryColor,
                     onPressed: () async {
-                      if (speakersIds.contains(context.currentUser?.id)) {
-                        showMaterialModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => SingleChildScrollView(
-                            controller: ModalScrollController.of(context),
-                            child: KickedMembersWidget(
-                              ref: 'rooms/${room?.owner?.id}/kickedListeners',
-                              agoraEngine: agoraEngine,
-                            ),
+                      showMaterialModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => SingleChildScrollView(
+                          controller: ModalScrollController.of(context),
+                          child: KickedMembersWidget(
+                            ref: 'rooms/${room?.owner?.id}/kickedListeners',
+                            agoraEngine: agoraEngine,
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(50),
