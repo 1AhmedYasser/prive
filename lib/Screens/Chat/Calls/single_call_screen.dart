@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:blur/blur.dart';
 import 'package:dio/dio.dart';
 import 'package:draggable_widget/draggable_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:wakelock/wakelock.dart';
+
 import '../../../Extras/resources.dart';
 import '../../../Helpers/stream_manager.dart';
 import '../../../Helpers/utils.dart';
@@ -74,6 +76,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   bool didEndCall = false;
   bool isSharingScreen = false;
   String userAgoraToken = "";
+  int channelUid = 0;
 
   @override
   void initState() {
@@ -350,7 +353,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
       agoraEngine = widget.agoraEngine;
       localView = VideoViewController(
         rtcEngine: agoraEngine!,
-        canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+        canvas: VideoCanvas(
+          uid: channelUid,
+        ),
       );
       setState(() {});
     }
@@ -432,8 +437,11 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             context.currentUser?.id ?? "": "Ended",
           });
         }
-        agoraEngine?.leaveChannel();
-        agoraEngine?.release();
+        await agoraEngine?.leaveChannel();
+        try {
+          await agoraEngine?.release(sync: true);
+        } catch (_) {}
+
         if (mounted) {
           Utils.showAlert(
             context,
@@ -488,6 +496,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             onJoinChannelSuccess: (connection, uid) async {
               print('joinChannelSuccess $uid');
               if (mounted) {
+                channelUid = uid;
                 setState(() {});
               }
             },
@@ -545,13 +554,15 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           options: ChannelMediaOptions(
             token: tokenResponse.data ?? "",
             clientRoleType: ClientRoleType.clientRoleBroadcaster,
-            channelProfile: ChannelProfileType.channelProfileCommunication1v1,
+            channelProfile: ChannelProfileType.channelProfileCommunication,
           ),
         )
             .then((value) {
           localView = VideoViewController(
             rtcEngine: agoraEngine!,
-            canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+            canvas: VideoCanvas(
+              uid: channelUid,
+            ),
           );
           if (call?.members?.length == 2) {
             remoteView = VideoViewController.remote(

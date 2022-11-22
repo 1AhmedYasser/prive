@@ -68,6 +68,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   bool isHeadphonesOn = true;
   CallMember? me;
   List<String> kickedMembersIds = [];
+  int channelUid = 0;
 
   @override
   void initState() {
@@ -615,7 +616,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     );
   }
 
-  void endCall(BuildContext context, DatabaseReference databaseReference) {
+  void endCall(BuildContext context, DatabaseReference databaseReference) async {
     didEndCall = true;
     Navigator.pop(context);
     Navigator.pop(context);
@@ -623,19 +624,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     _stopForegroundTask();
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "Ended"});
-    agoraEngine?.leaveChannel();
-    agoraEngine?.release();
+    await agoraEngine?.leaveChannel();
   }
 
-  void leaveCall(BuildContext context, DatabaseReference databaseReference) {
+  void leaveCall(BuildContext context, DatabaseReference databaseReference) async {
     didEndCall = true;
     Navigator.pop(context);
     databaseReference.child("members/${context.currentUser?.id}").remove();
     _stopForegroundTask();
     DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
     userRef.update({context.currentUser?.id ?? "": "Ended"});
-    agoraEngine?.leaveChannel();
-    agoraEngine?.release();
+    await agoraEngine?.leaveChannel();
   }
 
   Future<void> _createGroupCall() async {
@@ -686,7 +685,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       agoraEngine = widget.agoraEngine;
       localView = VideoViewController(
         rtcEngine: agoraEngine!,
-        canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+        canvas: VideoCanvas(uid: channelUid),
       );
       setState(() {});
     }
@@ -877,12 +876,16 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           RtcEngineEventHandler(
             onJoinChannelSuccess: (connection, uid) async {
               print('joinChannelSuccess $uid');
+              channelUid = uid;
+              if (mounted) {
+                setState(() {});
+              }
             },
             onUserJoined: (connection, uid, elapsed) {
               print('userJoined $uid');
               localView = VideoViewController(
                 rtcEngine: agoraEngine!,
-                canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+                canvas: VideoCanvas(uid: channelUid),
               );
               remoteViews.clear();
               for (var member in videoMembers) {
@@ -939,7 +942,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           (value) {
             localView = VideoViewController(
               rtcEngine: agoraEngine!,
-              canvas: VideoCanvas(uid: int.parse(context.currentUser?.id ?? '0')),
+              canvas: VideoCanvas(uid: channelUid),
             );
             remoteViews.clear();
 

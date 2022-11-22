@@ -1153,7 +1153,6 @@ class _RoomScreenState extends State<RoomScreen> {
     onChangeListener?.cancel();
     onDeleteListener?.cancel();
     agoraEngine?.leaveChannel();
-    agoraEngine?.release();
     super.dispose();
   }
 }
