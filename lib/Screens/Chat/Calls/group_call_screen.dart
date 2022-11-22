@@ -712,7 +712,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     initAgora();
   }
 
-  void _joinGroupCall() {
+  Future<void> _joinGroupCall() async {
     CallMember joiningUser = CallMember(
       id: context.currentUser?.id,
       name: context.currentUser?.name,
@@ -739,6 +739,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     if (widget.agoraEngine == null) {
       initAgora();
     } else {
+      isSpeakerOn = await widget.agoraEngine?.isSpeakerphoneEnabled() ?? false;
       agoraEngine = widget.agoraEngine;
       localView = VideoViewController(
         rtcEngine: agoraEngine!,
@@ -956,6 +957,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               channelUid = uid;
               if (mounted) {
                 setState(() {});
+              }
+              if (widget.isVideo) {
+                agoraEngine?.setEnableSpeakerphone(true);
+              } else {
+                agoraEngine?.setEnableSpeakerphone(false);
               }
             },
             onUserJoined: (connection, uid, elapsed) {

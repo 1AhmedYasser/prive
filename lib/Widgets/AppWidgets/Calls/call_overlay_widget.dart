@@ -492,6 +492,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
 
   void _getSpeakerStatus() async {
     isSpeakerOn = await widget.agoraEngine?.isSpeakerphoneEnabled() ?? false;
+    print('sppeaker $isHeadphonesOn');
     setState(() {});
   }
 
