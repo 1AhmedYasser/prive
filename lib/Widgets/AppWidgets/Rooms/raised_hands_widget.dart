@@ -26,7 +26,6 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
   @override
   void initState() {
     _listenToFirebaseChanges();
-    // getRaisedHands();
     super.initState();
   }
 

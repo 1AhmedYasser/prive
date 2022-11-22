@@ -25,6 +25,7 @@ import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
 import '../../Providers/volume_provider.dart';
 import '../../UltraNetwork/ultra_network.dart';
+import '../../Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
 import '../../Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
 import '../../Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
 import '../../Widgets/Common/cached_image.dart';
@@ -676,7 +677,48 @@ class _RoomScreenState extends State<RoomScreen> {
                   ),
                 ),
               ),
-            )
+            ),
+            if (room?.kickedListeners?.isNotEmpty == true && me?.isOwner == true)
+              Positioned(
+                bottom: 55,
+                left: 40,
+                child: Badge(
+                  badgeContent: Text(
+                    "${room?.kickedListeners?.length}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  showBadge: room?.kickedListeners?.isNotEmpty == true ? true : false,
+                  position: BadgePosition.topEnd(end: -4),
+                  padding: const EdgeInsets.all(7),
+                  badgeColor: Theme.of(context).primaryColorDark,
+                  child: FloatingActionButton(
+                    elevation: 1,
+                    backgroundColor: Theme.of(context).primaryColor,
+                    onPressed: () async {
+                      if (speakersIds.contains(context.currentUser?.id)) {
+                        showMaterialModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => SingleChildScrollView(
+                            controller: ModalScrollController.of(context),
+                            child: KickedMembersWidget(
+                              ref: 'rooms/${room?.owner?.id}/kickedListeners',
+                              agoraEngine: agoraEngine,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: const Icon(
+                        FontAwesomeIcons.ban,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
+              )
           ],
         ),
       ),
