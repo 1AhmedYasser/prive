@@ -57,6 +57,7 @@ class _RoomScreenState extends State<RoomScreen> {
   bool isEditingDescription = false;
   TextEditingController descriptionController = TextEditingController();
   FocusNode descriptionFocusNode = FocusNode();
+  final yourRoomNameController = TextEditingController();
 
   @override
   void initState() {
@@ -64,6 +65,7 @@ class _RoomScreenState extends State<RoomScreen> {
     setState(() {
       room = widget.room;
       descriptionController.text = room?.description ?? '';
+      yourRoomNameController.text = context.currentUser?.name ?? '';
     });
     speakersIds = room?.speakers?.map((e) => e.id ?? "").toList() ?? [];
     raisedHandsIds = room?.raisedHands?.map((e) => e.id ?? "").toList() ?? [];
@@ -313,75 +315,145 @@ class _RoomScreenState extends State<RoomScreen> {
                             itemCount: room?.speakers?.length ?? 0,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
-                              return Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      Consumer<VolumeProvider>(builder: (context, provider, ch) {
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: room?.speakers?[index].isSpeaking == true
-                                                  ? Colors.green
-                                                  : Colors.transparent,
-                                              width: 1.5,
+                              return InkWell(
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () {
+                                  if (room?.owner?.id == context.currentUser?.id ||
+                                      context.currentUser?.id == room?.speakers?[index].id) {
+                                    RoomMenuDialog.showSpeakerMenu(
+                                      context,
+                                      room?.owner?.id,
+                                      room?.speakers?[index],
+                                      onChangeNamePressed: () async {
+                                        // Todo: Change Room Name
+                                        // Navigator.of(context);
+                                        this._showChangeNameDialog();
+                                      },
+                                      onDemotePressed: () async {
+                                        // Remove From Speakers
+                                        final speakersRef = FirebaseDatabase.instance
+                                            .ref('rooms/${room?.owner?.id}/speakers/${room?.speakers?[index].id}');
+                                        speakersRef.remove();
+
+                                        // Add To Listeners
+                                        final listenersRef = FirebaseDatabase.instance
+                                            .ref('rooms/${room?.owner?.id}/listeners/${room?.speakers?[index].id}');
+                                        listenersRef.update({
+                                          "id": room?.speakers?[index].id,
+                                          "name": room?.speakers?[index].name,
+                                          "image": room?.speakers?[index].image,
+                                          "isSpeaker": false,
+                                          "isListener": true,
+                                          "phone": room?.speakers?[index].phone,
+                                          "isHandRaised": false,
+                                          "hasPermissionToSpeak": false,
+                                          "isOwner": room?.speakers?[index].isOwner,
+                                          "isMicOn": false,
+                                        });
+                                        isMyMicOn = false;
+
+                                        // Demote From Room Contacts
+                                        final roomContactsRef = FirebaseDatabase.instance
+                                            .ref('rooms/${room?.owner?.id}/room_contacts/${room?.speakers?[index].id}');
+                                        roomContactsRef.update({
+                                          "id": room?.speakers?[index].id,
+                                          "name": room?.speakers?[index].name,
+                                          "image": room?.speakers?[index].image,
+                                          "isSpeaker": false,
+                                          "isListener": true,
+                                          "phone": room?.speakers?[index].phone,
+                                          "isHandRaised": false,
+                                          "hasPermissionToSpeak": false,
+                                          "isOwner": room?.speakers?[index].isOwner,
+                                          "isMicOn": false,
+                                        });
+
+                                        // Remove From Raised Hands If He Is There
+                                        final raisedHandsRef = FirebaseDatabase.instance
+                                            .ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
+                                        raisedHandsRef.remove();
+
+                                        await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleAudience);
+
+                                        agoraEngine?.muteRemoteAudioStream(
+                                            uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: true);
+
+                                        await agoraEngine?.muteLocalAudioStream(true);
+                                      },
+                                    );
+                                  }
+                                },
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Consumer<VolumeProvider>(builder: (context, provider, ch) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: room?.speakers?[index].isSpeaking == true
+                                                    ? Colors.green
+                                                    : Colors.transparent,
+                                                width: 1.5,
+                                              ),
+                                              borderRadius: BorderRadius.circular(25),
                                             ),
-                                            borderRadius: BorderRadius.circular(25),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(25),
-                                            child: SizedBox(
-                                              height: 78,
-                                              width: 80,
-                                              child: CachedImage(
-                                                url: room?.speakers?[index].image ?? "",
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(25),
+                                              child: SizedBox(
+                                                height: 78,
+                                                width: 80,
+                                                child: CachedImage(
+                                                  url: room?.speakers?[index].image ?? "",
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      }),
-                                      if (room?.speakers?[index].isOwner == true)
-                                        const Positioned(
-                                          right: 8,
-                                          child: Icon(
-                                            Icons.star,
-                                            color: Colors.yellow,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
-                                        child: Consumer<VolumeProvider>(builder: (context, provider, ch) {
-                                          return Icon(
-                                            room?.speakers?[index].isMicOn == true
-                                                ? FontAwesomeIcons.microphone
-                                                : FontAwesomeIcons.microphoneSlash,
-                                            color: room?.speakers?[index].isMicOn == true
-                                                ? (room?.speakers?[index].isSpeaking == true
-                                                    ? Colors.green
-                                                    : const Color(0xff7a8fa6))
-                                                : Colors.red,
-                                            size: 15,
                                           );
                                         }),
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Expanded(
-                                        child: Text(
-                                          (room?.speakers?[index].name?.split(" ").first ?? "").trim(),
-                                          style: const TextStyle(
-                                            color: Colors.black,
+                                        if (room?.speakers?[index].isOwner == true)
+                                          const Positioned(
+                                            right: 8,
+                                            child: Icon(
+                                              Icons.star,
+                                              color: Colors.yellow,
+                                            ),
                                           ),
-                                          maxLines: 1,
+                                      ],
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          child: Consumer<VolumeProvider>(builder: (context, provider, ch) {
+                                            return Icon(
+                                              room?.speakers?[index].isMicOn == true
+                                                  ? FontAwesomeIcons.microphone
+                                                  : FontAwesomeIcons.microphoneSlash,
+                                              color: room?.speakers?[index].isMicOn == true
+                                                  ? (room?.speakers?[index].isSpeaking == true
+                                                      ? Colors.green
+                                                      : const Color(0xff7a8fa6))
+                                                  : Colors.red,
+                                              size: 15,
+                                            );
+                                          }),
                                         ),
-                                      )
-                                    ],
-                                  )
-                                ],
+                                        const SizedBox(width: 3),
+                                        Expanded(
+                                          child: Text(
+                                            (room?.speakers?[index].name?.split(" ").first ?? "").trim(),
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
                               );
                             }),
                       ),
@@ -448,6 +520,16 @@ class _RoomScreenState extends State<RoomScreen> {
                                       "isMicOn": listener?.isMicOn,
                                     });
                                   });
+                                } else {
+                                  if (room?.listeners?[index].id == context.currentUser?.id) {
+                                    RoomMenuDialog.showChangeNameMenu(
+                                      context,
+                                      room?.listeners?[index],
+                                      onChangeNamePressed: () {
+                                        _showChangeNameDialog();
+                                      },
+                                    );
+                                  }
                                 }
                               },
                               child: Column(
@@ -911,15 +993,17 @@ class _RoomScreenState extends State<RoomScreen> {
         }
       }
 
-      room?.listeners?.forEach((listener) {
-        if (listener.id == context.currentUser?.id) {
-          if (listener.isMicOn == true) {
-            agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-          } else {
-            agoraEngine?.setClientRole(role: ClientRoleType.clientRoleAudience);
+      if (mounted) {
+        room?.listeners?.forEach((listener) {
+          if (listener.id == context.currentUser?.id) {
+            if (listener.isMicOn == true) {
+              agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+            } else {
+              agoraEngine?.setClientRole(role: ClientRoleType.clientRoleAudience);
+            }
           }
-        }
-      });
+        });
+      }
       setState(() {});
     } else {
       if (showingInfo == false) {
@@ -1145,6 +1229,89 @@ class _RoomScreenState extends State<RoomScreen> {
         ),
       ),
     );
+  }
+
+  void _showChangeNameDialog() async {
+    Future.delayed(const Duration(milliseconds: 10), () async {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Change Your Name'),
+            content: TextField(
+              controller: yourRoomNameController,
+              decoration: const InputDecoration(hintText: "Your Name"),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  yourRoomNameController.text = me?.name ?? '';
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  elevation: 0,
+                ),
+                child: const Text("Cancel").tr(),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  print(yourRoomNameController.text);
+
+                  if (me?.isSpeaker == true) {
+                    // Update Name As A Speaker
+                    final speakersRef =
+                        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${context.currentUser?.id}');
+                    speakersRef.update({
+                      "name": yourRoomNameController.text,
+                    });
+
+                    // Update Name if your an owner
+                    if (room?.owner?.id == context.currentUser?.id) {
+                      final ownerRef = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/owner');
+                      ownerRef.update({
+                        "name": yourRoomNameController.text,
+                      });
+                    }
+                  } else {
+                    // Update Name As A Listener
+                    final listenersRef =
+                        FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/listeners/${context.currentUser?.id}');
+                    listenersRef.update({
+                      "name": yourRoomNameController.text,
+                    });
+
+                    // Update Name From Raised Hands
+                    if (me?.isHandRaised == true) {
+                      final raisedHandsRef = FirebaseDatabase.instance
+                          .ref('rooms/${room?.owner?.id}/raisedHands/${context.currentUser?.id}');
+                      raisedHandsRef.update({
+                        "name": yourRoomNameController.text,
+                      });
+                    }
+                  }
+
+                  // Update Name in room contacts
+                  if (room?.owner?.id != context.currentUser?.id) {
+                    final roomContactsRef = FirebaseDatabase.instance
+                        .ref('rooms/${room?.owner?.id}/room_contacts/${context.currentUser?.id}');
+                    roomContactsRef.update({
+                      "name": yourRoomNameController.text,
+                    });
+                  }
+                },
+                child: const Text('Change').tr(),
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 
   @override
