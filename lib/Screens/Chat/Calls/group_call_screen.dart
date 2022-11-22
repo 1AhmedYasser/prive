@@ -16,6 +16,7 @@ import 'package:prive/Providers/volume_provider.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/main.dart';
 import 'package:provider/provider.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -24,6 +25,7 @@ import 'package:wakelock/wakelock.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/prive_call.dart';
+import '../../../Providers/call_provider.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
 import 'package:collection/collection.dart';
 import '../../../UltraNetwork/ultra_network.dart';
@@ -34,6 +36,7 @@ class GroupCallScreen extends StatefulWidget {
   final bool isJoining;
   final ScrollController scrollController;
   final RtcEngine? agoraEngine;
+  final BuildContext parentContext;
   final Call? call;
   const GroupCallScreen(
       {Key? key,
@@ -42,6 +45,7 @@ class GroupCallScreen extends StatefulWidget {
       this.isJoining = false,
       required this.channel,
       this.agoraEngine,
+      required this.parentContext,
       this.call})
       : super(key: key);
 
@@ -185,6 +189,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () {
+                            // if (mounted) {
+                            //   Provider.of<CallProvider>(context, listen: false).changeOverlayState(true);
+                            // }
                             Navigator.pop(context);
                           },
                           child: Container(

@@ -27,11 +27,13 @@ import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Models/Chat/group_admin.dart';
+import '../../../Providers/call_provider.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
 import '../../../Widgets/Common/cached_image.dart';
 import 'chat_info_screen.dart';
@@ -463,137 +465,147 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(
             children: [
               if (groupCall != null && groupCall?.members?.isNotEmpty == true)
-                Container(
-                  height: 65,
-                  color: Colors.grey.shade300.withOpacity(0.7),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 20, left: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              groupCall?.type == "Video" ? "Video Call" : "Voice Call",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ).tr(),
-                            const SizedBox(height: 5),
-                            Text(
-                              "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 100,
-                        ),
-                        if (groupCall?.members?.isNotEmpty == true)
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: <Widget>[
-                              if ((groupCall?.members?.length ?? 0) >= 1)
-                                SizedBox(
-                                  height: 44,
-                                  width: 44,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: CachedImage(
-                                      url: groupCall?.members?.first.image ?? "",
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              if ((groupCall?.members?.length ?? 0) > 1)
-                                Positioned(
-                                  right: 25.0,
-                                  child: SizedBox(
-                                    height: 44,
-                                    width: 44,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: CachedImage(
-                                        url: groupCall?.members?[1].image ?? "",
-                                        fit: BoxFit.fill,
+                Consumer<CallProvider>(
+                  builder: (context, provider, ch) {
+                    return provider.isOverlayShown
+                        ? const SizedBox.shrink()
+                        : Container(
+                            height: 65,
+                            color: Colors.grey.shade300.withOpacity(0.7),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20, left: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        groupCall?.type == "Video" ? "Video Call" : "Voice Call",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ).tr(),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        "${groupCall?.members?.length ?? "0"} ${groupCall?.members?.length == 1 ? "Participant".tr() : "Participants".tr()}",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 12.5,
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ),
-                              if ((groupCall?.members?.length ?? 0) > 2)
-                                Positioned(
-                                  right: 50.0,
-                                  child: SizedBox(
-                                    height: 44,
-                                    width: 44,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: CachedImage(
-                                        url: groupCall?.members?[2].image ?? "",
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
+                                  const SizedBox(
+                                    width: 100,
                                   ),
-                                ),
-                            ],
-                          ),
-                        const Expanded(child: SizedBox()),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (kickedCallMembersIds.contains(context.currentUser?.id)) {
-                              Utils.showAlert(
-                                context,
-                                message: "You Have Been Kicked Out Of This Call".tr(),
-                                alertImage: R.images.alertInfoImage,
-                              );
-                            } else {
-                              BotToast.removeAll("call_overlay");
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) {
-                                  return DraggableScrollableSheet(
-                                    minChildSize: 0.5,
-                                    initialChildSize: 0.6,
-                                    maxChildSize: 0.95,
-                                    builder: (_, controller) {
-                                      return GroupCallScreen(
-                                        isVideo: groupCall?.type == "Video" ? true : false,
-                                        isJoining: true,
-                                        channel: channel,
-                                        scrollController: controller,
-                                      );
+                                  if (groupCall?.members?.isNotEmpty == true)
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: <Widget>[
+                                        if ((groupCall?.members?.length ?? 0) >= 1)
+                                          SizedBox(
+                                            height: 44,
+                                            width: 44,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(50),
+                                              child: CachedImage(
+                                                url: groupCall?.members?.first.image ?? "",
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                          ),
+                                        if ((groupCall?.members?.length ?? 0) > 1)
+                                          Positioned(
+                                            right: 25.0,
+                                            child: SizedBox(
+                                              height: 44,
+                                              width: 44,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(50),
+                                                child: CachedImage(
+                                                  url: groupCall?.members?[1].image ?? "",
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        if ((groupCall?.members?.length ?? 0) > 2)
+                                          Positioned(
+                                            right: 50.0,
+                                            child: SizedBox(
+                                              height: 44,
+                                              width: 44,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(50),
+                                                child: CachedImage(
+                                                  url: groupCall?.members?[2].image ?? "",
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  const Expanded(child: SizedBox()),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      if (kickedCallMembersIds.contains(context.currentUser?.id)) {
+                                        Utils.showAlert(
+                                          context,
+                                          message: "You Have Been Kicked Out Of This Call".tr(),
+                                          alertImage: R.images.alertInfoImage,
+                                        );
+                                      } else {
+                                        BotToast.removeAll("call_overlay");
+                                        if (mounted) {
+                                          Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
+                                        }
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (_) {
+                                            return DraggableScrollableSheet(
+                                              minChildSize: 0.5,
+                                              initialChildSize: 0.6,
+                                              maxChildSize: 0.95,
+                                              builder: (_, controller) {
+                                                return GroupCallScreen(
+                                                  isVideo: groupCall?.type == "Video" ? true : false,
+                                                  isJoining: true,
+                                                  channel: channel,
+                                                  parentContext: context,
+                                                  scrollController: controller,
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ).then((value) => checkForGroupCall());
+                                      }
+                                      // await Future.delayed(
+                                      //     const Duration(milliseconds: 300), () {
+                                      //   setState(() {
+                                      //     groupCall = null;
+                                      //   });
+                                      // });
                                     },
-                                  );
-                                },
-                              ).then((value) => checkForGroupCall());
-                            }
-                            // await Future.delayed(
-                            //     const Duration(milliseconds: 300), () {
-                            //   setState(() {
-                            //     groupCall = null;
-                            //   });
-                            // });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColor,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text("Join").tr(),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          child: const Text("Join").tr(),
-                        )
-                      ],
-                    ),
-                  ),
+                          );
+                  },
                 ),
               Expanded(
                 child: Stack(
@@ -932,6 +944,7 @@ class _ChatScreenState extends State<ChatScreen> {
               return GroupCallScreen(
                 isVideo: isVideo,
                 channel: channel,
+                parentContext: context,
                 scrollController: controller,
               );
             },

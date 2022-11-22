@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:prive/Providers/call_provider.dart';
 import 'package:prive/Providers/channels_provider.dart';
 import 'package:prive/Providers/stories_provider.dart';
 import 'package:prive/Providers/volume_provider.dart';
@@ -85,6 +86,9 @@ class _PriveState extends State<Prive> {
         ),
         ChangeNotifierProvider(
           create: (ctx) => StoriesProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => CallProvider(),
         ),
       ],
       child: MaterialApp(

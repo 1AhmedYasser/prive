@@ -17,13 +17,16 @@ import 'package:prive/Extras/resources.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/call_overlay_widget.dart';
 import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+import '../Providers/call_provider.dart';
 import '../UltraNetwork/ultra_network.dart';
 import '../Widgets/Common/alert_widget.dart';
+import '../main.dart';
 
 class Utils {
   static final player = AudioPlayer();
@@ -622,6 +625,9 @@ class Utils {
     required Channel channel,
   }) {
     BotToast.removeAll("call_overlay");
+    Future.delayed(const Duration(milliseconds: 10), () {
+      Provider.of<CallProvider>(navigatorKey.currentContext!, listen: false).changeOverlayState(true);
+    });
     BotToast.showWidget(
       toastBuilder: (context) {
         return CallOverlayWidget(

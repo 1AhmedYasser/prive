@@ -326,9 +326,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                       room?.owner?.id,
                                       room?.speakers?[index],
                                       onChangeNamePressed: () async {
-                                        // Todo: Change Room Name
-                                        // Navigator.of(context);
-                                        this._showChangeNameDialog();
+                                        _showChangeNameDialog();
                                       },
                                       onDemotePressed: () async {
                                         // Remove From Speakers
@@ -1100,6 +1098,25 @@ class _RoomScreenState extends State<RoomScreen> {
     final ref = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}');
     if (room?.owner?.id == context.currentUser?.id) {
       ref.remove();
+      // Todo: Pass Ownership to the next speaker
+      // } else if (room?.owner?.id == context.currentUser?.id && (room?.speakers?.length ?? 1) > 1) {
+      // RoomUser? nextSpeaker = room?.speakers?.firstWhere((e) => e.id != room?.owner?.id);
+      // final nextOwnerRef = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${nextSpeaker?.id}');
+      // nextOwnerRef.update({
+      //   "id": nextSpeaker?.id,
+      //   "name": nextSpeaker?.name,
+      //   "image": nextSpeaker?.image,
+      //   "isSpeaker": true,
+      //   "isListener": false,
+      //   "phone": nextSpeaker?.phone,
+      //   "isHandRaised": nextSpeaker?.isHandRaised,
+      //   "hasPermissionToSpeak": nextSpeaker?.hasPermissionToSpeak,
+      //   "isOwner": true,
+      //   "isMicOn": nextSpeaker?.isMicOn,
+      // });
+      //
+      // final previousOwnerRef = FirebaseDatabase.instance.ref('rooms/${room?.owner?.id}/speakers/${room?.owner?.id}');
+      // previousOwnerRef.remove();
     } else if (speakersIds.contains(context.currentUser?.id)) {
       ref.child('speakers/${context.currentUser?.id}').remove();
     } else {

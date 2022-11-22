@@ -12,11 +12,13 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/main.dart';
+import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
+import '../../../Providers/call_provider.dart';
 import '../../../Screens/Chat/Calls/group_call_screen.dart';
 import '../../../Screens/Chat/Calls/single_call_screen.dart';
 
@@ -112,6 +114,9 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                         trailing: GestureDetector(
                           onTap: () {
                             BotToast.removeAll("call_overlay");
+                            if (mounted) {
+                              Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
+                            }
                             if (widget.isGroup) {
                               showModalBottomSheet(
                                 context: navigatorKey.currentContext!,
@@ -126,6 +131,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                         isVideo: call?.type == "Video" ? true : false,
                                         isJoining: true,
                                         call: call,
+                                        parentContext: context,
                                         channel: widget.channel,
                                         scrollController: controller,
                                         agoraEngine: widget.agoraEngine,
@@ -234,6 +240,10 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                             BotToast.removeAll("call_overlay");
+                                            if (mounted) {
+                                              Provider.of<CallProvider>(context, listen: false)
+                                                  .changeOverlayState(false);
+                                            }
                                             FlutterCallkitIncoming.endAllCalls();
                                             databaseReference.remove();
                                             _stopForegroundTask();
@@ -250,6 +260,9 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                           Navigator.pop(context);
                                           FlutterCallkitIncoming.endAllCalls();
                                           BotToast.removeAll("call_overlay");
+                                          if (mounted) {
+                                            Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
+                                          }
                                           _stopForegroundTask();
                                           databaseReference.child("members/${context.currentUser?.id}").remove();
                                           DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
@@ -270,6 +283,9 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                 );
                               } else {
                                 BotToast.removeAll("call_overlay");
+                                if (mounted) {
+                                  Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
+                                }
                                 FlutterCallkitIncoming.endAllCalls();
                                 final databaseReference =
                                     FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
@@ -423,6 +439,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         if (mounted) {
           FlutterCallkitIncoming.endAllCalls();
           BotToast.removeAll("call_overlay");
+          Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
           _stopForegroundTask();
           databaseReference.child("members/${context.currentUser?.id}").remove();
           DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
@@ -460,6 +477,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         _stopForegroundTask();
         if (mounted) {
           BotToast.removeAll("call_overlay");
+          Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
         }
       }
       showingInfo = true;

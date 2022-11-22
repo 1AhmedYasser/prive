@@ -15,7 +15,9 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:prive/Providers/call_provider.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:provider/provider.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:wakelock/wakelock.dart';
@@ -113,6 +115,9 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         elevation: 0,
         leading: BackButton(
           onPressed: () {
+            if (mounted) {
+              Provider.of<CallProvider>(context, listen: false).changeOverlayState(true);
+            }
             Navigator.pop(context);
           },
           color: Colors.white,
