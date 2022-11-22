@@ -9,6 +9,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -72,6 +73,8 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   CallMember? me;
   VideoViewController? remoteView;
   VideoViewController? localView;
+  final MethodChannel _iosScreenShareChannel = const MethodChannel('screensharing_ios');
+
   bool didJoinAgora = false;
   bool didEndCall = false;
   bool isSharingScreen = false;
@@ -355,6 +358,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
         rtcEngine: agoraEngine!,
         canvas: VideoCanvas(
           uid: channelUid,
+          sourceType: isSharingScreen ? VideoSourceType.videoSourceScreen : null,
         ),
       );
       setState(() {});
@@ -562,6 +566,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
             rtcEngine: agoraEngine!,
             canvas: VideoCanvas(
               uid: channelUid,
+              sourceType: isSharingScreen ? VideoSourceType.videoSourceScreen : null,
             ),
           );
           if (call?.members?.length == 2) {
@@ -989,33 +994,40 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   void _startScreenShare() async {
-    agoraEngine?.startScreenCaptureByScreenRect(
-        screenRect: const Rectangle(x: 0, y: 0, width: 640, height: 400),
-        regionRect: const Rectangle(),
-        captureParams: const ScreenCaptureParameters(
-          captureMouseCursor: true,
-          frameRate: 30,
-        ));
+    await agoraEngine?.startScreenCapture(const ScreenCaptureParameters2(captureAudio: true, captureVideo: true));
+    await agoraEngine?.startPreview(sourceType: VideoSourceType.videoSourceScreen);
 
     if (Platform.isIOS) {
       ReplayKitLauncher.launchReplayKitBroadcast('ScreenSharing');
     }
-
-    ChannelMediaOptions options = ChannelMediaOptions(
-      publishScreenTrack: isSharingScreen,
-      publishCameraTrack: !isSharingScreen,
-    );
-
-    agoraEngine?.updateChannelMediaOptions(options);
+    _updateScreenShareChannelMediaOptions();
 
     setState(() {
       isSharingScreen = true;
     });
   }
 
+  Future<void> _updateScreenShareChannelMediaOptions({bool startShare = true}) async {
+    await agoraEngine?.updateChannelMediaOptions(
+      ChannelMediaOptions(
+        publishScreenTrack: startShare,
+        publishSecondaryScreenTrack: startShare,
+        publishCameraTrack: !startShare,
+        publishMicrophoneTrack: !startShare,
+        publishScreenCaptureAudio: startShare,
+        publishScreenCaptureVideo: startShare,
+        clientRoleType: ClientRoleType.clientRoleBroadcaster,
+      ),
+    );
+  }
+
   void _stopScreenShare() async {
     print("Stop Screen Sharing");
     await agoraEngine?.stopScreenCapture();
+    if (Platform.isIOS) {
+      ReplayKitLauncher.finishReplayKitBroadcast('ScreenSharing');
+    }
+    _updateScreenShareChannelMediaOptions(startShare: false);
 
     if (Platform.isIOS) {
       ReplayKitLauncher.finishReplayKitBroadcast('');

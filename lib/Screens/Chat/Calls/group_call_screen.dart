@@ -1024,39 +1024,41 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _startScreenShare() async {
-    print("Start Screen Sharing");
-    agoraEngine?.startScreenCaptureByScreenRect(
-        screenRect: const Rectangle(x: 0, y: 0, width: 640, height: 400),
-        regionRect: const Rectangle(),
-        captureParams: const ScreenCaptureParameters(
-          captureMouseCursor: true,
-          frameRate: 30,
-        ));
+    await agoraEngine?.startScreenCapture(const ScreenCaptureParameters2(captureAudio: true, captureVideo: true));
+    await agoraEngine?.startPreview(sourceType: VideoSourceType.videoSourceScreen);
 
     if (Platform.isIOS) {
       ReplayKitLauncher.launchReplayKitBroadcast('ScreenSharing');
     }
-
-    ChannelMediaOptions options = ChannelMediaOptions(
-      publishScreenTrack: isSharingScreen,
-      publishCameraTrack: !isSharingScreen,
-    );
-
-    agoraEngine?.updateChannelMediaOptions(options);
+    _updateScreenShareChannelMediaOptions();
 
     setState(() {
       isSharingScreen = true;
     });
   }
 
+  Future<void> _updateScreenShareChannelMediaOptions({bool startShare = true}) async {
+    await agoraEngine?.updateChannelMediaOptions(
+      ChannelMediaOptions(
+        publishScreenTrack: startShare,
+        publishSecondaryScreenTrack: startShare,
+        publishCameraTrack: !startShare,
+        publishMicrophoneTrack: !startShare,
+        publishScreenCaptureAudio: startShare,
+        publishScreenCaptureVideo: startShare,
+        clientRoleType: ClientRoleType.clientRoleBroadcaster,
+      ),
+    );
+  }
+
   void _stopScreenShare() async {
     print("Stop Screen Sharing");
     await agoraEngine?.stopScreenCapture();
+    _updateScreenShareChannelMediaOptions(startShare: false);
 
     if (Platform.isIOS) {
       ReplayKitLauncher.finishReplayKitBroadcast('');
     }
-
     setState(() {
       isSharingScreen = false;
     });
