@@ -8,7 +8,7 @@ import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-import '../Chat/Calls/single_call_screen.dart';
+import '../Calls/single_call_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -51,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void _checkIfUserIsLoggedIn() async {
     var loginStatus = await Utils.getBool(R.pref.isLoggedIn);
     if (loginStatus == true) {
+      if (!mounted) return;
       StreamManager.connectUserToStream(context);
       isLoggedIn = (loginStatus == null) ? false : loginStatus;
       setState(() {});
@@ -75,22 +76,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (currentCall != null) {
       print("Have Calls");
       print(currentCall);
-      DatabaseReference ref = FirebaseDatabase.instance
-          .ref("SingleCalls/${currentCall['extra']['channelName']}");
+      DatabaseReference ref = FirebaseDatabase.instance.ref("SingleCalls/${currentCall['extra']['channelName']}");
       final event = await ref.once();
 
       if (event.snapshot.exists) {
         Map<dynamic, dynamic>? callResponse = {};
         callResponse = (event.snapshot.value as Map<dynamic, dynamic>);
-        Map<dynamic, dynamic>? membersList =
-            (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
+        Map<dynamic, dynamic>? membersList = (callResponse['members'] as Map<dynamic, dynamic>?) ?? {};
 
         if (membersList.length == 1) {
+          if (!mounted) return;
           final client = StreamChatCore.of(context).client;
-          ChannelState? channelState = await client.queryChannel("messaging",
-              channelId: currentCall['extra']['channelName']);
-          Channel? channel = Channel(
-              client, "messaging", channelState.channel?.id,
+          ChannelState? channelState =
+              await client.queryChannel("messaging", channelId: currentCall['extra']['channelName']);
+          Channel? channel = Channel(client, "messaging", channelState.channel?.id,
               name: channelState.channel?.name,
               image: currentCall['avatar'],
               extraData: channelState.channel?.extraData);
@@ -100,27 +99,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             }
           });
           if (channel != null) {
-            Navigator.of(context).push(
-              PageRouteBuilder(
-                pageBuilder: (BuildContext context, _, __) {
-                  return SingleCallScreen(
-                    isJoining: true,
-                    isVideo:
-                        currentCall['handle'] == "Voice Call" ? false : true,
-                    channelName: currentCall['nameCaller'],
-                    channelImage: currentCall['avatar'],
-                    channel: channel!,
-                  );
-                },
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-              ),
-            );
+            if (mounted) {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (BuildContext context, _, __) {
+                    return SingleCallScreen(
+                      isJoining: true,
+                      isVideo: currentCall['handle'] == "Voice Call" ? false : true,
+                      channelName: currentCall['nameCaller'],
+                      channelImage: currentCall['avatar'],
+                      channel: channel!,
+                    );
+                  },
+                  transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            }
           } else {
             print("No Channel Found");
           }

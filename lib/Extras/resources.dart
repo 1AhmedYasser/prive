@@ -158,6 +158,7 @@ class SharedPref {
 class Constants {
   String streamKey = '3dda2nbf6nxp';
   String agoraAppId = "666a21c863d9431da1ee9651748608fb";
+  String tenorApiKey = 'AIzaSyB3_59z3gmUWiHlY5x7qTS-Vze7qAT939A';
 }
 
 class Routes {

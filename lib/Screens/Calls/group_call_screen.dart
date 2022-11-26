@@ -429,6 +429,28 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    // Todo: Add Bot Feature
+                    // if (widget.isVideo)
+                    //   InkWell(
+                    //     splashColor: Colors.transparent,
+                    //     highlightColor: Colors.transparent,
+                    //     onTap: () {
+                    //     },
+                    //     child: Container(
+                    //       width: 50,
+                    //       height: 50,
+                    //       decoration: BoxDecoration(
+                    //         color: Colors.white10,
+                    //         borderRadius: BorderRadius.circular(30),
+                    //       ),
+                    //       child: const Icon(
+                    //         Icons.tap_and_play_outlined,
+                    //         color: Colors.white,
+                    //         size: 25,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // const SizedBox(height: 13),
                     InkWell(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

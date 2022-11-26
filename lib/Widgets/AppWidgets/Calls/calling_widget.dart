@@ -5,13 +5,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:prive/Screens/Chat/Calls/single_call_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Screens/Calls/single_call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
   final String channelName;

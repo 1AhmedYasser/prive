@@ -89,9 +89,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           padding: const EdgeInsets.only(bottom: 5),
           child: ImageIcon(
             AssetImage(image),
-            color: _currentIndex == index
-                ? Theme.of(context).primaryColorDark
-                : const Color(0xff7a8fa6),
+            color: _currentIndex == index ? Theme.of(context).primaryColorDark : const Color(0xff7a8fa6),
           ),
         ),
       ),
@@ -127,6 +125,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   void loadContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
     } else {
+      if (!mounted) return;
       List contacts = await Utils.fetchContacts(context);
       List<User> users = contacts.first;
       String usersMap = jsonEncode(users);
@@ -180,9 +179,7 @@ class _ChipBuilder extends ChipBuilder {
                   padding: const EdgeInsets.only(bottom: 5, top: 10),
                   child: ImageIcon(
                     AssetImage(getImage(index)),
-                    color: active
-                        ? Theme.of(context).primaryColorDark
-                        : const Color(0xff7a8fa6),
+                    color: active ? Theme.of(context).primaryColorDark : const Color(0xff7a8fa6),
                   ),
                 ),
                 Expanded(
@@ -190,9 +187,7 @@ class _ChipBuilder extends ChipBuilder {
                     getTitles(index),
                     maxLines: 1,
                     style: TextStyle(
-                      color: active
-                          ? Theme.of(context).primaryColorDark
-                          : const Color(0xff7a8fa6),
+                      color: active ? Theme.of(context).primaryColorDark : const Color(0xff7a8fa6),
                     ),
                   ),
                 )

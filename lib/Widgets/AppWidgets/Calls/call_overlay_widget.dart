@@ -19,8 +19,8 @@ import '../../../Helpers/utils.dart';
 import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Providers/call_provider.dart';
-import '../../../Screens/Chat/Calls/group_call_screen.dart';
-import '../../../Screens/Chat/Calls/single_call_screen.dart';
+import '../../../Screens/Calls/group_call_screen.dart';
+import '../../../Screens/Calls/single_call_screen.dart';
 
 class CallOverlayWidget extends StatefulWidget {
   final bool isGroup;
