@@ -1,23 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Providers/channels_provider.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Home/calls_screen.dart';
 import 'package:prive/Screens/Home/channels_screen.dart';
 import 'package:prive/Screens/Home/rooms_screen.dart';
 import 'package:prive/Screens/Home/stories_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-
-import '../../Resources/images.dart';
-import '../../Resources/shared_pref.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -45,9 +45,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           Utils.showAlert(
             context,
             withCancel: true,
-            message: "Do You Want To Exit Prive ?".tr(),
-            okButtonText: "Yes".tr(),
-            cancelButtonText: "No".tr(),
+            message: 'Do You Want To Exit Prive ?'.tr(),
+            okButtonText: 'Yes'.tr(),
+            cancelButtonText: 'No'.tr(),
             onOkButtonPressed: () {
               try {
                 SystemNavigator.pop();
@@ -68,13 +68,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           height: 60,
           top: -25,
           items: [
-            _buildTab("Chat".tr(), Images.chatTabImage, 0),
-            _buildTab("Calls".tr(), Images.phoneTabImage, 1),
+            _buildTab('Chat'.tr(), Images.chatTabImage, 0),
+            _buildTab('Calls'.tr(), Images.phoneTabImage, 1),
             TabItem(
               icon: Container(),
             ),
-            _buildTab("Rooms".tr(), Images.micTabImage, 3),
-            _buildTab("Stories".tr(), Images.storiesTabImage, 4),
+            _buildTab('Rooms'.tr(), Images.micTabImage, 3),
+            _buildTab('Stories'.tr(), Images.storiesTabImage, 4),
           ],
           initialActiveIndex: 2,
           onTap: (int i) => _onTabTapped(i),
@@ -218,17 +218,17 @@ class _ChipBuilder extends ChipBuilder {
   String getTitles(int index) {
     switch (index) {
       case 0:
-        return "Chat".tr();
+        return 'Chat'.tr();
       case 1:
-        return "Calls".tr();
+        return 'Calls'.tr();
       case 2:
-        return "";
+        return '';
       case 3:
-        return "Rooms".tr();
+        return 'Rooms'.tr();
       case 4:
-        return "Stories".tr();
+        return 'Stories'.tr();
       default:
-        return "Chat".tr();
+        return 'Chat'.tr();
     }
   }
 }

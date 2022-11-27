@@ -17,10 +17,10 @@ class ChatBackgroundsScreen extends StatefulWidget {
 
 class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
   bool isImageShown = false;
-  String selectedImage = "";
-  String previewedImage = "";
-  late File galleryImage = File("");
-  late File selectedGalleryImage = File("");
+  String selectedImage = '';
+  String previewedImage = '';
+  late File galleryImage = File('');
+  late File selectedGalleryImage = File('');
   final imagePicker = ImagePicker();
   bool isFileSelected = false;
 
@@ -64,7 +64,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                   isFileSelected = false;
                 }
                 isImageShown = false;
-                galleryImage = File("");
+                galleryImage = File('');
               });
             } else {
               Navigator.pop(context);
@@ -72,7 +72,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
           },
         ),
         title: const Text(
-          "Chat Background",
+          'Chat Background',
           style: TextStyle(
             fontSize: 23,
             color: Colors.black,
@@ -112,14 +112,14 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
               isImageShown = false;
               if (isFileSelected) {
                 selectedGalleryImage = galleryImage;
-                selectedImage = "";
+                selectedImage = '';
                 Utils.saveString(SharedPref.chosenChatBackground, selectedGalleryImage.path);
                 Utils.saveBool(SharedPref.isChosenChatBackgroundAFile, true);
                 Navigator.pop(context);
               } else {
                 selectedImage = previewedImage;
-                selectedGalleryImage = File("");
-                galleryImage = File("");
+                selectedGalleryImage = File('');
+                galleryImage = File('');
                 Utils.saveString(SharedPref.chosenChatBackground, selectedImage);
                 Utils.saveBool(SharedPref.isChosenChatBackgroundAFile, false);
               }
@@ -133,7 +133,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: const Text(
-                  "Set Background",
+                  'Set Background',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                 ).tr(),
               ),
@@ -163,7 +163,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                   ),
                   const SizedBox(width: 18),
                   const Text(
-                    "Select From Gallery Or Camera",
+                    'Select From Gallery Or Camera',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
@@ -190,7 +190,10 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, childAspectRatio: 0.49, crossAxisSpacing: 0),
+                  crossAxisCount: 3,
+                  childAspectRatio: 0.49,
+                  crossAxisSpacing: 0,
+                ),
                 itemBuilder: (context, index) {
                   return InkWell(
                     splashColor: Colors.transparent,
@@ -249,17 +252,17 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
     bool? isAFile = await Utils.getBool(SharedPref.isChosenChatBackgroundAFile);
 
     if (isAFile == true) {
-      galleryImage = File(await Utils.getString(SharedPref.chosenChatBackground) ?? "");
+      galleryImage = File(await Utils.getString(SharedPref.chosenChatBackground) ?? '');
       selectedGalleryImage = galleryImage;
-      selectedImage = "";
+      selectedImage = '';
       setState(() {});
     } else {
       if (isAFile == null) {
         selectedImage = Images.chatBackground1;
       } else {
-        selectedImage = await Utils.getString(SharedPref.chosenChatBackground) ?? "";
-        selectedGalleryImage = File("");
-        galleryImage = File("");
+        selectedImage = await Utils.getString(SharedPref.chosenChatBackground) ?? '';
+        selectedGalleryImage = File('');
+        galleryImage = File('');
       }
       setState(() {});
     }

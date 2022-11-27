@@ -29,7 +29,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
           statusBarBrightness: Brightness.light,
         ),
         title: const Text(
-          "Forward",
+          'Forward',
           style: TextStyle(color: Colors.black),
         ).tr(),
         leading: const BackButton(
@@ -48,7 +48,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
                 });
               },
               child: Text(
-                isSelectedEnabled ? "Unselect" : "Select",
+                isSelectedEnabled ? 'Unselect' : 'Select',
                 style: const TextStyle(color: Colors.black, fontSize: 17),
               ).tr(),
             ),
@@ -80,7 +80,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
                     if (searchController.text.isNotEmpty) Filter.autoComplete('name', searchController.text)
                   ],
                 ),
-                sort: const [SortOption('last_message_at')],
+                channelStateSort: const [SortOption('last_message_at')],
                 presence: true,
                 limit: 20,
               ),
@@ -192,7 +192,7 @@ class _ForwardScreenState extends State<ForwardScreen> {
                   }
                 },
                 child: const Text(
-                  "Forward",
+                  'Forward',
                   style: TextStyle(
                     fontSize: 17.5,
                   ),

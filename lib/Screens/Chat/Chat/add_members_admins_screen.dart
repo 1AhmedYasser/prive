@@ -3,23 +3,22 @@ import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
+import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:collection/collection.dart';
-
-import '../../../Helpers/utils.dart';
-import '../../../Models/Chat/group_admin.dart';
-import '../../../Resources/animations.dart';
-import '../../../Resources/shared_pref.dart';
-import '../../../UltraNetwork/ultra_loading_indicator.dart';
-import '../../../Widgets/AppWidgets/channels_empty_widgets.dart';
-import '../../../Widgets/ChatWidgets/search_text_field.dart';
-import '../../../Widgets/Common/cached_image.dart';
 
 class AddMembersAdminsScreen extends StatefulWidget {
   final Channel channel;
@@ -73,7 +72,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
         title: Column(
           children: [
             Text(
-              widget.isAddingAdmin ? "Add Admin" : "Add Member",
+              widget.isAddingAdmin ? 'Add Admin' : 'Add Member',
               style: TextStyle(
                 color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                 fontSize: 16,
@@ -92,14 +91,14 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected".tr();
+              statusString = 'Connected'.tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting".tr();
+              statusString = 'Connecting'.tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected".tr();
+              statusString = 'Disconnected'.tr();
               break;
           }
           return StreamInfoTile(
@@ -116,7 +115,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                       padding: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
                       child: SearchTextField(
                         controller: _controller,
-                        hintText: "Search".tr(),
+                        hintText: 'Search'.tr(),
                         showCloseButton: false,
                         onChanged: (value) {
                           if (value.isEmpty) {
@@ -128,7 +127,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                               users = allUsers
                                   .where(
                                     (element) =>
-                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
+                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ''),
                                   )
                                   .toList();
                             });
@@ -156,19 +155,20 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
                                           if (widget.isAddingAdmin) {
-                                            BotToast.removeAll("loading");
+                                            BotToast.removeAll('loading');
                                             BotToast.showAnimationWidget(
-                                                toastBuilder: (context) {
-                                                  return const IgnorePointer(child: UltraLoadingIndicator());
-                                                },
-                                                animationDuration: const Duration(milliseconds: 0),
-                                                groupKey: "loading");
+                                              toastBuilder: (context) {
+                                                return const IgnorePointer(child: UltraLoadingIndicator());
+                                              },
+                                              animationDuration: const Duration(milliseconds: 0),
+                                              groupKey: 'loading',
+                                            );
                                             List<Map<String, dynamic>> admins = [];
                                             GroupAdmin newAdmin = GroupAdmin(
                                               nonAdminUsers[index].id,
                                               nonAdminUsers[index].name,
                                               nonAdminUsers[index].image,
-                                              "admin",
+                                              'admin',
                                               AdminGroupPermissions(
                                                 pinMessages: true,
                                                 addAdmins: true,
@@ -185,27 +185,27 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                               groupAdmins.add(newAdmin);
                                               for (var admin in groupAdmins) {
                                                 admins.add({
-                                                  "id": admin.id,
-                                                  "name": admin.name,
-                                                  "image": admin.image,
-                                                  "group_role": admin.groupRole,
-                                                  "admin_permissions": {
-                                                    "pin_messages": admin.groupPermissions?.pinMessages ?? true,
-                                                    "add_members": admin.groupPermissions?.addMembers ?? true,
-                                                    "add_admins": admin.groupPermissions?.addAdmins ?? true,
-                                                    "change_group_info":
+                                                  'id': admin.id,
+                                                  'name': admin.name,
+                                                  'image': admin.image,
+                                                  'group_role': admin.groupRole,
+                                                  'admin_permissions': {
+                                                    'pin_messages': admin.groupPermissions?.pinMessages ?? true,
+                                                    'add_members': admin.groupPermissions?.addMembers ?? true,
+                                                    'add_admins': admin.groupPermissions?.addAdmins ?? true,
+                                                    'change_group_info':
                                                         admin.groupPermissions?.changeGroupInfo ?? true,
-                                                    "delete_others_messages":
+                                                    'delete_others_messages':
                                                         admin.groupPermissions?.deleteOthersMessages ?? true,
-                                                    "delete_members": admin.groupPermissions?.deleteMembers ?? true
+                                                    'delete_members': admin.groupPermissions?.deleteMembers ?? true
                                                   },
                                                 });
                                               }
-                                              widget.channel.updatePartial(set: {"group_admins": admins}).then((value) {
+                                              widget.channel.updatePartial(set: {'group_admins': admins}).then((value) {
                                                 if (mounted) {
                                                   Navigator.pop(context);
                                                 }
-                                                BotToast.removeAll("loading");
+                                                BotToast.removeAll('loading');
                                               });
                                             }
                                           } else {
@@ -213,7 +213,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                               [nonMembersUsers[index].id],
                                               message: Message(
                                                 text:
-                                                    "${context.currentUser?.name} Added ${nonMembersUsers[index].name}",
+                                                    '${context.currentUser?.name} Added ${nonMembersUsers[index].name}',
                                               ),
                                             ).then((value) {
                                               if (mounted) {
@@ -236,8 +236,8 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                                       width: 50,
                                                       child: CachedImage(
                                                         url: widget.isAddingAdmin
-                                                            ? nonAdminUsers[index].image ?? ""
-                                                            : nonMembersUsers[index].image ?? "",
+                                                            ? nonAdminUsers[index].image ?? ''
+                                                            : nonMembersUsers[index].image ?? '',
                                                       ),
                                                     ),
                                                   ),
@@ -296,8 +296,8 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                         )
                       : ChannelsEmptyState(
                           animationController: _animationController,
-                          title: "No Contacts Found".tr(),
-                          message: "",
+                          title: 'No Contacts Found'.tr(),
+                          message: '',
                         )
                   : _permissionDenied == false
                       ? const UltraLoadingIndicator()
@@ -339,7 +339,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                   ),
                                 ),
                                 child: const Text(
-                                  "Go To Settings",
+                                  'Go To Settings',
                                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
@@ -355,23 +355,25 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       allUsers = users;
       phoneContacts = users.isNotEmpty ? [Contact()] : [];
       setState(() {});
     } else {
-      print("No Contacts found");
+      print('No Contacts found');
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
@@ -389,12 +391,11 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
     }
 
     members = widget.channel.state?.members ?? [];
-    membersUsers = members.map((e) => e.user ?? User(id: context.currentUser?.id ?? "")).toList();
-    admins = members.where((member) => member.channelRole == "owner" || member.channelRole == "admin").toList();
-    adminsUsers = admins.map((e) => e.user ?? User(id: context.currentUser?.id ?? "")).toList();
+    membersUsers = members.map((e) => e.user ?? User(id: context.currentUser?.id ?? '')).toList();
+    admins = members.where((member) => member.channelRole == 'owner' || member.channelRole == 'admin').toList();
+    adminsUsers = admins.map((e) => e.user ?? User(id: context.currentUser?.id ?? '')).toList();
 
     List<String> membersUsersIds = membersUsers.map((e) => e.id).toList();
-    List<String> adminUsersIds = adminsUsers.map((e) => e.id).toList();
     List<String> usersIds = users.map((e) => e.id).toList();
 
     nonMembersUsers = [];

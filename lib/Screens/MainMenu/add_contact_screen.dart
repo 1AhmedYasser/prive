@@ -1,26 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Providers/channels_provider.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
-import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
-import '../../Resources/images.dart';
-import '../../Resources/shared_pref.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({Key? key}) : super(key: key);
 
   @override
-  _AddContactScreenState createState() => _AddContactScreenState();
+  State<AddContactScreen> createState() => _AddContactScreenState();
 }
 
 class _AddContactScreenState extends State<AddContactScreen> {
@@ -28,7 +27,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  late File profileImage = File("");
+  late File profileImage = File('');
   final imagePicker = ImagePicker();
 
   @override
@@ -36,7 +35,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Add Contact".tr()),
+        child: PriveAppBar(title: 'Add Contact'.tr()),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -69,7 +68,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   borderRadius: BorderRadius.circular(30),
                                   child: (profileImage.path.isEmpty)
                                       ? CachedImage(
-                                          url: "",
+                                          url: '',
                                           containerColor: Colors.grey.shade300,
                                         )
                                       : Image.file(
@@ -90,19 +89,29 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 padding: const EdgeInsets.only(left: 25, right: 25, top: 35),
                 child: Column(
                   children: [
-                    buildTextField("First Name (Required)".tr(), firstNameController,
-                        emptyValidatorMessage: "Please enter a first name".tr()),
+                    buildTextField(
+                      'First Name (Required)'.tr(),
+                      firstNameController,
+                      emptyValidatorMessage: 'Please enter a first name'.tr(),
+                    ),
                     const SizedBox(height: 20),
-                    buildTextField("Last Name (Optional)".tr(), lastNameController,
-                        emptyValidatorMessage: "Please enter a last name".tr(), validate: false),
+                    buildTextField(
+                      'Last Name (Optional)'.tr(),
+                      lastNameController,
+                      emptyValidatorMessage: 'Please enter a last name'.tr(),
+                      validate: false,
+                    ),
                     const SizedBox(height: 20),
-                    buildTextField("Phone Number".tr(), phoneNumberController,
-                        type: const TextInputType.numberWithOptions(
-                          signed: true,
-                          decimal: false,
-                        ),
-                        formatters: [FilteringTextInputFormatter.digitsOnly],
-                        emptyValidatorMessage: "Please enter a phone number".tr()),
+                    buildTextField(
+                      'Phone Number'.tr(),
+                      phoneNumberController,
+                      type: const TextInputType.numberWithOptions(
+                        signed: true,
+                        decimal: false,
+                      ),
+                      formatters: [FilteringTextInputFormatter.digitsOnly],
+                      emptyValidatorMessage: 'Please enter a phone number'.tr(),
+                    ),
                     const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: () async {
@@ -123,9 +132,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           await loadContacts();
                           if (mounted) {
                             Provider.of<ChannelsProvider>(context, listen: false).refreshChannels();
-                            Utils.showAlert(context,
-                                    message: "Contact Added Successfully".tr(), alertImage: Images.alertSuccessImage)
-                                .then(
+                            Utils.showAlert(
+                              context,
+                              message: 'Contact Added Successfully'.tr(),
+                              alertImage: Images.alertSuccessImage,
+                            ).then(
                               (value) => Navigator.pop(context),
                             );
                           }
@@ -140,7 +151,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         ),
                       ),
                       child: const Text(
-                        "Add Contact",
+                        'Add Contact',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w400,
@@ -157,12 +168,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 
-  Widget buildTextField(String hint, TextEditingController controller,
-      {int maxLines = 1,
-      TextInputType type = TextInputType.text,
-      List<TextInputFormatter> formatters = const [],
-      String emptyValidatorMessage = "",
-      bool validate = true}) {
+  Widget buildTextField(
+    String hint,
+    TextEditingController controller, {
+    int maxLines = 1,
+    TextInputType type = TextInputType.text,
+    List<TextInputFormatter> formatters = const [],
+    String emptyValidatorMessage = '',
+    bool validate = true,
+  }) {
     return TextFormField(
       maxLines: maxLines,
       controller: controller,

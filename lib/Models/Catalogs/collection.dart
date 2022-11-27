@@ -1,6 +1,5 @@
+import 'package:prive/Models/Catalogs/catalog_product.dart';
 import 'package:prive/UltraNetwork/base_model.dart';
-
-import 'catalogProduct.dart';
 
 class Collection extends BaseModel<Collection> {
   int? statusCode;

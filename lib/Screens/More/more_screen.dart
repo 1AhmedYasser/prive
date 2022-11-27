@@ -52,7 +52,7 @@ class _MoreScreenState extends State<MoreScreen> {
                       const BackButton(),
                       const SizedBox(width: 8),
                       Text(
-                        "Settings".tr(),
+                        'Settings'.tr(),
                         style: const TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w600,
@@ -63,28 +63,28 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
                 OptionRowWidget(
                   image: Images.myGroupsImage,
-                  title: "My Groups".tr(),
+                  title: 'My Groups'.tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: Images.myChannelsImage,
-                  title: "My Channels".tr(),
+                  title: 'My Channels'.tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: Images.catalogManagerImage,
-                  title: "Catalog Manager".tr(),
+                  title: 'Catalog Manager'.tr(),
                   onPressed: () => Navigator.pushNamed(context, Routes.catalogScreen).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: Images.contactsImage,
-                  title: "Contacts".tr(),
+                  title: 'Contacts'.tr(),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ContactsScreen(
-                          title: "Contacts".tr(),
+                          title: 'Contacts'.tr(),
                         ),
                       ),
                     ).then((value) => setState(() {}));
@@ -92,17 +92,17 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
                 OptionRowWidget(
                   image: Images.peopleNearbyImage,
-                  title: "People Nearby".tr(),
+                  title: 'People Nearby'.tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: Images.inviteFriendsImage,
-                  title: "Invite Friends".tr(),
+                  title: 'Invite Friends'.tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: Images.settingsImage,
-                  title: "Settings".tr(),
+                  title: 'Settings'.tr(),
                   onPressed: () {
                     Navigator.pushNamed(context, Routes.settingsRoute).then((value) => setState(() {}));
                   },
@@ -110,16 +110,16 @@ class _MoreScreenState extends State<MoreScreen> {
                 OptionRowWidget(
                   image: Images.logoutImage,
                   imageColor: const Color(0xff7a8fa6).withOpacity(0.9),
-                  title: "Log out".tr(),
+                  title: 'Log out'.tr(),
                   showDivider: false,
                   onPressed: () {
-                    Utils.saveString(SharedPref.token, "");
-                    Utils.saveString(SharedPref.userId, "");
-                    Utils.saveString(SharedPref.userName, "");
-                    Utils.saveString(SharedPref.userFirstName, "");
-                    Utils.saveString(SharedPref.userLastName, "");
-                    Utils.saveString(SharedPref.userEmail, "");
-                    Utils.saveString(SharedPref.userPhone, "");
+                    Utils.saveString(SharedPref.token, '');
+                    Utils.saveString(SharedPref.userId, '');
+                    Utils.saveString(SharedPref.userName, '');
+                    Utils.saveString(SharedPref.userFirstName, '');
+                    Utils.saveString(SharedPref.userLastName, '');
+                    Utils.saveString(SharedPref.userEmail, '');
+                    Utils.saveString(SharedPref.userPhone, '');
                     Utils.saveBool(SharedPref.isLoggedIn, false);
                     StreamManager.disconnectUserFromStream(context);
                     Navigator.pushNamedAndRemoveUntil(context, Routes.loginRoute, (Route<dynamic> route) => false);

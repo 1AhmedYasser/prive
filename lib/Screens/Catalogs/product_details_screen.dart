@@ -1,25 +1,24 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Screens/Catalogs/catalog_product_sender_screen.dart';
+import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../../Helpers/Utils.dart';
-import '../../Models/Catalogs/catalogProduct.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/Common/cached_image.dart';
-import 'new_product_screen.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final CatalogProductData? product;
   final CollectionData? collection;
-  const ProductDetailsScreen({Key? key, this.product, this.collection})
-      : super(key: key);
+  const ProductDetailsScreen({Key? key, this.product, this.collection}) : super(key: key);
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -31,9 +30,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   List<Map> moreMenu = [];
   CatalogProductData? product;
   List<String> moreMenuTitles = [
-    "Edit",
+    'Edit',
     //"Hide",
-    "Delete",
+    'Delete',
   ];
   CancelToken cancelToken = CancelToken();
 
@@ -46,19 +45,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   void getSlider() {
-    if (product?.photo1 != null && product?.photo1 != "NONE") {
+    if (product?.photo1 != null && product?.photo1 != 'NONE') {
       sliderWidgets.add(
-        _buildSliderContainer(product?.photo1 ?? "", 0),
+        _buildSliderContainer(product?.photo1 ?? '', 0),
       );
     }
-    if (product?.photo2 != null && product?.photo2 != "NONE") {
+    if (product?.photo2 != null && product?.photo2 != 'NONE') {
       sliderWidgets.add(
-        _buildSliderContainer(product?.photo2 ?? "", 0),
+        _buildSliderContainer(product?.photo2 ?? '', 0),
       );
     }
-    if (product?.photo3 != null && product?.photo3 != "NONE") {
+    if (product?.photo3 != null && product?.photo3 != 'NONE') {
       sliderWidgets.add(
-        _buildSliderContainer(product?.photo3 ?? "", 0),
+        _buildSliderContainer(product?.photo3 ?? '', 0),
       );
     }
   }
@@ -102,7 +101,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 dropdownItemPadding: EdgeInsets.zero,
                 onChange: (dropdownItem) {
                   switch (dropdownItem['value']) {
-                    case "Edit":
+                    case 'Edit':
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -117,10 +116,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         }
                       });
                       break;
-                    case "Hide":
-                      print("Hide Product");
+                    case 'Hide':
+                      print('Hide Product');
                       break;
-                    case "Delete":
+                    case 'Delete':
                       _deleteProduct();
                       break;
                     default:
@@ -209,8 +208,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       dotHeight: 8,
                       paintStyle: PaintingStyle.fill,
                       strokeWidth: 1.5,
-                      dotColor:
-                          Theme.of(context).primaryColorDark.withOpacity(0.4),
+                      dotColor: Theme.of(context).primaryColorDark.withOpacity(0.4),
                       activeDotColor: Theme.of(context).primaryColorDark,
                     ),
                   ),
@@ -227,7 +225,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product?.itemName ?? "",
+                    product?.itemName ?? '',
                     style: const TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.w600,
@@ -236,7 +234,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
-                      product?.description ?? "",
+                      product?.description ?? '',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
@@ -245,9 +243,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ),
                   Text(
-                    product?.price?.isEmpty == true
-                        ? ""
-                        : "${product?.price ?? ""} ${"SAR".tr()}",
+                    product?.price?.isEmpty == true ? '' : "${product?.price ?? ""} ${"SAR".tr()}",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
@@ -279,7 +275,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 child: Text(
-                  "Send Message".tr(),
+                  'Send Message'.tr(),
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
@@ -296,16 +292,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   CarouselSlider _buildSlider() {
     return CarouselSlider(
       options: CarouselOptions(
-          height: 265,
-          viewportFraction: 1,
-          enableInfiniteScroll: true,
-          autoPlay: false,
-          autoPlayInterval: const Duration(seconds: 3),
-          onPageChanged: (page, reason) {
-            setState(() {
-              activeSliderIndex = page;
-            });
-          }),
+        height: 265,
+        viewportFraction: 1,
+        enableInfiniteScroll: true,
+        autoPlay: false,
+        autoPlayInterval: const Duration(seconds: 3),
+        onPageChanged: (page, reason) {
+          setState(() {
+            activeSliderIndex = page;
+          });
+        },
+      ),
       items: sliderWidgets,
     );
   }
@@ -319,8 +316,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         width: double.maxFinite,
         margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
         decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(0)),
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(0),
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(0),
           child: CachedImage(
@@ -346,7 +344,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       context,
       getProducts,
       formData: FormData.fromMap(
-        {"CollectionID": widget.collection?.collectionID ?? ""},
+        {'CollectionID': widget.collection?.collectionID ?? ''},
       ),
       cancelToken: cancelToken,
     ).then((value) {
@@ -354,8 +352,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         setState(() {
           CatalogProduct productsResponse = value;
           List<CatalogProductData> products = productsResponse.data ?? [];
-          product = products
-              .firstWhere((element) => element.itemID == product?.itemID);
+          product = products.firstWhere((element) => element.itemID == product?.itemID);
         });
       }
     });
@@ -366,14 +363,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       context,
       deleteProduct,
       formData: FormData.fromMap(
-        {"ItemID": product?.itemID ?? ""},
+        {'ItemID': product?.itemID ?? ''},
       ),
       cancelToken: cancelToken,
     ).then((value) {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Deleted Successfully".tr(),
+          message: 'Product Deleted Successfully'.tr(),
         ).then((value) => Navigator.pop(context, true));
       }
     });

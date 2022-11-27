@@ -70,6 +70,8 @@ dependencies:
   map_launcher: ^2.4.0
   carousel_slider: ^4.1.1
   awesome_dialog: ^3.0.2
+  video_thumbnail: ^0.5.3
+  video_player: ^2.4.8
   flutter_staggered_grid_view: ^0.4.0
   rflutter_alert: ^2.0.4
   modal_bottom_sheet:
@@ -95,6 +97,8 @@ dependencies:
   wakelock: ^0.6.2
   flutter_foreground_task: ^3.10.0
   replay_kit_launcher: ^1.0.0
+  collection: ^1.17.0
+  path_provider: ^2.0.11
 
   # Firebase
   firebase_core: ^2.2.0
@@ -104,6 +108,7 @@ dependencies:
   firebase_database: ^10.0.5
 
   # Stream
+  stream_chat_flutter_core: ^5.1.0
   stream_chat_flutter: ^5.1.0
   stream_chat_persistence: ^5.1.0
   stream_chat_localizations: ^4.0.0

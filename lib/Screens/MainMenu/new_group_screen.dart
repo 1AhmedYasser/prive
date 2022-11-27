@@ -1,23 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:app_settings/app_settings.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Resources/animations.dart';
-import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
-import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../Helpers/Utils.dart';
-import '../../Resources/shared_pref.dart';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
-import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
-import '../../Widgets/Common/cached_image.dart';
+import 'package:prive/Helpers/Utils.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
+import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class NewGroupScreen extends StatefulWidget {
   const NewGroupScreen({Key? key}) : super(key: key);
@@ -60,7 +61,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
           color: Color(0xff7a8fa6),
         ),
         title: const Text(
-          "New Group",
+          'New Group',
           style: TextStyle(
             fontSize: 23,
             color: Colors.black,
@@ -82,11 +83,11 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                   if (_selectedUsers.length < 2) {
                     Utils.showAlert(
                       context,
-                      message: "The Group Must Have At Least 3 Members".tr(),
+                      message: 'The Group Must Have At Least 3 Members'.tr(),
                     );
                   } else {
                     Map<String, String> usersColors = {};
-                    usersColors[context.currentUser?.id ?? "0"] = generateRandomColorHex();
+                    usersColors[context.currentUser?.id ?? '0'] = generateRandomColorHex();
                     for (var user in _selectedUsers) {
                       usersColors[user.id] = generateRandomColorHex();
                     }
@@ -101,30 +102,30 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                             ..._selectedUsers.map((e) => e.id),
                           ],
                           'name': groupName,
-                          'channel_type': _selectedUsers.length > 1 ? "Group" : "Normal",
+                          'channel_type': _selectedUsers.length > 1 ? 'Group' : 'Normal',
                           'is_important': false,
                           'is_archive': false,
                           'name_colors': usersColors,
                           'group_admins': [
                             {
-                              "id": context.currentUser?.id,
-                              "name": context.currentUser?.name,
-                              "image": context.currentUser?.image,
-                              "group_role": "owner",
-                              "admin_permissions": {
-                                "pin_messages": true,
-                                "add_members": true,
-                                "add_admins": true,
-                                "change_group_info": true,
-                                "delete_others_messages": true,
-                                "delete_members": true
+                              'id': context.currentUser?.id,
+                              'name': context.currentUser?.name,
+                              'image': context.currentUser?.image,
+                              'group_role': 'owner',
+                              'admin_permissions': {
+                                'pin_messages': true,
+                                'add_members': true,
+                                'add_admins': true,
+                                'change_group_info': true,
+                                'delete_others_messages': true,
+                                'delete_members': true
                               },
                             }
                           ],
                           'members_permissions': {
-                            "send_messages": true,
-                            "send_media": true,
-                            "add_members": true,
+                            'send_messages': true,
+                            'send_media': true,
+                            'add_members': true,
                           }
                         },
                         id: Utils.generateRandomString(60),
@@ -152,14 +153,14 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected".tr();
+              statusString = 'Connected'.tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting".tr();
+              statusString = 'Connecting'.tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected".tr();
+              statusString = 'Disconnected'.tr();
               break;
           }
           return StreamInfoTile(
@@ -180,7 +181,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                           setState(() {});
                         },
                         decoration: InputDecoration(
-                          hintText: "Group Name ...".tr(),
+                          hintText: 'Group Name ...'.tr(),
                           contentPadding: const EdgeInsets.only(left: 20),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey.shade400),
@@ -197,7 +198,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                   SliverToBoxAdapter(
                     child: SearchTextField(
                       controller: _controller,
-                      hintText: "Search".tr(),
+                      hintText: 'Search'.tr(),
                       showCloseButton: false,
                       onChanged: (value) {
                         if (value.isEmpty) {
@@ -209,7 +210,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                             users = allUsers
                                 .where(
                                   (element) =>
-                                      element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
+                                      element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ''),
                                 )
                                 .toList();
                           });
@@ -299,7 +300,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                           child: Text(
                             _controller?.text.isNotEmpty == true
                                 ? '${"Matches For".tr()} "${_controller?.text.trim()}"'
-                                : "On the platform".tr(),
+                                : 'On the platform'.tr(),
                             style: TextStyle(
                               color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                             ),
@@ -347,7 +348,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                                                       height: 50,
                                                       width: 50,
                                                       child: CachedImage(
-                                                        url: users[index].image ?? "",
+                                                        url: users[index].image ?? '',
                                                       ),
                                                     ),
                                                   ),
@@ -364,7 +365,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                                                       const SizedBox(height: 3),
                                                       Text(
                                                         users[index].online
-                                                            ? "Online".tr()
+                                                            ? 'Online'.tr()
                                                             : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                                 users[index].lastActive ?? DateTime.now(),
                                                               )}",
@@ -411,8 +412,8 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                         )
                       : ChannelsEmptyState(
                           animationController: _animationController,
-                          title: "No Contacts Found".tr(),
-                          message: "",
+                          title: 'No Contacts Found'.tr(),
+                          message: '',
                         )
                   : _permissionDenied == false
                       ? const UltraLoadingIndicator()
@@ -454,7 +455,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                                   ),
                                 ),
                                 child: const Text(
-                                  "Go To Settings",
+                                  'Go To Settings',
                                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
@@ -479,16 +480,18 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       allUsers = users;
@@ -498,6 +501,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
+        if (!mounted) return;
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
         allUsers = users;

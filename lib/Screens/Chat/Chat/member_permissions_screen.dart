@@ -11,8 +11,7 @@ class MemberPermissionsScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MemberPermissionsScreen> createState() =>
-      _MemberPermissionsScreenState();
+  State<MemberPermissionsScreen> createState() => _MemberPermissionsScreenState();
 }
 
 class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
@@ -38,7 +37,7 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
         title: Column(
           children: [
             Text(
-              "Permissions",
+              'Permissions',
               style: TextStyle(
                 color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                 fontSize: 16,
@@ -51,113 +50,116 @@ class _MemberPermissionsScreenState extends State<MemberPermissionsScreen> {
         centerTitle: true,
       ),
       body: StreamBuilder<ChannelState>(
-          stream: widget.channel.state?.channelStateStream,
-          builder: (context, state) {
-            _getMembersPermissions();
-            return Column(
-              children: [
-                StreamOptionListTile(
-                  tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                  separatorColor:
-                      StreamChatTheme.of(context).colorTheme.disabled,
-                  title: "What Can Members Of This Group Do ?".tr(),
-                  titleTextStyle: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 14.5,
-                  ),
+        stream: widget.channel.state?.channelStateStream,
+        builder: (context, state) {
+          _getMembersPermissions();
+          return Column(
+            children: [
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'What Can Members Of This Group Do ?'.tr(),
+                titleTextStyle: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 14.5,
                 ),
-                StreamOptionListTile(
-                  tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                  separatorColor: Colors.transparent,
-                  title: "Send Messages".tr(),
-                  titleTextStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.5,
-                  ),
-                  trailing: CupertinoSwitch(
-                    value: sendMessages,
-                    onChanged: (val) {
-                      setState(() {
-                        sendMessages = !sendMessages;
-                        widget.channel.updatePartial(set: {
-                          "members_permissions": {
-                            "send_messages": sendMessages,
-                            "send_media": sendMedia,
-                            "add_members": addMembers,
+              ),
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: Colors.transparent,
+                title: 'Send Messages'.tr(),
+                titleTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14.5,
+                ),
+                trailing: CupertinoSwitch(
+                  value: sendMessages,
+                  onChanged: (val) {
+                    setState(() {
+                      sendMessages = !sendMessages;
+                      widget.channel.updatePartial(
+                        set: {
+                          'members_permissions': {
+                            'send_messages': sendMessages,
+                            'send_media': sendMedia,
+                            'add_members': addMembers,
                           }
-                        });
-                      });
-                    },
-                  ),
-                  onTap: () {},
+                        },
+                      );
+                    });
+                  },
                 ),
-                StreamOptionListTile(
-                  tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                  separatorColor:
-                      StreamChatTheme.of(context).colorTheme.disabled,
-                  title: "Send Media".tr(),
-                  titleTextStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.5,
-                  ),
-                  trailing: CupertinoSwitch(
-                    value: sendMedia,
-                    onChanged: (val) {
-                      setState(() {
-                        sendMedia = !sendMedia;
-                        widget.channel.updatePartial(set: {
-                          "members_permissions": {
-                            "send_messages": sendMessages,
-                            "send_media": sendMedia,
-                            "add_members": addMembers,
+                onTap: () {},
+              ),
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Send Media'.tr(),
+                titleTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14.5,
+                ),
+                trailing: CupertinoSwitch(
+                  value: sendMedia,
+                  onChanged: (val) {
+                    setState(() {
+                      sendMedia = !sendMedia;
+                      widget.channel.updatePartial(
+                        set: {
+                          'members_permissions': {
+                            'send_messages': sendMessages,
+                            'send_media': sendMedia,
+                            'add_members': addMembers,
                           }
-                        });
-                      });
-                    },
-                  ),
-                  onTap: () {},
+                        },
+                      );
+                    });
+                  },
                 ),
-                StreamOptionListTile(
-                  tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                  separatorColor:
-                      StreamChatTheme.of(context).colorTheme.disabled,
-                  title: "Add Members".tr(),
-                  titleTextStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.5,
-                  ),
-                  trailing: CupertinoSwitch(
-                    value: addMembers,
-                    onChanged: (val) {
-                      setState(() {
-                        addMembers = !addMembers;
-                        widget.channel.updatePartial(set: {
-                          "members_permissions": {
-                            "send_messages": sendMessages,
-                            "send_media": sendMedia,
-                            "add_members": addMembers,
+                onTap: () {},
+              ),
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Add Members'.tr(),
+                titleTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14.5,
+                ),
+                trailing: CupertinoSwitch(
+                  value: addMembers,
+                  onChanged: (val) {
+                    setState(() {
+                      addMembers = !addMembers;
+                      widget.channel.updatePartial(
+                        set: {
+                          'members_permissions': {
+                            'send_messages': sendMessages,
+                            'send_media': sendMedia,
+                            'add_members': addMembers,
                           }
-                        });
-                      });
-                    },
-                  ),
-                  onTap: () {},
+                        },
+                      );
+                    });
+                  },
                 ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: StreamChatTheme.of(context).colorTheme.disabled,
-                )
-              ],
-            );
-          }),
+                onTap: () {},
+              ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: StreamChatTheme.of(context).colorTheme.disabled,
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 
   void _getMembersPermissions() {
-    Map<String, dynamic>? membersPermissions = widget.channel
-            .extraData['members_permissions'] as Map<String, dynamic>? ??
-        {};
+    Map<String, dynamic>? membersPermissions =
+        widget.channel.extraData['members_permissions'] as Map<String, dynamic>? ?? {};
     sendMessages = membersPermissions['send_messages'] as bool? ?? true;
     sendMedia = membersPermissions['send_media'] as bool? ?? true;
     addMembers = membersPermissions['add_members'] as bool? ?? true;

@@ -83,7 +83,7 @@ class NotificationsManager {
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     print('do you have initial message ${initialMessage != null}');
     print('Initial Message Data ${initialMessage?.data}');
-    if (initialMessage != null) {
+    if (initialMessage != null && notificationsContext.mounted) {
       stream.Channel? channel;
       var channels = await stream.StreamChatCore.of(notificationsContext)
           .client
@@ -101,7 +101,7 @@ class NotificationsManager {
         }
       }
 
-      if (channel != null) {
+      if (channel != null && notificationsContext.mounted) {
         Navigator.of(notificationsContext).push(
           ChatScreen.routeWithChannel(channel),
         );
@@ -150,14 +150,7 @@ class NotificationsManager {
     storedBackgroundMessage = backgroundMessage;
     listenToCalls();
     if (backgroundMessage.data['type'] != null && backgroundMessage.data['type'] != 'call') {
-      final messageId = backgroundMessage.data['message_id'];
-      final channelId = backgroundMessage.data['channel_id'];
-      final channelType = backgroundMessage.data['channel_type'];
       initializeNotifications();
-      // await _showLocalNotification(
-      //     title: backgroundMessage.notification?.title ?? "New Message",
-      //     body: backgroundMessage.notification?.body ?? "",
-      //     payload: json.encode(backgroundMessage.data).toString());
     } else {
       var payload = backgroundMessage.data;
       String type = payload['type'];
@@ -218,26 +211,24 @@ class NotificationsManager {
     var payload = message.data;
     var type = payload['type'] as String;
     if (type == 'call') {
-      var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
       var callerName = payload['caller_name'] as String;
       var callerImage = payload['caller_image'] as String?;
-      var uuid = payload['uuid'] as String?;
       var hasVideo = payload['has_video'] == 'true';
-      final callUUID = const Uuid().v4();
       BotToast.cleanAll();
       BotToast.showAnimationWidget(
-          toastBuilder: (context) {
-            return CallingWidget(
-              channelName: channelName,
-              context: notificationsContext,
-              callerName: callerName,
-              callerImage: callerImage ?? '',
-              isVideoCall: hasVideo,
-            );
-          },
-          animationDuration: const Duration(milliseconds: 0),
-          groupKey: 'incoming_call_overlay');
+        toastBuilder: (context) {
+          return CallingWidget(
+            channelName: channelName,
+            context: notificationsContext,
+            callerName: callerName,
+            callerImage: callerImage ?? '',
+            isVideoCall: hasVideo,
+          );
+        },
+        animationDuration: const Duration(milliseconds: 0),
+        groupKey: 'incoming_call_overlay',
+      );
     }
 
     if (type != 'call') {
@@ -308,8 +299,14 @@ class NotificationsManager {
             usersRef.update({
               await Utils.getString(SharedPref.userId) ?? '': 'Ended',
             });
-            Utils.logAnswerOrCancelCall(
-                notificationsContext, notificationsContext.currentUser?.id ?? '', 'CANCELLED', '0');
+            if (notificationsContext.mounted) {
+              Utils.logAnswerOrCancelCall(
+                notificationsContext,
+                notificationsContext.currentUser?.id ?? '',
+                'CANCELLED',
+                '0',
+              );
+            }
             break;
           case CallEvent.ACTION_CALL_ENDED:
             break;

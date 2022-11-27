@@ -20,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Settings".tr()),
+        child: PriveAppBar(title: 'Settings'.tr()),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(
@@ -38,37 +38,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 30),
                 OptionRowWidget(
                   image: Images.notificationBellImage,
-                  title: "Notifications & Sounds".tr(),
+                  title: 'Notifications & Sounds'.tr(),
                   onPressed: () =>
                       Navigator.pushNamed(context, Routes.notificationsSoundsRoute).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: Images.chatImage,
-                  title: "Chat Settings".tr(),
+                  title: 'Chat Settings'.tr(),
                   onPressed: () =>
                       Navigator.pushNamed(context, Routes.chatSettingsRoute).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
                   image: Images.blockedUserImage,
-                  title: "Blocked Users".tr(),
+                  title: 'Blocked Users'.tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
                   image: Images.languageImage,
-                  title: "Language".tr(),
+                  title: 'Language'.tr(),
                   onPressed: () => Navigator.pushNamed(context, Routes.languageRoute).then((value) => setState(() {})),
                 ),
                 const SizedBox(height: 5),
-                buildSettingsChoices("Help", () {}, bottom: 30, textColor: const Color(0xff232323)),
-                buildSettingsChoices("Ask a Question".tr(), () {
+                buildSettingsChoices('Help', () {}, bottom: 30, textColor: const Color(0xff232323)),
+                buildSettingsChoices('Ask a Question'.tr(), () {
                   _showAskQuestionDialog();
                 }),
                 buildSettingsChoices(
-                  "Terms & Conditions".tr(),
+                  'Terms & Conditions'.tr(),
                   () => Navigator.pushNamed(context, Routes.termsPrivacyRoute).then((value) => setState(() {})),
                 ),
                 buildSettingsChoices(
-                  "Privacy Policy".tr(),
+                  'Privacy Policy'.tr(),
                   () {
                     Navigator.push(
                       context,
@@ -88,8 +88,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget buildSettingsChoices(String text, Function onPressed,
-      {double bottom = 17, Color textColor = const Color(0xff7a8fa6)}) {
+  Widget buildSettingsChoices(
+    String text,
+    Function onPressed, {
+    double bottom = 17,
+    Color textColor = const Color(0xff7a8fa6),
+  }) {
     return Padding(
       padding: EdgeInsets.only(left: 27, right: 27, bottom: bottom),
       child: GestureDetector(
@@ -113,10 +117,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)), side: BorderSide(color: Colors.white, width: 1.0)),
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            side: BorderSide(color: Colors.white, width: 1.0),
+          ),
           title: Center(
             child: Text(
-              "Ask a Question".tr(),
+              'Ask a Question'.tr(),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -129,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Please note that our APP support is done by volunteers. We try to respond as quickly as possible,but it may take a while.",
+                  'Please note that our APP support is done by volunteers. We try to respond as quickly as possible,but it may take a while.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade600),
                 ).tr(),
@@ -156,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
                           child: Text(
-                            "Cancel",
+                            'Cancel',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                           ).tr(),
@@ -180,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
                           child: Text(
-                            "Ask a Volunteer",
+                            'Ask a Volunteer',
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             style: TextStyle(color: Theme.of(context).primaryColorDark, fontSize: 15),

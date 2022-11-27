@@ -2,7 +2,6 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_carousel_slider/carousel_slider_transforms.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Providers/stories_provider.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
@@ -13,7 +12,7 @@ import 'package:prive/Models/Stories/stories.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Stories/viewers_modal_view.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import "package:collection/collection.dart";
+import 'package:collection/collection.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
 class StoriesViewerScreen extends StatefulWidget {

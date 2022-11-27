@@ -17,7 +17,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
   @override
   void didChangeDependencies() {
     setState(() {
-      currentSelectedIndex = context.locale == const Locale("en") ? 1 : 2;
+      currentSelectedIndex = context.locale == const Locale('en') ? 1 : 2;
     });
     super.didChangeDependencies();
   }
@@ -27,7 +27,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Language".tr()),
+        child: PriveAppBar(title: 'Language'.tr()),
       ),
       body: SingleChildScrollView(
         child: AnimationLimiter(
@@ -42,11 +42,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
               children: [
                 const SizedBox(height: 20),
-                buildLanguage("English", "English", 1, "en"),
+                buildLanguage('English', 'English', 1, 'en'),
                 const SizedBox(height: 5),
                 const Divider(),
                 const SizedBox(height: 5),
-                buildLanguage("العربية", "Arabic", 2, "ar"),
+                buildLanguage('العربية', 'Arabic', 2, 'ar'),
               ],
             ),
           ),
@@ -56,7 +56,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
   }
 
   Widget buildLanguage(
-      String title, String subTitle, int index, String language) {
+    String title,
+    String subTitle,
+    int index,
+    String language,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(left: 25, right: 25),
       child: InkWell(
@@ -98,14 +102,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: currentSelectedIndex == index
-                      ? Theme.of(context).primaryColor
-                      : const Color(0xff7a8fa6),
+                  color: currentSelectedIndex == index ? Theme.of(context).primaryColor : const Color(0xff7a8fa6),
                 ),
               ),
               child: currentSelectedIndex == index
                   ? Icon(
-                      FontAwesomeIcons.solidCheckCircle,
+                      FontAwesomeIcons.solidCircleCheck,
                       color: Theme.of(context).primaryColor,
                     )
                   : null,

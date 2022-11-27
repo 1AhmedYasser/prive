@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,15 +8,14 @@ import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import '../../Models/Catalogs/catalogProduct.dart';
-import '../../Resources/images.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/Common/cached_image.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class CollectionScreen extends StatefulWidget {
   final CollectionData collection;
@@ -53,7 +53,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
             color: Color(0xff7a8fa6),
           ),
           title: Text(
-            widget.collection.collectionName ?? "",
+            widget.collection.collectionName ?? '',
             style: const TextStyle(
               fontSize: 23,
               color: Colors.black,
@@ -73,7 +73,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 12),
                     child: Text(
-                      isEditing ? "Done" : "Edit",
+                      isEditing ? 'Done' : 'Edit',
                       style: TextStyle(
                         fontSize: 18,
                         color: Theme.of(context).primaryColorDark,
@@ -116,7 +116,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     ),
                     const SizedBox(width: 17),
                     Text(
-                      "Add New Product".tr(),
+                      'Add New Product'.tr(),
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 17,
@@ -160,7 +160,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                   style: const TextStyle(fontSize: 0),
                                   onTap: (handler) async {
                                     await handler(true);
-                                    _deleteProduct(products[index].itemID ?? "");
+                                    _deleteProduct(products[index].itemID ?? '');
                                     setState(() {
                                       products.removeAt(index);
                                     });
@@ -248,9 +248,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                                 Positioned.fill(
                                                   child: ClipRRect(
                                                     borderRadius: BorderRadius.circular(10),
-                                                    child: products[index].photo1 != "NONE"
+                                                    child: products[index].photo1 != 'NONE'
                                                         ? CachedImage(
-                                                            url: products[index].photo1 ?? "",
+                                                            url: products[index].photo1 ?? '',
                                                           )
                                                         : Image.asset(
                                                             Images.collectionsImage,
@@ -287,7 +287,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              products[index].itemName ?? "",
+                                              products[index].itemName ?? '',
                                               style: const TextStyle(
                                                 fontSize: 16.5,
                                                 fontWeight: FontWeight.w600,
@@ -296,7 +296,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 3.5, bottom: 3.5, right: 39),
                                               child: Text(
-                                                products[index].description ?? "",
+                                                products[index].description ?? '',
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
@@ -309,7 +309,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                             Text(
                                               products[index].price?.isNotEmpty == true
                                                   ? "${products[index].price} ${"SAR"}"
-                                                  : "",
+                                                  : '',
                                               style: const TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w400,
@@ -344,7 +344,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
       context,
       getProducts,
       formData: FormData.fromMap(
-        {"CollectionID": widget.collection.collectionID ?? ""},
+        {'CollectionID': widget.collection.collectionID ?? ''},
       ),
       cancelToken: cancelToken,
     ).then((value) {
@@ -364,7 +364,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
       showLoadingIndicator: false,
       showError: false,
       formData: FormData.fromMap(
-        {"ItemID": productId},
+        {'ItemID': productId},
       ),
       cancelToken: cancelToken,
     );

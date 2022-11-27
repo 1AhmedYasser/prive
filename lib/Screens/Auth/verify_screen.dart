@@ -1,25 +1,26 @@
 import 'dart:async';
+
 import 'package:bot_toast/bot_toast.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Auth/login.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:timer_count_down/timer_count_down.dart';
-import '../../Resources/images.dart';
-import '../../Resources/routes.dart';
-import '../../Resources/shared_pref.dart';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
   final String phoneNumber;
   final LoginData? loginData;
 
-  const VerifyAccountScreen({Key? key, this.phoneNumber = "", this.loginData}) : super(key: key);
+  const VerifyAccountScreen({Key? key, this.phoneNumber = '', this.loginData}) : super(key: key);
 
   @override
   State<VerifyAccountScreen> createState() => _VerifyAccountScreenState();
@@ -61,7 +62,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Verify".tr(),
+                'Verify'.tr(),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 29),
               ),
               const SizedBox(height: 20),
@@ -160,7 +161,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       },
                       style: TextButton.styleFrom(shadowColor: Colors.transparent),
                       child: Text(
-                        "Resend Code".tr(),
+                        'Resend Code'.tr(),
                         style: TextStyle(
                           color: isTimerOn ? Colors.grey : const Color(0xff1293a8),
                           fontWeight: FontWeight.w400,
@@ -176,18 +177,19 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     BotToast.showAnimationWidget(
-                        toastBuilder: (context) {
-                          return const IgnorePointer(child: UltraLoadingIndicator());
-                        },
-                        animationDuration: const Duration(milliseconds: 0),
-                        groupKey: "loading");
+                      toastBuilder: (context) {
+                        return const IgnorePointer(child: UltraLoadingIndicator());
+                      },
+                      animationDuration: const Duration(milliseconds: 0),
+                      groupKey: 'loading',
+                    );
                     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                      verificationId: verificationId ?? "",
+                      verificationId: verificationId ?? '',
                       smsCode: codeController.text,
                     );
                     await _auth.signInWithCredential(credential).then((value) {
-                      BotToast.removeAll("loading");
-                      if (widget.loginData?.accountState == "NewAccount") {
+                      BotToast.removeAll('loading');
+                      if (widget.loginData?.accountState == 'NewAccount') {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -200,13 +202,19 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       } else {
                         StreamManager.connectUserToStream(this.context).then((value) {
                           Navigator.pushNamedAndRemoveUntil(
-                              this.context, Routes.navigatorRoute, (Route<dynamic> route) => false);
+                            this.context,
+                            Routes.navigatorRoute,
+                            (Route<dynamic> route) => false,
+                          );
                           Utils.saveBool(SharedPref.isLoggedIn, true);
                         });
                       }
                     }).catchError((error) {
-                      Utils.showAlert(context,
-                          message: "You Entered An Invalid Code".tr(), alertImage: Images.alertInfoImage);
+                      Utils.showAlert(
+                        context,
+                        message: 'You Entered An Invalid Code'.tr(),
+                        alertImage: Images.alertInfoImage,
+                      );
                     });
                   }
                 },
@@ -222,7 +230,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                   ),
                 ),
                 child: Text(
-                  "Verify Account".tr(),
+                  'Verify Account'.tr(),
                   style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
                 ),
               ),
@@ -259,22 +267,22 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
 
   _onVerificationFailed(FirebaseAuthException exception) {
     if (exception.code == 'invalid-phone-number') {
-      print("The phone number entered is invalid!");
+      print('The phone number entered is invalid!');
     }
   }
 
   _onCodeSent(String verificationId, int? forceResendingToken) {
     this.verificationId = verificationId;
-    print("Code Sent");
+    print('Code Sent');
   }
 
   _onCodeTimeout(String timeout) {
-    print("code timeout");
+    print('code timeout');
   }
 
   @override
   void dispose() {
-    BotToast.removeAll("loading");
+    BotToast.removeAll('loading');
     errorController!.close();
     super.dispose();
   }

@@ -7,19 +7,18 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-import '../../Resources/animations.dart';
-import '../../Resources/shared_pref.dart';
-import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
-
 class ContactsScreen extends StatefulWidget {
   final String title;
-  const ContactsScreen({Key? key, this.title = "New Message"}) : super(key: key);
+  const ContactsScreen({Key? key, this.title = 'New Message'}) : super(key: key);
 
   @override
   State<ContactsScreen> createState() => _ContactsScreenState();
@@ -79,7 +78,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
                                                   height: 50,
                                                   width: 50,
                                                   child: CachedImage(
-                                                    url: users[index].image ?? "",
+                                                    url: users[index].image ?? '',
                                                   ),
                                                 ),
                                               ),
@@ -96,7 +95,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
                                                   const SizedBox(height: 3),
                                                   Text(
                                                     users[index].online
-                                                        ? "Online".tr()
+                                                        ? 'Online'.tr()
                                                         : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                             users[index].lastActive ?? DateTime.now(),
                                                           )}",
@@ -149,7 +148,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
                           ),
                         ),
                         child: const Text(
-                          "Refresh Contacts",
+                          'Refresh Contacts',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -161,8 +160,8 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
                 )
               : ChannelsEmptyState(
                   animationController: _animationController,
-                  title: "No Contacts Found".tr(),
-                  message: "",
+                  title: 'No Contacts Found'.tr(),
+                  message: '',
                 )
           : _permissionDenied == false
               ? const UltraLoadingIndicator()
@@ -204,7 +203,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
                           ),
                         ),
                         child: const Text(
-                          "Go To Settings",
+                          'Go To Settings',
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                         ).tr(),
                       )
@@ -216,15 +215,19 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
 
   Future<void> createChannel(BuildContext context, User user) async {
     final core = StreamChatCore.of(context);
-    final channel = core.client.channel('messaging', id: Utils.generateRandomString(60), extraData: {
-      'members': [
-        core.currentUser!.id,
-        user.id,
-      ],
-      'channel_type': "Normal",
-      'is_important': false,
-      'is_archive': false
-    });
+    final channel = core.client.channel(
+      'messaging',
+      id: Utils.generateRandomString(60),
+      extraData: {
+        'members': [
+          core.currentUser!.id,
+          user.id,
+        ],
+        'channel_type': 'Normal',
+        'is_important': false,
+        'is_archive': false
+      },
+    );
     await channel.watch();
 
     if (mounted) {
@@ -237,6 +240,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
   void loadContacts() async {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
     } else {
+      if (!mounted) return;
       List contacts = await Utils.fetchContacts(context);
       List<User> users = contacts.first;
       String usersMap = jsonEncode(users);
@@ -247,16 +251,18 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       phoneContacts = users.isNotEmpty ? [Contact()] : [Contact()];
@@ -265,6 +271,7 @@ class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStat
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
+        if (!mounted) return;
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
         phoneContacts = contacts[1];

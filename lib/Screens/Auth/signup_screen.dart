@@ -20,14 +20,14 @@ class SignUpScreen extends StatefulWidget {
   final String phoneNumber;
   final LoginData? loginData;
 
-  const SignUpScreen({Key? key, this.phoneNumber = "", this.loginData}) : super(key: key);
+  const SignUpScreen({Key? key, this.phoneNumber = '', this.loginData}) : super(key: key);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  late File profileImage = File("");
+  late File profileImage = File('');
   final imagePicker = ImagePicker();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
@@ -61,7 +61,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Sign Up".tr(),
+                      'Sign Up'.tr(),
                       style: const TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.w600,
@@ -97,12 +97,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 45),
-                buildField("First Name (Required)", firstNameController),
+                buildField('First Name (Required)', firstNameController),
                 const SizedBox(height: 20),
-                buildField("Last Name (Optional)", lastNameController),
+                buildField('Last Name (Optional)', lastNameController),
                 const SizedBox(height: 20),
                 buildField(
-                  "Age (Optional)",
+                  'Age (Optional)',
                   ageController,
                   type: const TextInputType.numberWithOptions(
                     signed: true,
@@ -116,7 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Gender (Optional)".tr(),
+                      'Gender (Optional)'.tr(),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
@@ -129,9 +129,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: const EdgeInsets.only(left: 35, right: 35),
                   child: Row(
                     children: [
-                      buildGender("Male", 0),
+                      buildGender('Male', 0),
                       const SizedBox(width: 40),
-                      buildGender("Female", 1),
+                      buildGender('Female', 1),
                     ],
                   ),
                 ),
@@ -147,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: EdgeInsets.all(5),
                     child: CachedImage(
                       url:
-                          "https://me.kaspersky.com/content/ar-ae/images/repository/isc/2020/9910/a-guide-to-qr-codes-and-how-to-scan-qr-codes-2.png",
+                          'https://me.kaspersky.com/content/ar-ae/images/repository/isc/2020/9910/a-guide-to-qr-codes-and-how-to-scan-qr-codes-2.png',
                       containerColor: Colors.transparent,
                     ),
                   ),
@@ -158,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "By Signing Up,".tr(),
+                      'By Signing Up,'.tr(),
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w400,
@@ -174,7 +174,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "You Agree To The ".tr(),
+                          'You Agree To The '.tr(),
                           style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400, color: Color(0xff7a8fa6)),
                         ),
                       ),
@@ -183,7 +183,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: GestureDetector(
                           onTap: () {},
                           child: Text(
-                            "Terms & Conditions".tr(),
+                            'Terms & Conditions'.tr(),
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w400,
@@ -200,8 +200,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       if (profileImage.path.isEmpty) {
-                        Utils.showAlert(context,
-                            message: "Please Choose An Image".tr(), alertImage: Images.alertInfoImage);
+                        Utils.showAlert(
+                          context,
+                          message: 'Please Choose An Image'.tr(),
+                          alertImage: Images.alertInfoImage,
+                        );
                       } else {
                         if (loading == false) {
                           List<int> imageBytes = await profileImage.readAsBytes();
@@ -213,26 +216,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               signup,
                               cancelToken: cancelToken,
                               formData: FormData.fromMap({
-                                "UserFirstName": firstNameController.text,
-                                "UserLastName": lastNameController.text,
-                                "UserPhoto": base64Image,
-                                "UserGender": selectedGender == 0 ? "Male" : "Female",
-                                "UserBarCode": "783473487",
-                                "UserID": widget.loginData?.userID
+                                'UserFirstName': firstNameController.text,
+                                'UserLastName': lastNameController.text,
+                                'UserPhoto': base64Image,
+                                'UserGender': selectedGender == 0 ? 'Male' : 'Female',
+                                'UserBarCode': '783473487',
+                                'UserID': widget.loginData?.userID
                               }),
                             ).then((value) {
                               loading = false;
                               Login signup = value;
                               if (signup.success == true) {
                                 LoginData? signupData = signup.data?[0];
-                                Utils.saveString(SharedPref.token, signupData?.token ?? "");
-                                Utils.saveString(SharedPref.userId, signupData?.userID ?? "");
-                                Utils.saveString(SharedPref.userImage, signupData?.userPhoto ?? "");
-                                Utils.saveString(SharedPref.userPhone, signupData?.userPhone ?? "");
-                                Utils.saveString(SharedPref.userFirstName, signupData?.userFirstName ?? "");
-                                Utils.saveString(SharedPref.userLastName, signupData?.userLastName ?? "");
-                                Utils.saveString(SharedPref.userName,
-                                    "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
+                                Utils.saveString(SharedPref.token, signupData?.token ?? '');
+                                Utils.saveString(SharedPref.userId, signupData?.userID ?? '');
+                                Utils.saveString(SharedPref.userImage, signupData?.userPhoto ?? '');
+                                Utils.saveString(SharedPref.userPhone, signupData?.userPhone ?? '');
+                                Utils.saveString(SharedPref.userFirstName, signupData?.userFirstName ?? '');
+                                Utils.saveString(SharedPref.userLastName, signupData?.userLastName ?? '');
+                                Utils.saveString(
+                                  SharedPref.userName,
+                                  "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}",
+                                );
                                 StreamManager.connectUserToStream(context);
                                 Utils.saveBool(SharedPref.isLoggedIn, true);
                                 Navigator.pushReplacementNamed(context, Routes.navigatorRoute);
@@ -255,7 +260,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   child: Text(
-                    "Sign Up".tr(),
+                    'Sign Up'.tr(),
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
                   ),
                 ),
@@ -281,10 +286,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-                border: Border.all(
-                  color: selectedGender == index ? Theme.of(context).primaryColor : Colors.grey,
-                ),
-                borderRadius: BorderRadius.circular(30)),
+              border: Border.all(
+                color: selectedGender == index ? Theme.of(context).primaryColor : Colors.grey,
+              ),
+              borderRadius: BorderRadius.circular(30),
+            ),
             child: CircleAvatar(
               backgroundColor: selectedGender == index ? Theme.of(context).primaryColor : Colors.transparent,
               radius: 12,
@@ -307,8 +313,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Padding buildField(String title, TextEditingController controller,
-      {TextInputType type = TextInputType.name, List<TextInputFormatter> formatters = const []}) {
+  Padding buildField(
+    String title,
+    TextEditingController controller, {
+    TextInputType type = TextInputType.name,
+    List<TextInputFormatter> formatters = const [],
+  }) {
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30),
       child: TextFormField(

@@ -1,35 +1,40 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:app_settings/app_settings.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Rooms/room.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/shared_pref.dart';
+import 'package:prive/Screens/MainMenu/new_group_screen.dart';
 import 'package:prive/Screens/Rooms/room_screen.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../Helpers/Utils.dart';
-import '../../Models/Rooms/room.dart';
-import '../../Models/Rooms/room_user.dart';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
-import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
-import '../../Widgets/Common/cached_image.dart';
-import '../MainMenu/new_group_screen.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 
 class PeopleChooserScreen extends StatefulWidget {
   final String roomName;
   final String roomDescription;
   final bool isNow;
   final DateTime? selectedDateTime;
-  const PeopleChooserScreen(
-      {Key? key, this.roomName = "", this.roomDescription = "", this.isNow = true, this.selectedDateTime})
-      : super(key: key);
+  const PeopleChooserScreen({
+    Key? key,
+    this.roomName = '',
+    this.roomDescription = '',
+    this.isNow = true,
+    this.selectedDateTime,
+  }) : super(key: key);
 
   @override
   State<PeopleChooserScreen> createState() => _PeopleChooserScreenState();
@@ -67,7 +72,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
           color: Color(0xff7a8fa6),
         ),
         title: const Text(
-          "Choose People",
+          'Choose People',
           style: TextStyle(
             fontSize: 23,
             color: Colors.black,
@@ -84,9 +89,9 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
               color: _selectedUsers.isNotEmpty ? Theme.of(context).primaryColor : Colors.grey,
               onPressed: () async {
                 RoomUser owner = RoomUser(
-                  id: context.currentUser?.id ?? "",
-                  name: context.currentUser?.name ?? "",
-                  image: context.currentUser?.image ?? "",
+                  id: context.currentUser?.id ?? '',
+                  name: context.currentUser?.name ?? '',
+                  image: context.currentUser?.image ?? '',
                   isOwner: true,
                   isSpeaker: true,
                   hasPermissionToSpeak: true,
@@ -106,24 +111,24 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                     isSpeaker: false,
                     hasPermissionToSpeak: false,
                     isListener: true,
-                    phone: user.extraData["phone"] as String,
+                    phone: user.extraData['phone'] as String,
                     isHandRaised: false,
                     isMicOn: false,
                   ).toJson();
                 }
                 String roomId =
-                    DateFormat('yyyyMMddhhmmmss', "en").format(widget.selectedDateTime ?? DateTime.now()).toString();
+                    DateFormat('yyyyMMddhhmmmss', 'en').format(widget.selectedDateTime ?? DateTime.now()).toString();
                 if (widget.isNow) {
                   DatabaseReference ref = FirebaseDatabase.instance.ref("rooms/${context.currentUser?.id ?? ""}");
                   await ref.set({
-                    "topic": widget.roomName,
-                    "description": widget.roomDescription,
-                    "owner": owner.toJson(),
-                    "speakers": {owner.id: owner.toJson()},
-                    "listeners": {},
-                    "room_contacts": roomContacts,
-                    "raised_hands": {},
-                    "roomId": roomId
+                    'topic': widget.roomName,
+                    'description': widget.roomDescription,
+                    'owner': owner.toJson(),
+                    'speakers': {owner.id: owner.toJson()},
+                    'listeners': {},
+                    'room_contacts': roomContacts,
+                    'raised_hands': {},
+                    'roomId': roomId
                   });
                   if (mounted) {
                     Navigator.pop(context);
@@ -152,16 +157,17 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                   }
                   Navigator.pop(context);
                   DatabaseReference ref = FirebaseDatabase.instance.ref(
-                      "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(dateTime ?? DateTime.now()).toString()}");
+                    "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(dateTime ?? DateTime.now()).toString()}",
+                  );
                   await ref.set({
-                    "topic": widget.roomName,
-                    "description": widget.roomDescription,
-                    "owner": owner.toJson(),
-                    "speakers": {owner.id: owner.toJson()},
-                    "listeners": {},
-                    "room_contacts": roomContacts,
-                    "raised_hands": {},
-                    "date_time": dateTime.toString()
+                    'topic': widget.roomName,
+                    'description': widget.roomDescription,
+                    'owner': owner.toJson(),
+                    'speakers': {owner.id: owner.toJson()},
+                    'listeners': {},
+                    'room_contacts': roomContacts,
+                    'raised_hands': {},
+                    'date_time': dateTime.toString()
                   });
                 }
               },
@@ -176,14 +182,14 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected".tr();
+              statusString = 'Connected'.tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting".tr();
+              statusString = 'Connecting'.tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected".tr();
+              statusString = 'Disconnected'.tr();
               break;
           }
           return StreamInfoTile(
@@ -215,7 +221,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                       padding: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
                       child: SearchTextField(
                         controller: _controller,
-                        hintText: "Search".tr(),
+                        hintText: 'Search'.tr(),
                         showCloseButton: false,
                         onChanged: (value) {
                           if (value.isEmpty) {
@@ -227,7 +233,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                               users = allUsers
                                   .where(
                                     (element) =>
-                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
+                                        element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ''),
                                   )
                                   .toList();
                             });
@@ -253,7 +259,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                           child: Text(
                             _controller?.text.isNotEmpty == true
                                 ? '${"Matches For".tr()} "${_controller?.text.trim()}"'
-                                : "Start The Room With".tr(),
+                                : 'Start The Room With'.tr(),
                             style: TextStyle(
                               color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                             ),
@@ -301,7 +307,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                                                       height: 50,
                                                       width: 50,
                                                       child: CachedImage(
-                                                        url: users[index].image ?? "",
+                                                        url: users[index].image ?? '',
                                                       ),
                                                     ),
                                                   ),
@@ -318,7 +324,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                                                       const SizedBox(height: 3),
                                                       Text(
                                                         users[index].online
-                                                            ? "Online".tr()
+                                                            ? 'Online'.tr()
                                                             : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                                 users[index].lastActive ?? DateTime.now(),
                                                               )}",
@@ -365,8 +371,8 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                         )
                       : ChannelsEmptyState(
                           animationController: _animationController,
-                          title: "No Contacts Found".tr(),
-                          message: "",
+                          title: 'No Contacts Found'.tr(),
+                          message: '',
                         )
                   : _permissionDenied == false
                       ? const UltraLoadingIndicator()
@@ -408,7 +414,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                                   ),
                                 ),
                                 child: const Text(
-                                  "Go To Settings",
+                                  'Go To Settings',
                                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                 ).tr(),
                               )
@@ -424,16 +430,18 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       allUsers = users;

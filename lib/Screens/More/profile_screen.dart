@@ -1,20 +1,20 @@
-import "dart:io";
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Resources/images.dart';
 import 'package:prive/Resources/routes.dart';
 import 'package:prive/Resources/shared_pref.dart';
-import '../../Helpers/stream_manager.dart';
-import '../../Helpers/utils.dart';
-import '../../Models/Auth/login.dart';
-import '../../UltraNetwork/ultra_constants.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/Common/cached_image.dart';
-import 'more_screen.dart';
+import 'package:prive/Screens/More/more_screen.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  late File profileImage = File("");
+  late File profileImage = File('');
   final imagePicker = ImagePicker();
   CancelToken cancelToken = CancelToken();
 
@@ -57,17 +57,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Utils.showAlert(
                 context,
                 withCancel: true,
-                message: "Are You Sure You Want to Log out ?".tr(),
-                okButtonText: "Yes".tr(),
-                cancelButtonText: "No".tr(),
+                message: 'Are You Sure You Want to Log out ?'.tr(),
+                okButtonText: 'Yes'.tr(),
+                cancelButtonText: 'No'.tr(),
                 onOkButtonPressed: () {
                   _logout();
-                  Utils.saveString(SharedPref.userId, "");
-                  Utils.saveString(SharedPref.userName, "");
-                  Utils.saveString(SharedPref.userFirstName, "");
-                  Utils.saveString(SharedPref.userLastName, "");
-                  Utils.saveString(SharedPref.userEmail, "");
-                  Utils.saveString(SharedPref.userPhone, "");
+                  Utils.saveString(SharedPref.userId, '');
+                  Utils.saveString(SharedPref.userName, '');
+                  Utils.saveString(SharedPref.userFirstName, '');
+                  Utils.saveString(SharedPref.userLastName, '');
+                  Utils.saveString(SharedPref.userEmail, '');
+                  Utils.saveString(SharedPref.userPhone, '');
                   Utils.saveBool(SharedPref.isLoggedIn, false);
                   StreamManager.disconnectUserFromStream(context);
                   Navigator.pushNamedAndRemoveUntil(
@@ -79,7 +79,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent, elevation: 0, shadowColor: Colors.transparent),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+            ),
             child: Row(
               children: [
                 Image.asset(
@@ -90,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(width: 7),
                 const Text(
-                  "Log out",
+                  'Log out',
                   style: TextStyle(
                     color: Color(0xffff2d55),
                     fontSize: 17,
@@ -133,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   borderRadius: BorderRadius.circular(30),
                                   child: (profileImage.path.isEmpty)
                                       ? CachedImage(
-                                          url: context.currentUserImage ?? "",
+                                          url: context.currentUserImage ?? '',
                                           placeholder: Images.cameraImage,
                                           containerColor: Colors.grey.shade300,
                                         )
@@ -162,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               Text(
-                "Online".tr(),
+                'Online'.tr(),
                 style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 15.5),
               ),
               Padding(
@@ -174,24 +177,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Expanded(
                           child: buildTextField(
-                            "First Name".tr(),
+                            'First Name'.tr(),
                             firstNameController,
-                            emptyValidatorMessage: "Please enter a first name".tr(),
+                            emptyValidatorMessage: 'Please enter a first name'.tr(),
                           ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
                           child: buildTextField(
-                            "Last Name".tr(),
+                            'Last Name'.tr(),
                             lastNameController,
-                            emptyValidatorMessage: "Please enter a last name".tr(),
+                            emptyValidatorMessage: 'Please enter a last name'.tr(),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
                     buildTextField(
-                      "Phone Number".tr(),
+                      'Phone Number'.tr(),
                       phoneNumberController,
                       enabled: false,
                       type: const TextInputType.numberWithOptions(
@@ -199,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decimal: false,
                       ),
                       formatters: [FilteringTextInputFormatter.digitsOnly],
-                      emptyValidatorMessage: "Please enter a phone number".tr(),
+                      emptyValidatorMessage: 'Please enter a phone number'.tr(),
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
@@ -217,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: const Text(
-                        "Save",
+                        'Save',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
@@ -243,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       child: const Text(
-                        "Settings",
+                        'Settings',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
@@ -260,12 +263,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget buildTextField(String hint, TextEditingController controller,
-      {int maxLines = 1,
-      TextInputType type = TextInputType.text,
-      bool enabled = true,
-      List<TextInputFormatter> formatters = const [],
-      String emptyValidatorMessage = ""}) {
+  Widget buildTextField(
+    String hint,
+    TextEditingController controller, {
+    int maxLines = 1,
+    TextInputType type = TextInputType.text,
+    bool enabled = true,
+    List<TextInputFormatter> formatters = const [],
+    String emptyValidatorMessage = '',
+  }) {
     return TextFormField(
       maxLines: maxLines,
       controller: controller,
@@ -318,15 +324,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _updateProfile() async {
     Map<String, dynamic> params = {
-      "UserID": context.currentUser?.id,
-      "UserFirstName": firstNameController.text,
-      "UserLastName": lastNameController.text,
+      'UserID': context.currentUser?.id,
+      'UserFirstName': firstNameController.text,
+      'UserLastName': lastNameController.text,
     };
 
     if (profileImage.path.isNotEmpty) {
-      params["UserPhoto"] = await MultipartFile.fromFile(
+      params['UserPhoto'] = await MultipartFile.fromFile(
         profileImage.path,
-        filename: "UserPhoto",
+        filename: 'UserPhoto',
       );
     }
 
@@ -339,17 +345,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ).then((value) {
         if (value != null) {
           Login loginData = value;
-          Utils.saveString(SharedPref.userName,
-              "${loginData.data?.first.userFirstName ?? ""} ${loginData.data?.first.userLastName ?? ""}");
-          Utils.saveString(SharedPref.userFirstName, loginData.data?.first.userFirstName ?? "");
-          Utils.saveString(SharedPref.userLastName, loginData.data?.first.userLastName ?? "");
-          Utils.saveString(SharedPref.userImage, loginData.data?.first.userPhoto ?? "");
+          Utils.saveString(
+            SharedPref.userName,
+            "${loginData.data?.first.userFirstName ?? ""} ${loginData.data?.first.userLastName ?? ""}",
+          );
+          Utils.saveString(SharedPref.userFirstName, loginData.data?.first.userFirstName ?? '');
+          Utils.saveString(SharedPref.userLastName, loginData.data?.first.userLastName ?? '');
+          Utils.saveString(SharedPref.userImage, loginData.data?.first.userPhoto ?? '');
           StreamManager.updateUser(context);
 
           Utils.showAlert(
             context,
-            message: "Profile Updated Successfully".tr(),
-            okButtonText: "Ok".tr(),
+            message: 'Profile Updated Successfully'.tr(),
+            okButtonText: 'Ok'.tr(),
             onOkButtonPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
@@ -366,17 +374,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       logout,
       showLoadingIndicator: false,
       showError: false,
-      formData: FormData.fromMap({"UserID": context.currentUser?.id}),
+      formData: FormData.fromMap({'UserID': context.currentUser?.id}),
       cancelToken: cancelToken,
     ).then((value) {
-      Utils.saveString(SharedPref.token, "");
+      Utils.saveString(SharedPref.token, '');
     });
   }
 
   void getUserInfo() async {
-    firstNameController.text = await Utils.getString(SharedPref.userFirstName) ?? "";
-    lastNameController.text = await Utils.getString(SharedPref.userLastName) ?? "";
-    phoneNumberController.text = await Utils.getString(SharedPref.userPhone) ?? "";
+    firstNameController.text = await Utils.getString(SharedPref.userFirstName) ?? '';
+    lastNameController.text = await Utils.getString(SharedPref.userLastName) ?? '';
+    phoneNumberController.text = await Utils.getString(SharedPref.userPhone) ?? '';
   }
 
   Future getImage(ImageSource source, bool isVideo) async {

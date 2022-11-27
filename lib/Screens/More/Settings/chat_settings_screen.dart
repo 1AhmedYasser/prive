@@ -18,11 +18,11 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
   int currentSelectedIndex = 0;
 
   Map<String, String> themes = {
-    Images.colorTheme1: "Classic",
-    Images.colorTheme2: "Day",
-    Images.colorTheme3: "Dark",
-    Images.colorTheme4: "Night",
-    Images.colorTheme5: "Arctic",
+    Images.colorTheme1: 'Classic',
+    Images.colorTheme2: 'Day',
+    Images.colorTheme3: 'Dark',
+    Images.colorTheme4: 'Night',
+    Images.colorTheme5: 'Arctic',
   };
 
   @override
@@ -30,7 +30,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Chat Settings".tr()),
+        child: PriveAppBar(title: 'Chat Settings'.tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -39,7 +39,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 25, left: 20, bottom: 17, right: 20),
               child: Text(
-                "Message Text Size",
+                'Message Text Size',
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 18,
@@ -79,7 +79,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                     ),
                     const SizedBox(width: 18),
                     const Text(
-                      "Change Chat Background",
+                      'Change Chat Background',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
@@ -99,7 +99,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 17, left: 20, bottom: 20, right: 20),
               child: Text(
-                "Color Theme",
+                'Color Theme',
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 18,
@@ -146,10 +146,11 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
                                         border: Border.all(
-                                            color: currentSelectedIndex == index
-                                                ? Theme.of(context).primaryColor
-                                                : const Color(0xff7a8fa6),
-                                            width: 0.5),
+                                          color: currentSelectedIndex == index
+                                              ? Theme.of(context).primaryColor
+                                              : const Color(0xff7a8fa6),
+                                          width: 0.5,
+                                        ),
                                       ),
                                       child: currentSelectedIndex == index
                                           ? Icon(
@@ -163,7 +164,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                               ],
                             ),
                             const SizedBox(height: 5),
-                            Text(themes[themes.keys.toList()[index]] ?? "")
+                            Text(themes[themes.keys.toList()[index]] ?? '')
                           ],
                         ),
                       ),
@@ -193,7 +194,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                     ),
                     const SizedBox(width: 18),
                     const Text(
-                      "Reset To Default",
+                      'Reset To Default',
                       style: TextStyle(
                         fontSize: 17,
                         color: Color(0xff7a8fa6),

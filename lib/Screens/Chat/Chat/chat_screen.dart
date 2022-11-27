@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:collection/collection.dart';
 import 'package:community_material_icon/community_material_icon.dart';
@@ -15,34 +17,33 @@ import 'package:location/location.dart' as loc;
 import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Call/call.dart';
+import 'package:prive/Models/Call/call_member.dart';
+import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Providers/call_provider.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
+import 'package:prive/Resources/sounds.dart';
+import 'package:prive/Screens/Calls/group_call_screen.dart';
+import 'package:prive/Screens/Calls/single_call_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_info_screen.dart';
+import 'package:prive/Screens/Chat/Chat/forward_screen.dart';
+import 'package:prive/Screens/Chat/Chat/group_info_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/audio_player_message.dart';
 import 'package:prive/Widgets/ChatWidgets/Audio/record_button_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/google_map_view_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/Location/map_thumbnail_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Messages/catalog_message.dart';
 import 'package:prive/Widgets/ChatWidgets/chat_menu_widget.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Models/Call/call.dart';
-import '../../../Models/Call/call_member.dart';
-import '../../../Models/Chat/group_admin.dart';
-import '../../../Providers/call_provider.dart';
-import '../../../Resources/animations.dart';
-import '../../../Resources/images.dart';
-import '../../../Resources/shared_pref.dart';
-import '../../../Resources/sounds.dart';
-import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
-import '../../../Widgets/Common/cached_image.dart';
-import '../../Calls/group_call_screen.dart';
-import '../../Calls/single_call_screen.dart';
-import 'chat_info_screen.dart';
-import 'forward_screen.dart';
-import 'group_info_screen.dart';
-import 'dart:ui' as ui;
 
 class ChatScreen extends StatefulWidget {
   final Channel channel;
@@ -236,49 +237,50 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           const SizedBox(height: 2),
                           BetterStreamBuilder<List<Member>>(
-                              stream: channel.state!.membersStream,
-                              initialData: channel.state!.members,
-                              builder: (context, data) {
-                                if (widget.channel.isGroup) {
-                                  return Text(
-                                    "${data.length} Members",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey,
-                                    ),
-                                  );
-                                } else {
-                                  return StreamConnectionStatusBuilder(
-                                    statusBuilder: (context, status) {
-                                      switch (status) {
-                                        case ConnectionStatus.connected:
-                                          return _buildConnectedTitleState(context, data);
-                                        case ConnectionStatus.connecting:
-                                          return const Text(
-                                            'Connecting',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green,
-                                            ),
-                                          ).tr();
-                                        case ConnectionStatus.disconnected:
-                                          return const Text(
-                                            'Offline',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red,
-                                            ),
-                                          ).tr();
-                                        default:
-                                          return const SizedBox.shrink();
-                                      }
-                                    },
-                                  );
-                                }
-                              }),
+                            stream: channel.state!.membersStream,
+                            initialData: channel.state!.members,
+                            builder: (context, data) {
+                              if (widget.channel.isGroup) {
+                                return Text(
+                                  '${data.length} Members',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                              } else {
+                                return StreamConnectionStatusBuilder(
+                                  statusBuilder: (context, status) {
+                                    switch (status) {
+                                      case ConnectionStatus.connected:
+                                        return _buildConnectedTitleState(context, data);
+                                      case ConnectionStatus.connecting:
+                                        return const Text(
+                                          'Connecting',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                        ).tr();
+                                      case ConnectionStatus.disconnected:
+                                        return const Text(
+                                          'Offline',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red,
+                                          ),
+                                        ).tr();
+                                      default:
+                                        return const SizedBox.shrink();
+                                    }
+                                  },
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                     )
@@ -315,13 +317,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? Row(
                           children: [
                             Text(
-                              "${selectedMessages.length}",
+                              '${selectedMessages.length}',
                               style: const TextStyle(color: Colors.black, fontSize: 17),
                             ),
                           ],
                         )
                       : const Text(
-                          "Select Messages",
+                          'Select Messages',
                           style: TextStyle(color: Colors.black, fontSize: 17),
                         ).tr(),
           actions: isMessageSelectionOn == false && isMessageSearchOn == false
@@ -356,7 +358,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       onOptionSelected: (option) {
                         if (option == 1) {
                           setState(() {
-                            _messageSearchController.text = "";
+                            _messageSearchController.text = '';
                             isMessageSearchOn = true;
                           });
                         }
@@ -379,7 +381,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 });
                               },
                               child: Text(
-                                "Cancel".tr(),
+                                'Cancel'.tr(),
                                 style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 15,
@@ -398,7 +400,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         onTap: () {
                           if (selectedMessages.isNotEmpty) {
-                            String shareText = "";
+                            String shareText = '';
                             for (var message in selectedMessages) {
                               shareText +=
                                   "${message.user?.name}, [${DateFormat('MMM dd, yyyy').format(message.createdAt.toLocal())} at ${DateFormat('hh:mm a').format(message.createdAt.toLocal())}]\n${message.text}\n\n";
@@ -464,7 +466,7 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         child: StreamChannel(
           channel: channel,
-          initialMessageId: initialMessage != null ? initialMessage?.id ?? "" : null,
+          initialMessageId: initialMessage != null ? initialMessage?.id ?? '' : null,
           child: Column(
             children: [
               if (groupCall != null && groupCall?.members?.isNotEmpty == true)
@@ -484,7 +486,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        groupCall?.type == "Video" ? "Video Call" : "Voice Call",
+                                        groupCall?.type == 'Video' ? 'Video Call' : 'Voice Call',
                                         style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 16,
@@ -515,7 +517,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             child: ClipRRect(
                                               borderRadius: BorderRadius.circular(50),
                                               child: CachedImage(
-                                                url: groupCall?.members?.first.image ?? "",
+                                                url: groupCall?.members?.first.image ?? '',
                                                 fit: BoxFit.fill,
                                               ),
                                             ),
@@ -529,7 +531,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(50),
                                                 child: CachedImage(
-                                                  url: groupCall?.members?[1].image ?? "",
+                                                  url: groupCall?.members?[1].image ?? '',
                                                   fit: BoxFit.fill,
                                                 ),
                                               ),
@@ -544,7 +546,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(50),
                                                 child: CachedImage(
-                                                  url: groupCall?.members?[2].image ?? "",
+                                                  url: groupCall?.members?[2].image ?? '',
                                                   fit: BoxFit.fill,
                                                 ),
                                               ),
@@ -558,11 +560,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                       if (kickedCallMembersIds.contains(context.currentUser?.id)) {
                                         Utils.showAlert(
                                           context,
-                                          message: "You Have Been Kicked Out Of This Call".tr(),
+                                          message: 'You Have Been Kicked Out Of This Call'.tr(),
                                           alertImage: Images.alertInfoImage,
                                         );
                                       } else {
-                                        BotToast.removeAll("call_overlay");
+                                        BotToast.removeAll('call_overlay');
                                         if (mounted) {
                                           Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
                                         }
@@ -577,7 +579,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               maxChildSize: 0.95,
                                               builder: (_, controller) {
                                                 return GroupCallScreen(
-                                                  isVideo: groupCall?.type == "Video" ? true : false,
+                                                  isVideo: groupCall?.type == 'Video' ? true : false,
                                                   isJoining: true,
                                                   channel: channel,
                                                   parentContext: context,
@@ -602,7 +604,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
-                                    child: const Text("Join").tr(),
+                                    child: const Text('Join').tr(),
                                   )
                                 ],
                               ),
@@ -649,7 +651,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             const Text(
-                                              "No Messages Yet!",
+                                              'No Messages Yet!',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w500,
@@ -815,7 +817,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (searchedMessages.isNotEmpty) const SizedBox(width: 40),
                       if (searchedMessages.isNotEmpty)
                         Text(
-                          "${initialMessage != null ? searchedMessages.indexOf(initialMessage!) + 1 : 0} of ${searchedMessages.length} Matches",
+                          '${initialMessage != null ? searchedMessages.indexOf(initialMessage!) + 1 : 0} of ${searchedMessages.length} Matches',
                           style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                         )
                     ],
@@ -843,7 +845,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                 onTap: () => onLocationRequestPressed(),
                                 child: const Icon(
                                   Icons.location_history,
-                                ))
+                                ),
+                              )
                             : sendMedia
                                 ? GestureDetector(
                                     onTap: () => onLocationRequestPressed(),
@@ -958,12 +961,12 @@ class _ChatScreenState extends State<ChatScreen> {
       final ref = FirebaseDatabase.instance.ref('Users/${otherMember?.userId}');
       final snapshot = await ref.get();
       if (snapshot.exists) {
-        if (snapshot.value as String == "Ended") {
+        if (snapshot.value as String == 'Ended') {
           if (mounted) {
             Utils.logCallStart(
               context,
-              context.currentUser?.id ?? "",
-              otherMember?.userId ?? "",
+              context.currentUser?.id ?? '',
+              otherMember?.userId ?? '',
               isVideo,
             );
             Navigator.of(context).push(
@@ -987,11 +990,11 @@ class _ChatScreenState extends State<ChatScreen> {
           showDialog(
             context: context,
             builder: (_) => CupertinoAlertDialog(
-              title: const Text("Prive"),
+              title: const Text('Prive'),
               content: Text("${otherMember?.user?.name ?? "Member".tr()} ${"is on another call".tr()}"),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text("Ok").tr(),
+                  child: const Text('Ok').tr(),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -1002,8 +1005,8 @@ class _ChatScreenState extends State<ChatScreen> {
         if (mounted) {
           Utils.logCallStart(
             context,
-            context.currentUser?.id ?? "",
-            otherMember?.userId ?? "",
+            context.currentUser?.id ?? '',
+            otherMember?.userId ?? '',
             isVideo,
           );
           Navigator.of(context).push(
@@ -1128,7 +1131,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           usernameBuilder: (context, message) {
-            if (defaultMessage.message.extraData["isMessageForwarded"] == true) {
+            if (defaultMessage.message.extraData['isMessageForwarded'] == true) {
               return Row(
                 children: [
                   Image.asset(
@@ -1137,7 +1140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    "Forwarded",
+                    'Forwarded',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -1147,13 +1150,13 @@ class _ChatScreenState extends State<ChatScreen> {
               );
             } else if (message.user?.id != context.currentUser?.id && widget.isChannel) {
               return Text(
-                message.user?.name ?? "",
+                message.user?.name ?? '',
                 style: const TextStyle(fontSize: 11),
               );
             } else if (channel.isGroup) {
               Map<String, dynamic>? nameColors = channel.extraData['name_colors'] as Map<String, dynamic>?;
               return Text(
-                message.user?.name ?? "",
+                message.user?.name ?? '',
                 overflow: TextOverflow.ellipsis,
                 textWidthBasis: TextWidthBasis.longestLine,
                 textScaleFactor: 0.95,
@@ -1279,7 +1282,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           CupertinoActionSheetAction(
             child: Text(
-              "Delete Message",
+              'Delete Message',
               style: TextStyle(color: Theme.of(context).primaryColorDark),
             ).tr(),
             onPressed: () {
@@ -1290,7 +1293,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
         cancelButton: CupertinoActionSheetAction(
           child: const Text(
-            "Cancel",
+            'Cancel',
             style: TextStyle(color: Colors.red),
           ).tr(),
           onPressed: () => Navigator.pop(context),
@@ -1306,8 +1309,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Color parseColor(String color) {
-    String hex = color.replaceAll("#", "");
-    if (hex.isEmpty) hex = "ffffff";
+    String hex = color.replaceAll('#', '');
+    if (hex.isEmpty) hex = 'ffffff';
     if (hex.length == 3) {
       hex =
           '${hex.substring(0, 1)}${hex.substring(0, 1)}${hex.substring(1, 2)}${hex.substring(1, 2)}${hex.substring(2, 3)}${hex.substring(2, 3)}';
@@ -1367,7 +1370,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   String getLastSeenDate(DateTime data) {
-    String lastSeen = "last seen ".tr();
+    String lastSeen = 'last seen '.tr();
     final now = DateTime.now();
     DateTime lastSeenDate = data.toLocal();
     final today = DateTime(now.year, now.month, now.day);
@@ -1406,9 +1409,9 @@ class _ChatScreenState extends State<ChatScreen> {
     final messageDateFormatted = DateTime(element.year, element.month, element.day);
 
     if (messageDateFormatted == today) {
-      return "Today".tr();
+      return 'Today'.tr();
     } else if (messageDateFormatted == yesterday) {
-      return "Yesterday".tr();
+      return 'Yesterday'.tr();
     } else {
       DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
@@ -1519,7 +1522,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void checkForGroupCall() async {
-    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
@@ -1572,7 +1575,7 @@ class _ChatScreenState extends State<ChatScreen> {
           members: members,
           kickedMembers: kickedMembers,
         );
-        kickedCallMembersIds = groupCall?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+        kickedCallMembersIds = groupCall?.kickedMembers?.map((e) => e.id ?? '').toList() ?? [];
       }
       setState(() {});
     } else {
@@ -1582,7 +1585,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
     onAddListener = databaseReference.onChildAdded.listen((event) {
       checkForGroupCall();
     });

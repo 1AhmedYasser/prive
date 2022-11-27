@@ -1,19 +1,19 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Screens/Catalogs/collection_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../Models/Catalogs/catalog.dart';
-import '../../Models/Catalogs/collection.dart';
-import '../../Resources/images.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
-import 'collection_screen.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class CatalogManagerScreen extends StatefulWidget {
   final CatalogData catalog;
@@ -50,7 +50,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                   color: Color(0xff7a8fa6),
                 ),
                 title: const Text(
-                  "Catalog Manger",
+                  'Catalog Manger',
                   style: TextStyle(
                     fontSize: 23,
                     color: Colors.black,
@@ -87,7 +87,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 50, right: 50, top: 15),
                         child: Text(
-                          "Create Collections To Make Your Item Easier To Find And Your Catalog More Interesting To Browse"
+                          'Create Collections To Make Your Item Easier To Find And Your Catalog More Interesting To Browse'
                               .tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -112,8 +112,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
                                 child: NewCatalogCollectionWidget(
-                                  title: "Create New Collection".tr(),
-                                  type: "Collection".tr(),
+                                  title: 'Create New Collection'.tr(),
+                                  type: 'Collection'.tr(),
                                   withImage: false,
                                   catalogId: widget.catalog.catalogeID,
                                   isCatalog: false,
@@ -134,7 +134,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                             ),
                           ),
                           child: Text(
-                            "Create Collections".tr(),
+                            'Create Collections'.tr(),
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
@@ -167,7 +167,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                             Flexible(
                               flex: 1,
                               child: Text(
-                                widget.catalog.catalogeName ?? "",
+                                widget.catalog.catalogeName ?? '',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -192,7 +192,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                           },
                           blendMode: BlendMode.darken,
                           child: CachedImage(
-                            url: widget.catalog.catalogePhoto ?? "",
+                            url: widget.catalog.catalogePhoto ?? '',
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -210,8 +210,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
                                 child: NewCatalogCollectionWidget(
-                                  title: "Create New Collection".tr(),
-                                  type: "Collection".tr(),
+                                  title: 'Create New Collection'.tr(),
+                                  type: 'Collection'.tr(),
                                   withImage: false,
                                   isCatalog: false,
                                   catalogId: widget.catalog.catalogeID,
@@ -234,7 +234,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                 ),
                                 const SizedBox(width: 17),
                                 Text(
-                                  "Add New Collection".tr(),
+                                  'Add New Collection'.tr(),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 17,
@@ -267,14 +267,14 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                 },
                                 child: ListTile(
                                   title: Text(
-                                    collections[collectionIndex].collectionName ?? "",
+                                    collections[collectionIndex].collectionName ?? '',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   subtitle: Text(
-                                    collections[collectionIndex].itemsNum == "1"
+                                    collections[collectionIndex].itemsNum == '1'
                                         ? "1 ${"Item"}"
                                         : "${collections[collectionIndex].itemsNum} ${"Items"}",
                                     style: const TextStyle(
@@ -296,47 +296,48 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                             ),
                                             onTap: () {
                                               AwesomeDialog(
-                                                  context: context,
-                                                  animType: AnimType.scale,
-                                                  dialogType: DialogType.noHeader,
-                                                  title: collections[collectionIndex].collectionName ?? "",
-                                                  desc: 'Select Your Choice'.tr(),
-                                                  btnOkText: "Edit".tr(),
-                                                  btnCancelText: "Delete".tr(),
-                                                  btnOkColor: Theme.of(context).primaryColor,
-                                                  btnOkOnPress: () {
-                                                    showMaterialModalBottomSheet(
-                                                      context: context,
-                                                      backgroundColor: Colors.transparent,
-                                                      builder: (context) => SingleChildScrollView(
-                                                        controller: ModalScrollController.of(context),
-                                                        child: NewCatalogCollectionWidget(
-                                                          title: "Edit Collection".tr(),
-                                                          type: "Collection".tr(),
-                                                          withImage: false,
-                                                          isCatalog: false,
-                                                          isEdit: true,
-                                                          collection: collections[collectionIndex],
-                                                          catalogId: widget.catalog.catalogeID,
-                                                        ),
+                                                context: context,
+                                                animType: AnimType.scale,
+                                                dialogType: DialogType.noHeader,
+                                                title: collections[collectionIndex].collectionName ?? '',
+                                                desc: 'Select Your Choice'.tr(),
+                                                btnOkText: 'Edit'.tr(),
+                                                btnCancelText: 'Delete'.tr(),
+                                                btnOkColor: Theme.of(context).primaryColor,
+                                                btnOkOnPress: () {
+                                                  showMaterialModalBottomSheet(
+                                                    context: context,
+                                                    backgroundColor: Colors.transparent,
+                                                    builder: (context) => SingleChildScrollView(
+                                                      controller: ModalScrollController.of(context),
+                                                      child: NewCatalogCollectionWidget(
+                                                        title: 'Edit Collection'.tr(),
+                                                        type: 'Collection'.tr(),
+                                                        withImage: false,
+                                                        isCatalog: false,
+                                                        isEdit: true,
+                                                        collection: collections[collectionIndex],
+                                                        catalogId: widget.catalog.catalogeID,
                                                       ),
-                                                    ).then((value) {
-                                                      if (value == true) {
-                                                        _getCollections();
-                                                      }
-                                                    });
-                                                  },
-                                                  btnCancelOnPress: () {
-                                                    _removeCollection(collections[collectionIndex].collectionID ?? "");
-                                                    setState(() {
-                                                      collections.removeAt(collectionIndex);
-                                                    });
-                                                  }).show();
+                                                    ),
+                                                  ).then((value) {
+                                                    if (value == true) {
+                                                      _getCollections();
+                                                    }
+                                                  });
+                                                },
+                                                btnCancelOnPress: () {
+                                                  _removeCollection(collections[collectionIndex].collectionID ?? '');
+                                                  setState(() {
+                                                    collections.removeAt(collectionIndex);
+                                                  });
+                                                },
+                                              ).show();
                                             },
                                           ),
                                         const SizedBox(width: 13),
                                         Text(
-                                          "See All".tr(),
+                                          'See All'.tr(),
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Theme.of(context).primaryColorDark,
@@ -384,12 +385,12 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                     child: ClipRRect(
                                                       borderRadius: BorderRadius.circular(10),
                                                       child:
-                                                          collections[collectionIndex].products?[index].photo1 != "NONE"
+                                                          collections[collectionIndex].products?[index].photo1 != 'NONE'
                                                               ? CachedImage(
                                                                   url: collections[collectionIndex]
                                                                           .products?[index]
                                                                           .photo1 ??
-                                                                      "",
+                                                                      '',
                                                                 )
                                                               : Image.asset(
                                                                   Images.collectionsImage,
@@ -429,7 +430,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  collections[collectionIndex].products?[index].itemName ?? "",
+                                                  collections[collectionIndex].products?[index].itemName ?? '',
                                                   style: const TextStyle(
                                                     fontSize: 16.5,
                                                     fontWeight: FontWeight.w600,
@@ -438,7 +439,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                 Padding(
                                                   padding: const EdgeInsets.only(top: 3.5, bottom: 3.5, right: 39),
                                                   child: Text(
-                                                    collections[collectionIndex].products?[index].description ?? "",
+                                                    collections[collectionIndex].products?[index].description ?? '',
                                                     maxLines: 1,
                                                     overflow: TextOverflow.ellipsis,
                                                     style: const TextStyle(
@@ -451,8 +452,8 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                 Text(
                                                   collections[collectionIndex].products?[index].price?.isNotEmpty ==
                                                           true
-                                                      ? "${collections[collectionIndex].products?[index].price} SAR"
-                                                      : "",
+                                                      ? '${collections[collectionIndex].products?[index].price} SAR'
+                                                      : '',
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w400,
@@ -493,7 +494,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
       context,
       getCollections,
       formData: FormData.fromMap(
-        {"CatalogeID": widget.catalog.catalogeID},
+        {'CatalogeID': widget.catalog.catalogeID},
       ),
       cancelToken: cancelToken,
     ).then((value) {
@@ -518,7 +519,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
       showError: false,
       showLoadingIndicator: false,
       formData: FormData.fromMap(
-        {"CollectionID": collectionId},
+        {'CollectionID': collectionId},
       ),
       cancelToken: cancelToken,
     ).then((value) {

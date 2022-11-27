@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,14 +9,13 @@ import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Call/call_logs.dart';
+import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:collection/collection.dart';
-import '../../Models/Call/call_logs.dart';
-import '../../Resources/animations.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -83,7 +83,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                             child: SizedBox(
                               height: 48,
                               child: const Text(
-                                "Calls",
+                                'Calls',
                                 style: TextStyle(
                                   fontSize: 34,
                                   fontWeight: FontWeight.w600,
@@ -103,7 +103,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                 _deleteAllCalls();
                               },
                               child: Text(
-                                "Clear All",
+                                'Clear All',
                                 style: TextStyle(
                                   fontSize: 17,
                                   color: Theme.of(context).primaryColorDark,
@@ -119,7 +119,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                 });
                               },
                               child: Text(
-                                isEditing ? "Done" : "Edit",
+                                isEditing ? 'Done' : 'Edit',
                                 style: TextStyle(
                                   fontSize: 17,
                                   color: Theme.of(context).primaryColorDark,
@@ -138,8 +138,8 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                           child: CupertinoSlidingSegmentedControl(
                             groupValue: currentTab,
                             children: <int, Widget>{
-                              0: const Text("All").tr(),
-                              1: const Text("Missed").tr(),
+                              0: const Text('All').tr(),
+                              1: const Text('Missed').tr(),
                             },
                             onValueChanged: (value) {
                               setState(() {
@@ -216,7 +216,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                         color: Colors.transparent,
                                         onTap: (handler) async {
                                           await handler(true);
-                                          _deleteOneCall(callLogs[index].cALLID ?? "");
+                                          _deleteOneCall(callLogs[index].cALLID ?? '');
                                           setState(() {
                                             callLogs.removeAt(index);
                                           });
@@ -262,8 +262,8 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                                   borderRadius: BorderRadius.circular(30),
                                                   child: CachedImage(
                                                     url: callLogs[index].senderID == context.currentUser?.id
-                                                        ? callLogs[index].receiver?.firstOrNull?.userPhoto ?? ""
-                                                        : callLogs[index].sender?.firstOrNull?.userPhoto ?? "",
+                                                        ? callLogs[index].receiver?.firstOrNull?.userPhoto ?? ''
+                                                        : callLogs[index].sender?.firstOrNull?.userPhoto ?? '',
                                                   ),
                                                 ),
                                               ),
@@ -287,21 +287,21 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                                   Row(
                                                     children: [
                                                       Icon(
-                                                        callLogs[index].callType == "Voice"
+                                                        callLogs[index].callType == 'Voice'
                                                             ? Icons.phone
                                                             : Icons.videocam,
-                                                        color: callLogs[index].callStatues != "CANCELLED"
+                                                        color: callLogs[index].callStatues != 'CANCELLED'
                                                             ? Colors.green
                                                             : Colors.red,
                                                         size: 20,
                                                       ),
                                                       const SizedBox(width: 5),
                                                       Text(
-                                                        callLogs[index].callStatues != "CANCELLED"
-                                                            ? "Outgoing"
-                                                            : "Missed",
+                                                        callLogs[index].callStatues != 'CANCELLED'
+                                                            ? 'Outgoing'
+                                                            : 'Missed',
                                                         style: TextStyle(
-                                                          color: callLogs[index].callStatues != "CANCELLED"
+                                                          color: callLogs[index].callStatues != 'CANCELLED'
                                                               ? Colors.green
                                                               : Colors.red,
                                                         ),
@@ -319,7 +319,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                                 ),
                                               ),
                                               style: TextStyle(
-                                                color: callLogs[index].callStatues != "CANCELLED"
+                                                color: callLogs[index].callStatues != 'CANCELLED'
                                                     ? Colors.grey.shade600
                                                     : Colors.red,
                                               ),
@@ -357,7 +357,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
                                 height: 20,
                               ),
                               Text(
-                                "Your Calls Will Appear Here",
+                                'Your Calls Will Appear Here',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 20,
@@ -376,18 +376,28 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
 
   List<CallLogsData> searchLogs(String value, List<CallLogsData> logs) {
     Set<CallLogsData> searchedList = {};
-    searchedList.addAll(logs
-        .where((element) => element.sender?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true)
-        .toList());
-    searchedList.addAll(logs
-        .where((element) => element.sender?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
-        .toList());
-    searchedList.addAll(logs
-        .where((element) => element.receiver?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true)
-        .toList());
-    searchedList.addAll(logs
-        .where((element) => element.receiver?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
-        .toList());
+    searchedList.addAll(
+      logs
+          .where((element) => element.sender?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true)
+          .toList(),
+    );
+    searchedList.addAll(
+      logs
+          .where((element) => element.sender?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
+          .toList(),
+    );
+    searchedList.addAll(
+      logs
+          .where(
+            (element) => element.receiver?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true,
+          )
+          .toList(),
+    );
+    searchedList.addAll(
+      logs
+          .where((element) => element.receiver?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
+          .toList(),
+    );
 
     return searchedList.toList();
   }
@@ -397,7 +407,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
       context,
       getCallLogs,
       formData: FormData.fromMap({
-        "UserID": context.currentUser?.id,
+        'UserID': context.currentUser?.id,
       }),
       cancelToken: cancelToken,
     ).then((value) {
@@ -410,7 +420,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
           setState(() {
             callLogs = logsResponse.data ?? [];
             allCalls = callLogs;
-            missedCalls = callLogs.where((element) => element.callStatues == "CANCELLED").toList();
+            missedCalls = callLogs.where((element) => element.callStatues == 'CANCELLED').toList();
           });
         }
       }
@@ -424,7 +434,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
       showLoadingIndicator: false,
       showError: false,
       formData: FormData.fromMap(
-        {"CALLID": callId},
+        {'CALLID': callId},
       ),
       cancelToken: cancelToken,
     );
@@ -437,7 +447,7 @@ class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin
       showLoadingIndicator: false,
       showError: false,
       formData: FormData.fromMap(
-        {"UserID": context.currentUser?.id},
+        {'UserID': context.currentUser?.id},
       ),
       cancelToken: cancelToken,
     );

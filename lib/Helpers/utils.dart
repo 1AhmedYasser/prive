@@ -467,7 +467,7 @@ class Utils {
               phone.number.trim().replaceAll(' ', '').startsWith('010') ||
               phone.number.trim().replaceAll(' ', '').startsWith('012')) {
             String dialCode = deviceDialCode.dialCode == '+20' ? '+2' : deviceDialCode.dialCode;
-            if (phone.number.trim().replaceAll(' ', '').startsWith("05")) {
+            if (phone.number.trim().replaceAll(' ', '').startsWith('05')) {
               phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
             } else {
               phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
@@ -491,21 +491,23 @@ class Utils {
     List<List<String>> dividedPhoneNumbers = [];
     dividedPhoneNumbers = partition(phoneNumbers, 500).toList();
     for (var phoneNumbers in dividedPhoneNumbers) {
-      QueryUsersResponse usersResponse = await StreamChatCore.of(context).client.queryUsers(
-        filter: Filter.and([
-          Filter.notEqual('id', context.currentUser!.id),
-          Filter.notEqual('role', 'admin'),
-          Filter.in_('phone', phoneNumbers)
-        ]),
-        sort: const [
-          SortOption(
-            'name',
-            direction: 1,
-          ),
-        ],
-      );
-      for (var user in usersResponse.users) {
-        users.add(user);
+      if (context.mounted) {
+        QueryUsersResponse usersResponse = await StreamChatCore.of(context).client.queryUsers(
+          filter: Filter.and([
+            Filter.notEqual('id', context.currentUser!.id),
+            Filter.notEqual('role', 'admin'),
+            Filter.in_('phone', phoneNumbers)
+          ]),
+          sort: const [
+            SortOption(
+              'name',
+              direction: 1,
+            ),
+          ],
+        );
+        for (var user in usersResponse.users) {
+          users.add(user);
+        }
       }
     }
 

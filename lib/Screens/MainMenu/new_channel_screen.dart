@@ -4,7 +4,7 @@ class NewChannelScreen extends StatefulWidget {
   const NewChannelScreen({Key? key}) : super(key: key);
 
   @override
-  _NewChannelScreenState createState() => _NewChannelScreenState();
+  State<NewChannelScreen> createState() => _NewChannelScreenState();
 }
 
 class _NewChannelScreenState extends State<NewChannelScreen> {

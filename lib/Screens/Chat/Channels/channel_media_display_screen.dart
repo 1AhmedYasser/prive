@@ -61,7 +61,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
         elevation: 1,
         centerTitle: true,
         title: Text(
-          "Photos & Videos",
+          'Photos & Videos',
           style: TextStyle(
             color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
             fontSize: 16.0,
@@ -102,7 +102,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  "No Media",
+                  'No Media',
                   style: TextStyle(
                     fontSize: 14.0,
                     color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
@@ -110,7 +110,7 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
                 ).tr(),
                 const SizedBox(height: 8.0),
                 Text(
-                  "Photos & Videos Will Appear Here",
+                  'Photos & Videos Will Appear Here',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.0,

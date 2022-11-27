@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,16 +7,15 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
 import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Catalogs/catalog_manager_screen.dart';
+import 'package:prive/Screens/Catalogs/catalog_product_sender_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../Models/Catalogs/catalog.dart';
-import 'package:prive/Helpers/stream_manager.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../Catalogs/catalog_product_sender_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({Key? key}) : super(key: key);
@@ -52,7 +52,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             color: Color(0xff7a8fa6),
           ),
           title: Text(
-            catalogs.isEmpty && isLoading == false ? "Create A Catalog" : "Catalogs",
+            catalogs.isEmpty && isLoading == false ? 'Create A Catalog' : 'Catalogs',
             style: const TextStyle(
               fontSize: 23,
               color: Colors.black,
@@ -71,7 +71,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: Text(
-                    isEditing ? "Done" : "Edit",
+                    isEditing ? 'Done' : 'Edit',
                     style: TextStyle(
                       fontSize: 18,
                       color: Theme.of(context).primaryColorDark,
@@ -98,7 +98,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         ),
                       ),
                       const Text(
-                        "Create A Catalog",
+                        'Create A Catalog',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 21,
@@ -108,7 +108,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 50, right: 50, top: 15),
                         child: Text(
-                          "Send Products And Services To Your Customers And Save Space On Your Phone",
+                          'Send Products And Services To Your Customers And Save Space On Your Phone',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey.shade600,
@@ -131,8 +131,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               builder: (context) => SingleChildScrollView(
                                 controller: ModalScrollController.of(context),
                                 child: NewCatalogCollectionWidget(
-                                  title: "Create New Catalog".tr(),
-                                  type: "Catalog".tr(),
+                                  title: 'Create New Catalog'.tr(),
+                                  type: 'Catalog'.tr(),
                                 ),
                               ),
                             ).then((value) {
@@ -150,7 +150,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             ),
                           ),
                           child: const Text(
-                            "Create Catalog",
+                            'Create Catalog',
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
@@ -179,8 +179,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       builder: (context) => SingleChildScrollView(
                         controller: ModalScrollController.of(context),
                         child: NewCatalogCollectionWidget(
-                          title: "Create New Catalog".tr(),
-                          type: "Catalog".tr(),
+                          title: 'Create New Catalog'.tr(),
+                          type: 'Catalog'.tr(),
                         ),
                       ),
                     ).then((value) {
@@ -200,7 +200,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         ),
                         const SizedBox(width: 17),
                         Text(
-                          "Add New Catalog",
+                          'Add New Catalog',
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 17,
@@ -241,7 +241,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       style: const TextStyle(fontSize: 0),
                                       onTap: (handler) async {
                                         await handler(true);
-                                        _removeCatalog(catalogs[index].catalogeID ?? "");
+                                        _removeCatalog(catalogs[index].catalogeID ?? '');
                                         setState(() {
                                           catalogs.removeAt(index);
                                         });
@@ -263,8 +263,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           builder: (context) => SingleChildScrollView(
                                             controller: ModalScrollController.of(context),
                                             child: NewCatalogCollectionWidget(
-                                              title: "Edit Catalog".tr(),
-                                              type: "Catalog".tr(),
+                                              title: 'Edit Catalog'.tr(),
+                                              type: 'Catalog'.tr(),
                                               isEdit: true,
                                               catalog: catalogs[index],
                                             ),
@@ -341,7 +341,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           child: Padding(
                                             padding: const EdgeInsets.only(bottom: 20),
                                             child: ListTile(
-                                              leading: catalogs[index].catalogePhoto == "NONE"
+                                              leading: catalogs[index].catalogePhoto == 'NONE'
                                                   ? Container(
                                                       decoration: BoxDecoration(
                                                         borderRadius: BorderRadius.circular(10),
@@ -377,13 +377,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                           height: 70,
                                                           width: 73,
                                                           child: CachedImage(
-                                                            url: catalogs[index].catalogePhoto ?? "",
+                                                            url: catalogs[index].catalogePhoto ?? '',
                                                           ),
                                                         ),
                                                       ),
                                                     ),
                                               title: Text(
-                                                catalogs[index].catalogeName ?? "",
+                                                catalogs[index].catalogeName ?? '',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 17,
@@ -415,7 +415,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       context,
       getCatalogs,
       formData: FormData.fromMap(
-        {"UserID": context.currentUser?.id},
+        {'UserID': context.currentUser?.id},
       ),
       cancelToken: cancelToken,
     ).then((value) {
@@ -440,7 +440,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       showError: false,
       showLoadingIndicator: false,
       formData: FormData.fromMap(
-        {"CatalogeID": catalogId},
+        {'CatalogeID': catalogId},
       ),
       cancelToken: cancelToken,
     ).then((value) {

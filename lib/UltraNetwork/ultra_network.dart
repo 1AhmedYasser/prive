@@ -42,15 +42,18 @@ class UltraNetwork with ChangeNotifier {
     );
   }
 
-  Future<dynamic> _ultraRequest(BuildContext context, UltraRequest request,
-      {Map<String, dynamic>? parameters,
-      bool showLoadingIndicator = true,
-      required CancelToken cancelToken,
-      Function? onError,
-      isList = false,
-      bool showError = true,
-      FormData? formData,
-      bool decodeResponse = true}) async {
+  Future<dynamic> _ultraRequest(
+    BuildContext context,
+    UltraRequest request, {
+    Map<String, dynamic>? parameters,
+    bool showLoadingIndicator = true,
+    required CancelToken cancelToken,
+    Function? onError,
+    isList = false,
+    bool showError = true,
+    FormData? formData,
+    bool decodeResponse = true,
+  }) async {
     if (await Connectivity().checkConnectivity() != ConnectivityResult.none) {
       if (showLoadingIndicator) {
         BotToast.showAnimationWidget(
@@ -101,15 +104,17 @@ class UltraNetwork with ChangeNotifier {
       } on DioError catch (error) {
         if (showLoadingIndicator) BotToast.removeAll('loading');
         if (cancelToken.isCancelled == false) {
-          if (showError) UltraError.handleError(context, error, onError);
+          if (showError && context.mounted) UltraError.handleError(context, error, onError);
         }
       }
     } else {
       if (showError) {
         bool? isAlertAlreadyOn = await Utils.getBool(SharedPref.internetAlert);
         if (isAlertAlreadyOn == false || isAlertAlreadyOn == null) {
-          Utils.showNoInternetConnection(context);
-          Utils.saveBool(SharedPref.internetAlert, true);
+          if (context.mounted) {
+            Utils.showNoInternetConnection(context);
+            Utils.saveBool(SharedPref.internetAlert, true);
+          }
         }
       }
     }

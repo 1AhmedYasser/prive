@@ -18,9 +18,8 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen> {
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
         child: PriveAppBar(
-            title: widget.isTerms
-                ? "Terms & Conditions".tr()
-                : "Privacy Policy".tr()),
+          title: widget.isTerms ? 'Terms & Conditions'.tr() : 'Privacy Policy'.tr(),
+        ),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

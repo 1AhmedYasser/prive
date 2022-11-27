@@ -8,9 +8,12 @@ class ChatSendWidget extends StatefulWidget {
   final FocusNode messageFocus;
   final ScrollController chatScrollController;
 
-  const ChatSendWidget(
-      {Key? key, required this.messageController, required this.messageFocus, required this.chatScrollController})
-      : super(key: key);
+  const ChatSendWidget({
+    Key? key,
+    required this.messageController,
+    required this.messageFocus,
+    required this.chatScrollController,
+  }) : super(key: key);
 
   @override
   State<ChatSendWidget> createState() => _ChatSendWidgetState();

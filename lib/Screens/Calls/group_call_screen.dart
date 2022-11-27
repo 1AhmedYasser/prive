@@ -21,6 +21,8 @@ import 'package:prive/Models/Call/call.dart';
 import 'package:prive/Models/Call/call_member.dart';
 import 'package:prive/Models/Call/prive_call.dart';
 import 'package:prive/Providers/volume_provider.dart';
+import 'package:prive/Resources/constants.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
@@ -31,9 +33,6 @@ import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 
-import '../../Resources/constants.dart';
-import '../../Resources/images.dart';
-
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
   final Channel channel;
@@ -42,16 +41,16 @@ class GroupCallScreen extends StatefulWidget {
   final RtcEngine? agoraEngine;
   final BuildContext parentContext;
   final Call? call;
-  const GroupCallScreen(
-      {Key? key,
-      this.isVideo = false,
-      required this.scrollController,
-      this.isJoining = false,
-      required this.channel,
-      this.agoraEngine,
-      required this.parentContext,
-      this.call})
-      : super(key: key);
+  const GroupCallScreen({
+    Key? key,
+    this.isVideo = false,
+    required this.scrollController,
+    this.isJoining = false,
+    required this.channel,
+    this.agoraEngine,
+    required this.parentContext,
+    this.call,
+  }) : super(key: key);
 
   @override
   State<GroupCallScreen> createState() => _GroupCallScreenState();
@@ -125,24 +124,24 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                     if ((call?.members?.length ?? 0) > 1) {
                                       if (call?.isMuteAllEnabled == false) {
                                         // Mute All
-                                        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
-                                        ref.update({"isMuteAllEnabled": true});
+                                        final ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
+                                        ref.update({'isMuteAllEnabled': true});
                                         call?.members?.forEach((member) {
                                           if (member.id != context.currentUser?.id) {
                                             final userRef = FirebaseDatabase.instance
-                                                .ref("GroupCalls/${widget.channel.id}/members/${member.id}");
-                                            userRef.update({"isMicOn": false, "hasPermissionToSpeak": false});
+                                                .ref('GroupCalls/${widget.channel.id}/members/${member.id}');
+                                            userRef.update({'isMicOn': false, 'hasPermissionToSpeak': false});
                                           }
                                         });
                                       } else {
                                         // UnMute All
-                                        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
-                                        ref.update({"isMuteAllEnabled": false});
+                                        final ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
+                                        ref.update({'isMuteAllEnabled': false});
                                         call?.members?.forEach((member) {
                                           if (member.id != context.currentUser?.id) {
                                             final userRef = FirebaseDatabase.instance
-                                                .ref("GroupCalls/${widget.channel.id}/members/${member.id}");
-                                            userRef.update({"hasPermissionToSpeak": true});
+                                                .ref('GroupCalls/${widget.channel.id}/members/${member.id}');
+                                            userRef.update({'hasPermissionToSpeak': true});
                                           }
                                         });
                                       }
@@ -170,7 +169,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         child: Column(
                           children: [
                             Text(
-                              widget.isVideo ? "Video Call" : "Voice Call",
+                              widget.isVideo ? 'Video Call' : 'Voice Call',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 19,
@@ -306,19 +305,19 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
                                   child: CachedImage(
-                                    url: call?.members?[index].image ?? "",
+                                    url: call?.members?[index].image ?? '',
                                     fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
                               title: Text(
-                                call?.members?[index].name ?? "",
+                                call?.members?[index].name ?? '',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Consumer<VolumeProvider>(
                                 builder: (context, provider, ch) {
                                   return Text(
-                                    call?.members?[index].isSpeaking == true ? "Speaking" : "Listening",
+                                    call?.members?[index].isSpeaking == true ? 'Speaking' : 'Listening',
                                     style: const TextStyle(color: Colors.grey),
                                   );
                                 },
@@ -344,26 +343,27 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                               onKickPressed: () {
                                                 CallMember? member = call?.members?[index];
                                                 final ref =
-                                                    FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+                                                    FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
                                                 ref.child('kickedMembers/${member?.id}').update({
-                                                  "id": member?.id,
-                                                  "name": member?.name,
-                                                  "image": member?.image,
-                                                  "phone": member?.phone,
-                                                  "hasPermissionToSpeak": member?.hasPermissionToSpeak,
-                                                  "isMicOn": member?.isMicOn,
-                                                  "isHeadphonesOn": member?.isHeadphonesOn,
-                                                  "isVideoOn": member?.isVideoOn,
+                                                  'id': member?.id,
+                                                  'name': member?.name,
+                                                  'image': member?.image,
+                                                  'phone': member?.phone,
+                                                  'hasPermissionToSpeak': member?.hasPermissionToSpeak,
+                                                  'isMicOn': member?.isMicOn,
+                                                  'isHeadphonesOn': member?.isHeadphonesOn,
+                                                  'isVideoOn': member?.isVideoOn,
                                                 });
                                               },
                                               onMutePressed: () {
                                                 final ref = FirebaseDatabase.instance.ref(
-                                                    "GroupCalls/${widget.channel.id}/members/${call?.members?[index].id}");
+                                                  'GroupCalls/${widget.channel.id}/members/${call?.members?[index].id}',
+                                                );
 
                                                 if (call?.members?[index].hasPermissionToSpeak == true) {
-                                                  ref.update({"isMicOn": false, "hasPermissionToSpeak": false});
+                                                  ref.update({'isMicOn': false, 'hasPermissionToSpeak': false});
                                                 } else {
-                                                  ref.update({"hasPermissionToSpeak": true});
+                                                  ref.update({'hasPermissionToSpeak': true});
                                                 }
                                               },
                                             );
@@ -460,11 +460,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       onTap: () {
                         isHeadphonesOn = !isHeadphonesOn;
                         final ref = FirebaseDatabase.instance
-                            .ref("GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
+                            .ref('GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}');
                         if (isHeadphonesOn == false) {
-                          ref.update({"isMicOn": false, "isHeadphonesOn": false});
+                          ref.update({'isMicOn': false, 'isHeadphonesOn': false});
                         } else {
-                          ref.update({"isHeadphonesOn": true});
+                          ref.update({'isHeadphonesOn': true});
                         }
                         setState(() {});
                       },
@@ -541,8 +541,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           if (widget.isVideo) {
                             isVideoOn = !isVideoOn;
                             final ref = FirebaseDatabase.instance
-                                .ref("GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                            ref.update({"isVideoOn": isVideoOn});
+                                .ref('GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}');
+                            ref.update({'isVideoOn': isVideoOn});
                           } else {
                             isSpeakerOn = !isSpeakerOn;
                           }
@@ -575,7 +575,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            widget.isVideo ? "Video" : "Speaker",
+                            widget.isVideo ? 'Video' : 'Speaker',
                             style: const TextStyle(color: Colors.white),
                           ).tr()
                         ],
@@ -598,10 +598,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                             this.isMute = isMute;
                           });
                           final ref = FirebaseDatabase.instance
-                              .ref("GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}");
-                          ref.update({"isMicOn": !this.isMute});
+                              .ref('GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}');
+                          ref.update({'isMicOn': !this.isMute});
                           agoraEngine?.muteRemoteAudioStream(
-                            uid: int.parse(context.currentUser?.id ?? "0"),
+                            uid: int.parse(context.currentUser?.id ?? '0'),
                             mute: this.isMute,
                           );
                           await agoraEngine?.muteLocalAudioStream(this.isMute);
@@ -617,7 +617,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    isMute ? "Un Mute" : "Mute",
+                    isMute ? 'Un Mute' : 'Mute',
                     style: const TextStyle(color: Colors.white, fontSize: 17),
                   ).tr()
                 ],
@@ -631,7 +631,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     if (call?.ownerId == context.currentUser?.id && call?.kickedMembers?.isNotEmpty == true)
                       Badge(
                         badgeContent: Text(
-                          "${call?.kickedMembers?.length}",
+                          '${call?.kickedMembers?.length}',
                           style: const TextStyle(color: Colors.white),
                         ),
                         showBadge: call?.kickedMembers?.isNotEmpty == true ? true : false,
@@ -676,12 +676,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
-                        final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+                        final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
                         showCupertinoModalPopup<void>(
                           context: context,
                           builder: (BuildContext context) => CupertinoActionSheet(
                             title: Text(
-                                '${"Are You Sure  You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
+                              '${"Are You Sure  You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}',
+                            ),
                             actions: <CupertinoActionSheetAction>[
                               if (context.currentUser?.id == call?.ownerId)
                                 CupertinoActionSheetAction(
@@ -690,7 +691,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                     endCall(context, databaseReference);
                                   },
                                   child: Text(
-                                      '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
+                                    '${"End".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}',
+                                  ),
                                 ),
                               CupertinoActionSheetAction(
                                 onPressed: () {
@@ -698,7 +700,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                   leaveCall(context, databaseReference);
                                 },
                                 child: Text(
-                                    '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
+                                  '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}',
+                                ),
                               ),
                             ],
                             cancelButton: CupertinoActionSheetAction(
@@ -725,7 +728,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                      "Leave",
+                      'Leave',
                       style: TextStyle(color: Colors.white),
                     ).tr()
                   ],
@@ -745,18 +748,18 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     Navigator.pop(context);
     databaseReference.remove();
     _stopForegroundTask();
-    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-    userRef.update({context.currentUser?.id ?? "": "Ended"});
+    DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+    userRef.update({context.currentUser?.id ?? '': 'Ended'});
     await agoraEngine?.leaveChannel();
   }
 
   void leaveCall(BuildContext context, DatabaseReference databaseReference) async {
     didEndCall = true;
     Navigator.pop(context);
-    databaseReference.child("members/${context.currentUser?.id}").remove();
+    databaseReference.child('members/${context.currentUser?.id}').remove();
     _stopForegroundTask();
-    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-    userRef.update({context.currentUser?.id ?? "": "Ended"});
+    DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+    userRef.update({context.currentUser?.id ?? '': 'Ended'});
     await agoraEngine?.leaveChannel();
   }
 
@@ -771,15 +774,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       isMicOn: false,
       isVideoOn: widget.isVideo,
     );
-    DatabaseReference ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    DatabaseReference ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
     await ref.set({
-      "ownerId": context.currentUser?.id ?? "",
-      "type": widget.isVideo ? "Video" : "Voice",
-      "members": {owner.id: owner.toJson()},
-      "isMuteAllEnabled": false
+      'ownerId': context.currentUser?.id ?? '',
+      'type': widget.isVideo ? 'Video' : 'Voice',
+      'members': {owner.id: owner.toJson()},
+      'isMuteAllEnabled': false
     });
-    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-    userRef.update({context.currentUser?.id ?? "": "In Call"});
+    DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+    userRef.update({context.currentUser?.id ?? '': 'In Call'});
     initAgora();
   }
 
@@ -802,10 +805,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isVideoOn == true
           : widget.isVideo,
     );
-    final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}/members");
-    ref.update({joiningUser.id ?? "": joiningUser.toJson()});
-    DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-    userRef.update({context.currentUser?.id ?? "": "In Call"});
+    final ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}/members');
+    ref.update({joiningUser.id ?? '': joiningUser.toJson()});
+    DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+    userRef.update({context.currentUser?.id ?? '': 'In Call'});
 
     if (widget.agoraEngine == null) {
       initAgora();
@@ -821,7 +824,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void getCall() async {
-    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
@@ -878,7 +881,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         isMuteAllEnabled: isMuteAllEnabled,
       );
       me = call?.members?.firstWhereOrNull((element) => element.id == context.currentUser?.id);
-      kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+      kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? '').toList() ?? [];
 
       // Check If Kicked Your Kicked Out From The Call
       if (kickedMembersIds.contains(context.currentUser?.id)) {
@@ -886,7 +889,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           leaveCall(context, databaseReference);
           Utils.showAlert(
             context,
-            message: "You Have Been Kicked Out Of This Call".tr(),
+            message: 'You Have Been Kicked Out Of This Call'.tr(),
             alertImage: Images.alertInfoImage,
           );
         }
@@ -894,8 +897,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
       // Handle Mute All
       if (members.length == 1 && isMuteAllEnabled == true && ownerId == context.currentUser?.id) {
-        final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
-        ref.update({"isMuteAllEnabled": false});
+        final ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
+        ref.update({'isMuteAllEnabled': false});
       }
 
       // Handle Mute All When All Members has permissions to speak
@@ -905,8 +908,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 [];
 
         if (callMembersWhoCanSpeak.length == (call?.members?.length ?? 1) - 1) {
-          final ref = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
-          ref.update({"isMuteAllEnabled": false});
+          final ref = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
+          ref.update({'isMuteAllEnabled': false});
         }
       }
 
@@ -917,7 +920,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       if (isHeadphonesOn == false) {
         await agoraEngine?.muteAllRemoteAudioStreams(true);
         await agoraEngine?.muteRemoteAudioStream(
-          uid: int.parse(context.currentUser?.id ?? "0"),
+          uid: int.parse(context.currentUser?.id ?? '0'),
           mute: false,
         );
         await agoraEngine?.muteLocalAudioStream(true);
@@ -937,7 +940,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               VideoViewController.remote(
                 rtcEngine: agoraEngine!,
                 canvas: VideoCanvas(
-                  uid: int.parse(member.id ?? "0"),
+                  uid: int.parse(member.id ?? '0'),
                 ),
                 connection: RtcConnection(channelId: widget.channel.id),
               ),
@@ -953,7 +956,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         if (mounted) {
           Utils.showAlert(
             context,
-            message: "Group Call Has Ended".tr(),
+            message: 'Group Call Has Ended'.tr(),
             alertImage: Images.alertInfoImage,
           ).then(
             (value) {
@@ -969,7 +972,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _listenToFirebaseChanges() {
-    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
     onAddListener = databaseReference.onChildAdded.listen((event) {
       if (mounted) {
         getCall();
@@ -993,8 +996,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       roomToken,
       cancelToken: cancelToken,
       formData: FormData.fromMap({
-        "Uid": context.currentUser?.id ?? "0",
-        "channelName": widget.channel.id,
+        'Uid': context.currentUser?.id ?? '0',
+        'channelName': widget.channel.id,
       }),
       showLoadingIndicator: false,
       showError: false,
@@ -1047,7 +1050,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   VideoViewController.remote(
                     rtcEngine: agoraEngine!,
                     canvas: VideoCanvas(
-                      uid: int.parse(member.id ?? "0"),
+                      uid: int.parse(member.id ?? '0'),
                     ),
                     connection: RtcConnection(channelId: widget.channel.id),
                   ),
@@ -1058,7 +1061,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               }
             },
             onCameraReady: () async {
-              print("camera ready");
+              print('camera ready');
               await agoraEngine?.enableVideo();
               if (mounted) {
                 setState(() {});
@@ -1083,11 +1086,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         await agoraEngine?.startPreview();
         await agoraEngine
             ?.joinChannel(
-          token: tokenResponse.data ?? "",
-          channelId: widget.channel.id ?? "",
-          uid: int.parse(context.currentUser?.id ?? "0"),
+          token: tokenResponse.data ?? '',
+          channelId: widget.channel.id ?? '',
+          uid: int.parse(context.currentUser?.id ?? '0'),
           options: ChannelMediaOptions(
-            token: tokenResponse.data ?? "",
+            token: tokenResponse.data ?? '',
             clientRoleType: ClientRoleType.clientRoleBroadcaster,
             channelProfile: ChannelProfileType.channelProfileCommunication1v1,
           ),
@@ -1105,14 +1108,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 VideoViewController.remote(
                   rtcEngine: agoraEngine!,
                   canvas: VideoCanvas(
-                    uid: int.parse(member.id ?? "0"),
+                    uid: int.parse(member.id ?? '0'),
                   ),
                   connection: RtcConnection(channelId: widget.channel.id),
                 ),
               );
             }
-            print("Number of video members ${videoMembers.length}");
-            print("Number of remote views ${remoteViews.length}");
+            print('Number of video members ${videoMembers.length}');
+            print('Number of remote views ${remoteViews.length}');
             if (mounted) {
               setState(() {});
             }
@@ -1157,7 +1160,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         allowWifiLock: true,
       ),
     );
-    await FlutterForegroundTask.startService(notificationTitle: "Prive", notificationText: "Call In Progress");
+    await FlutterForegroundTask.startService(notificationTitle: 'Prive', notificationText: 'Call In Progress');
   }
 
   Future<void> _stopForegroundTask() async {
@@ -1171,7 +1174,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       if (speakerId == 0) {
         call?.members?.firstWhereOrNull((member) => (member.id ?? 0) == context.currentUser?.id)?.isSpeaking = status;
       } else {
-        call?.members?.firstWhereOrNull((member) => (member.id ?? 0) == "$speakerId")?.isSpeaking = status;
+        call?.members?.firstWhereOrNull((member) => (member.id ?? 0) == '$speakerId')?.isSpeaking = status;
       }
       Provider.of<VolumeProvider>(context, listen: false).refreshVolumes();
     }
@@ -1206,7 +1209,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _stopScreenShare() async {
-    print("Stop Screen Sharing");
+    print('Stop Screen Sharing');
     await agoraEngine?.stopScreenCapture();
     _updateScreenShareChannelMediaOptions(startShare: false);
 
@@ -1224,7 +1227,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       Utils.showCallOverlay(
         isGroup: true,
         isVideo: widget.isVideo,
-        callId: widget.channel.id ?? "",
+        callId: widget.channel.id ?? '',
         agoraEngine: agoraEngine,
         channel: widget.channel,
       );

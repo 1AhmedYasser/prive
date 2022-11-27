@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
+import 'package:prive/Screens/Calls/single_call_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
-import '../../Resources/images.dart';
-import '../../Resources/shared_pref.dart';
-import '../Calls/single_call_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   checkForCalls() async {
     var currentCall = await getCurrentCall();
     if (currentCall != null) {
-      print("Have Calls");
+      print('Have Calls');
       print(currentCall);
       DatabaseReference ref = FirebaseDatabase.instance.ref("SingleCalls/${currentCall['extra']['channelName']}");
       final event = await ref.once();
@@ -89,11 +88,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           if (!mounted) return;
           final client = StreamChatCore.of(context).client;
           ChannelState? channelState =
-              await client.queryChannel("messaging", channelId: currentCall['extra']['channelName']);
-          Channel? channel = Channel(client, "messaging", channelState.channel?.id,
-              name: channelState.channel?.name,
-              image: currentCall['avatar'],
-              extraData: channelState.channel?.extraData);
+              await client.queryChannel('messaging', channelId: currentCall['extra']['channelName']);
+          Channel? channel = Channel(
+            client,
+            'messaging',
+            channelState.channel?.id,
+            name: channelState.channel?.name,
+            image: currentCall['avatar'],
+            extraData: channelState.channel?.extraData,
+          );
           client.state.channels.forEach((key, ch) {
             if (ch.id == currentCall['extra']['channelName']) {
               channel = ch;
@@ -106,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   pageBuilder: (BuildContext context, _, __) {
                     return SingleCallScreen(
                       isJoining: true,
-                      isVideo: currentCall['handle'] == "Voice Call" ? false : true,
+                      isVideo: currentCall['handle'] == 'Voice Call' ? false : true,
                       channelName: currentCall['nameCaller'],
                       channelImage: currentCall['avatar'],
                       channel: channel!,
@@ -122,17 +125,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               );
             }
           } else {
-            print("No Channel Found");
+            print('No Channel Found');
           }
         } else {
-          print("Already Joined Call");
+          print('Already Joined Call');
         }
       } else {
-        print("No Calls End All Calls");
+        print('No Calls End All Calls');
         FlutterCallkitIncoming.endAllCalls();
       }
     } else {
-      print("No Calls");
+      print('No Calls');
     }
   }
 

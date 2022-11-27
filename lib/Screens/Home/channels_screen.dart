@@ -1,14 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
 import 'package:prive/Screens/Chat/Channels/archive_tab.dart';
 import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
 import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
 import 'package:prive/Screens/Chat/Channels/prive_channels_tab.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-
-import '../../Resources/images.dart';
-import '../../Resources/routes.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({Key? key}) : super(key: key);
@@ -18,7 +17,7 @@ class ChannelsScreen extends StatefulWidget {
 }
 
 class _ChannelsScreenState extends State<ChannelsScreen> {
-  final List<String> _tabs = ["Chats", "Groups", "Channels", "Archive"];
+  final List<String> _tabs = ['Chats', 'Groups', 'Channels', 'Archive'];
 
   @override
   void initState() {
@@ -69,7 +68,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               backgroundColor: Colors.grey.shade200.withOpacity(0.3),
               titleSpacing: 0,
               title: Align(
-                alignment: context.locale.languageCode == "en" ? Alignment.centerLeft : Alignment.centerRight,
+                alignment: context.locale.languageCode == 'en' ? Alignment.centerLeft : Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
                   child: Image.asset(
@@ -151,8 +150,9 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                          right: context.locale.languageCode == "en" ? 23 : 0,
-                          left: context.locale.languageCode == "en" ? 0 : 23),
+                        right: context.locale.languageCode == 'en' ? 23 : 0,
+                        left: context.locale.languageCode == 'en' ? 0 : 23,
+                      ),
                       child: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, Routes.profileRoute).then((value) {
@@ -165,7 +165,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                             width: 50,
                             height: 50,
                             child: CachedImage(
-                              url: context.currentUserImage ?? "",
+                              url: context.currentUserImage ?? '',
                               fit: BoxFit.fill,
                             ),
                           ),

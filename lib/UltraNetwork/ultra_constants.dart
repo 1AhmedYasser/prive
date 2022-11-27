@@ -2,7 +2,7 @@ import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Models/Call/call_logs.dart';
 import 'package:prive/Models/Call/prive_call.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
-import 'package:prive/Models/Catalogs/catalogProduct.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Models/Common/status_response.dart';
 import 'package:prive/Models/Stories/stories.dart';

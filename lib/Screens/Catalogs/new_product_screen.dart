@@ -1,17 +1,18 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:prive/Helpers/Utils.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
+import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import '../../Helpers/Utils.dart';
-import '../../Models/Catalogs/catalogProduct.dart';
-import '../../Models/Catalogs/collection.dart';
-import '../../Resources/images.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/AppWidgets/prive_appbar.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 
 class NewProductScreen extends StatefulWidget {
   final CollectionData? collection;
@@ -35,9 +36,9 @@ class _NewProductScreenState extends State<NewProductScreen> {
   @override
   void initState() {
     if (widget.product != null) {
-      productNameController.text = widget.product?.itemName ?? "";
-      priceController.text = widget.product?.price ?? "";
-      descriptionController.text = widget.product?.description ?? "";
+      productNameController.text = widget.product?.itemName ?? '';
+      priceController.text = widget.product?.price ?? '';
+      descriptionController.text = widget.product?.description ?? '';
     }
     super.initState();
   }
@@ -47,7 +48,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Add Products Or Services".tr()),
+        child: PriveAppBar(title: 'Add Products Or Services'.tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -70,64 +71,65 @@ class _NewProductScreenState extends State<NewProductScreen> {
                       child: Padding(
                         padding: EdgeInsets.only(top: 15, left: index == 0 ? 25 : 0, right: 13),
                         child: Container(
-                            decoration: BoxDecoration(
-                              color: index == 0 ? const Color(0xff7a8fa6) : Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            width: 130,
-                            height: 50,
-                            child: index == 0
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(top: 20),
-                                          child: Image.asset(
-                                            Images.newProductCameraImage,
-                                            width: 60,
-                                          ),
+                          decoration: BoxDecoration(
+                            color: index == 0 ? const Color(0xff7a8fa6) : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          width: 130,
+                          height: 50,
+                          child: index == 0
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 20),
+                                        child: Image.asset(
+                                          Images.newProductCameraImage,
+                                          width: 60,
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10, bottom: 15),
-                                        child: const Text(
-                                          "Add Images",
-                                          style: TextStyle(color: Colors.white),
-                                        ).tr(),
-                                      )
-                                    ],
-                                  )
-                                : productImages.length > index - 1
-                                    ? Stack(
-                                        children: [
-                                          Positioned.fill(
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: Image.file(
-                                                productImages[index - 1],
-                                                fit: BoxFit.fill,
-                                              ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10, bottom: 15),
+                                      child: const Text(
+                                        'Add Images',
+                                        style: TextStyle(color: Colors.white),
+                                      ).tr(),
+                                    )
+                                  ],
+                                )
+                              : productImages.length > index - 1
+                                  ? Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.file(
+                                              productImages[index - 1],
+                                              fit: BoxFit.fill,
                                             ),
                                           ),
-                                          Positioned(
-                                            top: 5,
-                                            right: 7,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  productImages.removeAt(index - 1);
-                                                });
-                                              },
-                                              child: const Icon(
-                                                Icons.remove_circle_outlined,
-                                                color: Colors.red,
-                                              ),
+                                        ),
+                                        Positioned(
+                                          top: 5,
+                                          right: 7,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                productImages.removeAt(index - 1);
+                                              });
+                                            },
+                                            child: const Icon(
+                                              Icons.remove_circle_outlined,
+                                              color: Colors.red,
                                             ),
-                                          )
-                                        ],
-                                      )
-                                    : const SizedBox()),
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  : const SizedBox(),
+                        ),
                       ),
                     );
                   },
@@ -142,23 +144,23 @@ class _NewProductScreenState extends State<NewProductScreen> {
                   Form(
                     key: _formKey,
                     child: buildTextField(
-                      "Product Or Service Name".tr(),
+                      'Product Or Service Name'.tr(),
                       productNameController,
-                      emptyValidatorMessage: "Please enter a product or service name".tr(),
+                      emptyValidatorMessage: 'Please enter a product or service name'.tr(),
                     ),
                   ),
                   const SizedBox(height: 20),
                   buildTextField(
-                    "Price (Optional)".tr(),
+                    'Price (Optional)'.tr(),
                     priceController,
-                    emptyValidatorMessage: "Please enter a product price".tr(),
+                    emptyValidatorMessage: 'Please enter a product price'.tr(),
                   ),
                   const SizedBox(height: 20),
                   buildTextField(
-                    "Description (Optional)".tr(),
+                    'Description (Optional)'.tr(),
                     descriptionController,
                     maxLines: 4,
-                    emptyValidatorMessage: "Please enter a product description".tr(),
+                    emptyValidatorMessage: 'Please enter a product description'.tr(),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
@@ -180,7 +182,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                       ),
                     ),
                     child: Text(
-                      widget.isEdit ? "Edit" : "Save",
+                      widget.isEdit ? 'Edit' : 'Save',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
@@ -197,11 +199,14 @@ class _NewProductScreenState extends State<NewProductScreen> {
     );
   }
 
-  Widget buildTextField(String hint, TextEditingController controller,
-      {int maxLines = 1,
-      TextInputType type = TextInputType.text,
-      List<TextInputFormatter> formatters = const [],
-      String emptyValidatorMessage = ""}) {
+  Widget buildTextField(
+    String hint,
+    TextEditingController controller, {
+    int maxLines = 1,
+    TextInputType type = TextInputType.text,
+    List<TextInputFormatter> formatters = const [],
+    String emptyValidatorMessage = '',
+  }) {
     return TextFormField(
       maxLines: maxLines,
       controller: controller,
@@ -268,23 +273,23 @@ class _NewProductScreenState extends State<NewProductScreen> {
 
   void _createProduct() async {
     Map<String, dynamic> parameters = {
-      "UserID": context.currentUser?.id,
-      "ItemName": productNameController.text,
-      "CollectionID": widget.collection?.collectionID ?? "",
-      "Price": priceController.text,
-      "Description": descriptionController.text
+      'UserID': context.currentUser?.id,
+      'ItemName': productNameController.text,
+      'CollectionID': widget.collection?.collectionID ?? '',
+      'Price': priceController.text,
+      'Description': descriptionController.text
     };
 
     if (productImages.isNotEmpty) {
-      parameters["Photo1"] = await MultipartFile.fromFile(productImages[0].path, filename: "Photo1");
+      parameters['Photo1'] = await MultipartFile.fromFile(productImages[0].path, filename: 'Photo1');
     }
 
     if (productImages.length >= 2) {
-      parameters["Photo2"] = await MultipartFile.fromFile(productImages[1].path, filename: "Photo2");
+      parameters['Photo2'] = await MultipartFile.fromFile(productImages[1].path, filename: 'Photo2');
     }
 
     if (productImages.length >= 3) {
-      parameters["Photo3"] = await MultipartFile.fromFile(productImages[2].path, filename: "Photo3");
+      parameters['Photo3'] = await MultipartFile.fromFile(productImages[2].path, filename: 'Photo3');
     }
 
     if (mounted) {
@@ -308,10 +313,10 @@ class _NewProductScreenState extends State<NewProductScreen> {
 
   void _updateProduct() async {
     Map<String, dynamic> parameters = {
-      "ItemID": widget.product?.itemID,
-      "ItemName": productNameController.text,
-      "Price": priceController.text,
-      "Description": descriptionController.text
+      'ItemID': widget.product?.itemID,
+      'ItemName': productNameController.text,
+      'Price': priceController.text,
+      'Description': descriptionController.text
     };
 
     UltraNetwork.request(
@@ -325,7 +330,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
       if (value != null) {
         Utils.showAlert(
           context,
-          message: "Product Updated Successfully".tr(),
+          message: 'Product Updated Successfully'.tr(),
         ).then((value) => Navigator.pop(context, true));
       }
     });

@@ -53,7 +53,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
         elevation: 1,
         centerTitle: true,
         title: Text(
-          "Files",
+          'Files',
           style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textHighEmphasis, fontSize: 16.0),
         ).tr(),
         leading: const Padding(
@@ -91,7 +91,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  "No Files",
+                  'No Files',
                   style: TextStyle(
                     fontSize: 14.0,
                     color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
@@ -99,7 +99,7 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
                 ).tr(),
                 const SizedBox(height: 8.0),
                 Text(
-                  "Files Will Appear Here",
+                  'Files Will Appear Here',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14.0,

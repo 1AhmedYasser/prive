@@ -1,11 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
-import 'package:prive/Models/Catalogs/catalogProduct.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/ChatWidgets/channel_item_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
-import '../../Widgets/ChatWidgets/channel_item_widget.dart';
 
 class CatalogProductSenderScreen extends StatefulWidget {
   final CatalogData? catalog;
@@ -31,7 +31,7 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
           statusBarBrightness: Brightness.light,
         ),
         title: Text(
-          "Send To".tr(),
+          'Send To'.tr(),
           style: const TextStyle(color: Colors.black),
         ),
         leading: const BackButton(
@@ -50,7 +50,7 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
                 });
               },
               child: Text(
-                isSelectedEnabled ? "Unselect" : "Select",
+                isSelectedEnabled ? 'Unselect' : 'Select',
                 style: const TextStyle(color: Colors.black, fontSize: 17),
               ).tr(),
             ),
@@ -82,7 +82,7 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
                     if (searchController.text.isNotEmpty) Filter.autoComplete('name', searchController.text)
                   ],
                 ),
-                sort: const [SortOption('last_message_at')],
+                channelStateSort: const [SortOption('last_message_at')],
                 presence: true,
                 limit: 20,
               ),
@@ -118,44 +118,52 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
                     } else {
                       if (widget.product != null) {
                         channels[index].sendMessage(
-                          Message(text: "", type: "product", attachments: [
-                            Attachment(
-                              type: 'product',
-                              uploadState: const UploadState.success(),
-                              title: widget.product?.itemName,
-                              imageUrl: widget.product?.photo1,
-                              extraData: {
-                                "id": widget.product?.itemID,
-                                "name": widget.product?.itemName,
-                                "description": widget.product?.description,
-                                "price": widget.product?.price,
-                                "photo1": widget.product?.photo1,
-                                "photo2": widget.product?.photo2,
-                                "photo3": widget.product?.photo3,
-                                "ownerId": widget.product?.userID,
-                                "ctype": "product"
-                              },
-                            )
-                          ]),
+                          Message(
+                            text: '',
+                            type: 'product',
+                            attachments: [
+                              Attachment(
+                                type: 'product',
+                                uploadState: const UploadState.success(),
+                                title: widget.product?.itemName,
+                                imageUrl: widget.product?.photo1,
+                                extraData: {
+                                  'id': widget.product?.itemID,
+                                  'name': widget.product?.itemName,
+                                  'description': widget.product?.description,
+                                  'price': widget.product?.price,
+                                  'photo1': widget.product?.photo1,
+                                  'photo2': widget.product?.photo2,
+                                  'photo3': widget.product?.photo3,
+                                  'ownerId': widget.product?.userID,
+                                  'ctype': 'product'
+                                },
+                              )
+                            ],
+                          ),
                         );
                       } else if (widget.catalog != null) {
                         channels[index].sendMessage(
-                          Message(text: "", type: "catalog", attachments: [
-                            Attachment(
-                              type: 'catalog',
-                              title: widget.catalog?.catalogeName,
-                              imageUrl: widget.catalog?.catalogePhoto,
-                              thumbUrl: widget.catalog?.catalogePhoto,
-                              uploadState: const UploadState.success(),
-                              extraData: {
-                                "cid": widget.catalog?.catalogeID,
-                                "name": widget.catalog?.catalogeName,
-                                "photo": widget.catalog?.catalogePhoto,
-                                "ownerId": widget.catalog?.userID,
-                                "ctype": "catalog"
-                              },
-                            ),
-                          ]),
+                          Message(
+                            text: '',
+                            type: 'catalog',
+                            attachments: [
+                              Attachment(
+                                type: 'catalog',
+                                title: widget.catalog?.catalogeName,
+                                imageUrl: widget.catalog?.catalogePhoto,
+                                thumbUrl: widget.catalog?.catalogePhoto,
+                                uploadState: const UploadState.success(),
+                                extraData: {
+                                  'cid': widget.catalog?.catalogeID,
+                                  'name': widget.catalog?.catalogeName,
+                                  'photo': widget.catalog?.catalogePhoto,
+                                  'ownerId': widget.catalog?.userID,
+                                  'ctype': 'catalog'
+                                },
+                              ),
+                            ],
+                          ),
                         );
                       }
 
@@ -210,44 +218,52 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
                     for (var channel in selectedChannels) {
                       if (widget.product != null) {
                         channel.sendMessage(
-                          Message(text: "", type: "product", attachments: [
-                            Attachment(
-                              type: 'product',
-                              uploadState: const UploadState.success(),
-                              title: widget.product?.itemName,
-                              imageUrl: widget.product?.photo1,
-                              extraData: {
-                                "id": widget.product?.itemID,
-                                "name": widget.product?.itemName,
-                                "description": widget.product?.description,
-                                "price": widget.product?.price,
-                                "photo1": widget.product?.photo1,
-                                "photo2": widget.product?.photo2,
-                                "photo3": widget.product?.photo3,
-                                "ownerId": widget.product?.userID,
-                                "ctype": "product"
-                              },
-                            )
-                          ]),
+                          Message(
+                            text: '',
+                            type: 'product',
+                            attachments: [
+                              Attachment(
+                                type: 'product',
+                                uploadState: const UploadState.success(),
+                                title: widget.product?.itemName,
+                                imageUrl: widget.product?.photo1,
+                                extraData: {
+                                  'id': widget.product?.itemID,
+                                  'name': widget.product?.itemName,
+                                  'description': widget.product?.description,
+                                  'price': widget.product?.price,
+                                  'photo1': widget.product?.photo1,
+                                  'photo2': widget.product?.photo2,
+                                  'photo3': widget.product?.photo3,
+                                  'ownerId': widget.product?.userID,
+                                  'ctype': 'product'
+                                },
+                              )
+                            ],
+                          ),
                         );
                       } else if (widget.catalog != null) {
                         channel.sendMessage(
-                          Message(text: "", type: "catalog", attachments: [
-                            Attachment(
-                              type: 'catalog',
-                              uploadState: const UploadState.success(),
-                              title: widget.catalog?.catalogeName,
-                              imageUrl: widget.catalog?.catalogePhoto,
-                              thumbUrl: widget.catalog?.catalogePhoto,
-                              extraData: {
-                                "cid": widget.catalog?.catalogeID,
-                                "name": widget.catalog?.catalogeName,
-                                "photo": widget.catalog?.catalogePhoto,
-                                "ownerId": widget.catalog?.userID,
-                                "ctype": "catalog"
-                              },
-                            )
-                          ]),
+                          Message(
+                            text: '',
+                            type: 'catalog',
+                            attachments: [
+                              Attachment(
+                                type: 'catalog',
+                                uploadState: const UploadState.success(),
+                                title: widget.catalog?.catalogeName,
+                                imageUrl: widget.catalog?.catalogePhoto,
+                                thumbUrl: widget.catalog?.catalogePhoto,
+                                extraData: {
+                                  'cid': widget.catalog?.catalogeID,
+                                  'name': widget.catalog?.catalogeName,
+                                  'photo': widget.catalog?.catalogePhoto,
+                                  'ownerId': widget.catalog?.userID,
+                                  'ctype': 'catalog'
+                                },
+                              )
+                            ],
+                          ),
                         );
                       }
                     }
@@ -255,7 +271,7 @@ class _CatalogProductSenderScreenState extends State<CatalogProductSenderScreen>
                   }
                 },
                 child: Text(
-                  "Forward".tr(),
+                  'Forward'.tr(),
                   style: const TextStyle(
                     fontSize: 17.5,
                   ),

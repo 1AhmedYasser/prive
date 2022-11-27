@@ -6,7 +6,7 @@ import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 import 'package:prive/Widgets/ChatWidgets/channels_list_item_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../Chat/chat_screen.dart';
+import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 
 class ChannelsTab extends StatefulWidget {
   const ChannelsTab({Key? key}) : super(key: key);

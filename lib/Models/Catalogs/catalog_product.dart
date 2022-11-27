@@ -11,8 +11,9 @@ class CatalogProduct extends BaseModel<CatalogProduct> {
     statusCode = json['status_code'] as int?;
     success = json['success'] as bool?;
     data = (json['data'] as List?)
-        ?.map((dynamic e) =>
-            CatalogProductData.fromJson(e as Map<String, dynamic>))
+        ?.map(
+          (dynamic e) => CatalogProductData.fromJson(e as Map<String, dynamic>),
+        )
         .toList();
     message = json['message'] as String?;
   }

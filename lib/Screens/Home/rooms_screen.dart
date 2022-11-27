@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,17 +8,16 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Rooms/room.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
+import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Screens/Rooms/upcoming_rooms_screen.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/new_room_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../Helpers/utils.dart';
-import '../../Models/Rooms/room.dart';
-import '../../Models/Rooms/room_user.dart';
-import '../../Resources/animations.dart';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class RoomsScreen extends StatefulWidget {
   const RoomsScreen({Key? key}) : super(key: key);
@@ -61,68 +61,69 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.only(left: 30, right: 25),
             child: Column(
-                children: AnimationConfiguration.toStaggeredList(
-              duration: const Duration(milliseconds: 375),
-              childAnimationBuilder: (widget) => SlideAnimation(
-                horizontalOffset: 50.0,
-                child: FadeInAnimation(
-                  child: widget,
+              children: AnimationConfiguration.toStaggeredList(
+                duration: const Duration(milliseconds: 375),
+                childAnimationBuilder: (widget) => SlideAnimation(
+                  horizontalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: widget,
+                  ),
                 ),
-              ),
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Rooms",
-                      style: TextStyle(
-                        fontSize: 34,
-                        fontWeight: FontWeight.w600,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Rooms',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ).tr(),
+                      const Expanded(child: SizedBox()),
+                      SizedBox(
+                        width: 20,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const UpComingRoomsScreen(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(Images.chatRoomsIcons),
+                        ),
                       ),
-                    ).tr(),
-                    const Expanded(child: SizedBox()),
-                    SizedBox(
-                      width: 20,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const UpComingRoomsScreen(),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          showMaterialModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => SingleChildScrollView(
+                              controller: ModalScrollController.of(context),
+                              child: const NewRoomWidget(),
                             ),
                           );
                         },
-                        child: Image.asset(Images.chatRoomsIcons),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showMaterialModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => SingleChildScrollView(
-                            controller: ModalScrollController.of(context),
-                            child: const NewRoomWidget(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
                         ),
-                      ),
-                      child: const Text("Start A Room").tr(),
-                    )
-                  ],
-                ),
-              ],
-            )),
+                        child: const Text('Start A Room').tr(),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 25),
           isLoading
@@ -151,11 +152,11 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                                     onTap: () {
                                       if (roomsList[index].roomId?.isNotEmpty == true) {
                                         List<String> kickedListenersIds =
-                                            roomsList[index].kickedListeners?.map((e) => e.id ?? "").toList() ?? [];
+                                            roomsList[index].kickedListeners?.map((e) => e.id ?? '').toList() ?? [];
                                         if (kickedListenersIds.contains(context.currentUser?.id)) {
                                           Utils.showAlert(
                                             context,
-                                            message: "You Have Been Kicked Out Of This Room".tr(),
+                                            message: 'You Have Been Kicked Out Of This Room'.tr(),
                                             alertImage: Images.alertInfoImage,
                                           );
                                         } else {
@@ -184,7 +185,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                                             Padding(
                                               padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
                                               child: Text(
-                                                roomsList[index].topic ?? "",
+                                                roomsList[index].topic ?? '',
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 15.5,
@@ -208,10 +209,13 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                                                   if ((roomsList[index].speakers?.length ?? 0) > 2)
                                                     buildSpeaker(roomsList[index].speakers?[2]),
                                                   buildInfo(
-                                                      "${(roomsList[index].speakers?.length ?? 0) > 3 ? "+${((roomsList[index].speakers?.length ?? 0) - 3)}" : roomsList[index].speakers?.length ?? 0}",
-                                                      "speakers".tr()),
+                                                    "${(roomsList[index].speakers?.length ?? 0) > 3 ? "+${((roomsList[index].speakers?.length ?? 0) - 3)}" : roomsList[index].speakers?.length ?? 0}",
+                                                    'speakers'.tr(),
+                                                  ),
                                                   buildInfo(
-                                                      "${roomsList[index].listeners?.length ?? 0}", "listeners".tr())
+                                                    '${roomsList[index].listeners?.length ?? 0}',
+                                                    'listeners'.tr(),
+                                                  )
                                                 ],
                                               ),
                                             )
@@ -247,7 +251,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                           ),
                           const SizedBox(height: 25),
                           const Text(
-                            "Start Creating Rooms Now",
+                            'Start Creating Rooms Now',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -279,12 +283,12 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: CachedImage(
-                  url: speaker?.image ?? "",
+                  url: speaker?.image ?? '',
                 ),
               ),
             ),
             const SizedBox(height: 5),
-            Text((speaker?.name?.split(" ").first ?? "").trim())
+            Text((speaker?.name?.split(' ').first ?? '').trim())
           ],
         ),
       ),
@@ -343,7 +347,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
       roomsResponse.forEach((key, value) {
         Map<dynamic, dynamic> rooms = value as Map<dynamic, dynamic>;
         String roomId = rooms['roomId'];
-        String topic = "";
+        String topic = '';
         RoomUser? owner;
         List<RoomUser>? speakers = [];
         List<RoomUser>? listeners = [];
@@ -441,22 +445,25 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
         });
         roomsList.add(
           Room(
-              roomId: roomId,
-              topic: topic,
-              owner: owner,
-              speakers: speakers,
-              listeners: listeners,
-              roomContacts: contacts,
-              raisedHands: raisedHands,
-              kickedListeners: kickedListeners),
+            roomId: roomId,
+            topic: topic,
+            owner: owner,
+            speakers: speakers,
+            listeners: listeners,
+            roomContacts: contacts,
+            raisedHands: raisedHands,
+            kickedListeners: kickedListeners,
+          ),
         );
       });
 
       // Filter out my rooms and the rooms iam not in
       roomsList = roomsList
-          .where((element) =>
-              element.owner?.id != context.currentUser?.id &&
-              element.roomContacts?.contains(context.currentUser?.id) == true)
+          .where(
+            (element) =>
+                element.owner?.id != context.currentUser?.id &&
+                element.roomContacts?.contains(context.currentUser?.id) == true,
+          )
           .toList();
       setState(() {
         isLoading = false;

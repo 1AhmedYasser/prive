@@ -1,12 +1,11 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:collection/collection.dart';
-
-import '../../../UltraNetwork/ultra_loading_indicator.dart';
 
 class AdminPermissionsScreen extends StatefulWidget {
   final Channel channel;
@@ -67,14 +66,14 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
             StreamOptionListTile(
               tileColor: StreamChatTheme.of(context).colorTheme.appBg,
               separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-              title: "What Can This Admin Do ?".tr(),
+              title: 'What Can This Admin Do ?'.tr(),
               titleTextStyle: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 14.5,
               ),
             ),
             _buildPermission(
-              "Pin Messages",
+              'Pin Messages',
               pinMessages,
               () {
                 setState(() {
@@ -90,7 +89,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               },
             ),
             _buildPermission(
-              "Add Members",
+              'Add Members',
               addMembers,
               () {
                 setState(() {
@@ -107,7 +106,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
             ),
             _buildPermission(
-              "Add Admins",
+              'Add Admins',
               addAdmins,
               () {
                 setState(() {
@@ -124,7 +123,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
             ),
             _buildPermission(
-              "Change Group Info",
+              'Change Group Info',
               changeGroupInfo,
               () {
                 setState(() {
@@ -141,7 +140,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
             ),
             _buildPermission(
-              "Delete Members Messages",
+              'Delete Members Messages',
               deleteOthersMessages,
               () {
                 setState(() {
@@ -158,7 +157,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
             ),
             _buildPermission(
-              "Delete Members",
+              'Delete Members',
               deleteMembers,
               () {
                 setState(() {
@@ -188,14 +187,16 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                       (admin) => admin.id == widget.admin.id,
                     ),
                   );
-                  BotToast.removeAll("loading");
+                  BotToast.removeAll('loading');
                   BotToast.showAnimationWidget(
-                      toastBuilder: (context) {
-                        return const IgnorePointer(
-                            child: UltraLoadingIndicator());
-                      },
-                      animationDuration: const Duration(milliseconds: 0),
-                      groupKey: "loading");
+                    toastBuilder: (context) {
+                      return const IgnorePointer(
+                        child: UltraLoadingIndicator(),
+                      );
+                    },
+                    animationDuration: const Duration(milliseconds: 0),
+                    groupKey: 'loading',
+                  );
                   updateAdmins(context, goBackAfterUpdate: true);
                 },
                 style: ElevatedButton.styleFrom(
@@ -210,7 +211,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                   ),
                 ),
                 child: const Text(
-                  "Remove Admin",
+                  'Remove Admin',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
@@ -228,28 +229,27 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
     List<Map<String, dynamic>> admins = [];
     for (var admin in groupAdmins) {
       admins.add({
-        "id": admin.id,
-        "name": admin.name,
-        "image": admin.image,
-        "group_role": admin.groupRole,
-        "admin_permissions": {
-          "pin_messages": admin.groupPermissions?.pinMessages ?? true,
-          "add_members": admin.groupPermissions?.addMembers ?? true,
-          "add_admins": admin.groupPermissions?.addAdmins ?? true,
-          "change_group_info": admin.groupPermissions?.changeGroupInfo ?? true,
-          "delete_others_messages":
-              admin.groupPermissions?.deleteOthersMessages ?? true,
-          "delete_members": admin.groupPermissions?.deleteMembers ?? true
+        'id': admin.id,
+        'name': admin.name,
+        'image': admin.image,
+        'group_role': admin.groupRole,
+        'admin_permissions': {
+          'pin_messages': admin.groupPermissions?.pinMessages ?? true,
+          'add_members': admin.groupPermissions?.addMembers ?? true,
+          'add_admins': admin.groupPermissions?.addAdmins ?? true,
+          'change_group_info': admin.groupPermissions?.changeGroupInfo ?? true,
+          'delete_others_messages': admin.groupPermissions?.deleteOthersMessages ?? true,
+          'delete_members': admin.groupPermissions?.deleteMembers ?? true
         },
       });
     }
-    widget.channel.updatePartial(set: {"group_admins": admins}).then((value) {
+    widget.channel.updatePartial(set: {'group_admins': admins}).then((value) {
       if (goBackAfterUpdate) {
         if (mounted) {
           Navigator.pop(context);
         }
       }
-      BotToast.removeAll("loading");
+      BotToast.removeAll('loading');
     });
   }
 
@@ -278,11 +278,9 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
 
   void _getGroupAdmins() {
     groupAdmins = [];
-    List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
+    List<dynamic>? admins = widget.channel.extraData['group_admins'] as List<dynamic>? ?? [];
     for (var admin in admins) {
-      GroupAdmin groupAdmin =
-          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
     setState(() {});

@@ -4,7 +4,7 @@ import 'package:prive/Resources/images.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
-import 'package:prive/Models/Catalogs/catalogProduct.dart';
+import 'package:prive/Models/Catalogs/catalog_product.dart';
 import 'package:prive/Screens/Catalogs/catalog_manager_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
@@ -90,9 +90,8 @@ class _CatalogMessageState extends State<CatalogMessage> {
           );
         }
       },
-      child: wrapAttachmentWidget(
-        context,
-        SizedBox(
+      child: WrapAttachmentWidget(
+        attachmentWidget: SizedBox(
           height: 240,
           width: type == 'product' ? 180 : 230,
           child: Column(
@@ -161,8 +160,7 @@ class _CatalogMessageState extends State<CatalogMessage> {
             ],
           ),
         ),
-        const RoundedRectangleBorder(),
-        true,
+        attachmentShape: const RoundedRectangleBorder(),
       ),
     );
   }

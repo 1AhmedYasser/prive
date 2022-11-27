@@ -6,16 +6,13 @@ import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 class NotificationsInnerSettingsScreen extends StatefulWidget {
   final String title;
 
-  const NotificationsInnerSettingsScreen({Key? key, this.title = ""})
-      : super(key: key);
+  const NotificationsInnerSettingsScreen({Key? key, this.title = ''}) : super(key: key);
 
   @override
-  State<NotificationsInnerSettingsScreen> createState() =>
-      _NotificationsInnerSettingsScreenState();
+  State<NotificationsInnerSettingsScreen> createState() => _NotificationsInnerSettingsScreenState();
 }
 
-class _NotificationsInnerSettingsScreenState
-    extends State<NotificationsInnerSettingsScreen> {
+class _NotificationsInnerSettingsScreenState extends State<NotificationsInnerSettingsScreen> {
   List<bool> currentValues = [false, false];
 
   @override
@@ -39,16 +36,18 @@ class _NotificationsInnerSettingsScreenState
               ),
               children: [
                 const SizedBox(height: 30),
-                buildSetting("${"Notifications For".tr()} ${widget.title}",
-                    currentValues[0] == true ? "On" : "Off", 0,
-                    isSwitch: true),
+                buildSetting(
+                  "${"Notifications For".tr()} ${widget.title}",
+                  currentValues[0] == true ? 'On' : 'Off',
+                  0,
+                  isSwitch: true,
+                ),
                 const SizedBox(height: 5),
                 buildDivider(),
                 Padding(
-                  padding: const EdgeInsets.only(
-                      top: 15, left: 25, bottom: 17, right: 20),
+                  padding: const EdgeInsets.only(top: 15, left: 25, bottom: 17, right: 20),
                   child: Text(
-                    "Settings",
+                    'Settings',
                     style: TextStyle(
                       color: Theme.of(context).primaryColorDark,
                       fontSize: 18,
@@ -56,23 +55,23 @@ class _NotificationsInnerSettingsScreenState
                     ),
                   ).tr(),
                 ),
-                buildSetting("Message Preview", "", 1, isSwitch: true),
+                buildSetting('Message Preview', '', 1, isSwitch: true),
                 const SizedBox(height: 5),
                 buildDivider(),
                 const SizedBox(height: 15),
-                buildSetting("Vibrate", "Default", 2),
+                buildSetting('Vibrate', 'Default', 2),
                 const SizedBox(height: 15),
                 buildDivider(),
                 const SizedBox(height: 15),
-                buildSetting("Popup Notifications", "No Popup", 3),
+                buildSetting('Popup Notifications', 'No Popup', 3),
                 const SizedBox(height: 15),
                 buildDivider(),
                 const SizedBox(height: 15),
-                buildSetting("Sound", "Default", 4),
+                buildSetting('Sound', 'Default', 4),
                 const SizedBox(height: 15),
                 buildDivider(),
                 const SizedBox(height: 15),
-                buildSetting("Importance", "Urgent", 5),
+                buildSetting('Importance', 'Urgent', 5),
               ],
             ),
           ),
@@ -81,8 +80,7 @@ class _NotificationsInnerSettingsScreenState
     );
   }
 
-  Widget buildSetting(String title, String subTitle, int index,
-      {bool isSwitch = false}) {
+  Widget buildSetting(String title, String subTitle, int index, {bool isSwitch = false}) {
     return Padding(
       padding: const EdgeInsets.only(left: 25, right: 25),
       child: InkWell(
@@ -151,8 +149,8 @@ class _NotificationsInnerSettingsScreenState
   Widget buildDivider() {
     return Padding(
       padding: EdgeInsets.only(
-        left: context.locale.languageCode == "en" ? 25 : 0,
-        right: context.locale.languageCode == "en" ? 0 : 25,
+        left: context.locale.languageCode == 'en' ? 25 : 0,
+        right: context.locale.languageCode == 'en' ? 0 : 25,
       ),
       child: const Divider(),
     );

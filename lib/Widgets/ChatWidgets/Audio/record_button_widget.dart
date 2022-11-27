@@ -60,8 +60,9 @@ class _RecordButtonState extends State<RecordButton> {
         height: 43,
         width: 43,
         decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(100)),
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(100),
+        ),
         child: Icon(
           icon,
           color: color,

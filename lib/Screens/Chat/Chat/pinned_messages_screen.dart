@@ -65,7 +65,7 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
         elevation: 1,
         centerTitle: true,
         title: Text(
-          "Pinned Messages",
+          'Pinned Messages',
           style: TextStyle(
             color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
             fontSize: 16.0,
@@ -86,77 +86,81 @@ class _PinnedMessagesScreenState extends State<PinnedMessagesScreen> {
   Widget _buildMediaGrid() {
     // final messageSearchBloc = MessageSearchBloc.of(context);
 
-    return StreamBuilder<List<GetMessageResponse>>(builder: (context, snapshot) {
-      if (snapshot.data == null) {
-        return const Center(
-          child: UltraLoadingIndicator(),
-        );
-      }
-
-      if (snapshot.data!.isEmpty) {
-        if (widget.emptyBuilder != null) {
-          return widget.emptyBuilder!(context);
+    return StreamBuilder<List<GetMessageResponse>>(
+      builder: (context, snapshot) {
+        if (snapshot.data == null) {
+          return const Center(
+            child: UltraLoadingIndicator(),
+          );
         }
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              StreamSvgIcon.pin(
-                size: 136.0,
-                color: StreamChatTheme.of(context).colorTheme.disabled,
+
+        if (snapshot.data!.isEmpty) {
+          if (widget.emptyBuilder != null) {
+            return widget.emptyBuilder!(context);
+          }
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StreamSvgIcon.pin(
+                  size: 136.0,
+                  color: StreamChatTheme.of(context).colorTheme.disabled,
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  'No Pinned Messages',
+                  style: TextStyle(
+                    fontSize: 17.0,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ).tr(),
+              ],
+            ),
+          );
+        }
+
+        var data = snapshot.data ?? [];
+
+        return StreamMessageSearchListView(
+          controller: _messageSearchListController,
+          emptyBuilder: (context) => const Text('Nothing to show'),
+          itemBuilder: (context, messageResponses, index, defaultWidget) {
+            var user = data[index].message.user!;
+            var attachments = data[index].message.attachments;
+            var text = data[index].message.text ?? '';
+
+            return ListTile(
+              leading: StreamUserAvatar(
+                user: user,
+                constraints: const BoxConstraints.tightFor(
+                  width: 40.0,
+                  height: 40.0,
+                ),
+                borderRadius: BorderRadius.circular(28),
               ),
-              const SizedBox(height: 16.0),
-              Text(
-                "No Pinned Messages",
+              title: Text(
+                user.name,
                 style: TextStyle(
-                  fontSize: 17.0,
                   color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
                   fontWeight: FontWeight.bold,
                 ),
-              ).tr(),
-            ],
-          ),
-        );
-      }
-
-      var data = snapshot.data ?? [];
-
-      return StreamMessageSearchListView(
-        controller: _messageSearchListController,
-        emptyBuilder: (context) => const Text('Nothing to show'),
-        itemBuilder: (context, messageResponses, index, defaultWidget) {
-          var user = data[index].message.user!;
-          var attachments = data[index].message.attachments;
-          var text = data[index].message.text ?? '';
-
-          return ListTile(
-            leading: StreamUserAvatar(
-              user: user,
-              constraints: const BoxConstraints.tightFor(
-                width: 40.0,
-                height: 40.0,
               ),
-              borderRadius: BorderRadius.circular(28),
-            ),
-            title: Text(
-              user.name,
-              style: TextStyle(
-                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              text != ''
-                  ? text
-                  : (attachments.isNotEmpty
-                      ? '${attachments.length} ${attachments.length > 1 ? "Attachments".tr() : "Attachment".tr()}'
-                      : ''),
-            ),
-            onTap: () {
-              widget.onShowMessage?.call(data[index].message, StreamChannel.of(context).channel);
-            },
-          );
-        },
-      );
-    });
+              subtitle: Text(
+                text != ''
+                    ? text
+                    : (attachments.isNotEmpty
+                        ? '${attachments.length} ${attachments.length > 1 ? "Attachments".tr() : "Attachment".tr()}'
+                        : ''),
+              ),
+              onTap: () {
+                widget.onShowMessage?.call(data[index].message, StreamChannel.of(context).channel);
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   @override

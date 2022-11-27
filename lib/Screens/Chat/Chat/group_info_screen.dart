@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Chat/Channels/channel_file_display_screen.dart';
 import 'package:prive/Screens/Chat/Channels/channel_media_display_screen.dart';
 import 'package:prive/Screens/Chat/Chat/add_members_admins_screen.dart';
 import 'package:prive/Screens/Chat/Chat/admins_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Screens/Chat/Chat/member_permissions_screen.dart';
+import 'package:prive/Screens/Chat/Chat/pinned_messages_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Helpers/Utils.dart';
-import '../../../Models/Chat/group_admin.dart';
-import '../../../Resources/shared_pref.dart';
-import 'pinned_messages_screen.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 
 class GroupInfoScreen extends StatefulWidget {
   final StreamMessageThemeData messageTheme;
@@ -35,10 +36,6 @@ class GroupInfoScreen extends StatefulWidget {
 class _GroupInfoScreenState extends State<GroupInfoScreen> {
   final TextEditingController _nameController = TextEditingController();
 
-  TextEditingController? _searchController;
-  String _userNameQuery = '';
-
-  Timer? _debounce;
   Function? modalSetStateCallback;
   List<User> users = [];
   List<String> usersPhoneNumbers = [];
@@ -47,7 +44,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   final FocusNode _focusNode = FocusNode();
 
   bool listExpanded = false;
-  String userRole = "";
+  String userRole = '';
 
   // Members Permissions
   bool sendMessages = true;
@@ -66,24 +63,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   ValueNotifier<bool?> mutedBool = ValueNotifier(false);
 
-  void _userNameListener() {
-    if (_searchController!.text == _userNameQuery) {
-      return;
-    }
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
-      if (mounted && modalSetStateCallback != null) {
-        modalSetStateCallback!(() {
-          _userNameQuery = _searchController!.text;
-        });
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.channel.name ?? "";
+    _nameController.text = widget.channel.name ?? '';
     mutedBool = ValueNotifier(StreamChannel.of(context).channel.isMuted);
     _getMembersPermissions();
     _getGroupAdmins();
@@ -94,83 +77,85 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     var channel = StreamChannel.of(context);
 
     return StreamBuilder<List<Member>>(
-        stream: channel.channel.state!.membersStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container(
-              color: StreamChatTheme.of(context).colorTheme.disabled,
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          }
-          _getGroupAdmins();
-          _getMembersPermissions();
+      stream: channel.channel.state!.membersStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            color: StreamChatTheme.of(context).colorTheme.disabled,
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        _getGroupAdmins();
+        _getMembersPermissions();
 
-          return Scaffold(
-            backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
-            appBar: AppBar(
-              elevation: 1.0,
-              toolbarHeight: 56.0,
-              backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
-              leading: const StreamBackButton(),
-              title: Column(
-                children: [
-                  StreamBuilder<ChannelState>(
-                      stream: channel.channelStateStream,
-                      builder: (context, state) {
-                        if (!state.hasData) {
-                          return Text(
-                            "Loading",
-                            style: TextStyle(
-                              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                              fontSize: 16,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ).tr();
-                        }
-
-                        return Text(
-                          _getChannelName(
-                            2 * MediaQuery.of(context).size.width / 3,
-                            members: snapshot.data,
-                            extraData: state.data!.channel!.extraData,
-                            maxFontSize: 16.0,
-                          )!,
-                          style: TextStyle(
-                            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        );
-                      }),
-                  const SizedBox(
-                    height: 3.0,
-                  ),
-                  Text(
-                    '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
-                    style: TextStyle(
-                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-                      fontSize: 12.0,
-                    ),
-                  ),
-                ],
-              ),
-              centerTitle: true,
-            ),
-            body: ListView(
+        return Scaffold(
+          backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
+          appBar: AppBar(
+            elevation: 1.0,
+            toolbarHeight: 56.0,
+            backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
+            leading: const StreamBackButton(),
+            title: Column(
               children: [
-                _buildMembers(snapshot.data!),
-                Container(
-                  height: 8.0,
-                  color: StreamChatTheme.of(context).colorTheme.disabled,
+                StreamBuilder<ChannelState>(
+                  stream: channel.channelStateStream,
+                  builder: (context, state) {
+                    if (!state.hasData) {
+                      return Text(
+                        'Loading',
+                        style: TextStyle(
+                          color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ).tr();
+                    }
+
+                    return Text(
+                      _getChannelName(
+                        2 * MediaQuery.of(context).size.width / 3,
+                        members: snapshot.data,
+                        extraData: state.data!.channel!.extraData,
+                        maxFontSize: 16.0,
+                      )!,
+                      style: TextStyle(
+                        color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
                 ),
-                _buildNameTile(),
-                _buildOptionListTiles(),
+                const SizedBox(
+                  height: 3.0,
+                ),
+                Text(
+                  '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
+                  style: TextStyle(
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                    fontSize: 12.0,
+                  ),
+                ),
               ],
             ),
-          );
-        });
+            centerTitle: true,
+          ),
+          body: ListView(
+            children: [
+              _buildMembers(snapshot.data!),
+              Container(
+                height: 8.0,
+                color: StreamChatTheme.of(context).colorTheme.disabled,
+              ),
+              _buildNameTile(),
+              _buildOptionListTiles(),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildMembers(List<Member> members) {
@@ -243,7 +228,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                       return const SizedBox.shrink();
                                     } else {
                                       return Text(
-                                        snapshot.data as String? ?? "",
+                                        snapshot.data as String? ?? '',
                                         style: const TextStyle(
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold,
@@ -259,7 +244,8 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                                 Text(
                                   _getLastSeen(member.user!),
                                   style: TextStyle(
-                                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5)),
+                                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                                  ),
                                 ),
                               ],
                             ),
@@ -268,12 +254,12 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                             padding: const EdgeInsets.only(right: 20),
                             child: Text(
                               member.channelRole == 'owner'
-                                  ? "Owner"
+                                  ? 'Owner'
                                   : member.channelRole == 'admin'
-                                      ? "Admin"
+                                      ? 'Admin'
                                       : groupAdminsIds.contains(member.userId)
-                                          ? "Admin"
-                                          : "Member",
+                                          ? 'Admin'
+                                          : 'Member',
                               style: TextStyle(
                                 color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                               ),
@@ -346,13 +332,13 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     var channel = StreamChannel.of(context);
     return Column(
       children: [
-        if (userRole == "owner" ||
-            (userRole == "admin" && adminSelf?.groupPermissions?.addMembers == true) ||
-            (userRole == "member" && addMembers == true))
+        if (userRole == 'owner' ||
+            (userRole == 'admin' && adminSelf?.groupPermissions?.addMembers == true) ||
+            (userRole == 'member' && addMembers == true))
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Add Members".tr(),
+            title: 'Add Members'.tr(),
             titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -373,45 +359,47 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             },
           ),
         StreamBuilder<bool>(
-            stream: StreamChannel.of(context).channel.isMutedStream,
-            builder: (context, snapshot) {
-              mutedBool.value = snapshot.data;
+          stream: StreamChannel.of(context).channel.isMutedStream,
+          builder: (context, snapshot) {
+            mutedBool.value = snapshot.data;
 
-              return StreamOptionListTile(
-                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-                title: "Mute Group".tr(),
-                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-                leading: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: StreamSvgIcon.mute(
-                    size: 24.0,
-                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-                  ),
+            return StreamOptionListTile(
+              tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+              separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+              title: 'Mute Group'.tr(),
+              titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: StreamSvgIcon.mute(
+                  size: 24.0,
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
-                trailing: snapshot.data == null
-                    ? const CircularProgressIndicator()
-                    : ValueListenableBuilder<bool?>(
-                        valueListenable: mutedBool,
-                        builder: (context, value, _) {
-                          return CupertinoSwitch(
-                            value: value!,
-                            onChanged: (val) {
-                              mutedBool.value = val;
+              ),
+              trailing: snapshot.data == null
+                  ? const CircularProgressIndicator()
+                  : ValueListenableBuilder<bool?>(
+                      valueListenable: mutedBool,
+                      builder: (context, value, _) {
+                        return CupertinoSwitch(
+                          value: value!,
+                          onChanged: (val) {
+                            mutedBool.value = val;
 
-                              if (snapshot.data!) {
-                                channel.channel.unmute();
-                              } else {
-                                channel.channel.mute();
-                              }
-                            },
-                          );
-                        }),
-                onTap: () {},
-              );
-            }),
+                            if (snapshot.data!) {
+                              channel.channel.unmute();
+                            } else {
+                              channel.channel.mute();
+                            }
+                          },
+                        );
+                      },
+                    ),
+              onTap: () {},
+            );
+          },
+        ),
         StreamOptionListTile(
-          title: "Pinned Messages".tr(),
+          title: 'Pinned Messages'.tr(),
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
@@ -482,7 +470,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         StreamOptionListTile(
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: "Photo & Videos".tr(),
+          title: 'Photo & Videos'.tr(),
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -553,7 +541,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         StreamOptionListTile(
           tileColor: StreamChatTheme.of(context).colorTheme.appBg,
           separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: "Files".tr(),
+          title: 'Files'.tr(),
           titleTextStyle: StreamChatTheme.of(context).textTheme.body,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -601,11 +589,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             );
           },
         ),
-        if (userRole == "owner" || userRole == "admin")
+        if (userRole == 'owner' || userRole == 'admin')
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Permissions".tr(),
+            title: 'Permissions'.tr(),
             titleTextStyle: StreamChatTheme.of(context).textTheme.body,
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -628,11 +616,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               ).then((value) => _getMembersPermissions());
             },
           ),
-        if (userRole == "owner" || userRole == "admin")
+        if (userRole == 'owner' || userRole == 'admin')
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Administrators".tr(),
+            title: 'Administrators'.tr(),
             titleTextStyle: StreamChatTheme.of(context).textTheme.body,
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -659,7 +647,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Leave Group".tr(),
+            title: 'Leave Group'.tr(),
             titleTextStyle: StreamChatTheme.of(context).textTheme.body,
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -675,10 +663,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             onTap: () async {
               final res = await showConfirmationBottomSheet(
                 context,
-                title: "Leave Group".tr(),
-                okText: "Leave".tr(),
-                question: "Are You Sure ?".tr(),
-                cancelText: "Cancel".tr(),
+                title: 'Leave Group'.tr(),
+                okText: 'Leave'.tr(),
+                question: 'Are You Sure ?'.tr(),
+                cancelText: 'Cancel'.tr(),
                 icon: Icon(
                   Icons.exit_to_app_rounded,
                   color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
@@ -695,11 +683,11 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               }
             },
           ),
-        if (userRole == "owner")
+        if (userRole == 'owner')
           StreamOptionListTile(
             tileColor: StreamChatTheme.of(context).colorTheme.appBg,
             separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: "Delete Group".tr(),
+            title: 'Delete Group'.tr(),
             titleTextStyle: StreamChatTheme.of(context).textTheme.body,
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -711,10 +699,10 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
             onTap: () async {
               final res = await showConfirmationBottomSheet(
                 context,
-                title: "Delete Group".tr(),
-                okText: "Delete".tr(),
-                question: "Are You Sure ?".tr(),
-                cancelText: "Cancel".tr(),
+                title: 'Delete Group'.tr(),
+                okText: 'Delete'.tr(),
+                question: 'Are You Sure ?'.tr(),
+                cancelText: 'Cancel'.tr(),
                 icon: Icon(
                   Icons.delete_forever,
                   color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
@@ -731,168 +719,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               }
             },
           ),
-      ],
-    );
-  }
-
-  void _buildAddUserModal(context) {
-    var channel = StreamChannel.of(context).channel;
-
-    showDialog(
-      useRootNavigator: false,
-      context: context,
-      barrierColor: StreamChatTheme.of(context).colorTheme.overlay,
-      builder: (context) {
-        return StatefulBuilder(builder: (context, modalSetState) {
-          modalSetStateCallback = modalSetState;
-          return Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
-            child: Material(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                topRight: Radius.circular(16.0),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Scaffold(
-                body: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: _buildTextInputSection(modalSetState),
-                    ),
-                    Expanded(
-                      child: StreamUserListView(
-                        controller: StreamUserListController(
-                          client: StreamChat.of(context).client,
-                          limit: 25,
-                          filter: Filter.and(
-                            [
-                              if (_searchController!.text.isNotEmpty) Filter.autoComplete('name', _userNameQuery),
-                              Filter.notIn(
-                                'id',
-                                [
-                                  StreamChat.of(context).currentUser!.id,
-                                  widget.channel.state!.members
-                                      .map<String?>(
-                                        ((e) => e.userId),
-                                      )
-                                      .whereType<String>(),
-                                ],
-                              ),
-                              Filter.notEqual("role", "admin"),
-                            ],
-                          ),
-                          sort: const [
-                            SortOption(
-                              'name',
-                              direction: 1,
-                            ),
-                          ],
-                        ),
-                        onUserTap: (user) async {
-                          _searchController!.clear();
-
-                          await channel.addMembers([user.id]);
-                          if (mounted) {
-                            Navigator.pop(context);
-                          }
-                          setState(() {});
-                        },
-                        emptyBuilder: (_) {
-                          return LayoutBuilder(
-                            builder: (context, viewportConstraints) {
-                              return SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: viewportConstraints.maxHeight,
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(24),
-                                          child: StreamSvgIcon.search(
-                                            size: 96,
-                                            color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-                                          ),
-                                        ),
-                                        const Text("No User Match this keyword").tr(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-      },
-    );
-  }
-
-  Widget _buildTextInputSection(modalSetState) {
-    final theme = StreamChatTheme.of(context);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 36,
-                child: TextField(
-                  controller: _searchController,
-                  cursorColor: theme.colorTheme.textHighEmphasis,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: "Search".tr(),
-                    hintStyle: theme.textTheme.body.copyWith(
-                      color: theme.colorTheme.textLowEmphasis,
-                    ),
-                    prefixIconConstraints: BoxConstraints.tight(const Size(40, 24)),
-                    prefixIcon: StreamSvgIcon.search(
-                      color: theme.colorTheme.textHighEmphasis,
-                      size: 24,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24.0),
-                      borderSide: BorderSide(
-                        color: theme.colorTheme.borders,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24.0),
-                        borderSide: BorderSide(
-                          color: theme.colorTheme.borders,
-                        )),
-                    contentPadding: const EdgeInsets.all(0),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16.0),
-            IconButton(
-              icon: StreamSvgIcon.closeSmall(
-                color: theme.colorTheme.textLowEmphasis,
-              ),
-              constraints: const BoxConstraints.tightFor(
-                height: 24,
-                width: 24,
-              ),
-              padding: EdgeInsets.zero,
-              splashRadius: 24,
-              onPressed: () => Navigator.pop(context),
-            )
-          ],
-        ),
       ],
     );
   }
@@ -990,16 +816,19 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                         color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                         size: 24.0,
                       ),
-                      "Message".tr(),
+                      'Message'.tr(),
                       () async {
                         var client = StreamChat.of(context).client;
 
-                        var c = client.channel('messaging', extraData: {
-                          'members': [
-                            user.id,
-                            StreamChat.of(context).currentUser!.id,
-                          ],
-                        });
+                        var c = client.channel(
+                          'messaging',
+                          extraData: {
+                            'members': [
+                              user.id,
+                              StreamChat.of(context).currentUser!.id,
+                            ],
+                          },
+                        );
 
                         await c.watch();
 
@@ -1034,39 +863,42 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                       (adminSelf?.groupPermissions?.deleteMembers == true &&
                           StreamChat.of(context).currentUser!.id != user.id))
                     _buildModalListTile(
-                        context,
-                        StreamSvgIcon.userRemove(
-                          color: StreamChatTheme.of(context).colorTheme.accentError,
-                          size: 24.0,
-                        ),
-                        "Remove From Group".tr(), () async {
-                      final res = await showConfirmationBottomSheet(
-                        context,
-                        title: "Remove Member".tr(),
-                        okText: "Remove".tr(),
-                        question: "Are You Sure ?".tr(),
-                        cancelText: "Cancel".tr(),
-                      );
-
-                      if (res == true) {
-                        await channel.removeMembers(
-                          [user.id],
-                          message: Message(
-                            text: "${context.currentUser?.name} Removed ${user.name}",
-                          ),
+                      context,
+                      StreamSvgIcon.userRemove(
+                        color: StreamChatTheme.of(context).colorTheme.accentError,
+                        size: 24.0,
+                      ),
+                      'Remove From Group'.tr(),
+                      () async {
+                        final res = await showConfirmationBottomSheet(
+                          context,
+                          title: 'Remove Member'.tr(),
+                          okText: 'Remove'.tr(),
+                          question: 'Are You Sure ?'.tr(),
+                          cancelText: 'Cancel'.tr(),
                         );
-                      }
-                      if (mounted) {
-                        Navigator.pop(context);
-                      }
-                    }, color: StreamChatTheme.of(context).colorTheme.accentError),
+
+                        if (res == true) {
+                          await channel.removeMembers(
+                            [user.id],
+                            message: Message(
+                              text: '${context.currentUser?.name} Removed ${user.name}',
+                            ),
+                          );
+                        }
+                        if (mounted) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      color: StreamChatTheme.of(context).colorTheme.accentError,
+                    ),
                   _buildModalListTile(
                       context,
                       StreamSvgIcon.closeSmall(
                         color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
                         size: 24.0,
                       ),
-                      "Cancel".tr(), () {
+                      'Cancel'.tr(), () {
                     Navigator.pop(context);
                   }),
                 ],
@@ -1092,7 +924,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
     if (otherMember != null) {
       if (otherMember.online) {
         alternativeWidget = Text(
-          "Online".tr(),
+          'Online'.tr(),
           style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5)),
         );
       } else {
@@ -1146,27 +978,29 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   Future<String?> _getUserName(User user) async {
     await _getContacts();
-    if (usersPhoneNumbers.contains(user.extraData["phone"] as String?)) {
+    if (usersPhoneNumbers.contains(user.extraData['phone'] as String?)) {
       userInContacts = true;
       return user.name;
     } else {
       userInContacts = false;
-      return user.extraData["phone"] as String? ?? "";
+      return user.extraData['phone'] as String? ?? '';
     }
   }
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       usersPhoneNumbers = users
@@ -1205,7 +1039,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
         title =
             '${currentMembers.map((e) => e.user!.name).join(', ')} ${exceedingMembers > 0 ? '+ $exceedingMembers' : ''}';
       } else {
-        title = "No Title".tr();
+        title = 'No Title'.tr();
       }
     } else {
       title = extraData['name'];
@@ -1215,7 +1049,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   String _getLastSeen(User user) {
     if (user.online) {
-      return "Online".tr();
+      return 'Online'.tr();
     } else {
       return '${"Last Seen".tr()} ${Jiffy(user.lastActive).fromNow()}';
     }
@@ -1223,7 +1057,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   Widget _buildNameTile() {
     if (!_focusNode.hasFocus) {
-      _nameController.text = widget.channel.name ?? "";
+      _nameController.text = widget.channel.name ?? '';
     }
 
     return Material(
@@ -1250,7 +1084,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   setState(() {});
                 },
                 decoration: InputDecoration.collapsed(
-                  hintText: "Add A Group Name",
+                  hintText: 'Add A Group Name',
                   hintStyle: StreamChatTheme.of(context).textTheme.bodyBold.copyWith(
                         color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                       ),
@@ -1269,7 +1103,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     child: StreamSvgIcon.closeSmall(),
                     onTap: () {
                       setState(() {
-                        _nameController.text = widget.channel.name ?? "";
+                        _nameController.text = widget.channel.name ?? '';
                         _focusNode.unfocus();
                       });
                     },
@@ -1282,9 +1116,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                         size: 24.0,
                       ),
                       onTap: () {
-                        widget.channel.updatePartial(set: {"name": _nameController.text.trim()}).then((value) {
+                        widget.channel.updatePartial(set: {'name': _nameController.text.trim()}).then((value) {
                           setState(() {
-                            _nameController.text = widget.channel.name ?? "";
+                            _nameController.text = widget.channel.name ?? '';
                             _focusNode.unfocus();
                           });
                         });
@@ -1318,7 +1152,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
               (admin) => admin.id == context.currentUser?.id,
             )
             ?.groupRole ??
-        "member";
+        'member';
   }
 
   void _getMembersPermissions() {

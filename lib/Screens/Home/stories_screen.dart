@@ -1,34 +1,34 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:collection/collection.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dashed_circle/dashed_circle.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:prive/Helpers/Utils.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Stories/stories.dart';
 import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Stories/my_stories_screen.dart';
 import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
 import 'package:prive/Screens/Stories/text_story_editor_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import "package:collection/collection.dart";
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:transition_plus/transition_plus.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../Helpers/Utils.dart';
-import '../../Models/Stories/stories.dart';
 import 'package:timeago/timeago.dart' as time_ago;
-import 'dart:io';
-import '../../UltraNetwork/ultra_loading_indicator.dart';
+import 'package:transition_plus/transition_plus.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -49,7 +49,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
   List<String> phoneNumbers = [];
   List<User> users = [];
   List<String> usersPhoneNumbers = [];
-  late File capturedImage = File("");
+  late File capturedImage = File('');
   final imagePicker = ImagePicker();
   List<String> myThumbnails = [];
   List<List<String>> usersThumbnails = [];
@@ -58,11 +58,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
   void initState() {
     time_ago.setLocaleMessages('en', time_ago.EnMessages());
     BotToast.showAnimationWidget(
-        toastBuilder: (context) {
-          return const IgnorePointer(child: UltraLoadingIndicator());
-        },
-        animationDuration: const Duration(milliseconds: 0),
-        groupKey: "loading");
+      toastBuilder: (context) {
+        return const IgnorePointer(child: UltraLoadingIndicator());
+      },
+      animationDuration: const Duration(milliseconds: 0),
+      groupKey: 'loading',
+    );
     _getContacts();
     super.initState();
   }
@@ -103,7 +104,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          "Stories",
+                          'Stories',
                           style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w600,
@@ -132,7 +133,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                   setState(() {});
                 });
               } else {
-                Utils.showImagePickerSelector(context, getImage, title: "Choose Story Type".tr(), withVideo: true);
+                Utils.showImagePickerSelector(context, getImage, title: 'Choose Story Type'.tr(), withVideo: true);
               }
             },
             child: Padding(
@@ -163,15 +164,15 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
                                   child: myStories.isNotEmpty
-                                      ? myStories.lastOrNull?.type == "Photos"
+                                      ? myStories.lastOrNull?.type == 'Photos'
                                           ? CachedImage(
-                                              url: myStories.lastOrNull?.content ?? "",
+                                              url: myStories.lastOrNull?.content ?? '',
                                             )
                                           : VideoThumbViewer(
-                                              videoUrl: myStories.lastOrNull?.content ?? "",
+                                              videoUrl: myStories.lastOrNull?.content ?? '',
                                             )
                                       : CachedImage(
-                                          url: context.currentUserImage ?? "",
+                                          url: context.currentUserImage ?? '',
                                         ),
                                 ),
                               ),
@@ -200,7 +201,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "My Story",
+                          'My Story',
                           style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -211,9 +212,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         ),
                         Text(
                           myStories.isEmpty
-                              ? "Add to my story".tr()
+                              ? 'Add to my story'.tr()
                               : time_ago.format(
-                                  DateFormat("yyyy-MM-dd HH:mm:ss", "en")
+                                  DateFormat('yyyy-MM-dd HH:mm:ss', 'en')
                                       .parse(myStories.last.createdAtStory ?? DateTime.now().toString(), true)
                                       .toLocal(),
                                 ),
@@ -230,8 +231,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
-                        Utils.showImagePickerSelector(context, getImage,
-                            title: "Choose Story Type".tr(), withVideo: true);
+                        Utils.showImagePickerSelector(
+                          context,
+                          getImage,
+                          title: 'Choose Story Type'.tr(),
+                          withVideo: true,
+                        );
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -266,7 +271,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                             stories.clear();
                             usersStories.clear();
                             myStories.clear();
-                            _getStories(usersPhoneNumbers.join(","));
+                            _getStories(usersPhoneNumbers.join(','));
                           });
                         },
                         child: Container(
@@ -294,7 +299,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 10, bottom: 20),
               child: Text(
-                "Recent Updates",
+                'Recent Updates',
                 style: TextStyle(fontSize: 18, color: Colors.grey.shade700),
               ).tr(),
             ),
@@ -317,19 +322,19 @@ class _StoriesScreenState extends State<StoriesScreen> {
                         for (var stories in usersStories) {
                           List<StoryItem> storesStories = [];
                           for (var story in stories) {
-                            if (story.type == "Photos") {
+                            if (story.type == 'Photos') {
                               storesStories.add(
                                 StoryItem.pageImage(
-                                  url: story.content ?? "",
+                                  url: story.content ?? '',
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   duration: const Duration(seconds: 10),
                                 ),
                               );
-                            } else if (story.type == "Videos") {
+                            } else if (story.type == 'Videos') {
                               storesStories.add(
                                 StoryItem.pageVideo(
-                                  story.content ?? "",
+                                  story.content ?? '',
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   duration: const Duration(seconds: 30),
@@ -379,12 +384,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                         height: 70,
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(60),
-                                          child: usersStories[index].firstOrNull?.type == "Photos"
+                                          child: usersStories[index].firstOrNull?.type == 'Photos'
                                               ? CachedImage(
-                                                  url: usersStories[index].firstOrNull?.content ?? "",
+                                                  url: usersStories[index].firstOrNull?.content ?? '',
                                                 )
                                               : VideoThumbViewer(
-                                                  videoUrl: usersStories[index].firstOrNull?.content ?? "",
+                                                  videoUrl: usersStories[index].firstOrNull?.content ?? '',
                                                 ),
                                         ),
                                       ),
@@ -409,10 +414,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                       ),
                                       Text(
                                         time_ago.format(
-                                          DateFormat("yyyy-MM-dd HH:mm:ss", "en")
+                                          DateFormat('yyyy-MM-dd HH:mm:ss', 'en')
                                               .parse(
-                                                  usersStories[index].last.createdAtStory ?? DateTime.now().toString(),
-                                                  true)
+                                                usersStories[index].last.createdAtStory ?? DateTime.now().toString(),
+                                                true,
+                                              )
                                               .toLocal(),
                                         ),
                                         style: TextStyle(
@@ -449,16 +455,18 @@ class _StoriesScreenState extends State<StoriesScreen> {
 
   _getContacts() async {
     String? myContacts = await Utils.getString(SharedPref.myContacts);
-    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       phoneContacts = users.isNotEmpty ? [Contact()] : [];
@@ -468,12 +476,13 @@ class _StoriesScreenState extends State<StoriesScreen> {
           )
           .toList();
       usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
-      _getStories(usersPhoneNumbers.join(","));
+      _getStories(usersPhoneNumbers.join(','));
       setState(() {});
     } else {
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         // TODO: Handle Permission Denied
       } else {
+        if (!mounted) return;
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
         phoneContacts = contacts[1];
@@ -483,7 +492,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
             )
             .toList();
         usersPhoneNumbers.add(context.currentUser?.extraData['phone'] as String);
-        _getStories(usersPhoneNumbers.join(","));
+        _getStories(usersPhoneNumbers.join(','));
         setState(() {});
       }
     }
@@ -497,11 +506,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
       showLoadingIndicator: false,
       showError: false,
       formData: FormData.fromMap(
-        {"Contats": phoneNumbers},
+        {'Contats': phoneNumbers},
       ),
       cancelToken: cancelToken,
     ).then((value) {
-      BotToast.removeAll("loading");
+      BotToast.removeAll('loading');
       if (value != null) {
         Stories storiesResponse = value;
         if (storiesResponse.success == true) {
@@ -545,11 +554,11 @@ class _StoriesScreenState extends State<StoriesScreen> {
       addStory,
       showError: false,
       formData: FormData.fromMap({
-        "UserID": context.currentUser?.id,
-        "Type": isVideo ? "Videos" : "Photos",
-        "Content": await MultipartFile.fromFile(
+        'UserID': context.currentUser?.id,
+        'Type': isVideo ? 'Videos' : 'Photos',
+        'Content': await MultipartFile.fromFile(
           capturedImage.path,
-          filename: "mp4",
+          filename: 'mp4',
         ),
       }),
       cancelToken: cancelToken,
@@ -557,7 +566,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
       stories.clear();
       usersStories.clear();
       myStories.clear();
-      _getStories(usersPhoneNumbers.join(","));
+      _getStories(usersPhoneNumbers.join(','));
     });
   }
 }
