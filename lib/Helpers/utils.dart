@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:math';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,33 +14,41 @@ import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Providers/call_provider.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/call_overlay_widget.dart';
 import 'package:prive/Widgets/AppWidgets/empty_state_widget.dart';
+import 'package:prive/Widgets/Common/alert_widget.dart';
+import 'package:prive/main.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:prive/Helpers/stream_manager.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart';
-import '../Providers/call_provider.dart';
-import '../UltraNetwork/ultra_network.dart';
-import '../Widgets/Common/alert_widget.dart';
-import '../main.dart';
 
 class Utils {
   static final player = AudioPlayer();
 
-  static Future<void> showImagePickerSelector(BuildContext context, Function getImage,
-      {String title = "Pick an Image", bool withVideo = false}) async {
+  static Future<void> showImagePickerSelector(
+    BuildContext context,
+    Function getImage, {
+    String title = 'Pick an Image',
+    bool withVideo = false,
+  }) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)), side: BorderSide(color: Colors.white, width: 1.0)),
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            side: BorderSide(color: Colors.white, width: 1.0),
+          ),
           title: Center(
             child: Text(
               title.tr(),
@@ -69,7 +78,7 @@ class Utils {
                         width: 10,
                       ),
                       Text(
-                        "Gallery".tr(),
+                        'Gallery'.tr(),
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -104,7 +113,7 @@ class Utils {
                           width: 10,
                         ),
                         Text(
-                          "Gallery Video".tr(),
+                          'Gallery Video'.tr(),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
@@ -136,7 +145,7 @@ class Utils {
                         width: 10,
                       ),
                       Text(
-                        "Camera".tr(),
+                        'Camera'.tr(),
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -171,7 +180,7 @@ class Utils {
                           width: 10,
                         ),
                         Text(
-                          "Video".tr(),
+                          'Video'.tr(),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
@@ -192,7 +201,7 @@ class Utils {
                     Navigator.of(context).pop();
                   },
                   child: Text(
-                    "Cancel".tr(),
+                    'Cancel'.tr(),
                     style: const TextStyle(
                       fontSize: 17,
                       color: Colors.black,
@@ -210,77 +219,80 @@ class Utils {
 
   static Future<dynamic> showMainMenu(BuildContext context) {
     Map<String, String> mainMenuItems = {
-      R.images.addContactImage: "Add Contact".tr(),
-      R.images.loadContactsListImage: "Load Contact List".tr(),
+      Images.addContactImage: 'Add Contact'.tr(),
+      Images.loadContactsListImage: 'Load Contact List'.tr(),
       // R.images.newChannelImage: "New Channel".tr(),
-      R.images.newGroupImage: "New Group".tr(),
-      R.images.newCatalogImage: "New Catalog".tr(),
+      Images.newGroupImage: 'New Group'.tr(),
+      Images.newCatalogImage: 'New Catalog'.tr(),
     };
     return showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+        borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+      ),
       context: context,
-      builder: (context) => StatefulBuilder(builder: (BuildContext context, setState) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 30),
-          child: MediaQuery.removePadding(
-            context: context,
-            removeBottom: true,
-            removeTop: true,
-            child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                //childAspectRatio: 2.5 / 2,
-                childAspectRatio: 2 / 2,
-              ),
-              itemBuilder: (context, index) {
-                return InkWell(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
-                    Navigator.pop(context);
-                    switch (index) {
-                      case 0:
-                        Navigator.pushNamed(context, R.routes.addContactScreen);
-                        break;
-                      case 1:
-                        Navigator.pushNamed(context, R.routes.contactsRoute);
-                        break;
-                      // case 2:
-                      //   break;
-                      case 2:
-                        Navigator.pushNamed(context, R.routes.newGroupScreen);
-                        break;
-                      case 3:
-                        Navigator.pushNamed(context, R.routes.catalogScreen);
-                        break;
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          mainMenuItems.keys.toList()[index],
-                          width: 80,
-                        ),
-                        const SizedBox(height: 11),
-                        Text(
-                          mainMenuItems[mainMenuItems.keys.toList()[index]] ?? "",
-                          style: const TextStyle(color: Color(0xff7a8fa6), fontSize: 15),
-                        )
-                      ],
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, setState) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 30),
+            child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: true,
+              removeTop: true,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  //childAspectRatio: 2.5 / 2,
+                  childAspectRatio: 2 / 2,
+                ),
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      Navigator.pop(context);
+                      switch (index) {
+                        case 0:
+                          Navigator.pushNamed(context, Routes.addContactScreen);
+                          break;
+                        case 1:
+                          Navigator.pushNamed(context, Routes.contactsRoute);
+                          break;
+                        // case 2:
+                        //   break;
+                        case 2:
+                          Navigator.pushNamed(context, Routes.newGroupScreen);
+                          break;
+                        case 3:
+                          Navigator.pushNamed(context, Routes.catalogScreen);
+                          break;
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            mainMenuItems.keys.toList()[index],
+                            width: 80,
+                          ),
+                          const SizedBox(height: 11),
+                          Text(
+                            mainMenuItems[mainMenuItems.keys.toList()[index]] ?? '',
+                            style: const TextStyle(color: Color(0xff7a8fa6), fontSize: 15),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
-              itemCount: mainMenuItems.length,
+                  );
+                },
+                itemCount: mainMenuItems.length,
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
@@ -297,9 +309,9 @@ class Utils {
       showError: false,
       formData: FormData.fromMap(
         {
-          "SenderID": senderId,
-          "ReceiverID": receiverID,
-          "CallType": isVideo ? "Video" : "Voice",
+          'SenderID': senderId,
+          'ReceiverID': receiverID,
+          'CallType': isVideo ? 'Video' : 'Voice',
         },
       ),
       cancelToken: CancelToken(),
@@ -319,9 +331,9 @@ class Utils {
       showError: false,
       formData: FormData.fromMap(
         {
-          "ReceiverID": receiverID,
-          "CallStatues": callStatus,
-          "Duration": duration,
+          'ReceiverID': receiverID,
+          'CallStatues': callStatus,
+          'Duration': duration,
         },
       ),
       cancelToken: CancelToken(),
@@ -335,8 +347,8 @@ class Utils {
 
   static bool isValidEmail(String email) {
     return RegExp(
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-        .hasMatch(email);
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
+    ).hasMatch(email);
   }
 
   static void saveString(String key, String value) async {
@@ -361,6 +373,7 @@ class Utils {
 
   static void checkForInternetConnection(BuildContext context) async {
     if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+      if (!context.mounted) return;
       Utils.showNoInternetConnection(context);
     }
   }
@@ -371,21 +384,23 @@ class Utils {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                side: BorderSide(color: Colors.white, width: 1.0)),
-            content: EmptyStateWidget(
-              image: R.images.noInternetImage,
-              title: "No Internet Connection".tr(),
-              description: "Please check your connection or try again".tr(),
-              onButtonPressed: () {
-                Utils.saveBool(R.pref.internetAlert, false);
-                Navigator.pop(context);
-              },
-              buttonText: "Try Again".tr(),
-            ));
+          elevation: 0,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            side: BorderSide(color: Colors.white, width: 1.0),
+          ),
+          content: EmptyStateWidget(
+            image: Images.noInternetImage,
+            title: 'No Internet Connection'.tr(),
+            description: 'Please check your connection or try again'.tr(),
+            onButtonPressed: () {
+              Utils.saveBool(SharedPref.internetAlert, false);
+              Navigator.pop(context);
+            },
+            buttonText: 'Try Again'.tr(),
+          ),
+        );
       },
     );
   }
@@ -401,7 +416,7 @@ class Utils {
     if (messageDateFormatted == today) {
       return DateFormat('hh:mm a').format(messageDate);
     } else if (messageDateFormatted == yesterday) {
-      return "Yesterday".tr();
+      return 'Yesterday'.tr();
     } else {
       DateTime firstDayOfTheCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
       if (messageDate.isBefore(firstDayOfTheCurrentWeek)) {
@@ -413,7 +428,7 @@ class Utils {
   }
 
   static String getLastSeenDate(DateTime data, BuildContext context) {
-    String lastSeen = "last seen ".tr();
+    String lastSeen = 'last seen '.tr();
     final now = DateTime.now();
     DateTime lastSeenDate = data.toLocal();
     final today = DateTime(now.year, now.month, now.day);
@@ -447,23 +462,23 @@ class Utils {
     for (var contact in phoneContacts) {
       for (var phone in contact.phones) {
         try {
-          PhoneNumber.fromRaw(phone.number.trim().replaceAll(" ", ""));
-          if (phone.number.trim().replaceAll(" ", "").startsWith("011") ||
-              phone.number.trim().replaceAll(" ", "").startsWith("010") ||
-              phone.number.trim().replaceAll(" ", "").startsWith("012")) {
-            String dialCode = deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
-            if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+          PhoneNumber.fromRaw(phone.number.trim().replaceAll(' ', ''));
+          if (phone.number.trim().replaceAll(' ', '').startsWith('011') ||
+              phone.number.trim().replaceAll(' ', '').startsWith('010') ||
+              phone.number.trim().replaceAll(' ', '').startsWith('012')) {
+            String dialCode = deviceDialCode.dialCode == '+20' ? '+2' : deviceDialCode.dialCode;
+            if (phone.number.trim().replaceAll(' ', '').startsWith("05")) {
               phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
             } else {
               phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
             }
           } else {
-            phoneNumbers.add(phone.number.trim().replaceAll(" ", ""));
+            phoneNumbers.add(phone.number.trim().replaceAll(' ', ''));
           }
         } catch (e) {
-          String dialCode = deviceDialCode.dialCode == "+20" ? "+2" : deviceDialCode.dialCode;
+          String dialCode = deviceDialCode.dialCode == '+20' ? '+2' : deviceDialCode.dialCode;
 
-          if (phone.number.trim().replaceAll(" ", "").startsWith("05")) {
+          if (phone.number.trim().replaceAll(' ', '').startsWith('05')) {
             phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "").substring(1)}");
           } else {
             phoneNumbers.add("$dialCode${phone.number.trim().replaceAll(" ", "")}");
@@ -478,9 +493,9 @@ class Utils {
     for (var phoneNumbers in dividedPhoneNumbers) {
       QueryUsersResponse usersResponse = await StreamChatCore.of(context).client.queryUsers(
         filter: Filter.and([
-          Filter.notEqual("id", context.currentUser!.id),
-          Filter.notEqual("role", "admin"),
-          Filter.in_("phone", phoneNumbers)
+          Filter.notEqual('id', context.currentUser!.id),
+          Filter.notEqual('role', 'admin'),
+          Filter.in_('phone', phoneNumbers)
         ]),
         sort: const [
           SortOption(
@@ -501,25 +516,25 @@ class Utils {
     String? deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
     CountryDialCode? deviceDialCode;
     try {
-      deviceCountryCode = (await FlutterSimCountryCode.simCountryCode ?? "").toUpperCase();
+      deviceCountryCode = (await FlutterSimCountryCode.simCountryCode ?? '').toUpperCase();
       if (deviceCountryCode.isEmpty == true) {
         deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
       }
-      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? 'US');
     } catch (e) {
       deviceCountryCode = WidgetsBinding.instance.window.locale.countryCode;
-      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? "US");
+      deviceDialCode = CountryDialCode.fromCountryCode(deviceCountryCode ?? 'US');
     }
     return deviceDialCode;
   }
 
   static Future<void> showAlert(
     BuildContext context, {
-    String alertImage = "",
-    String alertTitle = "Prive",
-    String message = "",
-    String okButtonText = "Ok",
-    String cancelButtonText = "Cancel",
+    String alertImage = '',
+    String alertTitle = 'Prive',
+    String message = '',
+    String okButtonText = 'Ok',
+    String cancelButtonText = 'Cancel',
     Function? onOkButtonPressed,
     Function? onCancelButtonPressed,
     bool withCancel = false,
@@ -532,10 +547,11 @@ class Utils {
           contentPadding: EdgeInsets.zero,
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              side: BorderSide(color: Colors.transparent, width: 1.0)),
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            side: BorderSide(color: Colors.transparent, width: 1.0),
+          ),
           content: AlertWidget(
-            image: alertImage.isEmpty ? R.images.alertInfoImage : alertImage,
+            image: alertImage.isEmpty ? Images.alertInfoImage : alertImage,
             title: alertTitle.tr(),
             description: message.tr(),
             okButtonText: okButtonText.tr(),
@@ -561,17 +577,18 @@ class Utils {
           return SingleChildScrollView(
             child: Container(
               decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  color: Colors.white),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                color: Colors.white,
+              ),
               child: Wrap(
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
                     child: Text(
-                      "Open Via".tr(),
+                      'Open Via'.tr(),
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -579,11 +596,11 @@ class Utils {
                     onTap: () {
                       priveChosen();
                     },
-                    title: const Text("Prive"),
+                    title: const Text('Prive'),
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.asset(
-                        R.images.logoImage,
+                        Images.logoImage,
                         width: 40,
                         height: 40,
                         fit: BoxFit.contain,
@@ -592,7 +609,7 @@ class Utils {
                   ),
                   for (var map in availableMaps)
                     ListTile(
-                      onTap: () => map.showMarker(coords: cords, title: ""),
+                      onTap: () => map.showMarker(coords: cords, title: ''),
                       title: Text(map.mapName),
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
@@ -620,11 +637,11 @@ class Utils {
   static void showCallOverlay({
     bool isGroup = false,
     bool isVideo = false,
-    String callId = "",
+    String callId = '',
     RtcEngine? agoraEngine,
     required Channel channel,
   }) {
-    BotToast.removeAll("call_overlay");
+    BotToast.removeAll('call_overlay');
     Future.delayed(const Duration(milliseconds: 10), () {
       Provider.of<CallProvider>(navigatorKey.currentContext!, listen: false).changeOverlayState(true);
     });
@@ -638,7 +655,7 @@ class Utils {
           channel: channel,
         );
       },
-      groupKey: "call_overlay",
+      groupKey: 'call_overlay',
     );
   }
 

@@ -13,7 +13,7 @@ class VideoThumbViewer extends StatefulWidget {
 }
 
 class _VideoThumbViewerState extends State<VideoThumbViewer> {
-  File videoThumbnail = File("");
+  File videoThumbnail = File('');
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _VideoThumbViewerState extends State<VideoThumbViewer> {
       thumbnailPath: (await getTemporaryDirectory()).path,
       quality: 50,
     ).then((value) {
-      videoThumbnail = File(value ?? "");
+      videoThumbnail = File(value ?? '');
       setState(() {});
     });
   }

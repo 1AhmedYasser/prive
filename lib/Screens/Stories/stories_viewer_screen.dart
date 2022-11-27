@@ -9,10 +9,10 @@ import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:story_view/story_view.dart';
 import 'dart:ui' as ui;
-import '../../Models/Stories/stories.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/AppWidgets/Stories/viewers_modal_view.dart';
-import '../../Widgets/Common/cached_image.dart';
+import 'package:prive/Models/Stories/stories.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/AppWidgets/Stories/viewers_modal_view.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import "package:collection/collection.dart";
 import 'package:prive/Helpers/stream_manager.dart';
 
@@ -85,19 +85,15 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                     inline: true,
                     onStoryShow: (story) {
                       WidgetsBinding.instance.addPostFrameCallback(
-                        (_) =>
-                            Provider.of<StoriesProvider>(context, listen: false)
-                                .setCurrentShownIndex(
+                        (_) => Provider.of<StoriesProvider>(context, listen: false).setCurrentShownIndex(
                           widget.passedStories[index].indexOf(story),
                         ),
                       );
                       if (widget.showViewers == false) {
-                        int storyIndex =
-                            widget.passedStories[index].indexOf(story);
+                        int storyIndex = widget.passedStories[index].indexOf(story);
                         if (storyIndex != -1) {
                           _viewStory(
-                            widget.usersStories[index][storyIndex].stotyID ??
-                                "0",
+                            widget.usersStories[index][storyIndex].stotyID ?? '0',
                           );
                         }
                       }
@@ -134,9 +130,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(30),
                               child: CachedImage(
-                                url: widget.usersStories[index].firstOrNull
-                                        ?.userPhoto ??
-                                    "",
+                                url: widget.usersStories[index].firstOrNull?.userPhoto ?? '',
                               ),
                             ),
                           ),
@@ -162,11 +156,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                           return InkWell(
                             onTap: () {
                               if (provider.currentShowIndex != -1) {
-                                if (widget
-                                        .usersStories[index]
-                                            [provider.currentShowIndex]
-                                        .views !=
-                                    "0") {
+                                if (widget.usersStories[index][provider.currentShowIndex].views != '0') {
                                   widget.storyController?.pause();
                                   showModalBottomSheet(
                                     shape: RoundedRectangleBorder(
@@ -176,8 +166,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                                     isDismissible: true,
                                     backgroundColor: Colors.grey.shade300,
                                     context: context,
-                                    builder: (context) =>
-                                        DraggableScrollableSheet(
+                                    builder: (context) => DraggableScrollableSheet(
                                       expand: false,
                                       initialChildSize: 0.25,
                                       minChildSize: 0.2,
@@ -186,12 +175,8 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                                         return SingleChildScrollView(
                                           controller: scrollController,
                                           child: ViewersModalView(
-                                            viewUsers: widget
-                                                    .usersStories[index][
-                                                        provider
-                                                            .currentShowIndex]
-                                                    .viewUsers ??
-                                                [],
+                                            viewUsers:
+                                                widget.usersStories[index][provider.currentShowIndex].viewUsers ?? [],
                                           ),
                                         );
                                       },
@@ -224,8 +209,8 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                                     const SizedBox(width: 7),
                                     Text(
                                       provider.currentShowIndex != -1
-                                          ? "${widget.usersStories[index][provider.currentShowIndex].views}"
-                                          : "0",
+                                          ? '${widget.usersStories[index][provider.currentShowIndex].views}'
+                                          : '0',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 15,
@@ -290,13 +275,13 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(30),
                                   child: const CachedImage(
-                                    url: "",
+                                    url: '',
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               const Text(
-                                "",
+                                '',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
@@ -322,8 +307,8 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
       showLoadingIndicator: false,
       formData: FormData.fromMap(
         {
-          "UserID": context.currentUser?.id,
-          "StoryID": storyId,
+          'UserID': context.currentUser?.id,
+          'StoryID': storyId,
         },
       ),
       cancelToken: cancelToken,
@@ -333,7 +318,7 @@ class _StoriesViewerScreenState extends State<StoriesViewerScreen> {
   @override
   void dispose() {
     widget.storyController?.dispose();
-    BotToast.removeAll("loading");
+    BotToast.removeAll('loading');
     super.dispose();
   }
 }

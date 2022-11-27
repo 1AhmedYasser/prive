@@ -7,14 +7,15 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:collection/collection.dart';
 import '../../Models/Call/call_logs.dart';
+import '../../Resources/animations.dart';
 
 class CallsScreen extends StatefulWidget {
   const CallsScreen({Key? key}) : super(key: key);
@@ -23,8 +24,7 @@ class CallsScreen extends StatefulWidget {
   State<CallsScreen> createState() => _CallsScreenState();
 }
 
-class _CallsScreenState extends State<CallsScreen>
-    with TickerProviderStateMixin {
+class _CallsScreenState extends State<CallsScreen> with TickerProviderStateMixin {
   late final AnimationController _animationController;
   int currentTab = 0;
   bool isEditing = false;
@@ -209,15 +209,14 @@ class _CallsScreenState extends State<CallsScreen>
                                     trailingActions: [
                                       SwipeAction(
                                         content: Image.asset(
-                                          R.images.deleteChatImage,
+                                          Images.deleteChatImage,
                                           width: 15,
                                           color: Colors.red,
                                         ),
                                         color: Colors.transparent,
                                         onTap: (handler) async {
                                           await handler(true);
-                                          _deleteOneCall(
-                                              callLogs[index].cALLID ?? "");
+                                          _deleteOneCall(callLogs[index].cALLID ?? "");
                                           setState(() {
                                             callLogs.removeAt(index);
                                           });
@@ -238,11 +237,8 @@ class _CallsScreenState extends State<CallsScreen>
                                                 padding: EdgeInsets.zero,
                                                 minSize: 0,
                                                 child: Icon(
-                                                  CupertinoIcons
-                                                      .minus_circle_fill,
-                                                  color: CupertinoColors
-                                                      .systemRed
-                                                      .resolveFrom(context),
+                                                  CupertinoIcons.minus_circle_fill,
+                                                  color: CupertinoColors.systemRed.resolveFrom(context),
                                                 ),
                                                 onPressed: () {
                                                   controller.openCellAt(
@@ -263,36 +259,21 @@ class _CallsScreenState extends State<CallsScreen>
                                                 height: 50,
                                                 width: 50,
                                                 child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(30),
+                                                  borderRadius: BorderRadius.circular(30),
                                                   child: CachedImage(
-                                                    url: callLogs[index]
-                                                                .senderID ==
-                                                            context
-                                                                .currentUser?.id
-                                                        ? callLogs[index]
-                                                                .receiver
-                                                                ?.firstOrNull
-                                                                ?.userPhoto ??
-                                                            ""
-                                                        : callLogs[index]
-                                                                .sender
-                                                                ?.firstOrNull
-                                                                ?.userPhoto ??
-                                                            "",
+                                                    url: callLogs[index].senderID == context.currentUser?.id
+                                                        ? callLogs[index].receiver?.firstOrNull?.userPhoto ?? ""
+                                                        : callLogs[index].sender?.firstOrNull?.userPhoto ?? "",
                                                   ),
                                                 ),
                                               ),
                                             ),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    callLogs[index].senderID ==
-                                                            context
-                                                                .currentUser?.id
+                                                    callLogs[index].senderID == context.currentUser?.id
                                                         ? "${callLogs[index].receiver?.firstOrNull?.userFirstName ?? ""} ${callLogs[index].receiver?.firstOrNull?.userLastName ?? ""}"
                                                         : "${callLogs[index].sender?.firstOrNull?.userFirstName ?? ""} ${callLogs[index].sender?.firstOrNull?.userLastName ?? ""}",
                                                     style: const TextStyle(
@@ -300,36 +281,27 @@ class _CallsScreenState extends State<CallsScreen>
                                                       color: Colors.black,
                                                     ),
                                                     maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Row(
                                                     children: [
                                                       Icon(
-                                                        callLogs[index]
-                                                                    .callType ==
-                                                                "Voice"
+                                                        callLogs[index].callType == "Voice"
                                                             ? Icons.phone
                                                             : Icons.videocam,
-                                                        color: callLogs[index]
-                                                                    .callStatues !=
-                                                                "CANCELLED"
+                                                        color: callLogs[index].callStatues != "CANCELLED"
                                                             ? Colors.green
                                                             : Colors.red,
                                                         size: 20,
                                                       ),
                                                       const SizedBox(width: 5),
                                                       Text(
-                                                        callLogs[index]
-                                                                    .callStatues !=
-                                                                "CANCELLED"
+                                                        callLogs[index].callStatues != "CANCELLED"
                                                             ? "Outgoing"
                                                             : "Missed",
                                                         style: TextStyle(
-                                                          color: callLogs[index]
-                                                                      .callStatues !=
-                                                                  "CANCELLED"
+                                                          color: callLogs[index].callStatues != "CANCELLED"
                                                               ? Colors.green
                                                               : Colors.red,
                                                         ),
@@ -343,15 +315,11 @@ class _CallsScreenState extends State<CallsScreen>
                                             Text(
                                               DateFormat('dd/MM/yyyy').format(
                                                 DateTime.parse(
-                                                  callLogs[index]
-                                                          .createdAtCalls ??
-                                                      DateTime.now().toString(),
+                                                  callLogs[index].createdAtCalls ?? DateTime.now().toString(),
                                                 ),
                                               ),
                                               style: TextStyle(
-                                                color: callLogs[index]
-                                                            .callStatues !=
-                                                        "CANCELLED"
+                                                color: callLogs[index].callStatues != "CANCELLED"
                                                     ? Colors.grey.shade600
                                                     : Colors.red,
                                               ),
@@ -380,7 +348,7 @@ class _CallsScreenState extends State<CallsScreen>
                           child: Column(
                             children: [
                               Lottie.asset(
-                                R.animations.callLog,
+                                Animations.callLog,
                                 width: 120,
                                 repeat: true,
                                 fit: BoxFit.fill,
@@ -409,32 +377,16 @@ class _CallsScreenState extends State<CallsScreen>
   List<CallLogsData> searchLogs(String value, List<CallLogsData> logs) {
     Set<CallLogsData> searchedList = {};
     searchedList.addAll(logs
-        .where((element) =>
-            element.sender?.first.userFirstName
-                ?.toLowerCase()
-                .contains(value.toLowerCase()) ==
-            true)
+        .where((element) => element.sender?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true)
         .toList());
     searchedList.addAll(logs
-        .where((element) =>
-            element.sender?.first.userLastName
-                ?.toLowerCase()
-                .contains(value.toLowerCase()) ==
-            true)
+        .where((element) => element.sender?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
         .toList());
     searchedList.addAll(logs
-        .where((element) =>
-            element.receiver?.first.userFirstName
-                ?.toLowerCase()
-                .contains(value.toLowerCase()) ==
-            true)
+        .where((element) => element.receiver?.first.userFirstName?.toLowerCase().contains(value.toLowerCase()) == true)
         .toList());
     searchedList.addAll(logs
-        .where((element) =>
-            element.receiver?.first.userLastName
-                ?.toLowerCase()
-                .contains(value.toLowerCase()) ==
-            true)
+        .where((element) => element.receiver?.first.userLastName?.toLowerCase().contains(value.toLowerCase()) == true)
         .toList());
 
     return searchedList.toList();
@@ -458,9 +410,7 @@ class _CallsScreenState extends State<CallsScreen>
           setState(() {
             callLogs = logsResponse.data ?? [];
             allCalls = callLogs;
-            missedCalls = callLogs
-                .where((element) => element.callStatues == "CANCELLED")
-                .toList();
+            missedCalls = callLogs.where((element) => element.callStatues == "CANCELLED").toList();
           });
         }
       }

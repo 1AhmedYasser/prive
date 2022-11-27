@@ -8,10 +8,11 @@ import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:lottie/lottie.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:prive/Models/Rooms/upcoming_room.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../Extras/resources.dart';
-import '../../Widgets/AppWidgets/prive_appbar.dart';
+import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
 class UpComingRoomsScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(MediaQuery.of(context).size.width, 60),
-        child: PriveAppBar(title: "Upcoming Rooms".tr()),
+        child: PriveAppBar(title: 'Upcoming Rooms'.tr()),
       ),
       body: isLoading
           ? const Padding(
@@ -62,8 +63,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                           child: SlideAnimation(
                             verticalOffset: 50.0,
                             child: FadeInAnimation(
-                              child: upcomingRoomsList[index].owner?.id ==
-                                      context.currentUser?.id
+                              child: upcomingRoomsList[index].owner?.id == context.currentUser?.id
                                   ? SwipeActionCell(
                                       controller: controller,
                                       index: index,
@@ -71,7 +71,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                                       trailingActions: [
                                         SwipeAction(
                                           content: Image.asset(
-                                            R.images.deleteChatImage,
+                                            Images.deleteChatImage,
                                             width: 15,
                                             color: Colors.red,
                                           ),
@@ -80,7 +80,8 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                                             await handler(true);
                                             FirebaseDatabase.instance
                                                 .ref(
-                                                    'upcoming_rooms/${upcomingRoomsList[index].owner?.id}/${upcomingRoomsList[index].roomId}')
+                                                  'upcoming_rooms/${upcomingRoomsList[index].owner?.id}/${upcomingRoomsList[index].roomId}',
+                                                )
                                                 .remove();
                                             setState(() {
                                               upcomingRoomsList.removeAt(index);
@@ -108,7 +109,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Lottie.asset(
-                          R.animations.upcomingRooms,
+                          Animations.upcomingRooms,
                           width: 140,
                           repeat: true,
                           fit: BoxFit.fill,
@@ -152,10 +153,9 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
               child: Row(
                 children: [
                   Text(
-                    DateFormat("hh:mm a", "en").format(
+                    DateFormat('hh:mm a', 'en').format(
                       DateTime.parse(
-                        upcomingRoomsList[index].time ??
-                            DateTime.now().toString(),
+                        upcomingRoomsList[index].time ?? DateTime.now().toString(),
                       ),
                     ),
                     style: const TextStyle(
@@ -166,10 +166,9 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    DateFormat("d MMM", "en").format(
+                    DateFormat('d MMM', 'en').format(
                       DateTime.parse(
-                        upcomingRoomsList[index].time ??
-                            DateTime.now().toString(),
+                        upcomingRoomsList[index].time ?? DateTime.now().toString(),
                       ),
                     ),
                     style: const TextStyle(
@@ -207,10 +206,9 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
               child: Divider(),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, top: 10, bottom: 10, right: 20),
+              padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10, right: 20),
               child: Text(
-                upcomingRoomsList[index].topic ?? "",
+                upcomingRoomsList[index].topic ?? '',
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 16,
@@ -219,10 +217,9 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, top: 0, bottom: 15, right: 20),
+              padding: const EdgeInsets.only(left: 20, top: 0, bottom: 15, right: 20),
               child: Text(
-                upcomingRoomsList[index].description ?? "",
+                upcomingRoomsList[index].description ?? '',
                 style: const TextStyle(
                   color: Color(0xff5d5d63),
                   fontSize: 15,
@@ -233,12 +230,11 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, top: 5, bottom: 25, right: 20),
+              padding: const EdgeInsets.only(left: 20, top: 5, bottom: 25, right: 20),
               child: Row(
                 children: [
                   Text(
-                    "With /",
+                    'With /',
                     style: TextStyle(
                       color: Theme.of(context).primaryColorDark,
                       fontSize: 16,
@@ -256,13 +252,13 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: CachedImage(
-                          url: upcomingRoomsList[index].owner?.image ?? "",
+                          url: upcomingRoomsList[index].owner?.image ?? '',
                         ),
                       ),
                     ),
                   ),
                   Text(
-                    upcomingRoomsList[index].owner?.name ?? "",
+                    upcomingRoomsList[index].owner?.name ?? '',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -299,18 +295,17 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
   void getUpcomingRooms() async {
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {
-      Map<dynamic, dynamic> upcomingRoomsResponse =
-          snapshot.value as Map<dynamic, dynamic>? ?? {};
+      Map<dynamic, dynamic> upcomingRoomsResponse = snapshot.value as Map<dynamic, dynamic>? ?? {};
       upcomingRoomsList.clear();
       upcomingRoomsResponse.forEach((key, value) {
         Map<dynamic, dynamic> upcomingRooms = value as Map<dynamic, dynamic>;
         upcomingRooms.forEach((key, value) {
           String roomId = key;
-          String topic = "";
-          String description = "";
+          String topic = '';
+          String description = '';
           RoomUser? owner;
           List<String> contacts = [];
-          String dateTime = "";
+          String dateTime = '';
           topic = value['topic'];
           description = value['description'];
           dateTime = value['date_time'];
@@ -325,8 +320,7 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
             isHandRaised: value['owner']['isHandRaised'],
             isMicOn: value['owner']['isMicOn'],
           );
-          Map<dynamic, dynamic>? roomContacts =
-              (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
+          Map<dynamic, dynamic>? roomContacts = (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
           roomContacts.forEach((key, value) {
             contacts.add(key);
           });
@@ -342,14 +336,17 @@ class _UpComingRoomsScreenState extends State<UpComingRoomsScreen> {
           );
         });
       });
-      List<UpcomingRoom> myUpcomingRooms = upcomingRoomsList
-          .where((element) => element.owner?.id == context.currentUser?.id)
-          .toList();
-      myUpcomingRooms.addAll(upcomingRoomsList
-          .where((element) =>
-              element.owner?.id != context.currentUser?.id &&
-              element.roomContacts?.contains(context.currentUser?.id) == true)
-          .toList());
+      List<UpcomingRoom> myUpcomingRooms =
+          upcomingRoomsList.where((element) => element.owner?.id == context.currentUser?.id).toList();
+      myUpcomingRooms.addAll(
+        upcomingRoomsList
+            .where(
+              (element) =>
+                  element.owner?.id != context.currentUser?.id &&
+                  element.roomContacts?.contains(context.currentUser?.id) == true,
+            )
+            .toList(),
+      );
 
       upcomingRoomsList = myUpcomingRooms;
 

@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Stories/stories_viewer_screen.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 import 'package:timeago/timeago.dart' as time_ago;
-import '../../Extras/resources.dart';
-import '../../Models/Stories/stories.dart';
-import '../../UltraNetwork/ultra_constants.dart';
-import '../../Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
-import '../../Widgets/Common/cached_image.dart';
+import 'package:prive/Models/Stories/stories.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/Widgets/AppWidgets/Stories/video_thumb_viewer.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 //ignore: must_be_immutable
@@ -47,7 +47,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
             color: Color(0xff7a8fa6),
           ),
           title: const Text(
-            "My Updates",
+            'My Updates',
             style: TextStyle(
               fontSize: 23,
               color: Colors.black,
@@ -63,7 +63,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                 });
               },
               child: Text(
-                isEditing ? "Done" : "Edit",
+                isEditing ? 'Done' : 'Edit',
                 style: TextStyle(
                   fontSize: 17,
                   color: Theme.of(context).primaryColorDark,
@@ -92,14 +92,14 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                     trailingActions: [
                       SwipeAction(
                         content: Image.asset(
-                          R.images.deleteChatImage,
+                          Images.deleteChatImage,
                           width: 15,
                           color: Colors.red,
                         ),
                         color: Colors.white,
                         onTap: (handler) async {
                           await handler(true);
-                          _deleteStory(widget.myStories[index].stotyID ?? "");
+                          _deleteStory(widget.myStories[index].stotyID ?? '');
                           setState(() {
                             widget.myStories.removeAt(index);
                           });
@@ -121,20 +121,20 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                           StoryController storyController = StoryController();
                           List<StoryItem> storesStories = [];
                           for (int i = 0; i < widget.myStories.length; i++) {
-                            if (widget.myStories[i].type == "Photos") {
+                            if (widget.myStories[i].type == 'Photos') {
                               storesStories.add(
                                 StoryItem.pageImage(
-                                  url: widget.myStories[i].content ?? "",
+                                  url: widget.myStories[i].content ?? '',
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
                                   duration: const Duration(seconds: 10),
                                 ),
                               );
-                            } else if (widget.myStories[i].type == "Videos") {
+                            } else if (widget.myStories[i].type == 'Videos') {
                               storesStories.add(
                                 StoryItem.pageVideo(
-                                  widget.myStories[i].content ?? "",
+                                  widget.myStories[i].content ?? '',
                                   controller: storyController,
                                   imageFit: BoxFit.fitWidth,
                                   shown: index != i ? true : false,
@@ -155,10 +155,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   storyController: storyController,
                                 );
                               },
-                              transitionsBuilder: (_,
-                                  Animation<double> animation,
-                                  __,
-                                  Widget child) {
+                              transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
                                 return FadeTransition(
                                   opacity: animation,
                                   child: child,
@@ -185,8 +182,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                       minSize: 0,
                                       child: Icon(
                                         CupertinoIcons.minus_circle_fill,
-                                        color: CupertinoColors.systemRed
-                                            .resolveFrom(context),
+                                        color: CupertinoColors.systemRed.resolveFrom(context),
                                       ),
                                       onPressed: () {
                                         controller.openCellAt(
@@ -211,21 +207,12 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                           width: 70,
                                           height: 70,
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(60),
-                                            child: widget.myStories[index]
-                                                        .type ==
-                                                    "Photos"
+                                            borderRadius: BorderRadius.circular(60),
+                                            child: widget.myStories[index].type == 'Photos'
                                                 ? CachedImage(
-                                                    url: widget.myStories[index]
-                                                            .content ??
-                                                        "",
+                                                    url: widget.myStories[index].content ?? '',
                                                   )
-                                                : VideoThumbViewer(
-                                                    videoUrl: widget
-                                                            .myStories[index]
-                                                            .content ??
-                                                        ""),
+                                                : VideoThumbViewer(videoUrl: widget.myStories[index].content ?? ''),
                                           ),
                                         ),
                                       ),
@@ -233,18 +220,15 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                   ),
                                   Expanded(
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          widget.myStories[index].views != "0"
-                                              ? widget.myStories[index].views !=
-                                                      "1"
+                                          widget.myStories[index].views != '0'
+                                              ? widget.myStories[index].views != '1'
                                                   ? "${widget.myStories[index].views} ${"Views"}"
                                                   : "1 ${"View"}"
-                                              : "No Views Yet".tr(),
+                                              : 'No Views Yet'.tr(),
                                           style: const TextStyle(
                                             fontSize: 16.5,
                                             fontWeight: FontWeight.w600,
@@ -256,14 +240,11 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
                                         ),
                                         Text(
                                           time_ago.format(
-                                            DateFormat(
-                                                    "yyyy-MM-dd HH:mm:ss", "en")
+                                            DateFormat('yyyy-MM-dd HH:mm:ss', 'en')
                                                 .parse(
-                                                    widget.myStories[index]
-                                                            .createdAtStory ??
-                                                        DateTime.now()
-                                                            .toString(),
-                                                    true)
+                                                  widget.myStories[index].createdAtStory ?? DateTime.now().toString(),
+                                                  true,
+                                                )
                                                 .toLocal(),
                                           ),
                                           style: TextStyle(
@@ -294,10 +275,9 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 17, top: 13, right: 20, bottom: 35),
+              padding: const EdgeInsets.only(left: 17, top: 13, right: 20, bottom: 35),
               child: Text(
-                "Your story updates will disappear after 24 hours.",
+                'Your story updates will disappear after 24 hours.',
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ).tr(),
             )
@@ -314,7 +294,7 @@ class _MyStoriesScreenState extends State<MyStoriesScreen> {
       showLoadingIndicator: false,
       showError: false,
       formData: FormData.fromMap(
-        {"StoryID": storyId},
+        {'StoryID': storyId},
       ),
       cancelToken: cancelToken,
     );

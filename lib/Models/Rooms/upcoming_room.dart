@@ -8,13 +8,14 @@ class UpcomingRoom {
   RoomUser? owner;
   List<String>? roomContacts;
 
-  UpcomingRoom(
-      {this.roomId,
-      this.topic,
-      this.description,
-      this.time,
-      this.owner,
-      this.roomContacts});
+  UpcomingRoom({
+    this.roomId,
+    this.topic,
+    this.description,
+    this.time,
+    this.owner,
+    this.roomContacts,
+  });
 
   UpcomingRoom.fromJson(Map<String, dynamic> json) {
     roomId = json['roomId'] as String?;

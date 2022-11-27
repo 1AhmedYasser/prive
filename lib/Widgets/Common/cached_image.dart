@@ -10,15 +10,15 @@ class CachedImage extends StatelessWidget {
   final Color containerColor;
   final bool withLoading;
 
-  const CachedImage(
-      {Key? key,
-      this.url = "",
-      this.placeholder = "",
-      this.placeholderPadding = 13,
-      this.fit = BoxFit.fill,
-      this.containerColor = const Color(0xffeeeeee),
-      this.withLoading = false})
-      : super(key: key);
+  const CachedImage({
+    Key? key,
+    this.url = '',
+    this.placeholder = '',
+    this.placeholderPadding = 13,
+    this.fit = BoxFit.fill,
+    this.containerColor = const Color(0xffeeeeee),
+    this.withLoading = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

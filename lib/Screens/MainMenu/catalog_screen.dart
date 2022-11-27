@@ -6,7 +6,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:flutter_swipe_action_cell/core/controller.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Catalogs/catalog_manager_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
@@ -93,7 +93,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 80, bottom: 30),
                         child: Image.asset(
-                          R.images.newCatalog,
+                          Images.newCatalog,
                           width: MediaQuery.of(context).size.width / 3,
                         ),
                       ),
@@ -194,7 +194,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     child: Row(
                       children: [
                         Image.asset(
-                          R.images.newCollectionGroupImage,
+                          Images.newCollectionGroupImage,
                           fit: BoxFit.fill,
                           width: 70,
                         ),
@@ -233,7 +233,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                   trailingActions: [
                                     SwipeAction(
                                       content: Image.asset(
-                                        R.images.deleteChatImage,
+                                        Images.deleteChatImage,
                                         width: 15,
                                         color: Colors.red,
                                       ),
@@ -354,7 +354,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                         ],
                                                       ),
                                                       child: Image.asset(
-                                                        R.images.collectionsImage,
+                                                        Images.collectionsImage,
                                                         fit: BoxFit.fill,
                                                         height: 70,
                                                         width: 73,

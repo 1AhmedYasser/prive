@@ -11,8 +11,8 @@ import 'package:prive/Models/Catalogs/collection.dart';
 import 'package:prive/Screens/Catalogs/new_product_screen.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import '../../Extras/resources.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
+import '../../Resources/images.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/Common/cached_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -20,9 +20,7 @@ import 'package:easy_localization/easy_localization.dart';
 class CollectionScreen extends StatefulWidget {
   final CollectionData collection;
   final CatalogData catalog;
-  const CollectionScreen(
-      {Key? key, required this.collection, required this.catalog})
-      : super(key: key);
+  const CollectionScreen({Key? key, required this.collection, required this.catalog}) : super(key: key);
 
   @override
   State<CollectionScreen> createState() => _CollectionScreenState();
@@ -108,12 +106,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 20, bottom: 20, left: 18, right: 18),
+                padding: const EdgeInsets.only(top: 20, bottom: 20, left: 18, right: 18),
                 child: Row(
                   children: [
                     Image.asset(
-                      R.images.newCollectionGroupImage,
+                      Images.newCollectionGroupImage,
                       fit: BoxFit.fill,
                       width: 70,
                     ),
@@ -130,8 +127,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 ),
               ),
             ),
-          if (widget.catalog.userID != context.currentUser?.id)
-            const SizedBox(height: 15),
+          if (widget.catalog.userID != context.currentUser?.id) const SizedBox(height: 15),
           Expanded(
             child: MediaQuery.removePadding(
               context: context,
@@ -148,19 +144,15 @@ class _CollectionScreenState extends State<CollectionScreen> {
                         horizontalOffset: 50,
                         child: FadeInAnimation(
                           child: SwipeActionCell(
-                            isDraggable: (widget.catalog.userID ==
-                                    context.currentUser?.id)
-                                ? true
-                                : false,
+                            isDraggable: (widget.catalog.userID == context.currentUser?.id) ? true : false,
                             controller: controller,
                             index: index,
                             key: ValueKey(products[index]),
                             trailingActions: [
-                              if (widget.catalog.userID ==
-                                  context.currentUser?.id)
+                              if (widget.catalog.userID == context.currentUser?.id)
                                 SwipeAction(
                                   content: Image.asset(
-                                    R.images.deleteChatImage,
+                                    Images.deleteChatImage,
                                     width: 15,
                                     color: Colors.red,
                                   ),
@@ -168,15 +160,13 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                   style: const TextStyle(fontSize: 0),
                                   onTap: (handler) async {
                                     await handler(true);
-                                    _deleteProduct(
-                                        products[index].itemID ?? "");
+                                    _deleteProduct(products[index].itemID ?? "");
                                     setState(() {
                                       products.removeAt(index);
                                     });
                                   },
                                 ),
-                              if (widget.catalog.userID ==
-                                  context.currentUser?.id)
+                              if (widget.catalog.userID == context.currentUser?.id)
                                 SwipeAction(
                                   content: Icon(
                                     Icons.edit,
@@ -190,8 +180,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              NewProductScreen(
+                                          builder: (context) => NewProductScreen(
                                             product: products[index],
                                             collection: widget.collection,
                                             isEdit: true,
@@ -221,8 +210,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                       minSize: 0,
                                       child: Icon(
                                         Icons.edit,
-                                        color:
-                                            Theme.of(context).primaryColorDark,
+                                        color: Theme.of(context).primaryColorDark,
                                       ),
                                       onPressed: () {
                                         controller.openCellAt(
@@ -239,8 +227,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductDetailsScreen(
+                                          builder: (context) => ProductDetailsScreen(
                                             product: products[index],
                                             collection: widget.collection,
                                           ),
@@ -252,8 +239,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                     child: Row(
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 13, right: 13),
+                                          padding: const EdgeInsets.only(left: 13, right: 13),
                                           child: SizedBox(
                                             width: 90,
                                             height: 90,
@@ -261,20 +247,13 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                               children: [
                                                 Positioned.fill(
                                                   child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    child: products[index]
-                                                                .photo1 !=
-                                                            "NONE"
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: products[index].photo1 != "NONE"
                                                         ? CachedImage(
-                                                            url: products[index]
-                                                                    .photo1 ??
-                                                                "",
+                                                            url: products[index].photo1 ?? "",
                                                           )
                                                         : Image.asset(
-                                                            R.images
-                                                                .collectionsImage,
+                                                            Images.collectionsImage,
                                                             fit: BoxFit.contain,
                                                           ),
                                                   ),
@@ -305,8 +284,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                           ),
                                         ),
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               products[index].itemName ?? "",
@@ -316,13 +294,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 3.5,
-                                                  bottom: 3.5,
-                                                  right: 39),
+                                              padding: const EdgeInsets.only(top: 3.5, bottom: 3.5, right: 39),
                                               child: Text(
-                                                products[index].description ??
-                                                    "",
+                                                products[index].description ?? "",
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
@@ -333,10 +307,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                               ),
                                             ),
                                             Text(
-                                              products[index]
-                                                          .price
-                                                          ?.isNotEmpty ==
-                                                      true
+                                              products[index].price?.isNotEmpty == true
                                                   ? "${products[index].price} ${"SAR"}"
                                                   : "",
                                               style: const TextStyle(

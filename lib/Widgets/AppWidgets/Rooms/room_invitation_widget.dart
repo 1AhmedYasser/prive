@@ -9,25 +9,30 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Extras/resources.dart';
-import '../../../Helpers/Utils.dart';
-import '../../../Models/Rooms/room.dart';
-import '../../../UltraNetwork/ultra_constants.dart';
-import '../../../UltraNetwork/ultra_loading_indicator.dart';
-import '../../Common/cached_image.dart';
-import '../channels_empty_widgets.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Models/Rooms/room.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:prive/Widgets/AppWidgets/channels_empty_widgets.dart';
 
 class RoomInvitationWidget extends StatefulWidget {
   final List<String> roomContacts;
   final bool isSpeaker;
   final String roomRef;
   final Room? room;
-  const RoomInvitationWidget(
-      {Key? key, this.roomContacts = const [], this.isSpeaker = false, required this.roomRef, this.room})
-      : super(key: key);
+  const RoomInvitationWidget({
+    Key? key,
+    this.roomContacts = const [],
+    this.isSpeaker = false,
+    required this.roomRef,
+    this.room,
+  }) : super(key: key);
 
   @override
   State<RoomInvitationWidget> createState() => _RoomInvitationWidgetState();
@@ -69,14 +74,14 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
 
           switch (status) {
             case ConnectionStatus.connected:
-              statusString = "Connected".tr();
+              statusString = 'Connected'.tr();
               showStatus = false;
               break;
             case ConnectionStatus.connecting:
-              statusString = "Connecting".tr();
+              statusString = 'Connecting'.tr();
               break;
             case ConnectionStatus.disconnected:
-              statusString = "Disconnected".tr();
+              statusString = 'Disconnected'.tr();
               break;
           }
           return Stack(
@@ -96,7 +101,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                       Padding(
                         padding: const EdgeInsets.only(top: 30, left: 30, right: 30, bottom: 0),
                         child: Text(
-                          widget.isSpeaker ? "Invite A Speaker" : "Invite People To The Room",
+                          widget.isSpeaker ? 'Invite A Speaker' : 'Invite People To The Room',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18,
@@ -110,7 +115,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                           height: 60,
                           child: SearchTextField(
                             controller: _controller,
-                            hintText: "Search".tr(),
+                            hintText: 'Search'.tr(),
                             showCloseButton: false,
                             borderRadius: 12,
                             onChanged: (value) {
@@ -123,7 +128,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                   users = allUsers
                                       .where(
                                         (element) =>
-                                            element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ""),
+                                            element.name.toLowerCase().contains(_controller?.text.toLowerCase() ?? ''),
                                       )
                                       .toList();
                                 });
@@ -175,7 +180,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                                                   height: 50,
                                                                   width: 50,
                                                                   child: CachedImage(
-                                                                    url: users[index].image ?? "",
+                                                                    url: users[index].image ?? '',
                                                                   ),
                                                                 ),
                                                               ),
@@ -192,7 +197,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                                                   const SizedBox(height: 3),
                                                                   Text(
                                                                     users[index].online
-                                                                        ? "Online".tr()
+                                                                        ? 'Online'.tr()
                                                                         : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
                                                                             users[index].lastActive ?? DateTime.now(),
                                                                           )}",
@@ -243,8 +248,8 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                 )
                               : ChannelsEmptyState(
                                   animationController: _animationController,
-                                  title: "No Contacts Found".tr(),
-                                  message: "",
+                                  title: 'No Contacts Found'.tr(),
+                                  message: '',
                                 )
                           : _permissionDenied == false
                               ? const UltraLoadingIndicator()
@@ -258,7 +263,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                       SizedBox(
                                         height: 200,
                                         child: Lottie.asset(
-                                          R.animations.contactsPermission,
+                                          Animations.contactsPermission,
                                           repeat: false,
                                         ),
                                       ),
@@ -286,7 +291,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                                           ),
                                         ),
                                         child: const Text(
-                                          "Go To Settings",
+                                          'Go To Settings',
                                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                                         ).tr(),
                                       )
@@ -306,15 +311,15 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                     final ref = FirebaseDatabase.instance.ref(widget.roomRef);
                     for (var user in _selectedUsers) {
                       ref.child(user.id).update({
-                        "id": user.id,
-                        "name": user.name,
-                        "image": user.image,
-                        "isSpeaker": widget.isSpeaker,
-                        "isListener": !widget.isSpeaker,
-                        "phone": user.extraData['phone'],
-                        "isHandRaised": false,
-                        "isOwner": false,
-                        "isMicOn": widget.isSpeaker,
+                        'id': user.id,
+                        'name': user.name,
+                        'image': user.image,
+                        'isSpeaker': widget.isSpeaker,
+                        'isListener': !widget.isSpeaker,
+                        'phone': user.extraData['phone'],
+                        'isHandRaised': false,
+                        'isOwner': false,
+                        'isMicOn': widget.isSpeaker,
                       });
                     }
                     Navigator.pop(context);
@@ -329,7 +334,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
                     ),
                   ),
                   child: const Text(
-                    "Send Invitation",
+                    'Send Invitation',
                     style: TextStyle(fontSize: 18),
                   ),
                 ),
@@ -349,26 +354,28 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
       showError: false,
       cancelToken: CancelToken(),
       formData: FormData.fromMap({
-        "Ownername": widget.room?.owner?.name,
-        "Roomname": widget.room?.topic,
-        "IsSpeaker": widget.isSpeaker ? 1 : 0,
-        "UsersIds": _selectedUsers.map((e) => e.id).toList().join(","),
+        'Ownername': widget.room?.owner?.name,
+        'Roomname': widget.room?.topic,
+        'IsSpeaker': widget.isSpeaker ? 1 : 0,
+        'UsersIds': _selectedUsers.map((e) => e.id).toList().join(','),
       }),
     );
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       users = users.where((user) => widget.roomContacts.contains(user.id) == false).toList();
@@ -379,6 +386,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         setState(() => _permissionDenied = true);
       } else {
+        if (!mounted) return;
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
         users = users.where((user) => widget.roomContacts.contains(user.id) == false).toList();

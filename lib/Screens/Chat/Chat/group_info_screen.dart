@@ -10,9 +10,9 @@ import 'package:prive/Screens/Chat/Chat/admins_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Screens/Chat/Chat/member_permissions_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
 import '../../../Models/Chat/group_admin.dart';
+import '../../../Resources/shared_pref.dart';
 import 'pinned_messages_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -1156,9 +1156,9 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

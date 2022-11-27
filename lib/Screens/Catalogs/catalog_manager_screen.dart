@@ -7,9 +7,9 @@ import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Catalogs/product_details_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../Extras/resources.dart';
 import '../../Models/Catalogs/catalog.dart';
 import '../../Models/Catalogs/collection.dart';
+import '../../Resources/images.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/Catalogs/new_catalog_collection_widget.dart';
 import 'collection_screen.dart';
@@ -71,7 +71,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 80, bottom: 30),
                         child: Image.asset(
-                          R.images.newCatalog,
+                          Images.newCatalog,
                           width: MediaQuery.of(context).size.width / 3,
                         ),
                       ),
@@ -228,7 +228,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                             child: Row(
                               children: [
                                 Image.asset(
-                                  R.images.newCollectionGroupImage,
+                                  Images.newCollectionGroupImage,
                                   fit: BoxFit.fill,
                                   width: 70,
                                 ),
@@ -392,7 +392,7 @@ class _CatalogManagerScreenState extends State<CatalogManagerScreen> {
                                                                       "",
                                                                 )
                                                               : Image.asset(
-                                                                  R.images.collectionsImage,
+                                                                  Images.collectionsImage,
                                                                   fit: BoxFit.contain,
                                                                 ),
                                                     ),

@@ -6,16 +6,20 @@ class GroupAdmin {
   AdminGroupPermissions? groupPermissions;
 
   GroupAdmin(
-      this.id, this.name, this.image, this.groupRole, this.groupPermissions);
+    this.id,
+    this.name,
+    this.image,
+    this.groupRole,
+    this.groupPermissions,
+  );
 
   GroupAdmin.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     image = json['image'];
     groupRole = json['group_role'];
-    groupPermissions = json['admin_permissions'] != null
-        ? AdminGroupPermissions.fromJson(json['admin_permissions'])
-        : null;
+    groupPermissions =
+        json['admin_permissions'] != null ? AdminGroupPermissions.fromJson(json['admin_permissions']) : null;
   }
 }
 

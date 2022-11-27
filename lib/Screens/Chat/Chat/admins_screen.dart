@@ -7,9 +7,9 @@ import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:collection/collection.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Chat/group_admin.dart';
+import '../../../Resources/shared_pref.dart';
 import 'add_members_admins_screen.dart';
 import 'admin_permissions_screen.dart';
 
@@ -73,8 +73,7 @@ class _AdminsScreenState extends State<AdminsScreen> {
                     tileColor: StreamChatTheme.of(context).colorTheme.appBg,
                     separatorColor: Colors.transparent,
                     title: "Add Admins".tr(),
-                    titleTextStyle:
-                        TextStyle(color: Theme.of(context).primaryColor),
+                    titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
                     leading: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Icon(
@@ -109,8 +108,7 @@ class _AdminsScreenState extends State<AdminsScreen> {
                       color: StreamChatTheme.of(context).colorTheme.appBg,
                       child: InkWell(
                         onTap: () {
-                          if (groupAdmins[index].groupRole == "admin" &&
-                              userRole == "owner") {
+                          if (groupAdmins[index].groupRole == "admin" && userRole == "owner") {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -143,10 +141,8 @@ class _AdminsScreenState extends State<AdminsScreen> {
                                   ),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         // Text(
                                         //   member.user!.name,
@@ -173,10 +169,7 @@ class _AdminsScreenState extends State<AdminsScreen> {
                                               ? "Admin"
                                               : "Member",
                                       style: TextStyle(
-                                        color: StreamChatTheme.of(context)
-                                            .colorTheme
-                                            .textHighEmphasis
-                                            .withOpacity(0.5),
+                                        color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                                       ),
                                     ).tr(),
                                   ),
@@ -184,9 +177,7 @@ class _AdminsScreenState extends State<AdminsScreen> {
                               ),
                               Container(
                                 height: 1.0,
-                                color: StreamChatTheme.of(context)
-                                    .colorTheme
-                                    .disabled,
+                                color: StreamChatTheme.of(context).colorTheme.disabled,
                               ),
                             ],
                           ),
@@ -213,10 +204,9 @@ class _AdminsScreenState extends State<AdminsScreen> {
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(
@@ -246,11 +236,9 @@ class _AdminsScreenState extends State<AdminsScreen> {
 
   void _getGroupAdmins() {
     groupAdmins = [];
-    List<dynamic>? admins =
-        widget.channel.extraData['group_admins'] as List<dynamic>;
+    List<dynamic>? admins = widget.channel.extraData['group_admins'] as List<dynamic>;
     for (var admin in admins) {
-      GroupAdmin groupAdmin =
-          GroupAdmin.fromJson(admin as Map<String, dynamic>);
+      GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
     }
     userRole = groupAdmins
@@ -260,7 +248,6 @@ class _AdminsScreenState extends State<AdminsScreen> {
             ?.groupRole ??
         "member";
 
-    adminSelf = groupAdmins
-        .firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
+    adminSelf = groupAdmins.firstWhereOrNull((admin) => admin.id == context.currentUser?.id);
   }
 }

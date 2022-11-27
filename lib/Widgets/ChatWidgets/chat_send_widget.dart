@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class ChatSendWidget extends StatefulWidget {
@@ -9,10 +9,7 @@ class ChatSendWidget extends StatefulWidget {
   final ScrollController chatScrollController;
 
   const ChatSendWidget(
-      {Key? key,
-      required this.messageController,
-      required this.messageFocus,
-      required this.chatScrollController})
+      {Key? key, required this.messageController, required this.messageFocus, required this.chatScrollController})
       : super(key: key);
 
   @override
@@ -39,7 +36,7 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
               GestureDetector(
                 onTap: () {},
                 child: Image.asset(
-                  R.images.attachmentImage,
+                  Images.attachmentImage,
                   width: 21,
                   height: 21,
                   fit: BoxFit.fill,
@@ -62,31 +59,30 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
                       controller: widget.messageController,
                       focusNode: widget.messageFocus,
                       decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(
-                                  color: Colors.grey.shade300, width: 1.5)),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(
-                                  color: Colors.grey.shade300, width: 1.5)),
-                          focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(
-                                  color: Colors.grey.shade300, width: 1.5)),
-                          errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(
-                                  color: Colors.grey.shade300, width: 1.5)),
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: BorderSide(
-                                  color: Colors.grey.shade300, width: 1.5)),
-                          contentPadding: const EdgeInsets.only(
-                              left: 25, right: 25, top: 5, bottom: 5),
-                          hintText: "Write Your Message ...".tr(),
-                          hintStyle: TextStyle(
-                              color: Colors.grey.shade500, fontSize: 15)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 5),
+                        hintText: 'Write Your Message ...'.tr(),
+                        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 15),
+                      ),
                       style: const TextStyle(fontSize: 15),
                       keyboardType: TextInputType.multiline,
                       textInputAction: TextInputAction.next,
@@ -108,32 +104,31 @@ class _ChatSendWidgetState extends State<ChatSendWidget> {
                     StreamChannel.of(context).channel.sendMessage(
                           Message(text: widget.messageController.text),
                         );
-                    widget.messageController.text = "";
+                    widget.messageController.text = '';
                     setState(() {});
                   } else {
-                    print("record");
+                    print('record');
                   }
                 },
                 child: widget.messageController.text.isNotEmpty
                     ? Container(
                         decoration: BoxDecoration(
-                          color: widget.messageController.text.isNotEmpty
-                              ? const Color(0xff37dabc)
-                              : Colors.grey.shade400,
+                          color:
+                              widget.messageController.text.isNotEmpty ? const Color(0xff37dabc) : Colors.grey.shade400,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: const Padding(
-                            padding: EdgeInsets.only(
-                                left: 12, right: 8, top: 10, bottom: 10),
-                            child: Center(
-                              child: Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
-                            )),
+                          padding: EdgeInsets.only(left: 12, right: 8, top: 10, bottom: 10),
+                          child: Center(
+                            child: Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       )
                     : Image.asset(
-                        R.images.recordMicImage,
+                        Images.recordMicImage,
                         width: 44,
                         height: 44,
                         fit: BoxFit.fill,

@@ -12,8 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 class TextStoryEditorScreen extends StatefulWidget {
   final Color backgroundColor;
-  const TextStoryEditorScreen({Key? key, required this.backgroundColor})
-      : super(key: key);
+  const TextStoryEditorScreen({Key? key, required this.backgroundColor}) : super(key: key);
 
   @override
   State<TextStoryEditorScreen> createState() => _TextStoryEditorScreenState();
@@ -98,7 +97,7 @@ class _TextStoryEditorScreenState extends State<TextStoryEditorScreen> {
                   maxLines: null,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    hintText: "Type A Status".tr(),
+                    hintText: 'Type A Status'.tr(),
                     hintStyle: textFont,
                     border: InputBorder.none,
                   ),
@@ -130,9 +129,7 @@ class _TextStoryEditorScreenState extends State<TextStoryEditorScreen> {
     });
     focusNode.unfocus();
     Future.delayed(const Duration(milliseconds: 500), () {
-      screenshotController
-          .capture(delay: const Duration(milliseconds: 120))
-          .then((capturedImage) async {
+      screenshotController.capture(delay: const Duration(milliseconds: 120)).then((capturedImage) async {
         if (capturedImage != null) {
           final tempDir = await getTemporaryDirectory();
           File storyFile = await File('${tempDir.path}/story.png').create();
@@ -153,11 +150,11 @@ class _TextStoryEditorScreenState extends State<TextStoryEditorScreen> {
       addStory,
       showError: false,
       formData: FormData.fromMap({
-        "UserID": context.currentUser?.id,
-        "Type": "Photos",
-        "Content": await MultipartFile.fromFile(
-          _capturedImage?.path ?? "",
-          filename: "story",
+        'UserID': context.currentUser?.id,
+        'Type': 'Photos',
+        'Content': await MultipartFile.fromFile(
+          _capturedImage?.path ?? '',
+          filename: 'story',
         ),
       }),
       cancelToken: cancelToken,

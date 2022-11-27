@@ -8,14 +8,14 @@ class OptionRowWidget extends StatelessWidget {
   final Function onPressed;
   final bool showDivider;
 
-  const OptionRowWidget(
-      {Key? key,
-      this.image = "",
-      this.title = "",
-      this.imageColor,
-      required this.onPressed,
-      this.showDivider = true})
-      : super(key: key);
+  const OptionRowWidget({
+    Key? key,
+    this.image = '',
+    this.title = '',
+    this.imageColor,
+    required this.onPressed,
+    this.showDivider = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

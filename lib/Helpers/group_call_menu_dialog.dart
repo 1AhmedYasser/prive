@@ -1,10 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:prive/Models/Call/call_member.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../Models/Call/call_member.dart';
-import '../Widgets/Common/cached_image.dart';
 
 class GroupCallMenuDialog {
   static showMemberMenu(
@@ -15,8 +14,8 @@ class GroupCallMenuDialog {
   }) {
     Alert(
       context: context,
-      title: callMember?.name ?? "",
-      desc: "",
+      title: callMember?.name ?? '',
+      desc: '',
       closeFunction: null,
       closeIcon: const SizedBox(height: 30),
       content: Column(
@@ -38,7 +37,7 @@ class GroupCallMenuDialog {
                 ),
                 const SizedBox(width: 10),
                 const Text(
-                  "Kick From Call",
+                  'Kick From Call',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -85,7 +84,7 @@ class GroupCallMenuDialog {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Cancel",
+                  'Cancel',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -104,7 +103,7 @@ class GroupCallMenuDialog {
           height: 78,
           width: 80,
           child: CachedImage(
-            url: callMember?.image ?? "",
+            url: callMember?.image ?? '',
           ),
         ),
       ),

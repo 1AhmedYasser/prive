@@ -3,12 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Catalogs/catalogProduct.dart';
 import '../../Models/Catalogs/collection.dart';
+import '../../Resources/images.dart';
 import '../../UltraNetwork/ultra_network.dart';
 import '../../Widgets/AppWidgets/prive_appbar.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -17,9 +17,7 @@ class NewProductScreen extends StatefulWidget {
   final CollectionData? collection;
   final CatalogProductData? product;
   final bool isEdit;
-  const NewProductScreen(
-      {Key? key, this.collection, this.product, this.isEdit = false})
-      : super(key: key);
+  const NewProductScreen({Key? key, this.collection, this.product, this.isEdit = false}) : super(key: key);
 
   @override
   State<NewProductScreen> createState() => _NewProductScreenState();
@@ -70,13 +68,10 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         }
                       },
                       child: Padding(
-                        padding: EdgeInsets.only(
-                            top: 15, left: index == 0 ? 25 : 0, right: 13),
+                        padding: EdgeInsets.only(top: 15, left: index == 0 ? 25 : 0, right: 13),
                         child: Container(
                             decoration: BoxDecoration(
-                              color: index == 0
-                                  ? const Color(0xff7a8fa6)
-                                  : Colors.grey.shade300,
+                              color: index == 0 ? const Color(0xff7a8fa6) : Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             width: 130,
@@ -87,17 +82,15 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                     children: [
                                       Expanded(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20),
+                                          padding: const EdgeInsets.only(top: 20),
                                           child: Image.asset(
-                                            R.images.newProductCameraImage,
+                                            Images.newProductCameraImage,
                                             width: 60,
                                           ),
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10, bottom: 15),
+                                        padding: const EdgeInsets.only(top: 10, bottom: 15),
                                         child: const Text(
                                           "Add Images",
                                           style: TextStyle(color: Colors.white),
@@ -110,8 +103,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                         children: [
                                           Positioned.fill(
                                             child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               child: Image.file(
                                                 productImages[index - 1],
                                                 fit: BoxFit.fill,
@@ -124,8 +116,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                             child: GestureDetector(
                                               onTap: () {
                                                 setState(() {
-                                                  productImages
-                                                      .removeAt(index - 1);
+                                                  productImages.removeAt(index - 1);
                                                 });
                                               },
                                               child: const Icon(
@@ -153,8 +144,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     child: buildTextField(
                       "Product Or Service Name".tr(),
                       productNameController,
-                      emptyValidatorMessage:
-                          "Please enter a product or service name".tr(),
+                      emptyValidatorMessage: "Please enter a product or service name".tr(),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -168,8 +158,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     "Description (Optional)".tr(),
                     descriptionController,
                     maxLines: 4,
-                    emptyValidatorMessage:
-                        "Please enter a product description".tr(),
+                    emptyValidatorMessage: "Please enter a product description".tr(),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
@@ -287,18 +276,15 @@ class _NewProductScreenState extends State<NewProductScreen> {
     };
 
     if (productImages.isNotEmpty) {
-      parameters["Photo1"] = await MultipartFile.fromFile(productImages[0].path,
-          filename: "Photo1");
+      parameters["Photo1"] = await MultipartFile.fromFile(productImages[0].path, filename: "Photo1");
     }
 
     if (productImages.length >= 2) {
-      parameters["Photo2"] = await MultipartFile.fromFile(productImages[1].path,
-          filename: "Photo2");
+      parameters["Photo2"] = await MultipartFile.fromFile(productImages[1].path, filename: "Photo2");
     }
 
     if (productImages.length >= 3) {
-      parameters["Photo3"] = await MultipartFile.fromFile(productImages[2].path,
-          filename: "Photo3");
+      parameters["Photo3"] = await MultipartFile.fromFile(productImages[2].path, filename: "Photo3");
     }
 
     if (mounted) {
@@ -313,8 +299,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
         if (value != null) {
           Utils.showAlert(
             context,
-            message:
-                "${"Product Added To".tr()} ${widget.collection?.collectionName}",
+            message: "${"Product Added To".tr()} ${widget.collection?.collectionName}",
           ).then((value) => Navigator.pop(context, true));
         }
       });

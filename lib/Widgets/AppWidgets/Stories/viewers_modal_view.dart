@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../../Models/Stories/stories.dart';
+import 'package:prive/Models/Stories/stories.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class ViewersModalView extends StatefulWidget {
@@ -43,9 +43,7 @@ class _ViewersModalViewState extends State<ViewersModalView> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                widget.viewUsers.length == 1
-                    ? "1 ${"View".tr()}"
-                    : "${widget.viewUsers.length} ${"Views".tr()}",
+                widget.viewUsers.length == 1 ? "1 ${"View".tr()}" : "${widget.viewUsers.length} ${"Views".tr()}",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -74,7 +72,7 @@ class _ViewersModalViewState extends State<ViewersModalView> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(30),
                           child: CachedImage(
-                            url: widget.viewUsers[index].userPhoto ?? "",
+                            url: widget.viewUsers[index].userPhoto ?? '',
                           ),
                         ),
                       ),
@@ -91,7 +89,8 @@ class _ViewersModalViewState extends State<ViewersModalView> {
                       ),
                       Expanded(
                         child: getReviewDate(
-                            widget.viewUsers[index].createdAtReview ?? ""),
+                          widget.viewUsers[index].createdAtReview ?? '',
+                        ),
                       )
                     ],
                   );
@@ -118,18 +117,17 @@ class _ViewersModalViewState extends State<ViewersModalView> {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
     DateTime reviewDate = DateTime.parse(date).toLocal();
-    String formattedDate = "";
-    String day = "";
+    String formattedDate = '';
+    String day = '';
     if (DateTime(reviewDate.year, reviewDate.month, reviewDate.day) == today) {
-      day = "Today";
-      formattedDate = DateFormat('hh:mm a', "en").format(reviewDate);
-    } else if (DateTime(reviewDate.year, reviewDate.month, reviewDate.day) ==
-        yesterday) {
-      day = "Yesterday";
-      formattedDate = DateFormat('hh:mm a', "en").format(reviewDate);
+      day = 'Today';
+      formattedDate = DateFormat('hh:mm a', 'en').format(reviewDate);
+    } else if (DateTime(reviewDate.year, reviewDate.month, reviewDate.day) == yesterday) {
+      day = 'Yesterday';
+      formattedDate = DateFormat('hh:mm a', 'en').format(reviewDate);
     } else {
-      day = DateFormat('MMM d', "en").format(reviewDate);
-      formattedDate = DateFormat('hh:mm a', "en").format(reviewDate);
+      day = DateFormat('MMM d', 'en').format(reviewDate);
+      formattedDate = DateFormat('hh:mm a', 'en').format(reviewDate);
     }
     return RichText(
       textAlign: TextAlign.end,
@@ -143,7 +141,7 @@ class _ViewersModalViewState extends State<ViewersModalView> {
             ),
           ),
           TextSpan(
-            text: "  $formattedDate",
+            text: '  $formattedDate',
             style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),

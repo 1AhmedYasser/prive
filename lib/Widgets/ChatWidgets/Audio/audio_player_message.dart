@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-
-import 'audio_loading_message_widget.dart';
+import 'package:prive/Widgets/ChatWidgets/Audio/audio_loading_message_widget.dart';
 
 class AudioPlayerMessage extends StatefulWidget {
   const AudioPlayerMessage({
@@ -30,8 +29,7 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
   void initState() {
     super.initState();
 
-    _playerStateChangedSubscription =
-        _audioPlayer.playerStateStream.listen(playerStateListener);
+    _playerStateChangedSubscription = _audioPlayer.playerStateStream.listen(playerStateListener);
 
     futureDuration = _audioPlayer.setAudioSource(widget.source);
   }
@@ -72,10 +70,8 @@ class AudioPlayerMessageState extends State<AudioPlayerMessage> {
     return StreamBuilder<bool>(
       stream: _audioPlayer.playingStream,
       builder: (context, _) {
-        final color =
-            _audioPlayer.playerState.playing ? Colors.blue : Colors.blue;
-        final icon =
-            _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow;
+        final color = _audioPlayer.playerState.playing ? Colors.blue : Colors.blue;
+        final icon = _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow;
         return Padding(
           padding: const EdgeInsets.all(4.0),
           child: GestureDetector(

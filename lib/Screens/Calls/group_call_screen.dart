@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:badges/badges.dart';
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,24 +15,24 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prive/Helpers/group_call_menu_dialog.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Call/call.dart';
 import 'package:prive/Models/Call/call_member.dart';
+import 'package:prive/Models/Call/prive_call.dart';
 import 'package:prive/Providers/volume_provider.dart';
+import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/wave_button.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:prive/Helpers/stream_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:wakelock/wakelock.dart';
-import '../../../Extras/resources.dart';
-import '../../../Helpers/utils.dart';
-import '../../../Models/Call/prive_call.dart';
-import '../../../UltraNetwork/ultra_constants.dart';
-import 'package:collection/collection.dart';
-import '../../../UltraNetwork/ultra_network.dart';
-import '../../../Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
+
+import '../../Resources/constants.dart';
+import '../../Resources/images.dart';
 
 class GroupCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -884,7 +887,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           Utils.showAlert(
             context,
             message: "You Have Been Kicked Out Of This Call".tr(),
-            alertImage: R.images.alertInfoImage,
+            alertImage: Images.alertInfoImage,
           );
         }
       }
@@ -951,7 +954,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           Utils.showAlert(
             context,
             message: "Group Call Has Ended".tr(),
-            alertImage: R.images.alertInfoImage,
+            alertImage: Images.alertInfoImage,
           ).then(
             (value) {
               if (mounted) {
@@ -1001,7 +1004,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         await [Permission.camera, Permission.microphone].request();
 
         agoraEngine = createAgoraRtcEngine();
-        await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
+        await agoraEngine?.initialize(const RtcEngineContext(appId: Constants.agoraAppId));
 
         if (widget.isVideo) {
           await agoraEngine?.enableVideo();

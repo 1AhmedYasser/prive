@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:draggable_widget/draggable_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +12,16 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Call/call.dart';
+import 'package:prive/Models/Call/call_member.dart';
+import 'package:prive/Providers/call_provider.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Screens/Calls/group_call_screen.dart';
+import 'package:prive/Screens/Calls/single_call_screen.dart';
 import 'package:prive/main.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Extras/resources.dart';
-import '../../../Helpers/utils.dart';
-import '../../../Models/Call/call.dart';
-import '../../../Models/Call/call_member.dart';
-import '../../../Providers/call_provider.dart';
-import '../../../Screens/Calls/group_call_screen.dart';
-import '../../../Screens/Calls/single_call_screen.dart';
 
 class CallOverlayWidget extends StatefulWidget {
   final bool isGroup;
@@ -28,9 +29,14 @@ class CallOverlayWidget extends StatefulWidget {
   final String callId;
   final RtcEngine? agoraEngine;
   final Channel channel;
-  const CallOverlayWidget(
-      {Key? key, this.isGroup = false, this.isVideo = false, this.callId = "", this.agoraEngine, required this.channel})
-      : super(key: key);
+  const CallOverlayWidget({
+    Key? key,
+    this.isGroup = false,
+    this.isVideo = false,
+    this.callId = '',
+    this.agoraEngine,
+    required this.channel,
+  }) : super(key: key);
 
   @override
   State<CallOverlayWidget> createState() => _CallOverlayWidgetState();
@@ -113,7 +119,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                         ),
                         trailing: GestureDetector(
                           onTap: () {
-                            BotToast.removeAll("call_overlay");
+                            BotToast.removeAll('call_overlay');
                             if (mounted) {
                               Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
                             }
@@ -128,7 +134,7 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                     maxChildSize: 0.95,
                                     builder: (_, controller) {
                                       return GroupCallScreen(
-                                        isVideo: call?.type == "Video" ? true : false,
+                                        isVideo: call?.type == 'Video' ? true : false,
                                         isJoining: true,
                                         call: call,
                                         parentContext: context,
@@ -189,8 +195,9 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                         .isVideoOn ??
                                     false);
                                 final ref = FirebaseDatabase.instance.ref(
-                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
-                                ref.update({"isVideoOn": isVideoOn});
+                                  "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}",
+                                );
+                                ref.update({'isVideoOn': isVideoOn});
                                 await widget.agoraEngine?.enableLocalVideo(isVideoOn);
                               } else {
                                 if (widget.isVideo == false) {
@@ -209,10 +216,11 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                               if (isHeadphonesOn && (me?.hasPermissionToSpeak == true)) {
                                 bool isMicOn = me?.isMicOn == true;
                                 final ref = FirebaseDatabase.instance.ref(
-                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
-                                ref.update({"isMicOn": !isMicOn});
+                                  "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}",
+                                );
+                                ref.update({'isMicOn': !isMicOn});
                                 await widget.agoraEngine?.muteRemoteAudioStream(
-                                  uid: int.parse(context.currentUser?.id ?? "0"),
+                                  uid: int.parse(context.currentUser?.id ?? '0'),
                                   mute: isMicOn,
                                 );
                                 await widget.agoraEngine?.muteLocalAudioStream(isMicOn);
@@ -232,14 +240,15 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                   context: navigatorKey.currentContext!,
                                   builder: (BuildContext context) => CupertinoActionSheet(
                                     title: Text(
-                                        '${"Are You Sure You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}'),
+                                      '${"Are You Sure You Want to leave this".tr()} ${widget.isVideo ? "video".tr() : "voice".tr()} ${"call ?".tr()}',
+                                    ),
                                     actions: <CupertinoActionSheetAction>[
                                       if (context.currentUser?.id == call?.ownerId)
                                         CupertinoActionSheetAction(
                                           isDestructiveAction: true,
                                           onPressed: () {
                                             Navigator.pop(context);
-                                            BotToast.removeAll("call_overlay");
+                                            BotToast.removeAll('call_overlay');
                                             if (mounted) {
                                               Provider.of<CallProvider>(context, listen: false)
                                                   .changeOverlayState(false);
@@ -247,8 +256,8 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                             FlutterCallkitIncoming.endAllCalls();
                                             databaseReference.remove();
                                             _stopForegroundTask();
-                                            DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-                                            userRef.update({context.currentUser?.id ?? "": "Ended"});
+                                            DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+                                            userRef.update({context.currentUser?.id ?? '': 'Ended'});
                                             widget.agoraEngine?.leaveChannel();
                                           },
                                           child: Text(
@@ -259,18 +268,19 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                           FlutterCallkitIncoming.endAllCalls();
-                                          BotToast.removeAll("call_overlay");
+                                          BotToast.removeAll('call_overlay');
                                           if (mounted) {
                                             Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
                                           }
                                           _stopForegroundTask();
-                                          databaseReference.child("members/${context.currentUser?.id}").remove();
-                                          DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-                                          userRef.update({context.currentUser?.id ?? "": "Ended"});
+                                          databaseReference.child('members/${context.currentUser?.id}').remove();
+                                          DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+                                          userRef.update({context.currentUser?.id ?? '': 'Ended'});
                                           widget.agoraEngine?.leaveChannel();
                                         },
                                         child: Text(
-                                            '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}'),
+                                          '${"Leave".tr()} ${widget.isVideo ? "Video".tr() : "Voice".tr()} ${"Call".tr()}',
+                                        ),
                                       ),
                                     ],
                                     cancelButton: CupertinoActionSheetAction(
@@ -282,18 +292,18 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                                   ),
                                 );
                               } else {
-                                BotToast.removeAll("call_overlay");
+                                BotToast.removeAll('call_overlay');
                                 if (mounted) {
                                   Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
                                 }
                                 FlutterCallkitIncoming.endAllCalls();
                                 final databaseReference =
-                                    FirebaseDatabase.instance.ref("SingleCalls/${widget.channel.id}");
-                                DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
+                                    FirebaseDatabase.instance.ref('SingleCalls/${widget.channel.id}');
+                                DatabaseReference usersRef = FirebaseDatabase.instance.ref('Users');
                                 databaseReference.remove();
                                 _stopForegroundTask();
                                 for (var member in widget.channel.state?.members ?? []) {
-                                  usersRef.update({member.userId ?? "": "Ended"});
+                                  usersRef.update({member.userId ?? '': 'Ended'});
                                 }
                               }
                             },
@@ -314,11 +324,12 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
                               () async {
                                 isHeadphonesOn = !isHeadphonesOn;
                                 final ref = FirebaseDatabase.instance.ref(
-                                    "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}");
+                                  "${widget.isGroup ? "GroupCalls" : "SingleCalls"}/${widget.channel.id}/members/${context.currentUser?.id}",
+                                );
                                 if (isHeadphonesOn == false) {
-                                  ref.update({"isMicOn": false, "isHeadphonesOn": false});
+                                  ref.update({'isMicOn': false, 'isHeadphonesOn': false});
                                 } else {
-                                  ref.update({"isHeadphonesOn": true});
+                                  ref.update({'isHeadphonesOn': true});
                                 }
                                 setState(() {});
                               },
@@ -432,23 +443,23 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
       );
 
       me = call?.members?.firstWhere((element) => element.id == context.currentUser?.id);
-      kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? "").toList() ?? [];
+      kickedMembersIds = call?.kickedMembers?.map((e) => e.id ?? '').toList() ?? [];
 
       // Check If Kicked Your Kicked Out From The Call
       if (kickedMembersIds.contains(context.currentUser?.id)) {
         if (mounted) {
           FlutterCallkitIncoming.endAllCalls();
-          BotToast.removeAll("call_overlay");
+          BotToast.removeAll('call_overlay');
           Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
           _stopForegroundTask();
-          databaseReference.child("members/${context.currentUser?.id}").remove();
-          DatabaseReference userRef = FirebaseDatabase.instance.ref("Users");
-          userRef.update({context.currentUser?.id ?? "": "Ended"});
+          databaseReference.child('members/${context.currentUser?.id}').remove();
+          DatabaseReference userRef = FirebaseDatabase.instance.ref('Users');
+          userRef.update({context.currentUser?.id ?? '': 'Ended'});
           widget.agoraEngine?.leaveChannel();
           Utils.showAlert(
             navigatorKey.currentContext!,
-            message: "You Have Been Kicked Out Of This Room".tr(),
-            alertImage: R.images.alertInfoImage,
+            message: 'You Have Been Kicked Out Of This Room'.tr(),
+            alertImage: Images.alertInfoImage,
           );
         }
       }
@@ -462,21 +473,21 @@ class _CallOverlayWidgetState extends State<CallOverlayWidget> {
         me?.isMicOn = false;
         await widget.agoraEngine?.muteAllRemoteAudioStreams(true);
         await widget.agoraEngine?.muteRemoteAudioStream(
-          uid: int.parse(context.currentUser?.id ?? "0"),
+          uid: int.parse(context.currentUser?.id ?? '0'),
           mute: false,
         );
         await widget.agoraEngine?.muteLocalAudioStream(true);
       } else {
         await widget.agoraEngine?.muteAllRemoteAudioStreams(false);
       }
-      print("My Mic is On ? : ${me?.isMicOn}");
+      print('My Mic is On ? : ${me?.isMicOn}');
       videoMembers = call?.members?.where((element) => element.isVideoOn == true).toList() ?? [];
       setState(() {});
     } else {
       if (showingInfo == false) {
         _stopForegroundTask();
         if (mounted) {
-          BotToast.removeAll("call_overlay");
+          BotToast.removeAll('call_overlay');
           Provider.of<CallProvider>(context, listen: false).changeOverlayState(false);
         }
       }

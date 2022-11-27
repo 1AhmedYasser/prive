@@ -11,17 +11,17 @@ class AlertWidget extends StatefulWidget {
   final Function? onCancelButtonPressed;
   final bool withCancel;
 
-  const AlertWidget(
-      {Key? key,
-      this.image = "",
-      this.title = "Information",
-      this.description = "",
-      this.okButtonText = "Ok",
-      this.cancelButtonText = "Cancel",
-      this.onOkButtonPressed,
-      this.onCancelButtonPressed,
-      this.withCancel = false})
-      : super(key: key);
+  const AlertWidget({
+    Key? key,
+    this.image = '',
+    this.title = 'Information',
+    this.description = '',
+    this.okButtonText = 'Ok',
+    this.cancelButtonText = 'Cancel',
+    this.onOkButtonPressed,
+    this.onCancelButtonPressed,
+    this.withCancel = false,
+  }) : super(key: key);
 
   @override
   State<AlertWidget> createState() => _AlertWidgetState();
@@ -64,8 +64,7 @@ class _AlertWidgetState extends State<AlertWidget> {
               ),
               Text(
                 widget.title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 21),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 21),
               ).tr(),
               if (widget.description.isNotEmpty)
                 const SizedBox(
@@ -77,10 +76,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                   child: Text(
                     widget.description,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Color(0xff777777)),
+                    style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 17, color: Color(0xff777777)),
                   ).tr(),
                 ),
               const SizedBox(
@@ -103,8 +99,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            minimumSize:
-                                Size(MediaQuery.of(context).size.width, 50),
+                            minimumSize: Size(MediaQuery.of(context).size.width, 50),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -135,8 +130,7 @@ class _AlertWidgetState extends State<AlertWidget> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,
-                          minimumSize:
-                              Size(MediaQuery.of(context).size.width, 50),
+                          minimumSize: Size(MediaQuery.of(context).size.width, 50),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),

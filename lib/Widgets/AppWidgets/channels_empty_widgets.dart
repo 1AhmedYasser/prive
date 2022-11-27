@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/animations.dart';
 
 class ChannelsEmptyState extends StatelessWidget {
   final String title;
   final String message;
 
-  const ChannelsEmptyState(
-      {Key? key,
-      required AnimationController animationController,
-      this.title = "No Messages Yet",
-      this.message = "Start Chatting With Your Friends Right Now"})
-      : _animationController = animationController,
+  const ChannelsEmptyState({
+    Key? key,
+    required AnimationController animationController,
+    this.title = 'No Messages Yet',
+    this.message = 'Start Chatting With Your Friends Right Now',
+  })  : _animationController = animationController,
         super(key: key);
 
   final AnimationController _animationController;
@@ -25,7 +25,7 @@ class ChannelsEmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Lottie.asset(
-            R.animations.emptyChannels,
+            Animations.emptyChannels,
             width: MediaQuery.of(context).size.width / 1.6,
             fit: BoxFit.fill,
             controller: _animationController,

@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../Common/cached_image.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class KickedMembersWidget extends StatefulWidget {
   final String ref;
@@ -61,7 +61,7 @@ class _KickedMembersWidgetState extends State<KickedMembersWidget> {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 50),
                         child: const Text(
-                          "No Kicked Members",
+                          'No Kicked Members',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
@@ -87,13 +87,13 @@ class _KickedMembersWidgetState extends State<KickedMembersWidget> {
                                     height: 60,
                                     width: 60,
                                     child: CachedImage(
-                                      url: kickedMembers[index].image ?? "",
+                                      url: kickedMembers[index].image ?? '',
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 15),
                                 Text(
-                                  kickedMembers[index].name ?? "",
+                                  kickedMembers[index].name ?? '',
                                   style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w500,

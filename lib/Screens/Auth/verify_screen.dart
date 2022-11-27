@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Auth/login.dart';
 import 'package:prive/Screens/Auth/signup_screen.dart';
 import 'package:timer_count_down/timer_count_down.dart';
+import '../../Resources/images.dart';
+import '../../Resources/routes.dart';
+import '../../Resources/shared_pref.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
@@ -198,13 +200,13 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       } else {
                         StreamManager.connectUserToStream(this.context).then((value) {
                           Navigator.pushNamedAndRemoveUntil(
-                              this.context, R.routes.navigatorRoute, (Route<dynamic> route) => false);
-                          Utils.saveBool(R.pref.isLoggedIn, true);
+                              this.context, Routes.navigatorRoute, (Route<dynamic> route) => false);
+                          Utils.saveBool(SharedPref.isLoggedIn, true);
                         });
                       }
                     }).catchError((error) {
                       Utils.showAlert(context,
-                          message: "You Entered An Invalid Code".tr(), alertImage: R.images.alertInfoImage);
+                          message: "You Entered An Invalid Code".tr(), alertImage: Images.alertInfoImage);
                     });
                   }
                 },

@@ -1,6 +1,6 @@
 // Methods enum
 import 'package:flutter/material.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum Methods { post, get, update, patch, delete }
@@ -24,10 +24,7 @@ class UMethods {
 class UHeaders {
   static Future<Map<String, dynamic>> getHeaders(BuildContext context) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var headers = {
-      "Content-Type": "application/json",
-      "token": "${pref.get(R.pref.token)}"
-    };
+    var headers = {'Content-Type': 'application/json', 'token': '${pref.get(SharedPref.token)}'};
     return headers;
   }
 }

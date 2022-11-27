@@ -1,17 +1,18 @@
+import 'dart:io';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:country_calling_code_picker/country.dart';
 import 'package:country_calling_code_picker/functions.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Auth/login.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Auth/verify_screen.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
-import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,14 +25,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isPhoneNumberValid = false;
-  String phoneNumber = "";
-  String countryName = "";
+  String phoneNumber = '';
+  String countryName = '';
   TextEditingController phoneController = TextEditingController();
   CancelToken cancelToken = CancelToken();
   bool loading = false;
 
-  PhoneNumber initialNumber =
-      PhoneNumber(isoCode: Platform.localeName.split('_').last);
+  PhoneNumber initialNumber = PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 15,
               ),
               Text(
-                'Please confirm your country code and enter your phone number'
-                    .tr(),
+                'Please confirm your country code and enter your phone number'.tr(),
                 style: const TextStyle(
                   fontSize: 17,
                   color: Color(0xff5d5d63),
@@ -76,32 +75,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 initialValue: initialNumber,
                 onInputChanged: (PhoneNumber number) async {
                   phoneNumber = number.phoneNumber.toString();
-                  Country? country = await getCountryByCountryCode(
-                      context, number.isoCode ?? "EG");
-                  countryName = country?.name ?? "United States";
+                  Country? country = await getCountryByCountryCode(context, number.isoCode ?? 'EG');
+                  countryName = country?.name ?? 'United States';
                 },
                 onInputValidated: (valid) {
                   isPhoneNumberValid = valid;
                 },
                 validator: (value) {
                   if (!isPhoneNumberValid) {
-                    return "Enter A Valid Phone Number".tr();
+                    return 'Enter A Valid Phone Number'.tr();
                   }
                   return null;
                 },
                 searchBoxDecoration: InputDecoration(
-                  label: Text("Search by country name or dial code".tr()),
-                  labelStyle: TextStyle(
-                      fontSize: 14, color: Theme.of(context).primaryColorDark),
+                  label: Text('Search by country name or dial code'.tr()),
+                  labelStyle: TextStyle(fontSize: 14, color: Theme.of(context).primaryColorDark),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   errorBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -113,22 +108,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 selectorConfig: const SelectorConfig(
-                    selectorType: PhoneInputSelectorType.DIALOG,
-                    setSelectorButtonAsPrefixIcon: true,
-                    trailingSpace: false,
-                    leadingPadding: 20),
+                  selectorType: PhoneInputSelectorType.DIALOG,
+                  setSelectorButtonAsPrefixIcon: true,
+                  trailingSpace: false,
+                  leadingPadding: 20,
+                ),
                 ignoreBlank: false,
                 inputDecoration: InputDecoration(
-                  hintText: "Phone Number".tr(),
+                  hintText: 'Phone Number'.tr(),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   errorBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -159,30 +153,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         login,
                         cancelToken: cancelToken,
                         formData: FormData.fromMap({
-                          "UserPhone": phoneNumber,
-                          "FirebaseToken":
-                              await Utils.getString(R.pref.firebaseToken),
-                          "Country": countryName
+                          'UserPhone': phoneNumber,
+                          'FirebaseToken': await Utils.getString(SharedPref.firebaseToken),
+                          'Country': countryName
                         }),
                       ).then((value) {
                         loading = false;
                         Login login = value;
                         if (login.success == true) {
                           LoginData? loginData = value.data?[0];
+                          Utils.saveString(SharedPref.token, loginData?.token ?? '');
+                          Utils.saveString(SharedPref.userId, loginData?.userID ?? '');
+                          Utils.saveString(SharedPref.userImage, loginData?.userPhoto ?? '');
+                          Utils.saveString(SharedPref.userPhone, loginData?.userPhone ?? '');
+                          Utils.saveString(SharedPref.userFirstName, loginData?.userFirstName ?? '');
+                          Utils.saveString(SharedPref.userLastName, loginData?.userLastName ?? '');
                           Utils.saveString(
-                              R.pref.token, loginData?.token ?? "");
-                          Utils.saveString(
-                              R.pref.userId, loginData?.userID ?? "");
-                          Utils.saveString(
-                              R.pref.userImage, loginData?.userPhoto ?? "");
-                          Utils.saveString(
-                              R.pref.userPhone, loginData?.userPhone ?? "");
-                          Utils.saveString(R.pref.userFirstName,
-                              loginData?.userFirstName ?? "");
-                          Utils.saveString(R.pref.userLastName,
-                              loginData?.userLastName ?? "");
-                          Utils.saveString(R.pref.userName,
-                              "${loginData?.userFirstName ?? ""} ${loginData?.userLastName ?? ""}");
+                            SharedPref.userName,
+                            "${loginData?.userFirstName ?? ""} ${loginData?.userLastName ?? ""}",
+                          );
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -209,9 +198,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 child: Text(
-                  "Next".tr(),
-                  style: const TextStyle(
-                      fontSize: 21, fontWeight: FontWeight.w400),
+                  'Next'.tr(),
+                  style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
                 ),
               ),
             ],
@@ -223,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    BotToast.removeAll("loading");
+    BotToast.removeAll('loading');
     super.dispose();
   }
 }

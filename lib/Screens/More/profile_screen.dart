@@ -5,8 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import '../../Helpers/stream_manager.dart';
 import '../../Helpers/utils.dart';
 import '../../Models/Auth/login.dart';
@@ -61,30 +62,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 cancelButtonText: "No".tr(),
                 onOkButtonPressed: () {
                   _logout();
-                  Utils.saveString(R.pref.userId, "");
-                  Utils.saveString(R.pref.userName, "");
-                  Utils.saveString(R.pref.userFirstName, "");
-                  Utils.saveString(R.pref.userLastName, "");
-                  Utils.saveString(R.pref.userEmail, "");
-                  Utils.saveString(R.pref.userPhone, "");
-                  Utils.saveBool(R.pref.isLoggedIn, false);
+                  Utils.saveString(SharedPref.userId, "");
+                  Utils.saveString(SharedPref.userName, "");
+                  Utils.saveString(SharedPref.userFirstName, "");
+                  Utils.saveString(SharedPref.userLastName, "");
+                  Utils.saveString(SharedPref.userEmail, "");
+                  Utils.saveString(SharedPref.userPhone, "");
+                  Utils.saveBool(SharedPref.isLoggedIn, false);
                   StreamManager.disconnectUserFromStream(context);
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    R.routes.loginRoute,
+                    Routes.loginRoute,
                     (Route<dynamic> route) => false,
                   );
                 },
               );
             },
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                shadowColor: Colors.transparent),
+                backgroundColor: Colors.transparent, elevation: 0, shadowColor: Colors.transparent),
             child: Row(
               children: [
                 Image.asset(
-                  R.images.logoutImage,
+                  Images.logoutImage,
                   fit: BoxFit.fill,
                   width: 17,
                   height: 17,
@@ -135,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: (profileImage.path.isEmpty)
                                       ? CachedImage(
                                           url: context.currentUserImage ?? "",
-                                          placeholder: R.images.cameraImage,
+                                          placeholder: Images.cameraImage,
                                           containerColor: Colors.grey.shade300,
                                         )
                                       : Image.file(
@@ -148,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 right: -15,
                                 top: -12,
                                 child: Image.asset(
-                                  R.images.cameraIconImage,
+                                  Images.cameraIconImage,
                                   width: 40,
                                   height: 40,
                                   fit: BoxFit.fill,
@@ -164,8 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Text(
                 "Online".tr(),
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 15.5),
+                style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 15.5),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25, top: 35),
@@ -178,8 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: buildTextField(
                             "First Name".tr(),
                             firstNameController,
-                            emptyValidatorMessage:
-                                "Please enter a first name".tr(),
+                            emptyValidatorMessage: "Please enter a first name".tr(),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -187,8 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: buildTextField(
                             "Last Name".tr(),
                             lastNameController,
-                            emptyValidatorMessage:
-                                "Please enter a last name".tr(),
+                            emptyValidatorMessage: "Please enter a last name".tr(),
                           ),
                         ),
                       ],
@@ -214,8 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
-                        minimumSize:
-                            Size(MediaQuery.of(context).size.width, 55),
+                        minimumSize: Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -241,8 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColorDark,
-                        minimumSize:
-                            Size(MediaQuery.of(context).size.width, 55),
+                        minimumSize: Size(MediaQuery.of(context).size.width, 55),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -345,14 +339,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ).then((value) {
         if (value != null) {
           Login loginData = value;
-          Utils.saveString(R.pref.userName,
+          Utils.saveString(SharedPref.userName,
               "${loginData.data?.first.userFirstName ?? ""} ${loginData.data?.first.userLastName ?? ""}");
-          Utils.saveString(
-              R.pref.userFirstName, loginData.data?.first.userFirstName ?? "");
-          Utils.saveString(
-              R.pref.userLastName, loginData.data?.first.userLastName ?? "");
-          Utils.saveString(
-              R.pref.userImage, loginData.data?.first.userPhoto ?? "");
+          Utils.saveString(SharedPref.userFirstName, loginData.data?.first.userFirstName ?? "");
+          Utils.saveString(SharedPref.userLastName, loginData.data?.first.userLastName ?? "");
+          Utils.saveString(SharedPref.userImage, loginData.data?.first.userPhoto ?? "");
           StreamManager.updateUser(context);
 
           Utils.showAlert(
@@ -378,15 +369,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       formData: FormData.fromMap({"UserID": context.currentUser?.id}),
       cancelToken: cancelToken,
     ).then((value) {
-      Utils.saveString(R.pref.token, "");
+      Utils.saveString(SharedPref.token, "");
     });
   }
 
   void getUserInfo() async {
-    firstNameController.text =
-        await Utils.getString(R.pref.userFirstName) ?? "";
-    lastNameController.text = await Utils.getString(R.pref.userLastName) ?? "";
-    phoneNumberController.text = await Utils.getString(R.pref.userPhone) ?? "";
+    firstNameController.text = await Utils.getString(SharedPref.userFirstName) ?? "";
+    lastNameController.text = await Utils.getString(SharedPref.userLastName) ?? "";
+    phoneNumberController.text = await Utils.getString(SharedPref.userPhone) ?? "";
   }
 
   Future getImage(ImageSource source, bool isVideo) async {

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
@@ -14,19 +13,19 @@ import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
+import '../../Resources/animations.dart';
+import '../../Resources/shared_pref.dart';
 import '../../Widgets/AppWidgets/channels_empty_widgets.dart';
 
 class ContactsScreen extends StatefulWidget {
   final String title;
-  const ContactsScreen({Key? key, this.title = "New Message"})
-      : super(key: key);
+  const ContactsScreen({Key? key, this.title = "New Message"}) : super(key: key);
 
   @override
   State<ContactsScreen> createState() => _ContactsScreenState();
 }
 
-class _ContactsScreenState extends State<ContactsScreen>
-    with TickerProviderStateMixin {
+class _ContactsScreenState extends State<ContactsScreen> with TickerProviderStateMixin {
   bool _permissionDenied = false;
   List<Contact> phoneContacts = [];
   List<User> users = [];
@@ -68,35 +67,30 @@ class _ContactsScreenState extends State<ContactsScreen>
                                       createChannel(context, users[index]);
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10, bottom: 0),
+                                      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 0),
                                       child: Column(
                                         children: [
                                           const SizedBox(height: 10),
                                           Row(
                                             children: [
                                               ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
+                                                borderRadius: BorderRadius.circular(50),
                                                 child: SizedBox(
                                                   height: 50,
                                                   width: 50,
                                                   child: CachedImage(
-                                                    url: users[index].image ??
-                                                        "",
+                                                    url: users[index].image ?? "",
                                                   ),
                                                 ),
                                               ),
                                               const SizedBox(width: 13),
                                               Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     users[index].name,
                                                     style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500,
+                                                      fontWeight: FontWeight.w500,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 3),
@@ -104,16 +98,11 @@ class _ContactsScreenState extends State<ContactsScreen>
                                                     users[index].online
                                                         ? "Online".tr()
                                                         : "${"Last Seen".tr()} ${DateFormat('d MMM').format(users[index].lastActive ?? DateTime.now())} ${"at".tr()} ${DateFormat('hh:mm a').format(
-                                                            users[index]
-                                                                    .lastActive ??
-                                                                DateTime.now(),
+                                                            users[index].lastActive ?? DateTime.now(),
                                                           )}",
                                                     style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: users[index].online
-                                                          ? Colors.green
-                                                          : Colors.grey,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: users[index].online ? Colors.green : Colors.grey,
                                                       fontSize: 13,
                                                     ),
                                                   ),
@@ -187,7 +176,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                       SizedBox(
                         height: 200,
                         child: Lottie.asset(
-                          R.animations.contactsPermission,
+                          Animations.contactsPermission,
                           repeat: false,
                         ),
                       ),
@@ -216,8 +205,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                         ),
                         child: const Text(
                           "Go To Settings",
-                          style: TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                         ).tr(),
                       )
                     ],
@@ -228,8 +216,7 @@ class _ContactsScreenState extends State<ContactsScreen>
 
   Future<void> createChannel(BuildContext context, User user) async {
     final core = StreamChatCore.of(context);
-    final channel = core.client
-        .channel('messaging', id: Utils.generateRandomString(60), extraData: {
+    final channel = core.client.channel('messaging', id: Utils.generateRandomString(60), extraData: {
       'members': [
         core.currentUser!.id,
         user.id,
@@ -253,18 +240,15 @@ class _ContactsScreenState extends State<ContactsScreen>
       List contacts = await Utils.fetchContacts(context);
       List<User> users = contacts.first;
       String usersMap = jsonEncode(users);
-      Utils.saveString(R.pref.myContacts, usersMap);
+      Utils.saveString(SharedPref.myContacts, usersMap);
       _getContacts();
     }
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null &&
-        myContacts.isNotEmpty == true &&
-        myContacts != "[]") {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

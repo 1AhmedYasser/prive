@@ -40,14 +40,12 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
   void initState() {
     print(widget.initialIsPlaying);
     isPlaying = widget.initialIsPlaying;
-    _rotationController =
-        AnimationController(vsync: this, duration: _kRotationDuration)
-          ..addListener(() => setState(_updateRotation))
-          ..repeat();
+    _rotationController = AnimationController(vsync: this, duration: _kRotationDuration)
+      ..addListener(() => setState(_updateRotation))
+      ..repeat();
 
-    _scaleController =
-        AnimationController(vsync: this, duration: _kToggleDuration)
-          ..addListener(() => setState(_updateScale));
+    _scaleController = AnimationController(vsync: this, duration: _kToggleDuration)
+      ..addListener(() => setState(_updateScale));
     _scaleController.forward();
     super.initState();
   }
@@ -79,17 +77,20 @@ class _WaveButtonState extends State<WaveButton> with TickerProviderStateMixin {
         children: [
           if (_showWaves) ...[
             Blob(
-                color: const Color(0xff0092ff),
-                scale: _scale,
-                rotation: _rotation),
+              color: const Color(0xff0092ff),
+              scale: _scale,
+              rotation: _rotation,
+            ),
             Blob(
-                color: const Color(0xff4ac7b7),
-                scale: _scale,
-                rotation: _rotation * 2 - 30),
+              color: const Color(0xff4ac7b7),
+              scale: _scale,
+              rotation: _rotation * 2 - 30,
+            ),
             Blob(
-                color: const Color(0xffa4a6f6),
-                scale: _scale,
-                rotation: _rotation * 3 - 45),
+              color: const Color(0xffa4a6f6),
+              scale: _scale,
+              rotation: _rotation * 3 - 45,
+            ),
           ],
           Container(
             constraints: const BoxConstraints.expand(),
@@ -120,8 +121,7 @@ class Blob extends StatelessWidget {
   final double scale;
   final Color color;
 
-  const Blob({Key? key, required this.color, this.rotation = 0, this.scale = 1})
-      : super(key: key);
+  const Blob({Key? key, required this.color, this.rotation = 0, this.scale = 1}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

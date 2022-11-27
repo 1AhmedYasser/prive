@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/MainMenu/contacts_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -44,8 +46,7 @@ class _MoreScreenState extends State<MoreScreen> {
               ),
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.only(left: 15, right: 27, bottom: 30),
+                  padding: const EdgeInsets.only(left: 15, right: 27, bottom: 30),
                   child: Row(
                     children: [
                       const BackButton(),
@@ -61,24 +62,22 @@ class _MoreScreenState extends State<MoreScreen> {
                   ),
                 ),
                 OptionRowWidget(
-                  image: R.images.myGroupsImage,
+                  image: Images.myGroupsImage,
                   title: "My Groups".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
-                  image: R.images.myChannelsImage,
+                  image: Images.myChannelsImage,
                   title: "My Channels".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
-                  image: R.images.catalogManagerImage,
+                  image: Images.catalogManagerImage,
                   title: "Catalog Manager".tr(),
-                  onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.catalogScreen)
-                          .then((value) => setState(() {})),
+                  onPressed: () => Navigator.pushNamed(context, Routes.catalogScreen).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
-                  image: R.images.contactsImage,
+                  image: Images.contactsImage,
                   title: "Contacts".tr(),
                   onPressed: () {
                     Navigator.push(
@@ -92,40 +91,38 @@ class _MoreScreenState extends State<MoreScreen> {
                   },
                 ),
                 OptionRowWidget(
-                  image: R.images.peopleNearbyImage,
+                  image: Images.peopleNearbyImage,
                   title: "People Nearby".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
-                  image: R.images.inviteFriendsImage,
+                  image: Images.inviteFriendsImage,
                   title: "Invite Friends".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
-                  image: R.images.settingsImage,
+                  image: Images.settingsImage,
                   title: "Settings".tr(),
                   onPressed: () {
-                    Navigator.pushNamed(context, R.routes.settingsRoute)
-                        .then((value) => setState(() {}));
+                    Navigator.pushNamed(context, Routes.settingsRoute).then((value) => setState(() {}));
                   },
                 ),
                 OptionRowWidget(
-                  image: R.images.logoutImage,
+                  image: Images.logoutImage,
                   imageColor: const Color(0xff7a8fa6).withOpacity(0.9),
                   title: "Log out".tr(),
                   showDivider: false,
                   onPressed: () {
-                    Utils.saveString(R.pref.token, "");
-                    Utils.saveString(R.pref.userId, "");
-                    Utils.saveString(R.pref.userName, "");
-                    Utils.saveString(R.pref.userFirstName, "");
-                    Utils.saveString(R.pref.userLastName, "");
-                    Utils.saveString(R.pref.userEmail, "");
-                    Utils.saveString(R.pref.userPhone, "");
-                    Utils.saveBool(R.pref.isLoggedIn, false);
+                    Utils.saveString(SharedPref.token, "");
+                    Utils.saveString(SharedPref.userId, "");
+                    Utils.saveString(SharedPref.userName, "");
+                    Utils.saveString(SharedPref.userFirstName, "");
+                    Utils.saveString(SharedPref.userLastName, "");
+                    Utils.saveString(SharedPref.userEmail, "");
+                    Utils.saveString(SharedPref.userPhone, "");
+                    Utils.saveBool(SharedPref.isLoggedIn, false);
                     StreamManager.disconnectUserFromStream(context);
-                    Navigator.pushNamedAndRemoveUntil(context,
-                        R.routes.loginRoute, (Route<dynamic> route) => false);
+                    Navigator.pushNamedAndRemoveUntil(context, Routes.loginRoute, (Route<dynamic> route) => false);
                   },
                 ),
               ],

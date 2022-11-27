@@ -2,10 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../Models/Rooms/room_user.dart';
-import '../Widgets/Common/cached_image.dart';
 
 class RoomMenuDialog {
   static showListenerMenu(
@@ -16,8 +15,8 @@ class RoomMenuDialog {
   }) {
     Alert(
       context: context,
-      title: listener?.name ?? "",
-      desc: "",
+      title: listener?.name ?? '',
+      desc: '',
       closeFunction: null,
       closeIcon: const SizedBox(height: 30),
       content: Column(
@@ -39,7 +38,7 @@ class RoomMenuDialog {
                 ),
                 const SizedBox(width: 10),
                 const Text(
-                  "Upgrade To Speaker",
+                  'Upgrade To Speaker',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -66,7 +65,7 @@ class RoomMenuDialog {
                 ),
                 const SizedBox(width: 10),
                 const Text(
-                  "Kick From Room",
+                  'Kick From Room',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -86,7 +85,7 @@ class RoomMenuDialog {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Cancel",
+                  'Cancel',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -105,7 +104,7 @@ class RoomMenuDialog {
           height: 78,
           width: 80,
           child: CachedImage(
-            url: listener?.image ?? "",
+            url: listener?.image ?? '',
           ),
         ),
       ),
@@ -121,7 +120,7 @@ class RoomMenuDialog {
   }) {
     Alert(
       context: context,
-      title: speaker?.name ?? "",
+      title: speaker?.name ?? '',
       desc: '',
       closeFunction: null,
       closeIcon: const SizedBox(height: 30),
@@ -145,7 +144,7 @@ class RoomMenuDialog {
                   ),
                   const SizedBox(width: 13),
                   const Text(
-                    "Change Your Name",
+                    'Change Your Name',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -173,7 +172,7 @@ class RoomMenuDialog {
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    "Demote To Listener",
+                    'Demote To Listener',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -193,7 +192,7 @@ class RoomMenuDialog {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Cancel",
+                  'Cancel',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -212,7 +211,7 @@ class RoomMenuDialog {
           height: 78,
           width: 80,
           child: CachedImage(
-            url: speaker?.image ?? "",
+            url: speaker?.image ?? '',
           ),
         ),
       ),
@@ -226,7 +225,7 @@ class RoomMenuDialog {
   }) {
     Alert(
       context: context,
-      title: listener?.name ?? "",
+      title: listener?.name ?? '',
       desc: '',
       closeFunction: null,
       closeIcon: const SizedBox(height: 30),
@@ -249,7 +248,7 @@ class RoomMenuDialog {
                 ),
                 const SizedBox(width: 13),
                 const Text(
-                  "Change Your Name",
+                  'Change Your Name',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -269,7 +268,7 @@ class RoomMenuDialog {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Cancel",
+                  'Cancel',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -288,7 +287,7 @@ class RoomMenuDialog {
           height: 78,
           width: 80,
           child: CachedImage(
-            url: listener?.image ?? "",
+            url: listener?.image ?? '',
           ),
         ),
       ),

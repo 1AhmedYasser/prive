@@ -18,7 +18,7 @@ class GoogleMapsViewWidget extends StatefulWidget {
   final VoidCallback onBack;
 
   @override
-  _GoogleMapsViewWidgetState createState() => _GoogleMapsViewWidgetState();
+  State<GoogleMapsViewWidget> createState() => _GoogleMapsViewWidgetState();
 }
 
 class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
@@ -35,8 +35,7 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
     super.initState();
     lat = _messageAttachment.extraData['lat'] as double;
     long = _messageAttachment.extraData['long'] as double;
-    _messageSubscription =
-        widget.channel.on('location_update').listen(_updateHandler);
+    _messageSubscription = widget.channel.on('location_update').listen(_updateHandler);
   }
 
   @override
@@ -81,13 +80,13 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
             ),
           ),
           backgroundColor: Colors.white,
-          leading: const BackButton(color: Colors.black,),
+          leading: const BackButton(
+            color: Colors.black,
+          ),
         ),
         body: AnimatedCrossFade(
           duration: kThemeAnimationDuration,
-          crossFadeState: mapController != null
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
+          crossFadeState: mapController != null ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           firstChild: ConstrainedBox(
             constraints: BoxConstraints.loose(MediaQuery.of(context).size),
             child: GoogleMap(
@@ -95,11 +94,10 @@ class _GoogleMapsViewWidgetState extends State<GoogleMapsViewWidget> {
                 target: pos,
                 zoom: 18,
               ),
-              onMapCreated: (controller) =>
-                  setState(() => mapController = controller),
+              onMapCreated: (controller) => setState(() => mapController = controller),
               markers: {
                 Marker(
-                  markerId: const MarkerId("user-location-marker-id"),
+                  markerId: const MarkerId('user-location-marker-id'),
                   position: pos,
                 )
               },

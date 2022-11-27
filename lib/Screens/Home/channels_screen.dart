@@ -1,12 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Screens/Chat/Channels/archive_tab.dart';
 import 'package:prive/Screens/Chat/Channels/channels_tab.dart';
 import 'package:prive/Screens/Chat/Channels/groups_tab.dart';
 import 'package:prive/Screens/Chat/Channels/prive_channels_tab.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
+
+import '../../Resources/images.dart';
+import '../../Resources/routes.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({Key? key}) : super(key: key);
@@ -67,13 +69,11 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               backgroundColor: Colors.grey.shade200.withOpacity(0.3),
               titleSpacing: 0,
               title: Align(
-                alignment: context.locale.languageCode == "en"
-                    ? Alignment.centerLeft
-                    : Alignment.centerRight,
+                alignment: context.locale.languageCode == "en" ? Alignment.centerLeft : Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
                   child: Image.asset(
-                    R.images.logoImage,
+                    Images.logoImage,
                     height: 40,
                     fit: BoxFit.fill,
                   ),
@@ -82,8 +82,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
               bottom: _tabs.isEmpty
                   ? null
                   : PreferredSize(
-                      preferredSize:
-                          Size(MediaQuery.of(context).size.width, 50),
+                      preferredSize: Size(MediaQuery.of(context).size.width, 50),
                       child: Column(
                         children: [
                           Row(
@@ -94,13 +93,10 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                                   onTap: (index) {},
                                   unselectedLabelColor: Colors.grey.shade400,
                                   indicatorSize: TabBarIndicatorSize.label,
-                                  labelColor:
-                                      Theme.of(context).primaryColorDark,
+                                  labelColor: Theme.of(context).primaryColorDark,
                                   isScrollable: true,
-                                  labelStyle:
-                                      const TextStyle(color: Color(0xff1293a8)),
-                                  labelPadding:
-                                      const EdgeInsets.only(left: 5, right: 5),
+                                  labelStyle: const TextStyle(color: Color(0xff1293a8)),
+                                  labelPadding: const EdgeInsets.only(left: 5, right: 5),
                                   indicator: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
                                     border: Border.all(
@@ -115,8 +111,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                                         child: Tab(
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
+                                              borderRadius: BorderRadius.circular(50),
                                               border: Border.all(
                                                 color: Colors.transparent,
                                                 width: 0.3,
@@ -125,8 +120,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                                             child: Align(
                                               alignment: Alignment.center,
                                               child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 20, right: 20),
+                                                padding: const EdgeInsets.only(left: 20, right: 20),
                                                 child: Text(
                                                   name,
                                                   style: const TextStyle(
@@ -161,8 +155,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                           left: context.locale.languageCode == "en" ? 0 : 23),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, R.routes.profileRoute)
-                              .then((value) {
+                          Navigator.pushNamed(context, Routes.profileRoute).then((value) {
                             setState(() {});
                           });
                         },

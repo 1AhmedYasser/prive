@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../Common/cached_image.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class RaisedHandsWidget extends StatefulWidget {
   final String roomRef;
@@ -62,7 +62,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 50),
                         child: const Text(
-                          "No Raised Hands",
+                          'No Raised Hands',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
@@ -87,19 +87,19 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                 if (raisedHands[index].isMicOn == true) {
                                   raisedHands[index].isMicOn = false;
                                   FirebaseDatabase.instance
-                                      .ref("${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({"isMicOn": false, "hasPermissionToSpeak": false});
+                                      .ref('${widget.roomRef}/raisedHands/${raisedHands[index].id}')
+                                      .update({'isMicOn': false, 'hasPermissionToSpeak': false});
                                   FirebaseDatabase.instance
-                                      .ref("${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({"isMicOn": false, "hasPermissionToSpeak": false});
+                                      .ref('${widget.roomRef}/listeners/${raisedHands[index].id}')
+                                      .update({'isMicOn': false, 'hasPermissionToSpeak': false});
                                 } else {
                                   raisedHands[index].isMicOn = true;
                                   FirebaseDatabase.instance
-                                      .ref("${widget.roomRef}/raisedHands/${raisedHands[index].id}")
-                                      .update({"isMicOn": true, "hasPermissionToSpeak": true});
+                                      .ref('${widget.roomRef}/raisedHands/${raisedHands[index].id}')
+                                      .update({'isMicOn': true, 'hasPermissionToSpeak': true});
                                   FirebaseDatabase.instance
-                                      .ref("${widget.roomRef}/listeners/${raisedHands[index].id}")
-                                      .update({"isMicOn": true, "hasPermissionToSpeak": true});
+                                      .ref('${widget.roomRef}/listeners/${raisedHands[index].id}')
+                                      .update({'isMicOn': true, 'hasPermissionToSpeak': true});
                                 }
                                 setState(() {});
                               },
@@ -111,13 +111,13 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
                                       height: 60,
                                       width: 60,
                                       child: CachedImage(
-                                        url: raisedHands[index].image ?? "",
+                                        url: raisedHands[index].image ?? '',
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 15),
                                   Text(
-                                    raisedHands[index].name ?? "",
+                                    raisedHands[index].name ?? '',
                                     style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w500,
@@ -171,7 +171,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
   }
 
   void getRaisedHands() async {
-    final ref = FirebaseDatabase.instance.ref("${widget.roomRef}/raisedHands");
+    final ref = FirebaseDatabase.instance.ref('${widget.roomRef}/raisedHands');
     final res = await ref.once();
     raisedHands.clear();
     if (res.snapshot.exists) {
@@ -206,7 +206,7 @@ class _RaisedHandsWidgetState extends State<RaisedHandsWidget> {
   }
 
   void _listenToFirebaseChanges() {
-    final ref = FirebaseDatabase.instance.ref("${widget.roomRef}/raisedHands");
+    final ref = FirebaseDatabase.instance.ref('${widget.roomRef}/raisedHands');
     onAddListener = ref.onChildAdded.listen((event) {
       getRaisedHands();
     });

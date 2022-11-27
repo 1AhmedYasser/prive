@@ -1,11 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/screen_slider.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
 import 'package:prive/Widgets/Common/intro_slider_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -20,20 +21,20 @@ class _IntroScreenState extends State<IntroScreen> {
 
   final _introSliders = [
     IntroSliderWidget(
-        image: R.images.introImage1,
-        title: "Messaging & Calls".tr(),
-        description:
-            "${"Voice and video calls".tr()}\n${"Free .. secure".tr()}"),
+      image: Images.introImage1,
+      title: 'Messaging & Calls'.tr(),
+      description: "${"Voice and video calls".tr()}\n${"Free .. secure".tr()}",
+    ),
     IntroSliderWidget(
-        image: R.images.introImage2,
-        title: "Online Market".tr(),
-        description:
-            "Make your catalog and start sell your products online".tr()),
+      image: Images.introImage2,
+      title: 'Online Market'.tr(),
+      description: 'Make your catalog and start sell your products online'.tr(),
+    ),
     IntroSliderWidget(
-        image: R.images.introImage3,
-        title: "Rooms".tr(),
-        description:
-            "${"Join rooms and take".tr()}\n${"to your favorite room".tr()}"),
+      image: Images.introImage3,
+      title: 'Rooms'.tr(),
+      description: "${"Join rooms and take".tr()}\n${"to your favorite room".tr()}",
+    ),
   ];
 
   @override
@@ -83,8 +84,7 @@ class _IntroScreenState extends State<IntroScreen> {
             ),
             const SizedBox(height: 50),
             ElevatedButton(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, R.routes.loginRoute),
+              onPressed: () => Navigator.pushReplacementNamed(context, Routes.loginRoute),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
                 elevation: 0,
@@ -97,9 +97,8 @@ class _IntroScreenState extends State<IntroScreen> {
                 ),
               ),
               child: Text(
-                "Start Messaging".tr(),
-                style:
-                    const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                'Start Messaging'.tr(),
+                style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
               ),
             ),
             SizedBox(

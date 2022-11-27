@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:prive/Helpers/stream_manager.dart';
-import '../../../Extras/resources.dart';
-import '../../../Models/Catalogs/catalog.dart';
-import '../../../Models/Catalogs/catalogProduct.dart';
-import '../../../Screens/Catalogs/catalog_manager_screen.dart';
-import '../../../Screens/Catalogs/product_details_screen.dart';
-import '../../Common/cached_image.dart';
+import 'package:prive/Models/Catalogs/catalog.dart';
+import 'package:prive/Models/Catalogs/catalogProduct.dart';
+import 'package:prive/Screens/Catalogs/catalog_manager_screen.dart';
+import 'package:prive/Screens/Catalogs/product_details_screen.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 
 class CatalogMessage extends StatefulWidget {
   final BuildContext context;
@@ -30,20 +30,19 @@ class _CatalogMessageState extends State<CatalogMessage> {
   String? description;
   String? price;
   String? owner;
-  String? photo = "";
-  String? photo2 = "";
-  String? photo3 = "";
+  String? photo = '';
+  String? photo2 = '';
+  String? photo3 = '';
   @override
   void initState() {
     type = widget.details.attachments.first.extraData['ctype'] as String?;
     id = widget.details.attachments.first.extraData['id'] as String?;
     cid = widget.details.attachments.first.extraData['cid'] as String?;
     name = widget.details.attachments.first.extraData['name'] as String?;
-    description =
-        widget.details.attachments.first.extraData['description'] as String?;
+    description = widget.details.attachments.first.extraData['description'] as String?;
     price = widget.details.attachments.first.extraData['price'] as String?;
     owner = widget.details.attachments.first.extraData['ownerId'] as String?;
-    if (type == "product") {
+    if (type == 'product') {
       photo = widget.details.attachments.first.extraData['photo1'] as String?;
       photo2 = widget.details.attachments.first.extraData['photo2'] as String?;
       photo3 = widget.details.attachments.first.extraData['photo3'] as String?;
@@ -105,11 +104,11 @@ class _CatalogMessageState extends State<CatalogMessage> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: photo != "NONE"
+                      child: photo != 'NONE'
                           ? CachedImage(
-                              url: photo ?? "",
+                              url: photo ?? '',
                             )
-                          : Image.asset(R.images.collectionsImage),
+                          : Image.asset(Images.collectionsImage),
                     ),
                   ),
                 ),
@@ -122,21 +121,17 @@ class _CatalogMessageState extends State<CatalogMessage> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12, right: 12),
                   child: Column(
-                    crossAxisAlignment: type == 'product'
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.center,
+                    crossAxisAlignment: type == 'product' ? CrossAxisAlignment.start : CrossAxisAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 5),
                         child: Text(
-                          name ?? "",
+                          name ?? '',
                           style: TextStyle(
-                              color: widget.details.user?.id ==
-                                      context.currentUser?.id
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600),
+                            color: widget.details.user?.id == context.currentUser?.id ? Colors.white : Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       if (price != null)
@@ -145,10 +140,7 @@ class _CatalogMessageState extends State<CatalogMessage> {
                           child: Text(
                             "$price ${"SAR".tr()}",
                             style: TextStyle(
-                              color: widget.details.user?.id ==
-                                      context.currentUser?.id
-                                  ? Colors.white
-                                  : Colors.black,
+                              color: widget.details.user?.id == context.currentUser?.id ? Colors.white : Colors.black,
                             ),
                           ),
                         ),
@@ -159,12 +151,11 @@ class _CatalogMessageState extends State<CatalogMessage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 5, top: 5),
                 child: Text(
-                  "View",
+                  'View',
                   style: TextStyle(
-                      color: widget.details.user?.id == context.currentUser?.id
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 17),
+                    color: widget.details.user?.id == context.currentUser?.id ? Colors.white : Colors.black,
+                    fontSize: 17,
+                  ),
                 ).tr(),
               ),
             ],

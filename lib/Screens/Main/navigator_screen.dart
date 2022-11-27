@@ -5,7 +5,6 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/notifications_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Providers/channels_provider.dart';
@@ -16,6 +15,9 @@ import 'package:prive/Screens/Home/stories_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+
+import '../../Resources/images.dart';
+import '../../Resources/shared_pref.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -66,13 +68,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           height: 60,
           top: -25,
           items: [
-            _buildTab("Chat".tr(), R.images.chatTabImage, 0),
-            _buildTab("Calls".tr(), R.images.phoneTabImage, 1),
+            _buildTab("Chat".tr(), Images.chatTabImage, 0),
+            _buildTab("Calls".tr(), Images.phoneTabImage, 1),
             TabItem(
               icon: Container(),
             ),
-            _buildTab("Rooms".tr(), R.images.micTabImage, 3),
-            _buildTab("Stories".tr(), R.images.storiesTabImage, 4),
+            _buildTab("Rooms".tr(), Images.micTabImage, 3),
+            _buildTab("Stories".tr(), Images.storiesTabImage, 4),
           ],
           initialActiveIndex: 2,
           onTap: (int i) => _onTabTapped(i),
@@ -129,7 +131,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       List contacts = await Utils.fetchContacts(context);
       List<User> users = contacts.first;
       String usersMap = jsonEncode(users);
-      Utils.saveString(R.pref.myContacts, usersMap);
+      Utils.saveString(SharedPref.myContacts, usersMap);
       if (mounted) {
         Provider.of<ChannelsProvider>(context, listen: false).refreshChannels();
       }
@@ -164,7 +166,7 @@ class _ChipBuilder extends ChipBuilder {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Image.asset(R.images.addTabImage),
+                        child: Image.asset(Images.addTabImage),
                       ),
                     ),
                   ),
@@ -199,17 +201,17 @@ class _ChipBuilder extends ChipBuilder {
   String getImage(int index) {
     switch (index) {
       case 0:
-        return R.images.chatTabImage;
+        return Images.chatTabImage;
       case 1:
-        return R.images.phoneTabImage;
+        return Images.phoneTabImage;
       case 2:
-        return R.images.addTabImage;
+        return Images.addTabImage;
       case 3:
-        return R.images.micTabImage;
+        return Images.micTabImage;
       case 4:
-        return R.images.storiesTabImage;
+        return Images.storiesTabImage;
       default:
-        return R.images.chatTabImage;
+        return Images.chatTabImage;
     }
   }
 

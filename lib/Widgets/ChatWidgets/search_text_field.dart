@@ -13,18 +13,18 @@ class SearchTextField extends StatefulWidget {
   final double borderRadius;
   final bool isFilled;
 
-  const SearchTextField(
-      {Key? key,
-      required this.controller,
-      this.onChanged,
-      this.onTap,
-      this.hintText = 'Search',
-      this.showCloseButton = true,
-      this.closeOnSearch = true,
-      this.isFilled = false,
-      this.borderRadius = 24,
-      this.autoFocus = false})
-      : super(key: key);
+  const SearchTextField({
+    Key? key,
+    required this.controller,
+    this.onChanged,
+    this.onTap,
+    this.hintText = 'Search',
+    this.showCloseButton = true,
+    this.closeOnSearch = true,
+    this.isFilled = false,
+    this.borderRadius = 24,
+    this.autoFocus = false,
+  }) : super(key: key);
 
   @override
   State<SearchTextField> createState() => _SearchTextFieldState();

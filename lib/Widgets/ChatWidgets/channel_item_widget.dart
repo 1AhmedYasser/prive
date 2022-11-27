@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Widgets/ChatWidgets/typing_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -22,7 +23,7 @@ class ChannelItemWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ChannelItemWidgetState createState() => _ChannelItemWidgetState();
+  State<ChannelItemWidget> createState() => _ChannelItemWidgetState();
 }
 
 class _ChannelItemWidgetState extends State<ChannelItemWidget> {
@@ -74,7 +75,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                             color: Theme.of(context).primaryColorDark,
                           ),
                         ),
-                        child: Lottie.asset(R.animations.groupCallIndicator, repeat: true, reverse: true),
+                        child: Lottie.asset(Animations.groupCallIndicator, repeat: true, reverse: true),
                       ),
                     )
                 ],
@@ -106,7 +107,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                     return const SizedBox.shrink();
                                   } else {
                                     return Text(
-                                      snapshot.data as String? ?? "",
+                                      snapshot.data as String? ?? '',
                                       style: const TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.w600,
@@ -198,11 +199,11 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                   Expanded(
                                     child: TypingIndicatorWidget(
                                       alternativeWidget: Align(
-                                        alignment: context.locale.languageCode == "en"
+                                        alignment: context.locale.languageCode == 'en'
                                             ? Alignment.centerLeft
                                             : Alignment.centerRight,
                                         child: Text(
-                                          lastMessage?.text ?? "",
+                                          lastMessage?.text ?? '',
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
@@ -231,7 +232,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 8, right: 8, top: 3.5, bottom: 3.5),
                                           child: Text(
-                                            "$count",
+                                            '$count',
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w600,
@@ -244,8 +245,8 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                   if (lastMessage?.user?.id == context.currentUser?.id)
                                     Padding(
                                       padding: EdgeInsets.only(
-                                        right: context.locale.languageCode == "en" ? 18 : 0,
-                                        left: context.locale.languageCode == "en" ? 0 : 18,
+                                        right: context.locale.languageCode == 'en' ? 18 : 0,
+                                        left: context.locale.languageCode == 'en' ? 0 : 18,
                                       ),
                                       child: StreamChatTheme(
                                         data: StreamChatThemeData.fromTheme(
@@ -257,10 +258,14 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
                                           message: lastMessage ?? Message(),
                                           size: 22.5,
                                           isMessageRead: widget.channel.state!.read
-                                              .where((element) =>
-                                                  element.user.id != widget.channel.client.state.currentUser!.id)
-                                              .where((element) =>
-                                                  element.lastRead.isAfter(lastMessage?.createdAt ?? DateTime.now()))
+                                              .where(
+                                                (element) =>
+                                                    element.user.id != widget.channel.client.state.currentUser!.id,
+                                              )
+                                              .where(
+                                                (element) =>
+                                                    element.lastRead.isAfter(lastMessage?.createdAt ?? DateTime.now()),
+                                              )
                                               .isNotEmpty,
                                         ),
                                       ),
@@ -283,32 +288,34 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
 
   Future<String?> _getChannelName() async {
     if (widget.channel.isGroup) {
-      return widget.channel.name ?? "";
+      return widget.channel.name ?? '';
     } else {
       final otherMember = widget.channel.state!.members.firstWhere(
         (member) => member.userId != context.currentUser?.id,
       );
       await _getContacts();
-      if (usersPhoneNumbers.contains(otherMember.user?.extraData["phone"] as String?)) {
-        return otherMember.user?.name ?? "";
+      if (usersPhoneNumbers.contains(otherMember.user?.extraData['phone'] as String?)) {
+        return otherMember.user?.name ?? '';
       } else {
-        return otherMember.user?.extraData["phone"] as String? ?? "";
+        return otherMember.user?.extraData['phone'] as String? ?? '';
       }
     }
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       usersPhoneNumbers = users
@@ -321,7 +328,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   }
 
   void checkForGroupCall() async {
-    final databaseReference = FirebaseDatabase.instance.ref("GroupCalls/${widget.channel.id}");
+    final databaseReference = FirebaseDatabase.instance.ref('GroupCalls/${widget.channel.id}');
 
     final snapshot = await databaseReference.get();
     if (snapshot.exists) {

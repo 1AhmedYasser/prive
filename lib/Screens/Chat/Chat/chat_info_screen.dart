@@ -11,8 +11,8 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 
-import '../../../Extras/resources.dart';
 import '../../../Helpers/Utils.dart';
+import '../../../Resources/shared_pref.dart';
 
 /// Detail screen for a 1:1 chat correspondence
 class ChatInfoScreen extends StatefulWidget {
@@ -553,9 +553,9 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

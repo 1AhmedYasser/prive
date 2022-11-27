@@ -2,13 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Models/Catalogs/catalog.dart';
 import 'package:prive/Models/Catalogs/collection.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import '../../../Helpers/Utils.dart';
-import '../../../UltraNetwork/ultra_network.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -23,8 +23,8 @@ class NewCatalogCollectionWidget extends StatefulWidget {
   final bool isEdit;
   const NewCatalogCollectionWidget({
     Key? key,
-    this.title = "",
-    this.type = "",
+    this.title = '',
+    this.type = '',
     this.isCatalog = true,
     this.withImage = true,
     this.catalogId,
@@ -34,24 +34,22 @@ class NewCatalogCollectionWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<NewCatalogCollectionWidget> createState() =>
-      _NewCatalogCollectionWidgetState();
+  State<NewCatalogCollectionWidget> createState() => _NewCatalogCollectionWidgetState();
 }
 
-class _NewCatalogCollectionWidgetState
-    extends State<NewCatalogCollectionWidget> {
+class _NewCatalogCollectionWidgetState extends State<NewCatalogCollectionWidget> {
   TextEditingController nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  late File image = File("");
+  late File image = File('');
   final imagePicker = ImagePicker();
   CancelToken cancelToken = CancelToken();
 
   @override
   void initState() {
     if (widget.catalog != null) {
-      nameController.text = widget.catalog?.catalogeName ?? "";
+      nameController.text = widget.catalog?.catalogeName ?? '';
     } else if (widget.collection != null) {
-      nameController.text = widget.collection?.collectionName ?? "";
+      nameController.text = widget.collection?.collectionName ?? '';
     }
     super.initState();
   }
@@ -97,8 +95,7 @@ class _NewCatalogCollectionWidgetState
                 cursorColor: const Color(0xff777777),
                 decoration: InputDecoration(
                   hintText: "${widget.type} ${"Name".tr()}",
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
                   labelStyle: const TextStyle(
                     color: Color(0xff777777),
                   ),
@@ -112,8 +109,7 @@ class _NewCatalogCollectionWidgetState
                     borderRadius: const BorderRadius.all(
                       Radius.circular(12),
                     ),
-                    borderSide: BorderSide(
-                        color: Theme.of(context).primaryColor, width: 2),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                   ),
                   errorBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(
@@ -161,19 +157,18 @@ class _NewCatalogCollectionWidgetState
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: image.path.isEmpty
-                        ? widget.catalog?.catalogePhoto == "NONE" ||
-                                widget.catalog == null
+                        ? widget.catalog?.catalogePhoto == 'NONE' || widget.catalog == null
                             ? Padding(
                                 padding: const EdgeInsets.all(15),
                                 child: Image.asset(
-                                  R.images.newProductCameraImage,
+                                  Images.newProductCameraImage,
                                   fit: BoxFit.contain,
                                 ),
                               )
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
                                 child: CachedImage(
-                                  url: widget.catalog?.catalogePhoto ?? "",
+                                  url: widget.catalog?.catalogePhoto ?? '',
                                 ),
                               )
                         : ClipRRect(
@@ -194,14 +189,13 @@ class _NewCatalogCollectionWidgetState
                         if (!widget.isEdit) {
                           _createCatalog();
                         } else {
-                          _updateCatalog(widget.catalog?.catalogeID ?? "");
+                          _updateCatalog(widget.catalog?.catalogeID ?? '');
                         }
                       } else {
                         if (widget.isEdit) {
-                          _updateCollection(widget.catalogId ?? "",
-                              widget.collection?.collectionID ?? "");
+                          _updateCollection(widget.catalogId ?? '', widget.collection?.collectionID ?? '');
                         } else {
-                          _createCollection(widget.catalogId ?? "");
+                          _createCollection(widget.catalogId ?? '');
                         }
                       }
                     }
@@ -242,14 +236,10 @@ class _NewCatalogCollectionWidgetState
   }
 
   Future<void> _createCatalog() async {
-    Map<String, dynamic> parameters = {
-      "UserID": context.currentUser?.id,
-      "CatalogeName": nameController.text
-    };
+    Map<String, dynamic> parameters = {'UserID': context.currentUser?.id, 'CatalogeName': nameController.text};
 
     if (image.path.isNotEmpty) {
-      parameters["CatalogePhoto"] =
-          await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
+      parameters['CatalogePhoto'] = await MultipartFile.fromFile(image.path, filename: 'CatalogePhoto');
     }
 
     if (mounted) {
@@ -269,14 +259,10 @@ class _NewCatalogCollectionWidgetState
   }
 
   Future<void> _updateCatalog(String catalogId) async {
-    Map<String, dynamic> parameters = {
-      "CatalogeID": catalogId,
-      "CatalogeName": nameController.text
-    };
+    Map<String, dynamic> parameters = {'CatalogeID': catalogId, 'CatalogeName': nameController.text};
 
     if (image.path.isNotEmpty) {
-      parameters["CatalogePhoto"] =
-          await MultipartFile.fromFile(image.path, filename: "CatalogePhoto");
+      parameters['CatalogePhoto'] = await MultipartFile.fromFile(image.path, filename: 'CatalogePhoto');
     }
 
     if (mounted) {
@@ -297,14 +283,13 @@ class _NewCatalogCollectionWidgetState
 
   void _createCollection(String catalogId) async {
     Map<String, dynamic> parameters = {
-      "UserID": context.currentUser?.id,
-      "CatalogeID": catalogId,
-      "CollectionName": nameController.text
+      'UserID': context.currentUser?.id,
+      'CatalogeID': catalogId,
+      'CollectionName': nameController.text
     };
 
     if (image.path.isNotEmpty) {
-      parameters["CollectionPhoto"] =
-          await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
+      parameters['CollectionPhoto'] = await MultipartFile.fromFile(image.path, filename: 'CollectionPhoto');
     }
 
     if (mounted) {
@@ -325,14 +310,13 @@ class _NewCatalogCollectionWidgetState
 
   Future<void> _updateCollection(String catalogId, String collectionId) async {
     Map<String, dynamic> parameters = {
-      "CatalogeID": catalogId,
-      "CollectionID": collectionId,
-      "CollectionName": nameController.text
+      'CatalogeID': catalogId,
+      'CollectionID': collectionId,
+      'CollectionName': nameController.text
     };
 
     if (image.path.isNotEmpty) {
-      parameters["CollectionPhoto"] =
-          await MultipartFile.fromFile(image.path, filename: "CollectionPhoto");
+      parameters['CollectionPhoto'] = await MultipartFile.fromFile(image.path, filename: 'CollectionPhoto');
     }
 
     if (mounted) {

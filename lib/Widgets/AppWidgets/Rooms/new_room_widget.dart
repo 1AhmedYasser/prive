@@ -5,14 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Models/Rooms/room_user.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Rooms/people_chooser_screen.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import '../../../Helpers/Utils.dart';
-import '../../../Models/Rooms/room.dart';
-import '../../../Screens/Rooms/room_screen.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Models/Rooms/room.dart';
+import 'package:prive/Screens/Rooms/room_screen.dart';
 
 class NewRoomWidget extends StatefulWidget {
   const NewRoomWidget({Key? key}) : super(key: key);
@@ -50,13 +51,12 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
           ),
         ),
         child: Padding(
-          padding:
-              const EdgeInsets.only(left: 40, top: 30, right: 40, bottom: 30),
+          padding: const EdgeInsets.only(left: 40, top: 30, right: 40, bottom: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "New Room",
+                'New Room',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -64,7 +64,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               ).tr(),
               const SizedBox(height: 20),
               const Text(
-                "What Will Your Room Be About ?",
+                'What Will Your Room Be About ?',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               const SizedBox(height: 15),
               _buildRoomField(
                 controller: topicNameController,
-                hint: "Topic Name".tr(),
+                hint: 'Topic Name'.tr(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter A Topic Name'.tr();
@@ -84,7 +84,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Tell Us About Your Room",
+                'Tell Us About Your Room',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -93,36 +93,30 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
               const SizedBox(height: 15),
               _buildRoomField(
                 controller: descriptionController,
-                hint: "Room Description".tr(),
+                hint: 'Room Description'.tr(),
                 maxLines: 3,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
                 validator: (value) {
                   return null;
                 },
               ),
               const SizedBox(height: 20),
               const Text(
-                "Choose Your Room",
+                'Choose Your Room',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ).tr(),
               const SizedBox(height: 15),
-              buildRoomType(
-                  R.images.publicRoom,
-                  "Open For Every One".tr(),
-                  "Start A Public Room Open For Every One In Your Contacts"
-                      .tr(),
-                  0, () {
+              buildRoomType(Images.publicRoom, 'Open For Every One'.tr(),
+                  'Start A Public Room Open For Every One In Your Contacts'.tr(), 0, () {
                 setState(() {
                   selectedRoomType = 0;
                 });
               }),
               const SizedBox(height: 15),
-              buildRoomType(R.images.closedRoom, "Closed".tr(),
-                  "Start A Private Room With These People".tr(), 1, () {
+              buildRoomType(Images.closedRoom, 'Closed'.tr(), 'Start A Private Room With These People'.tr(), 1, () {
                 setState(() {
                   selectedRoomType = 1;
                 });
@@ -133,7 +127,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   children: [
                     Expanded(
                       child: Text(
-                        "Choose Date & Time".tr(),
+                        'Choose Date & Time'.tr(),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -187,7 +181,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           DateFormat('d MMM yyyy').format(
                             selectedDateTime ?? DateTime.now(),
                           ),
-                          R.images.calendarImage, () {
+                          Images.calendarImage, () {
                         showDatePicker();
                       }),
                       const SizedBox(
@@ -197,7 +191,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           DateFormat('hh:mm a').format(
                             selectedDateTime ?? DateTime.now(),
                           ),
-                          R.images.clockImage, () {
+                          Images.clockImage, () {
                         showDatePicker(isTime: true);
                       }),
                     ],
@@ -209,15 +203,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       RoomUser owner = RoomUser(
-                        id: context.currentUser?.id ?? "",
-                        name: context.currentUser?.name ?? "",
-                        image: context.currentUser?.image ?? "",
+                        id: context.currentUser?.id ?? '',
+                        name: context.currentUser?.name ?? '',
+                        image: context.currentUser?.image ?? '',
                         isOwner: true,
                         isSpeaker: true,
                         hasPermissionToSpeak: true,
                         isListener: false,
-                        phone:
-                            context.currentUser?.extraData['phone'] as String,
+                        phone: context.currentUser?.extraData['phone'] as String,
                         isHandRaised: false,
                         isMicOn: true,
                       );
@@ -232,45 +225,44 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           isSpeaker: false,
                           hasPermissionToSpeak: false,
                           isListener: true,
-                          phone: user.extraData["phone"] as String,
+                          phone: user.extraData['phone'] as String,
                           isHandRaised: false,
                           isMicOn: false,
                         ).toJson();
                       }
                       if (selectedRoomType == 0) {
                         if (isSelected.first == false) {
-                          if (selectedDateTime?.isBefore(DateTime.now()) ==
-                              true) {
+                          if (selectedDateTime?.isBefore(DateTime.now()) == true) {
                             selectedDateTime = DateTime.now();
                           }
                           Navigator.pop(context);
                           DatabaseReference ref = FirebaseDatabase.instance.ref(
-                              "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(selectedDateTime ?? DateTime.now()).toString()}");
+                            "upcoming_rooms/${context.currentUser?.id ?? ""}/${DateFormat('yyyyMMddhhmmmss').format(selectedDateTime ?? DateTime.now()).toString()}",
+                          );
                           await ref.set({
-                            "topic": topicNameController.text,
-                            "description": descriptionController.text,
-                            "owner": owner.toJson(),
-                            "speakers": {owner.id: owner.toJson()},
-                            "listeners": {},
-                            "room_contacts": roomContacts,
-                            "raised_hands": {},
-                            "date_time": selectedDateTime.toString()
+                            'topic': topicNameController.text,
+                            'description': descriptionController.text,
+                            'owner': owner.toJson(),
+                            'speakers': {owner.id: owner.toJson()},
+                            'listeners': {},
+                            'room_contacts': roomContacts,
+                            'raised_hands': {},
+                            'date_time': selectedDateTime.toString()
                           });
                         } else {
-                          DatabaseReference ref = FirebaseDatabase.instance
-                              .ref("rooms/${context.currentUser?.id ?? ""}");
-                          String roomId = DateFormat('yyyyMMddhhmmmss', "en")
-                              .format(selectedDateTime ?? DateTime.now())
-                              .toString();
+                          DatabaseReference ref =
+                              FirebaseDatabase.instance.ref("rooms/${context.currentUser?.id ?? ""}");
+                          String roomId =
+                              DateFormat('yyyyMMddhhmmmss', 'en').format(selectedDateTime ?? DateTime.now()).toString();
                           await ref.set({
-                            "topic": topicNameController.text,
-                            "description": descriptionController.text,
-                            "owner": owner.toJson(),
-                            "speakers": {owner.id: owner.toJson()},
-                            "listeners": {},
-                            "room_contacts": roomContacts,
-                            "raised_hands": {},
-                            "roomId": roomId
+                            'topic': topicNameController.text,
+                            'description': descriptionController.text,
+                            'owner': owner.toJson(),
+                            'speakers': {owner.id: owner.toJson()},
+                            'listeners': {},
+                            'room_contacts': roomContacts,
+                            'raised_hands': {},
+                            'roomId': roomId
                           });
 
                           if (mounted) {
@@ -302,11 +294,9 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           MaterialPageRoute(
                             builder: (context) => PeopleChooserScreen(
                               roomName: topicNameController.text.trim(),
-                              roomDescription:
-                                  descriptionController.text.trim(),
+                              roomDescription: descriptionController.text.trim(),
                               isNow: isSelected.first,
-                              selectedDateTime:
-                                  selectedDateTime ?? DateTime.now(),
+                              selectedDateTime: selectedDateTime ?? DateTime.now(),
                             ),
                           ),
                         );
@@ -324,9 +314,9 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                   child: Text(
                     selectedRoomType == 0
                         ? isSelected.first
-                            ? "Start Room"
-                            : "Schedule Room"
-                        : "Choose People",
+                            ? 'Start Room'
+                            : 'Schedule Room'
+                        : 'Choose People',
                     style: const TextStyle(fontSize: 18),
                   ).tr(),
                 ),
@@ -338,13 +328,13 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
     );
   }
 
-  TextFormField _buildRoomField(
-      {required TextEditingController controller,
-      String hint = "",
-      int maxLines = 1,
-      required Function validator,
-      EdgeInsets contentPadding =
-          const EdgeInsets.symmetric(horizontal: 25, vertical: 10)}) {
+  TextFormField _buildRoomField({
+    required TextEditingController controller,
+    String hint = '',
+    int maxLines = 1,
+    required Function validator,
+    EdgeInsets contentPadding = const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.text,
@@ -366,8 +356,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
           borderRadius: const BorderRadius.all(
             Radius.circular(12),
           ),
-          borderSide:
-              BorderSide(color: Theme.of(context).primaryColor, width: 2),
+          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
         ),
         errorBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(
@@ -414,7 +403,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         Navigator.pop(context);
                       },
                       child: const Text(
-                        "Cancel",
+                        'Cancel',
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 17,
@@ -442,7 +431,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        "Done",
+                        'Done',
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontSize: 17,
@@ -457,15 +446,14 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                 child: CupertinoDatePicker(
                   minimumYear: DateTime.now().year,
                   minimumDate: DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day,
-                      DateTime.now().hour,
-                      chosenDateTime.minute),
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                    DateTime.now().hour,
+                    chosenDateTime.minute,
+                  ),
                   initialDateTime: chosenDateTime,
-                  mode: isTime
-                      ? CupertinoDatePickerMode.time
-                      : CupertinoDatePickerMode.date,
+                  mode: isTime ? CupertinoDatePickerMode.time : CupertinoDatePickerMode.date,
                   onDateTimeChanged: (dateTime) {
                     chosenDateTime = dateTime;
                   },
@@ -516,8 +504,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
     );
   }
 
-  Widget buildRoomType(String image, String title, String description, int type,
-      Function onPressed) {
+  Widget buildRoomType(String image, String title, String description, int type, Function onPressed) {
     return InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
@@ -570,20 +557,19 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
-    if (myContacts != null &&
-        myContacts.isNotEmpty == true &&
-        myContacts != "[]") {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
+    if (myContacts != null && myContacts.isNotEmpty == true && myContacts != '[]') {
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       setState(() {});
@@ -591,6 +577,7 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
       if (!await FlutterContacts.requestPermission(readonly: true)) {
         // TODO: Permission Needed
       } else {
+        if (!mounted) return;
         List contacts = await Utils.fetchContacts(context);
         users = contacts.first;
       }

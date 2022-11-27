@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 class PriveAppBar extends StatelessWidget {
   final String title;
 
-  const PriveAppBar({Key? key, this.title = ""}) : super(key: key);
+  const PriveAppBar({Key? key, this.title = ''}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -3,9 +3,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
 import 'dart:io';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 
 class ChatBackgroundsScreen extends StatefulWidget {
   const ChatBackgroundsScreen({Key? key}) : super(key: key);
@@ -24,19 +25,19 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
   bool isFileSelected = false;
 
   List<String> chatBackgrounds = [
-    R.images.chatBackground1,
-    R.images.chatBackground2,
-    R.images.chatBackground3,
-    R.images.chatBackground4,
-    R.images.chatBackground5,
-    R.images.chatBackground6,
-    R.images.chatBackground7,
-    R.images.chatBackground8,
-    R.images.chatBackground9,
-    R.images.chatBackground10,
-    R.images.chatBackground11,
-    R.images.chatBackground12,
-    R.images.chatBackground13,
+    Images.chatBackground1,
+    Images.chatBackground2,
+    Images.chatBackground3,
+    Images.chatBackground4,
+    Images.chatBackground5,
+    Images.chatBackground6,
+    Images.chatBackground7,
+    Images.chatBackground8,
+    Images.chatBackground9,
+    Images.chatBackground10,
+    Images.chatBackground11,
+    Images.chatBackground12,
+    Images.chatBackground13,
   ];
 
   @override
@@ -112,16 +113,15 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
               if (isFileSelected) {
                 selectedGalleryImage = galleryImage;
                 selectedImage = "";
-                Utils.saveString(
-                    R.pref.chosenChatBackground, selectedGalleryImage.path);
-                Utils.saveBool(R.pref.isChosenChatBackgroundAFile, true);
+                Utils.saveString(SharedPref.chosenChatBackground, selectedGalleryImage.path);
+                Utils.saveBool(SharedPref.isChosenChatBackgroundAFile, true);
                 Navigator.pop(context);
               } else {
                 selectedImage = previewedImage;
                 selectedGalleryImage = File("");
                 galleryImage = File("");
-                Utils.saveString(R.pref.chosenChatBackground, selectedImage);
-                Utils.saveBool(R.pref.isChosenChatBackgroundAFile, false);
+                Utils.saveString(SharedPref.chosenChatBackground, selectedImage);
+                Utils.saveBool(SharedPref.isChosenChatBackgroundAFile, false);
               }
             });
           },
@@ -150,8 +150,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding:
-                const EdgeInsets.only(left: 22, right: 27, bottom: 15, top: 35),
+            padding: const EdgeInsets.only(left: 22, right: 27, bottom: 15, top: 35),
             child: InkWell(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
@@ -159,7 +158,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
               child: Row(
                 children: [
                   Image.asset(
-                    R.images.chatBackgroundImage,
+                    Images.chatBackgroundImage,
                     width: 20,
                   ),
                   const SizedBox(width: 18),
@@ -182,8 +181,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
           ),
           const Divider(),
           Padding(
-            padding:
-                const EdgeInsets.only(left: 7, right: 7, top: 17, bottom: 20),
+            padding: const EdgeInsets.only(left: 7, right: 7, top: 17, bottom: 20),
             child: MediaQuery.removePadding(
               context: context,
               removeBottom: true,
@@ -192,9 +190,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 0.49,
-                    crossAxisSpacing: 0),
+                    crossAxisCount: 3, childAspectRatio: 0.49, crossAxisSpacing: 0),
                 itemBuilder: (context, index) {
                   return InkWell(
                     splashColor: Colors.transparent,
@@ -224,10 +220,7 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
-                                        border: Border.all(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            width: 0.5),
+                                        border: Border.all(color: Theme.of(context).primaryColor, width: 0.5),
                                       ),
                                       child: Icon(
                                         FontAwesomeIcons.solidCircleCheck,
@@ -253,20 +246,18 @@ class _ChatBackgroundsScreenState extends State<ChatBackgroundsScreen> {
   }
 
   void _getChosenBackground() async {
-    bool? isAFile = await Utils.getBool(R.pref.isChosenChatBackgroundAFile);
+    bool? isAFile = await Utils.getBool(SharedPref.isChosenChatBackgroundAFile);
 
     if (isAFile == true) {
-      galleryImage =
-          File(await Utils.getString(R.pref.chosenChatBackground) ?? "");
+      galleryImage = File(await Utils.getString(SharedPref.chosenChatBackground) ?? "");
       selectedGalleryImage = galleryImage;
       selectedImage = "";
       setState(() {});
     } else {
       if (isAFile == null) {
-        selectedImage = R.images.chatBackground1;
+        selectedImage = Images.chatBackground1;
       } else {
-        selectedImage =
-            await Utils.getString(R.pref.chosenChatBackground) ?? "";
+        selectedImage = await Utils.getString(SharedPref.chosenChatBackground) ?? "";
         selectedGalleryImage = File("");
         galleryImage = File("");
       }

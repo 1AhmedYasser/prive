@@ -13,7 +13,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
 import 'package:lottie/lottie.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
@@ -32,6 +31,10 @@ import '../../../Models/Call/call.dart';
 import '../../../Models/Call/call_member.dart';
 import '../../../Models/Chat/group_admin.dart';
 import '../../../Providers/call_provider.dart';
+import '../../../Resources/animations.dart';
+import '../../../Resources/images.dart';
+import '../../../Resources/shared_pref.dart';
+import '../../../Resources/sounds.dart';
 import '../../../Widgets/ChatWidgets/Messages/catalog_message.dart';
 import '../../../Widgets/Common/cached_image.dart';
 import '../../Calls/group_call_screen.dart';
@@ -66,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController = TextEditingController();
   FocusNode messageFocus = FocusNode();
   bool? isAFile;
-  String chatBackground = R.images.chatBackground1;
+  String chatBackground = Images.chatBackground1;
   Message? _quotedMessage;
   FocusNode? _focusNode;
   loc.Location location = loc.Location();
@@ -330,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           await startCall();
                         },
                         child: Image.asset(
-                          R.images.videoCallImage,
+                          Images.videoCallImage,
                           width: 25,
                         ),
                       ),
@@ -342,7 +345,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           await startCall(isVideo: false);
                         },
                         child: Image.asset(
-                          R.images.voiceCallImage,
+                          Images.voiceCallImage,
                           width: 22,
                         ),
                       ),
@@ -407,7 +410,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(width: 25),
                       GestureDetector(
                         child: Image.asset(
-                          R.images.forwardIcon,
+                          Images.forwardIcon,
                           color: selectedMessages.isEmpty ? Colors.grey.withOpacity(0.4) : null,
                           width: 20.5,
                         ),
@@ -432,7 +435,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(width: 30),
                       GestureDetector(
                         child: Image.asset(
-                          R.images.deleteChatImage,
+                          Images.deleteChatImage,
                           color: selectedMessages.isEmpty ? Colors.grey.withOpacity(0.4) : null,
                           width: 16.5,
                         ),
@@ -556,7 +559,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         Utils.showAlert(
                                           context,
                                           message: "You Have Been Kicked Out Of This Call".tr(),
-                                          alertImage: R.images.alertInfoImage,
+                                          alertImage: Images.alertInfoImage,
                                         );
                                       } else {
                                         BotToast.removeAll("call_overlay");
@@ -871,7 +874,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 )
                               : const SizedBox(width: 15),
                       preMessageSending: (message) {
-                        Utils.playSound(R.sounds.sendMessage);
+                        Utils.playSound(Sounds.sendMessage);
                         return message;
                       },
                       activeSendButton: adminSelf != null
@@ -1027,37 +1030,37 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildLottieAnimation() {
     switch (randomNumber) {
       case 0:
-        return Lottie.asset(R.animations.chatHello1);
+        return Lottie.asset(Animations.chatHello1);
       case 1:
-        return Lottie.asset(R.animations.chatHello2);
+        return Lottie.asset(Animations.chatHello2);
       case 2:
-        return Lottie.asset(R.animations.chatHello3);
+        return Lottie.asset(Animations.chatHello3);
       case 3:
-        return Lottie.asset(R.animations.chatHello4);
+        return Lottie.asset(Animations.chatHello4);
       case 4:
-        return Lottie.asset(R.animations.chatHello5);
+        return Lottie.asset(Animations.chatHello5);
       case 5:
-        return Lottie.asset(R.animations.chatHello6);
+        return Lottie.asset(Animations.chatHello6);
       case 6:
-        return Lottie.asset(R.animations.chatHello7);
+        return Lottie.asset(Animations.chatHello7);
       case 7:
-        return Lottie.asset(R.animations.chatHello8);
+        return Lottie.asset(Animations.chatHello8);
       case 8:
-        return Lottie.asset(R.animations.chatHello9);
+        return Lottie.asset(Animations.chatHello9);
       case 9:
-        return Lottie.asset(R.animations.chatHello10);
+        return Lottie.asset(Animations.chatHello10);
       case 10:
-        return Lottie.asset(R.animations.chatHello11);
+        return Lottie.asset(Animations.chatHello11);
       case 11:
-        return Lottie.asset(R.animations.chatHello12);
+        return Lottie.asset(Animations.chatHello12);
       case 12:
-        return Lottie.asset(R.animations.chatHello13);
+        return Lottie.asset(Animations.chatHello13);
       case 13:
-        return Lottie.asset(R.animations.chatHello14);
+        return Lottie.asset(Animations.chatHello14);
       case 14:
-        return Lottie.asset(R.animations.chatHello15);
+        return Lottie.asset(Animations.chatHello15);
       default:
-        return Lottie.asset(R.animations.chatHello1);
+        return Lottie.asset(Animations.chatHello1);
     }
   }
 
@@ -1129,7 +1132,7 @@ class _ChatScreenState extends State<ChatScreen> {
               return Row(
                 children: [
                   Image.asset(
-                    R.images.forwardIcon,
+                    Images.forwardIcon,
                     width: 15,
                   ),
                   const SizedBox(width: 10),
@@ -1389,8 +1392,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _getChatBackground() async {
-    isAFile = await Utils.getBool(R.pref.isChosenChatBackgroundAFile);
-    chatBackground = await Utils.getString(R.pref.chosenChatBackground) ?? R.images.chatBackground1;
+    isAFile = await Utils.getBool(SharedPref.isChosenChatBackgroundAFile);
+    chatBackground = await Utils.getString(SharedPref.chosenChatBackground) ?? Images.chatBackground1;
     setState(() {});
   }
 

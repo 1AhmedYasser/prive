@@ -1,17 +1,19 @@
 import 'dart:async';
-import 'package:easy_localization/easy_localization.dart';
+
 import 'package:bot_toast/bot_toast.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:prive/Widgets/Common/cached_image.dart';
+import 'package:prive/Helpers/Utils.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
+import 'package:prive/Resources/sounds.dart';
+import 'package:prive/Screens/Calls/single_call_screen.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
-import '../../../Extras/resources.dart';
-import '../../../Helpers/Utils.dart';
-import '../../../Screens/Calls/single_call_screen.dart';
 
 class CallingWidget extends StatefulWidget {
   final String channelName;
@@ -19,14 +21,14 @@ class CallingWidget extends StatefulWidget {
   final String callerImage;
   final bool isVideoCall;
   final BuildContext context;
-  const CallingWidget(
-      {Key? key,
-      required this.channelName,
-      required this.context,
-      this.callerName = "Incoming Call",
-      required this.isVideoCall,
-      this.callerImage = ""})
-      : super(key: key);
+  const CallingWidget({
+    Key? key,
+    required this.channelName,
+    required this.context,
+    this.callerName = 'Incoming Call',
+    required this.isVideoCall,
+    this.callerImage = '',
+  }) : super(key: key);
 
   @override
   State<CallingWidget> createState() => _CallingWidgetState();
@@ -43,14 +45,14 @@ class _CallingWidgetState extends State<CallingWidget> {
   void initState() {
     _setupRingingTone();
     timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => _setupRingingTone());
-    ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
-    usersRef = FirebaseDatabase.instance.ref("Users");
+    ref = FirebaseDatabase.instance.ref('SingleCalls/${widget.channelName}');
+    usersRef = FirebaseDatabase.instance.ref('Users');
     listener = ref.onValue.listen((DatabaseEvent event) async {
       if (event.snapshot.exists == false) {
         BotToast.cleanAll();
         FlutterCallkitIncoming.endAllCalls();
         await usersRef.update({
-          await Utils.getString(R.pref.userId) ?? "": "Ended",
+          await Utils.getString(SharedPref.userId) ?? '': 'Ended',
         });
       }
     });
@@ -100,7 +102,7 @@ class _CallingWidgetState extends State<CallingWidget> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          widget.isVideoCall ? "Video Call".tr() : "Voice Call".tr(),
+                          widget.isVideoCall ? 'Video Call'.tr() : 'Voice Call'.tr(),
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w600,
@@ -155,12 +157,12 @@ class _CallingWidgetState extends State<CallingWidget> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            R.images.acceptCall,
+                            Images.acceptCall,
                             width: 17,
                           ),
                           const SizedBox(width: 4),
                           const Text(
-                            "Reply",
+                            'Reply',
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.w600,
@@ -175,12 +177,12 @@ class _CallingWidgetState extends State<CallingWidget> {
                     child: ElevatedButton(
                       onPressed: () async {
                         FlutterCallkitIncoming.endAllCalls();
-                        Utils.logAnswerOrCancelCall(context, context.currentUser?.id ?? "", "CANCELLED", "0");
-                        DatabaseReference ref = FirebaseDatabase.instance.ref("SingleCalls/${widget.channelName}");
+                        Utils.logAnswerOrCancelCall(context, context.currentUser?.id ?? '', 'CANCELLED', '0');
+                        DatabaseReference ref = FirebaseDatabase.instance.ref('SingleCalls/${widget.channelName}');
                         ref.remove();
-                        DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
+                        DatabaseReference usersRef = FirebaseDatabase.instance.ref('Users');
                         await usersRef.update({
-                          await Utils.getString(R.pref.userId) ?? "": "Ended",
+                          await Utils.getString(SharedPref.userId) ?? '': 'Ended',
                         });
                         BotToast.cleanAll();
                       },
@@ -193,12 +195,12 @@ class _CallingWidgetState extends State<CallingWidget> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            R.images.declineCall,
+                            Images.declineCall,
                             width: 23,
                           ),
                           const SizedBox(width: 4),
                           const Text(
-                            "Decline",
+                            'Decline',
                             style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.w600,
@@ -220,7 +222,7 @@ class _CallingWidgetState extends State<CallingWidget> {
   }
 
   void _setupRingingTone() async {
-    await player.setAsset(R.sounds.incomingCall);
+    await player.setAsset(Sounds.incomingCall);
     player.play();
   }
 

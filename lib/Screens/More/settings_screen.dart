@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
 import 'package:prive/Screens/More/Settings/terms_privacy_screen.dart';
 import 'package:prive/Widgets/AppWidgets/option_row_widget.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
@@ -36,41 +37,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 const SizedBox(height: 30),
                 OptionRowWidget(
-                  image: R.images.notificationBellImage,
+                  image: Images.notificationBellImage,
                   title: "Notifications & Sounds".tr(),
-                  onPressed: () => Navigator.pushNamed(
-                          context, R.routes.notificationsSoundsRoute)
-                      .then((value) => setState(() {})),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, Routes.notificationsSoundsRoute).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
-                  image: R.images.chatImage,
+                  image: Images.chatImage,
                   title: "Chat Settings".tr(),
                   onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.chatSettingsRoute)
-                          .then((value) => setState(() {})),
+                      Navigator.pushNamed(context, Routes.chatSettingsRoute).then((value) => setState(() {})),
                 ),
                 OptionRowWidget(
-                  image: R.images.blockedUserImage,
+                  image: Images.blockedUserImage,
                   title: "Blocked Users".tr(),
                   onPressed: () {},
                 ),
                 OptionRowWidget(
-                  image: R.images.languageImage,
+                  image: Images.languageImage,
                   title: "Language".tr(),
-                  onPressed: () =>
-                      Navigator.pushNamed(context, R.routes.languageRoute)
-                          .then((value) => setState(() {})),
+                  onPressed: () => Navigator.pushNamed(context, Routes.languageRoute).then((value) => setState(() {})),
                 ),
                 const SizedBox(height: 5),
-                buildSettingsChoices("Help", () {},
-                    bottom: 30, textColor: const Color(0xff232323)),
+                buildSettingsChoices("Help", () {}, bottom: 30, textColor: const Color(0xff232323)),
                 buildSettingsChoices("Ask a Question".tr(), () {
                   _showAskQuestionDialog();
                 }),
                 buildSettingsChoices(
                   "Terms & Conditions".tr(),
-                  () => Navigator.pushNamed(context, R.routes.termsPrivacyRoute)
-                      .then((value) => setState(() {})),
+                  () => Navigator.pushNamed(context, Routes.termsPrivacyRoute).then((value) => setState(() {})),
                 ),
                 buildSettingsChoices(
                   "Privacy Policy".tr(),
@@ -118,8 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              side: BorderSide(color: Colors.white, width: 1.0)),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)), side: BorderSide(color: Colors.white, width: 1.0)),
           title: Center(
             child: Text(
               "Ask a Question".tr(),
@@ -164,8 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: Text(
                             "Cancel",
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.grey.shade600, fontSize: 16),
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                           ).tr(),
                         ),
                       ),
@@ -181,8 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                                color: Theme.of(context).primaryColorDark),
+                            side: BorderSide(color: Theme.of(context).primaryColorDark),
                           ),
                         ),
                         child: Padding(
@@ -191,9 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             "Ask a Volunteer",
                             textAlign: TextAlign.center,
                             maxLines: 1,
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColorDark,
-                                fontSize: 15),
+                            style: TextStyle(color: Theme.of(context).primaryColorDark, fontSize: 15),
                           ).tr(),
                         ),
                       ),

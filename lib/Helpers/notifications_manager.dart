@@ -11,13 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Helpers/Utils.dart';
+import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Calls/calling_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream;
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-import 'package:prive/Helpers/stream_manager.dart';
-import 'Utils.dart';
 
 class NotificationsManager {
   static late FlutterLocalNotificationsPlugin notificationPlugin;
@@ -38,16 +38,16 @@ class NotificationsManager {
       if (stream.StreamChat.of(notificationsContext).currentUser != null) {
         stream.StreamChat.of(notificationsContext)
             .client
-            .addDevice(token ?? "", stream.PushProvider.firebase, pushProviderName: "prive_firebase")
+            .addDevice(token ?? '', stream.PushProvider.firebase, pushProviderName: 'prive_firebase')
             .then((value) {
-          print("Added Device to stream");
+          print('Added Device to stream');
         });
       }
-      print("Firebase token: $token");
-      Utils.saveString(R.pref.firebaseToken, token ?? "");
+      print('Firebase token: $token');
+      Utils.saveString(SharedPref.firebaseToken, token ?? '');
     });
     var devicePushTokenVoIP = await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-    print("Device Token $devicePushTokenVoIP");
+    print('Device Token $devicePushTokenVoIP');
   }
 
   static void initializeNotifications() {
@@ -64,9 +64,11 @@ class NotificationsManager {
         requestSoundPermission: true,
       ),
     );
-    FlutterLocalNotificationsPlugin().initialize(initializationSettings,
-        onDidReceiveNotificationResponse: onSelectNotification,
-        onDidReceiveBackgroundNotificationResponse: onSelectNotification);
+    FlutterLocalNotificationsPlugin().initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: onSelectNotification,
+      onDidReceiveBackgroundNotificationResponse: onSelectNotification,
+    );
   }
 
   static void requestPermissions() async {
@@ -79,8 +81,8 @@ class NotificationsManager {
     });
 
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    print("do you have initial message ${initialMessage != null}");
-    print("Initial Message Data ${initialMessage?.data}");
+    print('do you have initial message ${initialMessage != null}');
+    print('Initial Message Data ${initialMessage?.data}');
     if (initialMessage != null) {
       stream.Channel? channel;
       var channels = await stream.StreamChatCore.of(notificationsContext)
@@ -88,7 +90,7 @@ class NotificationsManager {
           .queryChannels(
             filter: Filter.in_(
               'members',
-              [await Utils.getString(R.pref.userId) ?? ""],
+              [await Utils.getString(SharedPref.userId) ?? ''],
             ),
           )
           .last;
@@ -104,13 +106,13 @@ class NotificationsManager {
           ChatScreen.routeWithChannel(channel),
         );
       } else {
-        print("Channel not found");
+        print('Channel not found');
       }
     }
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("Notifications Message Opened App");
+      print('Notifications Message Opened App');
       stream.Channel? channel;
       stream.StreamChatCore.of(notificationsContext).client.state.channels.forEach((key, value) {
         if (value.id == message.data['channel_id']) {
@@ -126,7 +128,7 @@ class NotificationsManager {
   }
 
   static Future<dynamic> onSelectNotification(NotificationResponse? notification) async {
-    Map selectedNotification = json.decode(notification?.payload ?? "");
+    Map selectedNotification = json.decode(notification?.payload ?? '');
     if (selectedNotification.isNotEmpty) {
       stream.Channel? channel;
       stream.StreamChatCore.of(notificationsContext).client.state.channels.forEach((key, value) {
@@ -140,14 +142,14 @@ class NotificationsManager {
         );
       }
     } else {
-      print("no");
+      print('no');
     }
   }
 
   static Future<void> firebaseMessagingBackgroundHandler(RemoteMessage backgroundMessage) async {
     storedBackgroundMessage = backgroundMessage;
     listenToCalls();
-    if (backgroundMessage.data['type'] != null && backgroundMessage.data['type'] != "call") {
+    if (backgroundMessage.data['type'] != null && backgroundMessage.data['type'] != 'call') {
       final messageId = backgroundMessage.data['message_id'];
       final channelId = backgroundMessage.data['channel_id'];
       final channelType = backgroundMessage.data['channel_type'];
@@ -159,9 +161,9 @@ class NotificationsManager {
     } else {
       var payload = backgroundMessage.data;
       String type = payload['type'];
-      if (type == "call") {
+      if (type == 'call') {
         var channelName = payload['channel_name'] as String;
-        var hasVideo = payload['has_video'] == "true";
+        var hasVideo = payload['has_video'] == 'true';
         var callerName = payload['caller_name'] as String;
         var callerImage = payload['caller_image'] as String;
 
@@ -172,13 +174,13 @@ class NotificationsManager {
           'nameCaller': callerName,
           'appName': 'Prive',
           'avatar': callerImage,
-          'handle': hasVideo ? "Video Call" : "Voice Call",
+          'handle': hasVideo ? 'Video Call' : 'Voice Call',
           'extra': <String, dynamic>{'channelName': channelName},
           'type': hasVideo ? 1 : 0,
           'android': <String, dynamic>{
             'isCustomNotification': false,
             'isShowLogo': false,
-            'ringtonePath': "ringtone_default",
+            'ringtonePath': 'ringtone_default',
             'backgroundColor': '#1293a8',
             'backgroundUrl': 'https://fv9-3.failiem.lv/thumb_show.php?i=yxvrrm7mr&view',
             // 'actionColor': '#4CAF50'
@@ -197,7 +199,7 @@ class NotificationsManager {
             'supportsHolding': true,
             'supportsGrouping': false,
             'supportsUngrouping': false,
-            'ringtonePath': "Ringtone"
+            'ringtonePath': 'Ringtone'
           }
         };
         await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -208,20 +210,20 @@ class NotificationsManager {
 
   static Future<void> _firebaseMessagingHandler(RemoteMessage message) async {
     BaseNotification notification = BaseNotification(
-      title: message.notification?.title ?? "",
-      body: message.notification?.body ?? "",
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
     );
 
     print(message.data);
     var payload = message.data;
     var type = payload['type'] as String;
-    if (type == "call") {
+    if (type == 'call') {
       var callerId = payload['caller_id'] as String;
       var channelName = payload['channel_name'] as String;
       var callerName = payload['caller_name'] as String;
       var callerImage = payload['caller_image'] as String?;
       var uuid = payload['uuid'] as String?;
-      var hasVideo = payload['has_video'] == "true";
+      var hasVideo = payload['has_video'] == 'true';
       final callUUID = const Uuid().v4();
       BotToast.cleanAll();
       BotToast.showAnimationWidget(
@@ -230,47 +232,59 @@ class NotificationsManager {
               channelName: channelName,
               context: notificationsContext,
               callerName: callerName,
-              callerImage: callerImage ?? "",
+              callerImage: callerImage ?? '',
               isVideoCall: hasVideo,
             );
           },
           animationDuration: const Duration(milliseconds: 0),
-          groupKey: "incoming_call_overlay");
+          groupKey: 'incoming_call_overlay');
     }
 
-    if (type != "call") {
-      if (type == "message.new") {
-        print("New Message");
+    if (type != 'call') {
+      if (type == 'message.new') {
+        print('New Message');
       } else {
         await _showLocalNotification(notification: notification);
       }
     }
   }
 
-  static Future<void> _showLocalNotification(
-      {BaseNotification? notification, String title = "", String body = "", String payload = ""}) async {
+  static Future<void> _showLocalNotification({
+    BaseNotification? notification,
+    String title = '',
+    String body = '',
+    String payload = '',
+  }) async {
     if (Platform.isAndroid == true) {
-      var androidDetails = const AndroidNotificationDetails("id", "channel",
-          channelDescription: "description",
-          priority: Priority.high,
-          importance: Importance.max,
-          icon: "launcher_icon");
+      var androidDetails = const AndroidNotificationDetails(
+        'id',
+        'channel',
+        channelDescription: 'description',
+        priority: Priority.high,
+        importance: Importance.max,
+        icon: 'launcher_icon',
+      );
       await notificationPlugin.show(
-          0, notification?.title ?? title, notification?.body ?? body, NotificationDetails(android: androidDetails),
-          payload: payload);
+        0,
+        notification?.title ?? title,
+        notification?.body ?? body,
+        NotificationDetails(android: androidDetails),
+        payload: payload,
+      );
     } else {
       await notificationPlugin.show(
-          0,
-          notification?.title ?? title,
-          notification?.body ?? body,
-          const NotificationDetails(
-            iOS: DarwinNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            ),
+        0,
+        notification?.title ?? title,
+        notification?.body ?? body,
+        const NotificationDetails(
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
           ),
-          payload: payload);
+        ),
+        payload: payload,
+      );
     }
   }
 
@@ -289,13 +303,13 @@ class NotificationsManager {
             await Firebase.initializeApp();
             final databaseReference = FirebaseDatabase.instance
                 .ref("SingleCalls/${(event.body as Map<String, dynamic>)['extra']['channelName']}");
-            DatabaseReference usersRef = FirebaseDatabase.instance.ref("Users");
+            DatabaseReference usersRef = FirebaseDatabase.instance.ref('Users');
             databaseReference.remove();
             usersRef.update({
-              await Utils.getString(R.pref.userId) ?? "": "Ended",
+              await Utils.getString(SharedPref.userId) ?? '': 'Ended',
             });
             Utils.logAnswerOrCancelCall(
-                notificationsContext, notificationsContext.currentUser?.id ?? "", "CANCELLED", "0");
+                notificationsContext, notificationsContext.currentUser?.id ?? '', 'CANCELLED', '0');
             break;
           case CallEvent.ACTION_CALL_ENDED:
             break;
@@ -316,7 +330,7 @@ class NotificationsManager {
         }
       });
     } on Exception {
-      print("Error");
+      print('Error');
     }
   }
 
@@ -329,12 +343,12 @@ class NotificationsManager {
         DatabaseReference ref = FirebaseDatabase.instance.ref("Calls/${calls[0]['extra']['channelName']}");
         DatabaseEvent event = await ref.once();
         Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
-        data.remove(await Utils.getString(R.pref.userId));
+        data.remove(await Utils.getString(SharedPref.userId));
         print(event.snapshot.value);
         if (data.isNotEmpty) {
           int endedUsers = 0;
           data.forEach((key, value) {
-            if (value == "Ended") {
+            if (value == 'Ended') {
               endedUsers++;
             }
           });

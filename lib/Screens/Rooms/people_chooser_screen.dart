@@ -7,11 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:prive/Resources/animations.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Widgets/ChatWidgets/search_text_field.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../Extras/resources.dart';
 import '../../Helpers/Utils.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
@@ -379,7 +380,7 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                               SizedBox(
                                 height: 200,
                                 child: Lottie.asset(
-                                  R.animations.contactsPermission,
+                                  Animations.contactsPermission,
                                   repeat: false,
                                 ),
                               ),
@@ -422,9 +423,9 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

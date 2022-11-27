@@ -12,9 +12,10 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:collection/collection.dart';
 
-import '../../../Extras/resources.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Chat/group_admin.dart';
+import '../../../Resources/animations.dart';
+import '../../../Resources/shared_pref.dart';
 import '../../../UltraNetwork/ultra_loading_indicator.dart';
 import '../../../Widgets/AppWidgets/channels_empty_widgets.dart';
 import '../../../Widgets/ChatWidgets/search_text_field.dart';
@@ -310,7 +311,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                               SizedBox(
                                 height: 200,
                                 child: Lottie.asset(
-                                  R.animations.contactsPermission,
+                                  Animations.contactsPermission,
                                   repeat: false,
                                 ),
                               ),
@@ -353,9 +354,9 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
   }
 
   _getContacts() async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true && myContacts != "[]") {
-      List<dynamic> usersMapList = jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? "");
       List<User> myUsers = [];
       for (var user in usersMapList) {
         myUsers.add(User(

@@ -1,13 +1,14 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Screens/Auth/intro_screen.dart';
 import 'package:prive/Screens/Main/navigator_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
+import '../../Resources/images.dart';
+import '../../Resources/shared_pref.dart';
 import '../Calls/single_call_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -38,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             : const IntroScreen()
         : Scaffold(
             body: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(R.images.splashImage),
+                  image: AssetImage(Images.splashImage),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _checkIfUserIsLoggedIn() async {
-    var loginStatus = await Utils.getBool(R.pref.isLoggedIn);
+    var loginStatus = await Utils.getBool(SharedPref.isLoggedIn);
     if (loginStatus == true) {
       if (!mounted) return;
       StreamManager.connectUserToStream(context);

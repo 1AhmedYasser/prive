@@ -7,11 +7,10 @@ class ScreenSlider extends StatefulWidget {
   final PageController _controller;
   final Function onChange;
 
-  const ScreenSlider(this._list, this._controller, this.onChange, {Key? key})
-      : super(key: key);
+  const ScreenSlider(this._list, this._controller, this.onChange, {Key? key}) : super(key: key);
 
   @override
-  _ScreenSliderState createState() => _ScreenSliderState();
+  State<ScreenSlider> createState() => _ScreenSliderState();
 }
 
 class _ScreenSliderState extends State<ScreenSlider> {

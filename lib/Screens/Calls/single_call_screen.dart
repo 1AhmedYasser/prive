@@ -22,7 +22,6 @@ import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:wakelock/wakelock.dart';
 
-import '../../../Extras/resources.dart';
 import '../../../Helpers/stream_manager.dart';
 import '../../../Helpers/utils.dart';
 import '../../../Models/Call/call.dart';
@@ -30,6 +29,9 @@ import '../../../Models/Call/call_member.dart';
 import '../../../Models/Call/prive_call.dart';
 import '../../../UltraNetwork/ultra_constants.dart';
 import '../../../UltraNetwork/ultra_network.dart';
+import '../../Resources/constants.dart';
+import '../../Resources/images.dart';
+import '../../Resources/sounds.dart';
 
 class SingleCallScreen extends StatefulWidget {
   final bool isVideo;
@@ -169,7 +171,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
   }
 
   void _setupRingingTone() async {
-    await player.setAsset(R.sounds.calling);
+    await player.setAsset(Sounds.calling);
     player.play();
   }
 
@@ -273,7 +275,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
               child: IconButton(
                 iconSize: 60,
                 icon: Image.asset(
-                  R.images.closeCall,
+                  Images.closeCall,
                 ),
                 onPressed: () async {
                   didEndCall = true;
@@ -455,7 +457,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           Utils.showAlert(
             context,
             message: "Call Has Ended",
-            alertImage: R.images.alertInfoImage,
+            alertImage: Images.alertInfoImage,
           ).then(
             (value) => Navigator.pop(context),
           );
@@ -494,7 +496,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
           await [Permission.microphone].request();
         }
         agoraEngine = createAgoraRtcEngine();
-        await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
+        await agoraEngine?.initialize(const RtcEngineContext(appId: Constants.agoraAppId));
 
         if (widget.isVideo) {
           await agoraEngine?.enableVideo();
@@ -883,7 +885,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                         child: IconButton(
                           iconSize: 30,
                           icon: Image.asset(
-                            R.images.cameraSwitch,
+                            Images.cameraSwitch,
                           ),
                           onPressed: () {
                             // _flipController.toggleCard();
@@ -918,7 +920,7 @@ class _SingleCallScreenState extends State<SingleCallScreen> {
                       width: 60,
                       height: 60,
                       child: Image.asset(
-                        R.images.closeCall,
+                        Images.closeCall,
                       ),
                     ),
                   )

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 class StreamManager {
@@ -14,14 +14,14 @@ class StreamManager {
       final client = StreamChatCore.of(context).client;
       await client.connectUser(
         User(
-          id: await Utils.getString(R.pref.userId) ?? "",
+          id: await Utils.getString(SharedPref.userId) ?? '',
           extraData: {
-            'name': await Utils.getString(R.pref.userName),
-            'image': await Utils.getString(R.pref.userImage),
-            'phone': await Utils.getString(R.pref.userPhone),
+            'name': await Utils.getString(SharedPref.userName),
+            'image': await Utils.getString(SharedPref.userImage),
+            'phone': await Utils.getString(SharedPref.userPhone),
           },
         ),
-        client.devToken(await Utils.getString(R.pref.userId) ?? "").rawValue,
+        client.devToken(await Utils.getString(SharedPref.userId) ?? '').rawValue,
       );
     } on Exception catch (_) {
       print('Could not connect user');
@@ -33,11 +33,11 @@ class StreamManager {
       final client = StreamChatCore.of(context).client;
       await client.updateUser(
         User(
-          id: await Utils.getString(R.pref.userId) ?? "",
+          id: await Utils.getString(SharedPref.userId) ?? '',
           extraData: {
-            'name': await Utils.getString(R.pref.userName),
-            'image': await Utils.getString(R.pref.userImage),
-            'phone': await Utils.getString(R.pref.userPhone),
+            'name': await Utils.getString(SharedPref.userName),
+            'image': await Utils.getString(SharedPref.userImage),
+            'phone': await Utils.getString(SharedPref.userPhone),
           },
         ),
       );
@@ -56,34 +56,34 @@ class StreamManager {
 
   static String getChannelName(Channel channel, User currentUser) {
     if (channel.isGroup) {
-      return channel.name ?? "";
+      return channel.name ?? '';
     } else {
       final otherMember = channel.state!.members.firstWhere(
         (member) => member.userId != currentUser.id,
       );
       _getContacts(currentUser);
-      if (usersPhoneNumbers
-          .contains(otherMember.user?.extraData["phone"] as String?)) {
-        return otherMember.user?.name ?? "";
+      if (usersPhoneNumbers.contains(otherMember.user?.extraData['phone'] as String?)) {
+        return otherMember.user?.name ?? '';
       } else {
-        return otherMember.user?.extraData["phone"] as String? ?? "";
+        return otherMember.user?.extraData['phone'] as String? ?? '';
       }
     }
   }
 
   static void _getContacts(User currentUser) async {
-    String? myContacts = await Utils.getString(R.pref.myContacts);
+    String? myContacts = await Utils.getString(SharedPref.myContacts);
     if (myContacts != null && myContacts.isNotEmpty == true) {
-      List<dynamic> usersMapList =
-          jsonDecode(await Utils.getString(R.pref.myContacts) ?? "");
+      List<dynamic> usersMapList = jsonDecode(await Utils.getString(SharedPref.myContacts) ?? '');
       List<User> myUsers = [];
       for (var user in usersMapList) {
-        myUsers.add(User(
-          id: user['id'],
-          name: user['name'],
-          image: user['image'],
-          extraData: {'phone': user['phone'], 'shadow_banned': false},
-        ));
+        myUsers.add(
+          User(
+            id: user['id'],
+            name: user['name'],
+            image: user['image'],
+            extraData: {'phone': user['phone'], 'shadow_banned': false},
+          ),
+        );
       }
       users = myUsers;
       usersPhoneNumbers = users

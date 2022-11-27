@@ -13,17 +13,18 @@ class Room {
   List<RoomUser>? kickedListeners;
   List<RoomUser>? upgradedListeners;
 
-  Room(
-      {this.roomId,
-      this.topic,
-      this.description,
-      this.owner,
-      this.speakers,
-      this.listeners,
-      this.roomContacts,
-      this.raisedHands,
-      this.kickedListeners,
-      this.upgradedListeners});
+  Room({
+    this.roomId,
+    this.topic,
+    this.description,
+    this.owner,
+    this.speakers,
+    this.listeners,
+    this.roomContacts,
+    this.raisedHands,
+    this.kickedListeners,
+    this.upgradedListeners,
+  });
 
   Room.fromJson(Map<String, dynamic> json) {
     roomId = json['roomId'] as String?;

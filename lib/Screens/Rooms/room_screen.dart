@@ -12,23 +12,24 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/room_menu_dialog.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
+import 'package:prive/Models/Call/prive_call.dart';
+import 'package:prive/Models/Rooms/room.dart';
+import 'package:prive/Models/Rooms/room_user.dart';
+import 'package:prive/Providers/volume_provider.dart';
+import 'package:prive/Resources/constants.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
+import 'package:prive/UltraNetwork/ultra_network.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
+import 'package:prive/Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
+import 'package:prive/Widgets/Common/cached_image.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-
-import '../../Models/Call/prive_call.dart';
-import '../../Models/Rooms/room.dart';
-import '../../Models/Rooms/room_user.dart';
-import '../../Providers/volume_provider.dart';
-import '../../UltraNetwork/ultra_network.dart';
-import '../../Widgets/AppWidgets/Rooms/kicked_members_widget.dart';
-import '../../Widgets/AppWidgets/Rooms/raised_hands_widget.dart';
-import '../../Widgets/AppWidgets/Rooms/room_invitation_widget.dart';
-import '../../Widgets/Common/cached_image.dart';
 
 class RoomScreen extends StatefulWidget {
   final bool isNewRoomCreation;
@@ -127,7 +128,7 @@ class _RoomScreenState extends State<RoomScreen> {
                         child: Row(
                           children: [
                             Image.asset(
-                              R.images.roomLeave,
+                              Images.roomLeave,
                               width: 16,
                               color: Colors.red,
                             ),
@@ -376,7 +377,8 @@ class _RoomScreenState extends State<RoomScreen> {
                                         await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleAudience);
 
                                         agoraEngine?.muteRemoteAudioStream(
-                                            uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: true);
+                                            uid: int.parse(await Utils.getString(SharedPref.userId) ?? "0"),
+                                            mute: true);
 
                                         await agoraEngine?.muteLocalAudioStream(true);
                                       },
@@ -661,7 +663,7 @@ class _RoomScreenState extends State<RoomScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(50),
                     child: Image.asset(
-                      R.images.raiseHandIcon,
+                      Images.raiseHandIcon,
                       color: speakersIds.contains(context.currentUser?.id)
                           ? null
                           : raisedHandsIds.contains(context.currentUser?.id)
@@ -1000,7 +1002,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 await agoraEngine?.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
                 agoraEngine?.muteRemoteAudioStream(
-                    uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
+                    uid: int.parse(await Utils.getString(SharedPref.userId) ?? "0"), mute: !isMyMicOn);
 
                 await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
               }, onCancelButtonPressed: () {
@@ -1024,7 +1026,7 @@ class _RoomScreenState extends State<RoomScreen> {
             Utils.showAlert(
               context,
               message: "You Have Been Kicked Out Of This Room".tr(),
-              alertImage: R.images.alertInfoImage,
+              alertImage: Images.alertInfoImage,
             );
           }
         }
@@ -1045,7 +1047,7 @@ class _RoomScreenState extends State<RoomScreen> {
     } else {
       if (showingInfo == false) {
         if (mounted) {
-          Utils.showAlert(context, message: "The Room Has Ended".tr(), alertImage: R.images.alertInfoImage).then(
+          Utils.showAlert(context, message: "The Room Has Ended".tr(), alertImage: Images.alertInfoImage).then(
             (value) {
               if (mounted) {
                 Navigator.pop(context);
@@ -1171,7 +1173,7 @@ class _RoomScreenState extends State<RoomScreen> {
       roomToken,
       cancelToken: cancelToken,
       formData: FormData.fromMap({
-        "Uid": await Utils.getString(R.pref.userId),
+        "Uid": await Utils.getString(SharedPref.userId),
         "channelName": room?.roomId,
       }),
       showLoadingIndicator: false,
@@ -1182,7 +1184,7 @@ class _RoomScreenState extends State<RoomScreen> {
         await [Permission.microphone].request();
 
         agoraEngine = createAgoraRtcEngine();
-        await agoraEngine?.initialize(RtcEngineContext(appId: R.constants.agoraAppId));
+        await agoraEngine?.initialize(const RtcEngineContext(appId: Constants.agoraAppId));
 
         agoraEngine?.registerEventHandler(RtcEngineEventHandler(
           onJoinChannelSuccess: (connection, uid) {
@@ -1212,7 +1214,7 @@ class _RoomScreenState extends State<RoomScreen> {
         await agoraEngine?.joinChannel(
             token: tokenResponse.data ?? "",
             channelId: room?.roomId ?? "",
-            uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"),
+            uid: int.parse(await Utils.getString(SharedPref.userId) ?? "0"),
             options: ChannelMediaOptions(
               token: tokenResponse.data ?? "",
               clientRoleType: isSpeaker ? ClientRoleType.clientRoleBroadcaster : ClientRoleType.clientRoleAudience,
@@ -1246,7 +1248,7 @@ class _RoomScreenState extends State<RoomScreen> {
             isMyMicOn = !isMyMicOn;
           });
           agoraEngine?.muteRemoteAudioStream(
-              uid: int.parse(await Utils.getString(R.pref.userId) ?? "0"), mute: !isMyMicOn);
+              uid: int.parse(await Utils.getString(SharedPref.userId) ?? "0"), mute: !isMyMicOn);
 
           await agoraEngine?.muteLocalAudioStream(!isMyMicOn);
           if (isSpeaker) {

@@ -6,12 +6,12 @@ class IntroSliderWidget extends StatelessWidget {
   final String title;
   final String description;
 
-  const IntroSliderWidget(
-      {Key? key,
-      required this.image,
-      required this.title,
-      required this.description})
-      : super(key: key);
+  const IntroSliderWidget({
+    Key? key,
+    required this.image,
+    required this.title,
+    required this.description,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,9 @@ class IntroSliderWidget extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding:  EdgeInsets.all(MediaQuery.of(context).size.width * 0.030,),
+              padding: EdgeInsets.all(
+                MediaQuery.of(context).size.width * 0.030,
+              ),
               child: SizedBox(
                 child: Image.asset(
                   image,

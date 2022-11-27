@@ -1,7 +1,8 @@
 import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ChatMenuWidget extends StatefulWidget {
@@ -20,13 +21,13 @@ class ChatMenuWidget extends StatefulWidget {
 
 class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   List<Map> chatMoreMenu = [];
-  List<String> chatMoreMenuTitles = ["Search", "Clear History", "Mute", "Delete Chat", "Send Catalog"];
+  List<String> chatMoreMenuTitles = ['Search', 'Clear History', 'Mute', 'Delete Chat', 'Send Catalog'];
   List<String> chatMoreMenuIcons = [
-    R.images.searchChatImage,
-    R.images.clearHistoryImage,
-    R.images.muteNotificationsImage,
-    R.images.deleteChatImage,
-    R.images.catalogManagerImage
+    Images.searchChatImage,
+    Images.clearHistoryImage,
+    Images.muteNotificationsImage,
+    Images.deleteChatImage,
+    Images.catalogManagerImage
   ];
 
   @override
@@ -43,27 +44,27 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       dropdownItemPadding: EdgeInsets.zero,
       onChange: (dropdownItem) {
         switch (dropdownItem['value']) {
-          case "Search":
+          case 'Search':
             widget.onOptionSelected(1);
             break;
-          case "Clear History":
+          case 'Clear History':
             for (Message message in widget.channel.state?.messages ?? []) {
               if (message.isDeleted == false) {
                 widget.channel.deleteMessage(message, hard: true);
               }
             }
             break;
-          case "Mute":
+          case 'Mute':
             widget.channel.mute();
             break;
-          case "UnMute":
+          case 'UnMute':
             widget.channel.unmute();
             break;
-          case "Delete Chat":
+          case 'Delete Chat':
             _showDeleteChatDialog();
             break;
-          case "Send Catalog":
-            Navigator.pushNamed(context, R.routes.catalogScreen);
+          case 'Send Catalog':
+            Navigator.pushNamed(context, Routes.catalogScreen);
             break;
           default:
             break;
@@ -79,12 +80,12 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       onOpen: (open) {
         if (widget.channel.isMuted) {
           setState(() {
-            chatMoreMenuTitles[2] = "UnMute";
+            chatMoreMenuTitles[2] = 'UnMute';
             fillMenu();
           });
         } else {
           setState(() {
-            chatMoreMenuTitles[2] = "Mute";
+            chatMoreMenuTitles[2] = 'Mute';
             fillMenu();
           });
         }
@@ -93,7 +94,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       resultIcon: SizedBox(
         width: 21,
         height: 21,
-        child: Image.asset(R.images.chatMoreImage),
+        child: Image.asset(Images.chatMoreImage),
       ),
       resultBD: const BoxDecoration(color: Colors.transparent),
       resultIconLeftGap: 0,
@@ -101,7 +102,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       resultPadding: EdgeInsets.zero,
       resultIconRotation: true,
       resultIconRotationValue: 1,
-      dropdownItemReverse: context.locale.languageCode == "en" ? true : false,
+      dropdownItemReverse: context.locale.languageCode == 'en' ? true : false,
       isDropdownLabel: true,
       unselectedItemTS: const TextStyle(
         fontSize: 15,
@@ -111,7 +112,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
         fontSize: 15,
         color: Color(0xff232323),
       ),
-      dropdownItemMainAxis: context.locale.languageCode == "en" ? MainAxisAlignment.start : MainAxisAlignment.end,
+      dropdownItemMainAxis: context.locale.languageCode == 'en' ? MainAxisAlignment.start : MainAxisAlignment.end,
       isResultLabel: false,
       dropdownItemAlign: Alignment.centerRight,
       isResultIconLabel: false,
@@ -124,7 +125,7 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
       triangleWidth: 0,
       triangleHeight: 0,
       triangleAlign: 'center',
-      dropdownAlign: context.locale.languageCode == "en" ? "right" : "left",
+      dropdownAlign: context.locale.languageCode == 'en' ? 'right' : 'left',
       gap: 10,
     );
   }
@@ -149,10 +150,10 @@ class _ChatMenuWidgetState extends State<ChatMenuWidget> {
   void _showDeleteChatDialog() async {
     final res = await showConfirmationBottomSheet(
       context,
-      title: "Delete Conversation".tr(),
-      okText: "Delete".tr(),
-      question: "Are You Sure ?".tr(),
-      cancelText: "Cancel".tr(),
+      title: 'Delete Conversation'.tr(),
+      okText: 'Delete'.tr(),
+      question: 'Are You Sure ?'.tr(),
+      cancelText: 'Cancel'.tr(),
       icon: StreamSvgIcon.delete(
         color: StreamChatTheme.of(context).colorTheme.accentError,
       ),

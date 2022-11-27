@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
+import 'package:prive/Resources/images.dart';
 import 'package:prive/Screens/Rooms/room_screen.dart';
 import 'package:prive/Screens/Rooms/upcoming_rooms_screen.dart';
 import 'package:prive/Widgets/AppWidgets/Rooms/new_room_widget.dart';
@@ -16,6 +16,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../Helpers/utils.dart';
 import '../../Models/Rooms/room.dart';
 import '../../Models/Rooms/room_user.dart';
+import '../../Resources/animations.dart';
 import '../../UltraNetwork/ultra_loading_indicator.dart';
 
 class RoomsScreen extends StatefulWidget {
@@ -92,7 +93,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                             ),
                           );
                         },
-                        child: Image.asset(R.images.chatRoomsIcons),
+                        child: Image.asset(Images.chatRoomsIcons),
                       ),
                     ),
                     const SizedBox(
@@ -155,7 +156,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                                           Utils.showAlert(
                                             context,
                                             message: "You Have Been Kicked Out Of This Room".tr(),
-                                            alertImage: R.images.alertInfoImage,
+                                            alertImage: Images.alertInfoImage,
                                           );
                                         } else {
                                           Navigator.push(
@@ -233,7 +234,7 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Lottie.asset(
-                            R.animations.noRooms,
+                            Animations.noRooms,
                             width: MediaQuery.of(context).size.width / 1.3,
                             fit: BoxFit.fill,
                             controller: _animationController,

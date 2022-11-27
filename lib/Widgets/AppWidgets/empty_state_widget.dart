@@ -9,18 +9,18 @@ class EmptyStateWidget extends StatefulWidget {
   final Function onButtonPressed;
   final MainAxisAlignment columnMainAxis;
 
-  const EmptyStateWidget(
-      {Key? key,
-      this.image = "",
-      this.title = "",
-      this.description = "",
-      this.buttonText = "",
-      required this.onButtonPressed,
-      this.columnMainAxis = MainAxisAlignment.center})
-      : super(key: key);
+  const EmptyStateWidget({
+    Key? key,
+    this.image = '',
+    this.title = '',
+    this.description = '',
+    this.buttonText = '',
+    required this.onButtonPressed,
+    this.columnMainAxis = MainAxisAlignment.center,
+  }) : super(key: key);
 
   @override
-  _EmptyStateWidgetState createState() => _EmptyStateWidgetState();
+  State<EmptyStateWidget> createState() => _EmptyStateWidgetState();
 }
 
 class _EmptyStateWidgetState extends State<EmptyStateWidget> {
@@ -62,10 +62,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget> {
                 widget.description,
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                    color: Color(0xff777777)),
+                style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xff777777)),
               ).tr(),
             ),
           const SizedBox(

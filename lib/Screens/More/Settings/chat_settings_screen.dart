@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:prive/Extras/resources.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
 import 'package:prive/Widgets/AppWidgets/prive_appbar.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -17,11 +18,11 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
   int currentSelectedIndex = 0;
 
   Map<String, String> themes = {
-    R.images.colorTheme1: "Classic",
-    R.images.colorTheme2: "Day",
-    R.images.colorTheme3: "Dark",
-    R.images.colorTheme4: "Night",
-    R.images.colorTheme5: "Arctic",
+    Images.colorTheme1: "Classic",
+    Images.colorTheme2: "Day",
+    Images.colorTheme3: "Dark",
+    Images.colorTheme4: "Night",
+    Images.colorTheme5: "Arctic",
   };
 
   @override
@@ -36,8 +37,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(
-                  top: 25, left: 20, bottom: 17, right: 20),
+              padding: const EdgeInsets.only(top: 25, left: 20, bottom: 17, right: 20),
               child: Text(
                 "Message Text Size",
                 style: TextStyle(
@@ -66,18 +66,15 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
             ),
             const Divider(),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 22, right: 27, bottom: 15, top: 15),
+              padding: const EdgeInsets.only(left: 22, right: 27, bottom: 15, top: 15),
               child: InkWell(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                onTap: () =>
-                    Navigator.pushNamed(context, R.routes.chatBackgroundRoute)
-                        .then((value) => setState(() {})),
+                onTap: () => Navigator.pushNamed(context, Routes.chatBackgroundRoute).then((value) => setState(() {})),
                 child: Row(
                   children: [
                     Image.asset(
-                      R.images.chatBackgroundImage,
+                      Images.chatBackgroundImage,
                       width: 20,
                     ),
                     const SizedBox(width: 18),
@@ -100,8 +97,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
             ),
             const Divider(),
             Padding(
-              padding: const EdgeInsets.only(
-                  top: 17, left: 20, bottom: 20, right: 20),
+              padding: const EdgeInsets.only(top: 17, left: 20, bottom: 20, right: 20),
               child: Text(
                 "Color Theme",
                 style: TextStyle(
@@ -158,8 +154,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                                       child: currentSelectedIndex == index
                                           ? Icon(
                                               FontAwesomeIcons.solidCircleCheck,
-                                              color: Theme.of(context)
-                                                  .primaryColor,
+                                              color: Theme.of(context).primaryColor,
                                             )
                                           : null,
                                     ),
@@ -180,8 +175,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
             ),
             const Divider(),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 22, right: 27, bottom: 15, top: 15),
+              padding: const EdgeInsets.only(left: 22, right: 27, bottom: 15, top: 15),
               child: InkWell(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
@@ -194,7 +188,7 @@ class _ChatSettingsScreenState extends State<ChatSettingsScreen> {
                 child: Row(
                   children: [
                     Image.asset(
-                      R.images.undoImage,
+                      Images.undoImage,
                       width: 20,
                     ),
                     const SizedBox(width: 18),

@@ -1,24 +1,26 @@
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:prive/Extras/resources.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:prive/Models/Auth/login.dart';
+import 'package:prive/Resources/images.dart';
+import 'package:prive/Resources/routes.dart';
+import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_constants.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
 import 'package:prive/Widgets/Common/cached_image.dart';
-import 'package:dio/dio.dart';
 
 class SignUpScreen extends StatefulWidget {
   final String phoneNumber;
   final LoginData? loginData;
 
-  const SignUpScreen({Key? key, this.phoneNumber = "", this.loginData})
-      : super(key: key);
+  const SignUpScreen({Key? key, this.phoneNumber = "", this.loginData}) : super(key: key);
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -85,7 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ? Padding(
                             padding: const EdgeInsets.all(23),
                             child: Image.asset(
-                              R.images.cameraImage,
+                              Images.cameraImage,
                             ),
                           )
                         : ClipRRect(
@@ -173,10 +175,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           "You Agree To The ".tr(),
-                          style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff7a8fa6)),
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400, color: Color(0xff7a8fa6)),
                         ),
                       ),
                       Align(
@@ -202,12 +201,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (_formKey.currentState!.validate()) {
                       if (profileImage.path.isEmpty) {
                         Utils.showAlert(context,
-                            message: "Please Choose An Image".tr(),
-                            alertImage: R.images.alertInfoImage);
+                            message: "Please Choose An Image".tr(), alertImage: Images.alertInfoImage);
                       } else {
                         if (loading == false) {
-                          List<int> imageBytes =
-                              await profileImage.readAsBytes();
+                          List<int> imageBytes = await profileImage.readAsBytes();
                           String base64Image = base64Encode(imageBytes);
                           loading = true;
                           if (mounted) {
@@ -219,8 +216,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 "UserFirstName": firstNameController.text,
                                 "UserLastName": lastNameController.text,
                                 "UserPhoto": base64Image,
-                                "UserGender":
-                                    selectedGender == 0 ? "Male" : "Female",
+                                "UserGender": selectedGender == 0 ? "Male" : "Female",
                                 "UserBarCode": "783473487",
                                 "UserID": widget.loginData?.userID
                               }),
@@ -229,24 +225,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Login signup = value;
                               if (signup.success == true) {
                                 LoginData? signupData = signup.data?[0];
-                                Utils.saveString(
-                                    R.pref.token, signupData?.token ?? "");
-                                Utils.saveString(
-                                    R.pref.userId, signupData?.userID ?? "");
-                                Utils.saveString(R.pref.userImage,
-                                    signupData?.userPhoto ?? "");
-                                Utils.saveString(R.pref.userPhone,
-                                    signupData?.userPhone ?? "");
-                                Utils.saveString(R.pref.userFirstName,
-                                    signupData?.userFirstName ?? "");
-                                Utils.saveString(R.pref.userLastName,
-                                    signupData?.userLastName ?? "");
-                                Utils.saveString(R.pref.userName,
+                                Utils.saveString(SharedPref.token, signupData?.token ?? "");
+                                Utils.saveString(SharedPref.userId, signupData?.userID ?? "");
+                                Utils.saveString(SharedPref.userImage, signupData?.userPhoto ?? "");
+                                Utils.saveString(SharedPref.userPhone, signupData?.userPhone ?? "");
+                                Utils.saveString(SharedPref.userFirstName, signupData?.userFirstName ?? "");
+                                Utils.saveString(SharedPref.userLastName, signupData?.userLastName ?? "");
+                                Utils.saveString(SharedPref.userName,
                                     "${signupData?.userFirstName ?? ""} ${signupData?.userLastName ?? ""}");
                                 StreamManager.connectUserToStream(context);
-                                Utils.saveBool(R.pref.isLoggedIn, true);
-                                Navigator.pushReplacementNamed(
-                                    context, R.routes.navigatorRoute);
+                                Utils.saveBool(SharedPref.isLoggedIn, true);
+                                Navigator.pushReplacementNamed(context, Routes.navigatorRoute);
                               }
                             });
                           }
@@ -267,8 +256,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   child: Text(
                     "Sign Up".tr(),
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.w400),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -294,15 +282,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Container(
             decoration: BoxDecoration(
                 border: Border.all(
-                  color: selectedGender == index
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
+                  color: selectedGender == index ? Theme.of(context).primaryColor : Colors.grey,
                 ),
                 borderRadius: BorderRadius.circular(30)),
             child: CircleAvatar(
-              backgroundColor: selectedGender == index
-                  ? Theme.of(context).primaryColor
-                  : Colors.transparent,
+              backgroundColor: selectedGender == index ? Theme.of(context).primaryColor : Colors.transparent,
               radius: 12,
               child: selectedGender == index
                   ? const Icon(
@@ -324,8 +308,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Padding buildField(String title, TextEditingController controller,
-      {TextInputType type = TextInputType.name,
-      List<TextInputFormatter> formatters = const []}) {
+      {TextInputType type = TextInputType.name, List<TextInputFormatter> formatters = const []}) {
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30),
       child: TextFormField(
@@ -336,8 +319,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           hintText: title.tr(),
           hintStyle: const TextStyle(color: Color(0xff777777)),
           focusedBorder: OutlineInputBorder(
