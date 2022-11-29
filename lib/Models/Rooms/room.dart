@@ -3,9 +3,9 @@ import 'package:prive/Models/Rooms/room_user.dart';
 
 class Room {
   String? roomId;
+  String? roomFounderId;
   String? topic;
   String? description;
-  RoomUser? owner;
   List<RoomUser>? speakers;
   List<RoomUser>? listeners;
   List<String>? roomContacts;
@@ -15,9 +15,9 @@ class Room {
 
   Room({
     this.roomId,
+    this.roomFounderId,
     this.topic,
     this.description,
-    this.owner,
     this.speakers,
     this.listeners,
     this.roomContacts,
@@ -28,9 +28,9 @@ class Room {
 
   Room.fromJson(Map<String, dynamic> json) {
     roomId = json['roomId'] as String?;
+    roomFounderId = json['roomFounderId'] as String?;
     topic = json['topic'] as String?;
     description = json['description'] as String?;
-    owner = json['owner'] as RoomUser?;
     speakers = json['speakers'] as List<RoomUser>?;
     listeners = json['listeners'] as List<RoomUser>?;
     roomContacts = json['roomContacts'] as List<String>?;
@@ -42,9 +42,9 @@ class Room {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
     json['roomId'] = roomId;
+    json['roomFounderId'] = roomFounderId;
     json['topic'] = topic;
     json['description'] = description;
-    json['owner'] = owner;
     json['speakers'] = speakers;
     json['listeners'] = listeners;
     json['roomContacts'] = roomContacts;

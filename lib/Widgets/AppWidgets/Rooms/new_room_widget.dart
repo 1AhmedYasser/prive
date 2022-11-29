@@ -242,12 +242,12 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           await ref.set({
                             'topic': topicNameController.text,
                             'description': descriptionController.text,
-                            'owner': owner.toJson(),
                             'speakers': {owner.id: owner.toJson()},
                             'listeners': {},
                             'room_contacts': roomContacts,
                             'raised_hands': {},
-                            'date_time': selectedDateTime.toString()
+                            'date_time': selectedDateTime.toString(),
+                            'roomFounderId': context.currentUser?.id
                           });
                         } else {
                           DatabaseReference ref =
@@ -257,12 +257,12 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                           await ref.set({
                             'topic': topicNameController.text,
                             'description': descriptionController.text,
-                            'owner': owner.toJson(),
                             'speakers': {owner.id: owner.toJson()},
                             'listeners': {},
                             'room_contacts': roomContacts,
                             'raised_hands': {},
-                            'roomId': roomId
+                            'roomId': roomId,
+                            'roomFounderId': context.currentUser?.id
                           });
 
                           if (mounted) {
@@ -275,8 +275,8 @@ class _NewRoomWidgetState extends State<NewRoomWidget> {
                                   room: Room(
                                     roomId: roomId,
                                     topic: topicNameController.text,
+                                    roomFounderId: context.currentUser?.id,
                                     description: descriptionController.text,
-                                    owner: owner,
                                     speakers: [owner],
                                     listeners: [],
                                     roomContacts: [],

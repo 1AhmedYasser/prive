@@ -140,7 +140,6 @@ class _PeopleChooserScreenState extends State<PeopleChooserScreen> with TickerPr
                           room: Room(
                             roomId: roomId,
                             topic: widget.roomName,
-                            owner: owner,
                             speakers: [owner],
                             listeners: [],
                             roomContacts: [],

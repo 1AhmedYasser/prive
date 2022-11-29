@@ -9,6 +9,7 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_network.dart';
@@ -354,7 +355,7 @@ class _RoomInvitationWidgetState extends State<RoomInvitationWidget> with Ticker
       showError: false,
       cancelToken: CancelToken(),
       formData: FormData.fromMap({
-        'Ownername': widget.room?.owner?.name,
+        'Ownername': context.currentUser?.name,
         'Roomname': widget.room?.topic,
         'IsSpeaker': widget.isSpeaker ? 1 : 0,
         'UsersIds': _selectedUsers.map((e) => e.id).toList().join(','),

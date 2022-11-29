@@ -347,26 +347,14 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
       roomsResponse.forEach((key, value) {
         Map<dynamic, dynamic> rooms = value as Map<dynamic, dynamic>;
         String roomId = rooms['roomId'];
+        String roomFounderId = rooms['roomFounderId'];
         String topic = '';
-        RoomUser? owner;
         List<RoomUser>? speakers = [];
         List<RoomUser>? listeners = [];
         List<String> contacts = [];
         List<RoomUser>? raisedHands = [];
         List<RoomUser>? kickedListeners = [];
         topic = rooms['topic'];
-        owner = RoomUser(
-          id: rooms['owner']['id'],
-          name: rooms['owner']['name'],
-          image: rooms['owner']['image'],
-          isOwner: rooms['owner']['isOwner'],
-          isSpeaker: rooms['owner']['isSpeaker'],
-          isListener: rooms['owner']['isListener'],
-          hasPermissionToSpeak: rooms['owner']['hasPermissionToSpeak'],
-          phone: rooms['owner']['phone'],
-          isHandRaised: rooms['owner']['isHandRaised'],
-          isMicOn: rooms['owner']['isMicOn'],
-        );
         Map<dynamic, dynamic>? roomContacts = (value['room_contacts'] as Map<dynamic, dynamic>?) ?? {};
         roomContacts.forEach((key, value) {
           contacts.add(key);
@@ -447,11 +435,11 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
           Room(
             roomId: roomId,
             topic: topic,
-            owner: owner,
             speakers: speakers,
             listeners: listeners,
             roomContacts: contacts,
             raisedHands: raisedHands,
+            roomFounderId: roomFounderId,
             kickedListeners: kickedListeners,
           ),
         );
@@ -460,10 +448,12 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
       // Filter out my rooms and the rooms iam not in
       roomsList = roomsList
           .where(
-            (element) =>
-                element.owner?.id != context.currentUser?.id &&
-                element.roomContacts?.contains(context.currentUser?.id) == true,
+            (element) => element.roomContacts?.contains(context.currentUser?.id) == true,
           )
+          .toList();
+      roomsList = roomsList
+          .where((element) =>
+              element.speakers?.firstWhere((element) => element.isOwner == true).id != context.currentUser?.id)
           .toList();
       setState(() {
         isLoading = false;
