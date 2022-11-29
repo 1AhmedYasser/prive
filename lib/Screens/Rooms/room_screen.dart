@@ -358,7 +358,8 @@ class _RoomScreenState extends State<RoomScreen> {
 
                                       // Demote From Room Contacts
                                       final roomContactsRef = FirebaseDatabase.instance.ref(
-                                          'rooms/${room?.roomFounderId}/room_contacts/${room?.speakers?[index].id}');
+                                        'rooms/${room?.roomFounderId}/room_contacts/${room?.speakers?[index].id}',
+                                      );
                                       roomContactsRef.update({
                                         'id': room?.speakers?[index].id,
                                         'name': room?.speakers?[index].name,
