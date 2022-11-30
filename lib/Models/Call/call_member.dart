@@ -4,6 +4,7 @@ class CallMember {
   String? image;
   String? phone;
   bool? isMicOn;
+  bool? hasPermissionToListen;
   bool? hasPermissionToSpeak;
   bool? isVideoOn;
   bool? isHeadphonesOn;
@@ -17,6 +18,7 @@ class CallMember {
     required this.isMicOn,
     required this.isHeadphonesOn,
     this.hasPermissionToSpeak = true,
+    this.hasPermissionToListen = true,
     this.isVideoOn,
     this.isSpeaking = false,
   });
@@ -30,6 +32,7 @@ class CallMember {
     isMicOn = json['isMicOn'] as bool?;
     isVideoOn = json['isVideoOn'] as bool?;
     hasPermissionToSpeak = json['hasPermissionToSpeak'] as bool?;
+    hasPermissionToListen = json['hasPermissionToListen'] as bool?;
   }
 
   Map<String, dynamic> toJson() {
@@ -42,6 +45,7 @@ class CallMember {
     json['isMicOn'] = isMicOn;
     json['isVideoOn'] = isVideoOn;
     json['hasPermissionToSpeak'] = hasPermissionToSpeak;
+    json['hasPermissionToListen'] = hasPermissionToListen;
     return json;
   }
 }

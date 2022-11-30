@@ -10,6 +10,7 @@ class GroupCallMenuDialog {
     BuildContext context,
     CallMember? callMember, {
     required Function onMutePressed,
+    required Function onDeafenPressed,
     required Function onKickPressed,
   }) {
     Alert(
@@ -47,24 +48,52 @@ class GroupCallMenuDialog {
               ],
             ),
           ),
+          if (callMember?.hasPermissionToListen == true)
+            DialogButton(
+              onPressed: () {
+                onMutePressed();
+                Navigator.pop(context);
+              },
+              radius: BorderRadius.circular(15),
+              color: Colors.purple,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    FontAwesomeIcons.volumeXmark,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    "${callMember?.hasPermissionToSpeak == true ? "Mute" : "UnMute"} ${callMember?.name?.split(" ").first}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ).tr()
+                ],
+              ),
+            ),
           DialogButton(
             onPressed: () {
-              onMutePressed();
+              onDeafenPressed();
               Navigator.pop(context);
             },
             radius: BorderRadius.circular(15),
-            color: Colors.purple,
+            color: Colors.teal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  FontAwesomeIcons.volumeXmark,
+                  Icons.headset_off,
                   color: Colors.white,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  "${callMember?.hasPermissionToSpeak == true ? "Mute" : "UnMute"} ${callMember?.name?.split(" ").first}",
+                  "${callMember?.hasPermissionToListen == true ? "Deafen" : "UnDeafen"} ${callMember?.name?.split(" ").first}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,

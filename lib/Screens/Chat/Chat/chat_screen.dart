@@ -1544,6 +1544,7 @@ class _ChatScreenState extends State<ChatScreen> {
             phone: value['phone'],
             isHeadphonesOn: value['isHeadphonesOn'],
             hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            hasPermissionToListen: value['hasPermissionToListen'],
             isMicOn: value['isMicOn'],
             isVideoOn: value['isVideoOn'],
           ),

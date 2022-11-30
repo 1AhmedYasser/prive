@@ -327,6 +327,16 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    if (context.currentUser?.id != call?.ownerId &&
+                                        call?.members?[index].hasPermissionToListen == false)
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 7),
+                                        child: Icon(
+                                          Icons.headset_off,
+                                          color: Colors.red,
+                                          size: 25,
+                                        ),
+                                      ),
                                     Icon(
                                       call?.members?[index].isMicOn == true ? Icons.mic : Icons.mic_off_rounded,
                                       color: call?.members?[index].hasPermissionToSpeak == true
@@ -350,10 +360,32 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                                   'image': member?.image,
                                                   'phone': member?.phone,
                                                   'hasPermissionToSpeak': member?.hasPermissionToSpeak,
+                                                  'hasPermissionToListen': member?.hasPermissionToListen,
                                                   'isMicOn': member?.isMicOn,
                                                   'isHeadphonesOn': member?.isHeadphonesOn,
                                                   'isVideoOn': member?.isVideoOn,
                                                 });
+                                              },
+                                              onDeafenPressed: () {
+                                                // Todo: Deafen User
+                                                final ref = FirebaseDatabase.instance.ref(
+                                                  'GroupCalls/${widget.channel.id}/members/${call?.members?[index].id}',
+                                                );
+
+                                                if (call?.members?[index].hasPermissionToSpeak == true) {
+                                                  // Deafen User
+                                                  ref.update({
+                                                    'isMicOn': false,
+                                                    'hasPermissionToSpeak': false,
+                                                    'hasPermissionToListen': false
+                                                  });
+                                                } else {
+                                                  // UnDeafen User
+                                                  ref.update({
+                                                    'hasPermissionToSpeak': true,
+                                                    'hasPermissionToListen': true,
+                                                  });
+                                                }
                                               },
                                               onMutePressed: () {
                                                 final ref = FirebaseDatabase.instance.ref(
@@ -361,8 +393,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                                 );
 
                                                 if (call?.members?[index].hasPermissionToSpeak == true) {
+                                                  // Mute User
                                                   ref.update({'isMicOn': false, 'hasPermissionToSpeak': false});
                                                 } else {
+                                                  // UnMute User
                                                   ref.update({'hasPermissionToSpeak': true});
                                                 }
                                               },
@@ -458,15 +492,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
-                        isHeadphonesOn = !isHeadphonesOn;
-                        final ref = FirebaseDatabase.instance
-                            .ref('GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}');
-                        if (isHeadphonesOn == false) {
-                          ref.update({'isMicOn': false, 'isHeadphonesOn': false});
-                        } else {
-                          ref.update({'isHeadphonesOn': true});
+                        if (me?.hasPermissionToListen == true) {
+                          isHeadphonesOn = !isHeadphonesOn;
+                          final ref = FirebaseDatabase.instance
+                              .ref('GroupCalls/${widget.channel.id}/members/${context.currentUser?.id}');
+                          if (isHeadphonesOn == false) {
+                            ref.update({'isMicOn': false, 'isHeadphonesOn': false});
+                          } else {
+                            ref.update({'isHeadphonesOn': true});
+                          }
+                          setState(() {});
                         }
-                        setState(() {});
                       },
                       child: Container(
                         width: 50,
@@ -476,7 +512,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Icon(
-                          isHeadphonesOn ? Icons.headset_rounded : Icons.headset_off_rounded,
+                          isHeadphonesOn ? Icons.headset_rounded : Icons.headset_off,
                           color: Colors.white,
                           size: 25,
                         ),
@@ -770,6 +806,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       image: context.currentUser?.image,
       isHeadphonesOn: true,
       hasPermissionToSpeak: true,
+      hasPermissionToListen: true,
       phone: context.currentUser?.extraData['phone'] as String,
       isMicOn: false,
       isVideoOn: widget.isVideo,
@@ -797,6 +834,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       phone: context.currentUser?.extraData['phone'] as String,
       hasPermissionToSpeak: widget.call != null
           ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).hasPermissionToSpeak
+          : true,
+      hasPermissionToListen: widget.call != null
+          ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).hasPermissionToListen
           : true,
       isMicOn: widget.call != null
           ? widget.call?.members?.firstWhere((member) => member.id == context.currentUser?.id).isMicOn == true
@@ -848,6 +888,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             isMicOn: value['isMicOn'],
             isHeadphonesOn: value['isHeadphonesOn'],
             hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            hasPermissionToListen: value['hasPermissionToListen'],
             isVideoOn: value['isVideoOn'],
           ),
         );
@@ -864,6 +905,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             isMicOn: value['isMicOn'],
             isHeadphonesOn: value['isHeadphonesOn'],
             hasPermissionToSpeak: value['hasPermissionToSpeak'],
+            hasPermissionToListen: value['hasPermissionToListen'],
             isVideoOn: value['isVideoOn'],
           ),
         );
@@ -929,6 +971,16 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       }
 
       if (me?.hasPermissionToSpeak == false) {
+        await agoraEngine?.muteLocalAudioStream(true);
+      }
+
+      if (me?.hasPermissionToListen == false) {
+        isHeadphonesOn = false;
+        await agoraEngine?.muteAllRemoteAudioStreams(true);
+        await agoraEngine?.muteRemoteAudioStream(
+          uid: int.parse(context.currentUser?.id ?? '0'),
+          mute: false,
+        );
         await agoraEngine?.muteLocalAudioStream(true);
       }
 
