@@ -76,83 +76,89 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   Widget build(BuildContext context) {
     var channel = StreamChannel.of(context);
 
-    return StreamBuilder<List<Member>>(
-      stream: channel.channel.state!.membersStream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Container(
-            color: StreamChatTheme.of(context).colorTheme.disabled,
-            child: const Center(child: CircularProgressIndicator()),
-          );
-        }
+    return StreamBuilder<ChannelState>(
+      stream: widget.channel.state?.channelStateStream,
+      builder: (context, state) {
         _getGroupAdmins();
-        _getMembersPermissions();
-
-        return Scaffold(
-          backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
-          appBar: AppBar(
-            elevation: 1.0,
-            toolbarHeight: 56.0,
-            backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
-            leading: const StreamBackButton(),
-            title: Column(
-              children: [
-                StreamBuilder<ChannelState>(
-                  stream: channel.channelStateStream,
-                  builder: (context, state) {
-                    if (!state.hasData) {
-                      return Text(
-                        'Loading',
-                        style: TextStyle(
-                          color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ).tr();
-                    }
-
-                    return Text(
-                      _getChannelName(
-                        2 * MediaQuery.of(context).size.width / 3,
-                        members: snapshot.data,
-                        extraData: state.data!.channel!.extraData,
-                        maxFontSize: 16.0,
-                      )!,
-                      style: TextStyle(
-                        color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 3.0,
-                ),
-                Text(
-                  '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
-                  style: TextStyle(
-                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-                    fontSize: 12.0,
-                  ),
-                ),
-              ],
-            ),
-            centerTitle: true,
-          ),
-          body: ListView(
-            children: [
-              _buildMembers(snapshot.data!),
-              Container(
-                height: 8.0,
+        return StreamBuilder<List<Member>>(
+          stream: channel.channel.state!.membersStream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Container(
                 color: StreamChatTheme.of(context).colorTheme.disabled,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+            _getGroupAdmins();
+            _getMembersPermissions();
+
+            return Scaffold(
+              backgroundColor: StreamChatTheme.of(context).colorTheme.appBg,
+              appBar: AppBar(
+                elevation: 1.0,
+                toolbarHeight: 56.0,
+                backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
+                leading: const StreamBackButton(),
+                title: Column(
+                  children: [
+                    StreamBuilder<ChannelState>(
+                      stream: channel.channelStateStream,
+                      builder: (context, state) {
+                        if (!state.hasData) {
+                          return Text(
+                            'Loading',
+                            style: TextStyle(
+                              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ).tr();
+                        }
+
+                        return Text(
+                          _getChannelName(
+                            2 * MediaQuery.of(context).size.width / 3,
+                            members: snapshot.data,
+                            extraData: state.data!.channel!.extraData,
+                            maxFontSize: 16.0,
+                          )!,
+                          style: TextStyle(
+                            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 3.0,
+                    ),
+                    Text(
+                      '${channel.channel.memberCount} ${channel.channel.memberCount == 1 ? "Member".tr() : "Members".tr()}, ${snapshot.data?.where((e) => e.user!.online).length ?? 0} ${"Online".tr()}',
+                      style: TextStyle(
+                        color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ],
+                ),
+                centerTitle: true,
               ),
-              _buildNameTile(),
-              _buildOptionListTiles(),
-            ],
-          ),
+              body: ListView(
+                children: [
+                  _buildMembers(snapshot.data!),
+                  Container(
+                    height: 8.0,
+                    color: StreamChatTheme.of(context).colorTheme.disabled,
+                  ),
+                  _buildNameTile(),
+                  _buildOptionListTiles(),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -330,396 +336,403 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
 
   Widget _buildOptionListTiles() {
     var channel = StreamChannel.of(context);
-    return Column(
-      children: [
-        if (userRole == 'owner' ||
-            (userRole == 'admin' && adminSelf?.groupPermissions?.addMembers == true) ||
-            (userRole == 'member' && addMembers == true))
-          StreamOptionListTile(
-            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: 'Add Members'.tr(),
-            titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Icon(
-                Icons.person_add_rounded,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddMembersAdminsScreen(
-                    channel: widget.channel,
+    return StreamBuilder<ChannelState>(
+      stream: widget.channel.state?.channelStateStream,
+      builder: (context, state) {
+        _getGroupAdmins();
+        _getMembersPermissions();
+        return Column(
+          children: [
+            if (userRole == 'owner' ||
+                (userRole == 'admin' && adminSelf?.groupPermissions?.addMembers == true) ||
+                (userRole == 'member' && addMembers == true))
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Add Members'.tr(),
+                titleTextStyle: TextStyle(color: Theme.of(context).primaryColor),
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Icon(
+                    Icons.person_add_rounded,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
-              );
-            },
-          ),
-        StreamBuilder<bool>(
-          stream: StreamChannel.of(context).channel.isMutedStream,
-          builder: (context, snapshot) {
-            mutedBool.value = snapshot.data;
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddMembersAdminsScreen(
+                        channel: widget.channel,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            StreamBuilder<bool>(
+              stream: StreamChannel.of(context).channel.isMutedStream,
+              builder: (context, snapshot) {
+                mutedBool.value = snapshot.data;
 
-            return StreamOptionListTile(
+                return StreamOptionListTile(
+                  tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                  separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                  title: 'Mute Group'.tr(),
+                  titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                  leading: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: StreamSvgIcon.mute(
+                      size: 24.0,
+                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                    ),
+                  ),
+                  trailing: snapshot.data == null
+                      ? const CircularProgressIndicator()
+                      : ValueListenableBuilder<bool?>(
+                          valueListenable: mutedBool,
+                          builder: (context, value, _) {
+                            return CupertinoSwitch(
+                              value: value!,
+                              onChanged: (val) {
+                                mutedBool.value = val;
+
+                                if (snapshot.data!) {
+                                  channel.channel.unmute();
+                                } else {
+                                  channel.channel.mute();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                  onTap: () {},
+                );
+              },
+            ),
+            StreamOptionListTile(
+              title: 'Pinned Messages'.tr(),
               tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-              separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-              title: 'Mute Group'.tr(),
               titleTextStyle: StreamChatTheme.of(context).textTheme.body,
               leading: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: StreamSvgIcon.mute(
+                child: StreamSvgIcon.pin(
                   size: 24.0,
                   color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
               ),
-              trailing: snapshot.data == null
-                  ? const CircularProgressIndicator()
-                  : ValueListenableBuilder<bool?>(
-                      valueListenable: mutedBool,
-                      builder: (context, value, _) {
-                        return CupertinoSwitch(
-                          value: value!,
-                          onChanged: (val) {
-                            mutedBool.value = val;
+              trailing: StreamSvgIcon.right(
+                color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
+              ),
+              onTap: () {
+                final channel = StreamChannel.of(context).channel;
 
-                            if (snapshot.data!) {
-                              channel.channel.unmute();
-                            } else {
-                              channel.channel.mute();
-                            }
-                          },
-                        );
-                      },
-                    ),
-              onTap: () {},
-            );
-          },
-        ),
-        StreamOptionListTile(
-          title: 'Pinned Messages'.tr(),
-          tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-          titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: StreamSvgIcon.pin(
-              size: 24.0,
-              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-            ),
-          ),
-          trailing: StreamSvgIcon.right(
-            color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-          ),
-          onTap: () {
-            final channel = StreamChannel.of(context).channel;
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StreamChannel(
-                  channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StreamChannel(
+                      channel: channel,
+                      child: StreamMessageSearchListView(
+                        controller: StreamMessageSearchListController(
+                          client: StreamChat.of(context).client,
+                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                          sort: const [
+                            SortOption(
+                              'created_at',
+                              direction: SortOption.ASC,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return PinnedMessagesScreen(
-                        messageTheme: widget.messageTheme,
-                        sortOptions: const [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                        onShowMessage: (m, c) async {
-                          // final client = StreamChat.of(context).client;
-                          // final message = m;
-                          // final channel = client.channel(
-                          //   c.type,
-                          //   id: c.id,
-                          // );
-                          // if (channel.state == null) {
-                          //   await channel.watch();
-                          // }
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   Routes.CHANNEL_PAGE,
-                          //   arguments: ChannelPageArgs(
-                          //     channel: channel,
-                          //     initialMessage: message,
-                          //   ),
-                          // );
+                        itemBuilder: (context, messages, index, tile) {
+                          return PinnedMessagesScreen(
+                            messageTheme: widget.messageTheme,
+                            sortOptions: const [
+                              SortOption(
+                                'created_at',
+                                direction: SortOption.ASC,
+                              ),
+                            ],
+                            onShowMessage: (m, c) async {
+                              // final client = StreamChat.of(context).client;
+                              // final message = m;
+                              // final channel = client.channel(
+                              //   c.type,
+                              //   id: c.id,
+                              // );
+                              // if (channel.state == null) {
+                              //   await channel.watch();
+                              // }
+                              // Navigator.pushNamed(
+                              //   context,
+                              //   Routes.CHANNEL_PAGE,
+                              //   arguments: ChannelPageArgs(
+                              //     channel: channel,
+                              //     initialMessage: message,
+                              //   ),
+                              // );
+                            },
+                          );
                         },
-                      );
-                    },
+                      ),
+                    ),
                   ),
+                );
+              },
+            ),
+            StreamOptionListTile(
+              tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+              separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+              title: 'Photo & Videos'.tr(),
+              titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: StreamSvgIcon.pictures(
+                  size: 32.0,
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
               ),
-            );
-          },
-        ),
-        StreamOptionListTile(
-          tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-          separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: 'Photo & Videos'.tr(),
-          titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: StreamSvgIcon.pictures(
-              size: 32.0,
-              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-            ),
-          ),
-          trailing: StreamSvgIcon.right(
-            color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-          ),
-          onTap: () {
-            var channel = StreamChannel.of(context).channel;
+              trailing: StreamSvgIcon.right(
+                color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
+              ),
+              onTap: () {
+                var channel = StreamChannel.of(context).channel;
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StreamChannel(
-                  channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StreamChannel(
+                      channel: channel,
+                      child: StreamMessageSearchListView(
+                        controller: StreamMessageSearchListController(
+                          client: StreamChat.of(context).client,
+                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                          sort: const [
+                            SortOption(
+                              'created_at',
+                              direction: SortOption.ASC,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return ChannelMediaDisplayScreen(
-                        messageTheme: widget.messageTheme,
-                        sortOptions: const [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                        paginationParams: const PaginationParams(limit: 20),
-                        onShowMessage: (m, c) async {
-                          // final client = StreamChat.of(context).client;
-                          // final message = m;
-                          // final channel = client.channel(
-                          //   c.type,
-                          //   id: c.id,
-                          // );
-                          // if (channel.state == null) {
-                          //   await channel.watch();
-                          // }
-                          // await Navigator.pushNamed(
-                          //   context,
-                          //   Routes.CHANNEL_PAGE,
-                          //   arguments: ChannelPageArgs(
-                          //     channel: channel,
-                          //     initialMessage: message,
-                          //   ),
-                          // );
+                        itemBuilder: (context, messages, index, tile) {
+                          return ChannelMediaDisplayScreen(
+                            messageTheme: widget.messageTheme,
+                            sortOptions: const [
+                              SortOption(
+                                'created_at',
+                                direction: SortOption.ASC,
+                              ),
+                            ],
+                            paginationParams: const PaginationParams(limit: 20),
+                            onShowMessage: (m, c) async {
+                              // final client = StreamChat.of(context).client;
+                              // final message = m;
+                              // final channel = client.channel(
+                              //   c.type,
+                              //   id: c.id,
+                              // );
+                              // if (channel.state == null) {
+                              //   await channel.watch();
+                              // }
+                              // await Navigator.pushNamed(
+                              //   context,
+                              //   Routes.CHANNEL_PAGE,
+                              //   arguments: ChannelPageArgs(
+                              //     channel: channel,
+                              //     initialMessage: message,
+                              //   ),
+                              // );
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-        StreamOptionListTile(
-          tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-          separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-          title: 'Files'.tr(),
-          titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: StreamSvgIcon.files(
-              size: 32.0,
-              color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
-            ),
-          ),
-          trailing: StreamSvgIcon.right(
-            color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-          ),
-          onTap: () {
-            var channel = StreamChannel.of(context).channel;
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StreamChannel(
-                  channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
-                        ),
-                      ],
+                      ),
                     ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return const ChannelFileDisplayScreen(
-                        sortOptions: [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                        paginationParams: PaginationParams(limit: 20),
-                      );
-                    },
                   ),
+                );
+              },
+            ),
+            StreamOptionListTile(
+              tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+              separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+              title: 'Files'.tr(),
+              titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: StreamSvgIcon.files(
+                  size: 32.0,
+                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                 ),
               ),
-            );
-          },
-        ),
-        if (userRole == 'owner' || userRole == 'admin')
-          StreamOptionListTile(
-            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: 'Permissions'.tr(),
-            titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Icon(
-                Icons.vpn_key_rounded,
-                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+              trailing: StreamSvgIcon.right(
+                color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
               ),
+              onTap: () {
+                var channel = StreamChannel.of(context).channel;
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StreamChannel(
+                      channel: channel,
+                      child: StreamMessageSearchListView(
+                        controller: StreamMessageSearchListController(
+                          client: StreamChat.of(context).client,
+                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
+                          sort: const [
+                            SortOption(
+                              'created_at',
+                              direction: SortOption.ASC,
+                            ),
+                          ],
+                        ),
+                        itemBuilder: (context, messages, index, tile) {
+                          return const ChannelFileDisplayScreen(
+                            sortOptions: [
+                              SortOption(
+                                'created_at',
+                                direction: SortOption.ASC,
+                              ),
+                            ],
+                            paginationParams: PaginationParams(limit: 20),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-            trailing: StreamSvgIcon.right(
-              color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MemberPermissionsScreen(
-                    channel: widget.channel,
+            if (userRole == 'owner' || userRole == 'admin')
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Permissions'.tr(),
+                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Icon(
+                    Icons.vpn_key_rounded,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                   ),
                 ),
-              ).then((value) => _getMembersPermissions());
-            },
-          ),
-        if (userRole == 'owner' || userRole == 'admin')
-          StreamOptionListTile(
-            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: 'Administrators'.tr(),
-            titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Icon(
-                Icons.admin_panel_settings,
-                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                trailing: StreamSvgIcon.right(
+                  color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MemberPermissionsScreen(
+                        channel: widget.channel,
+                      ),
+                    ),
+                  ).then((value) => _getMembersPermissions());
+                },
               ),
-            ),
-            trailing: StreamSvgIcon.right(
-              color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AdminsScreen(
-                    channel: widget.channel,
+            if (userRole == 'owner' || userRole == 'admin')
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Administrators'.tr(),
+                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Icon(
+                    Icons.admin_panel_settings,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
                   ),
                 ),
-              ).then((value) => _getGroupAdmins());
-            },
-          ),
-        if (!channel.channel.isDistinct)
-          StreamOptionListTile(
-            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: 'Leave Group'.tr(),
-            titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Icon(
-                Icons.exit_to_app_rounded,
-                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                trailing: StreamSvgIcon.right(
+                  color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminsScreen(
+                        channel: widget.channel,
+                      ),
+                    ),
+                  ).then((value) => _getGroupAdmins());
+                },
               ),
-            ),
-            trailing: const SizedBox(
-              height: 24.0,
-              width: 24.0,
-            ),
-            onTap: () async {
-              final res = await showConfirmationBottomSheet(
-                context,
+            if (!channel.channel.isDistinct)
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
                 title: 'Leave Group'.tr(),
-                okText: 'Leave'.tr(),
-                question: 'Are You Sure ?'.tr(),
-                cancelText: 'Cancel'.tr(),
-                icon: Icon(
-                  Icons.exit_to_app_rounded,
-                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Icon(
+                    Icons.exit_to_app_rounded,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                  ),
                 ),
-              );
-              if (res == true) {
-                if (mounted) {
-                  final channel = StreamChannel.of(context).channel;
-                  await channel.removeMembers([StreamChat.of(context).currentUser!.id]);
-                  if (mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                trailing: const SizedBox(
+                  height: 24.0,
+                  width: 24.0,
+                ),
+                onTap: () async {
+                  final res = await showConfirmationBottomSheet(
+                    context,
+                    title: 'Leave Group'.tr(),
+                    okText: 'Leave'.tr(),
+                    question: 'Are You Sure ?'.tr(),
+                    cancelText: 'Cancel'.tr(),
+                    icon: Icon(
+                      Icons.exit_to_app_rounded,
+                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                    ),
+                  );
+                  if (res == true) {
+                    if (mounted) {
+                      final channel = StreamChannel.of(context).channel;
+                      await channel.removeMembers([StreamChat.of(context).currentUser!.id]);
+                      if (mounted) {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      }
+                    }
                   }
-                }
-              }
-            },
-          ),
-        if (userRole == 'owner')
-          StreamOptionListTile(
-            tileColor: StreamChatTheme.of(context).colorTheme.appBg,
-            separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
-            title: 'Delete Group'.tr(),
-            titleTextStyle: StreamChatTheme.of(context).textTheme.body,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Icon(
-                Icons.delete_forever,
-                color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                },
               ),
-            ),
-            onTap: () async {
-              final res = await showConfirmationBottomSheet(
-                context,
+            if (userRole == 'owner')
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
                 title: 'Delete Group'.tr(),
-                okText: 'Delete'.tr(),
-                question: 'Are You Sure ?'.tr(),
-                cancelText: 'Cancel'.tr(),
-                icon: Icon(
-                  Icons.delete_forever,
-                  color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                leading: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Icon(
+                    Icons.delete_forever,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                  ),
                 ),
-              );
-              if (res == true) {
-                if (mounted) {
-                  final channel = StreamChannel.of(context).channel;
-                  await channel.delete();
-                  if (mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                onTap: () async {
+                  final res = await showConfirmationBottomSheet(
+                    context,
+                    title: 'Delete Group'.tr(),
+                    okText: 'Delete'.tr(),
+                    question: 'Are You Sure ?'.tr(),
+                    cancelText: 'Cancel'.tr(),
+                    icon: Icon(
+                      Icons.delete_forever,
+                      color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                    ),
+                  );
+                  if (res == true) {
+                    if (mounted) {
+                      final channel = StreamChannel.of(context).channel;
+                      await channel.delete();
+                      if (mounted) {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      }
+                    }
                   }
-                }
-              }
-            },
-          ),
-      ],
+                },
+              ),
+          ],
+        );
+      },
     );
   }
 
