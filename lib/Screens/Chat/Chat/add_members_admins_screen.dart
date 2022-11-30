@@ -12,6 +12,7 @@ import 'package:lottie/lottie.dart';
 import 'package:prive/Helpers/stream_manager.dart';
 import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Models/Chat/group_member.dart';
 import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/shared_pref.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
@@ -51,6 +52,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
   List<User> adminsUsers = [];
   List<User> nonAdminUsers = [];
   List<GroupAdmin> groupAdmins = [];
+  List<GroupMember> groupMembers = [];
 
   @override
   void initState() {
@@ -201,6 +203,8 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
                                                   },
                                                 });
                                               }
+                                              groupMembers.removeWhere((member) => member.id == newAdmin.id);
+                                              updateMembers(context);
                                               widget.channel.updatePartial(set: {'group_admins': admins}).then((value) {
                                                 if (mounted) {
                                                   Navigator.pop(context);
@@ -407,6 +411,7 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
 
     nonAdminUsers = [];
     _getGroupAdmins();
+    _getGroupMembers();
     List<String?> groupAdminsIds = groupAdmins.map((e) => e.id).toList();
     for (var userId in membersUsersIds) {
       if (!groupAdminsIds.contains(userId)) {
@@ -435,6 +440,42 @@ class _AddMembersAdminsScreenState extends State<AddMembersAdminsScreen> with Ti
       groupAdmins.add(groupAdmin);
     }
     setState(() {});
+  }
+
+  void _getGroupMembers() {
+    groupMembers = [];
+    List<dynamic>? members = widget.channel.extraData['group_members'] as List<dynamic>? ?? [];
+    for (var member in members) {
+      GroupMember groupMember = GroupMember.fromJson(member as Map<String, dynamic>);
+      groupMembers.add(groupMember);
+    }
+    setState(() {});
+  }
+
+  void updateMembers(BuildContext context, {bool goBackAfterUpdate = false}) {
+    List<Map<String, dynamic>> members = [];
+    for (var member in groupMembers) {
+      members.add({
+        'id': member.id,
+        'name': member.name,
+        'image': member.image,
+        'group_role': member.groupRole,
+        'members_permissions': {
+          'send_messages': member.memberPermissions?.sendMessages ?? true,
+          'send_photos': member.memberPermissions?.sendPhotos ?? true,
+          'send_videos': member.memberPermissions?.sendVideos ?? true,
+          'send_voice_records': member.memberPermissions?.sendVoiceRecords ?? true,
+        },
+      });
+    }
+    widget.channel.updatePartial(set: {'group_members': members}).then((value) {
+      if (goBackAfterUpdate) {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      }
+      BotToast.removeAll('loading');
+    });
   }
 
   @override

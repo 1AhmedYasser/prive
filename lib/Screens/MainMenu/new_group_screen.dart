@@ -91,6 +91,21 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                     for (var user in _selectedUsers) {
                       usersColors[user.id] = generateRandomColorHex();
                     }
+                    List<Map<String, dynamic>> groupMembers = [];
+                    for (var member in _selectedUsers) {
+                      groupMembers.add({
+                        'id': member.id,
+                        'name': member.name,
+                        'image': member.image,
+                        'group_role': 'member',
+                        'member_permissions': {
+                          'send_messages': true,
+                          'send_photos': true,
+                          'send_videos': true,
+                          'send_voice_records': true,
+                        },
+                      });
+                    }
                     try {
                       final groupName = groupNameController.text;
                       final client = StreamChat.of(context).client;
@@ -106,6 +121,7 @@ class _NewGroupScreenState extends State<NewGroupScreen> with TickerProviderStat
                           'is_important': false,
                           'is_archive': false,
                           'name_colors': usersColors,
+                          'group_members': groupMembers,
                           'group_admins': [
                             {
                               'id': context.currentUser?.id,

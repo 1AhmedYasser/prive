@@ -15,7 +15,8 @@ import 'package:prive/Screens/Chat/Channels/channel_media_display_screen.dart';
 import 'package:prive/Screens/Chat/Chat/add_members_admins_screen.dart';
 import 'package:prive/Screens/Chat/Chat/admins_screen.dart';
 import 'package:prive/Screens/Chat/Chat/chat_screen.dart';
-import 'package:prive/Screens/Chat/Chat/member_permissions_screen.dart';
+import 'package:prive/Screens/Chat/Chat/group_permissions_screen.dart';
+import 'package:prive/Screens/Chat/Chat/members_screen.dart';
 import 'package:prive/Screens/Chat/Chat/pinned_messages_screen.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -500,48 +501,34 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => StreamChannel(
-                      channel: channel,
-                      child: StreamMessageSearchListView(
-                        controller: StreamMessageSearchListController(
-                          client: StreamChat.of(context).client,
-                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                          sort: const [
-                            SortOption(
-                              'created_at',
-                              direction: SortOption.ASC,
-                            ),
-                          ],
-                        ),
-                        itemBuilder: (context, messages, index, tile) {
-                          return ChannelMediaDisplayScreen(
-                            messageTheme: widget.messageTheme,
-                            sortOptions: const [
-                              SortOption(
-                                'created_at',
-                                direction: SortOption.ASC,
-                              ),
-                            ],
-                            paginationParams: const PaginationParams(limit: 20),
-                            onShowMessage: (m, c) async {
-                              // final client = StreamChat.of(context).client;
-                              // final message = m;
-                              // final channel = client.channel(
-                              //   c.type,
-                              //   id: c.id,
-                              // );
-                              // if (channel.state == null) {
-                              //   await channel.watch();
-                              // }
-                              // await Navigator.pushNamed(
-                              //   context,
-                              //   Routes.CHANNEL_PAGE,
-                              //   arguments: ChannelPageArgs(
-                              //     channel: channel,
-                              //     initialMessage: message,
-                              //   ),
-                              // );
-                            },
-                          );
+                      channel: widget.channel,
+                      child: ChannelMediaDisplayScreen(
+                        messageTheme: widget.messageTheme,
+                        sortOptions: const [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
+                        paginationParams: const PaginationParams(limit: 20),
+                        onShowMessage: (m, c) async {
+                          // final client = StreamChat.of(context).client;
+                          // final message = m;
+                          // final channel = client.channel(
+                          //   c.type,
+                          //   id: c.id,
+                          // );
+                          // if (channel.state == null) {
+                          //   await channel.watch();
+                          // }
+                          // await Navigator.pushNamed(
+                          //   context,
+                          //   Routes.CHANNEL_PAGE,
+                          //   arguments: ChannelPageArgs(
+                          //     channel: channel,
+                          //     initialMessage: message,
+                          //   ),
+                          // );
                         },
                       ),
                     ),
@@ -570,36 +557,47 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => StreamChannel(
-                      channel: channel,
-                      child: StreamMessageSearchListView(
-                        controller: StreamMessageSearchListController(
-                          client: StreamChat.of(context).client,
-                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                          sort: const [
-                            SortOption(
-                              'created_at',
-                              direction: SortOption.ASC,
-                            ),
-                          ],
+                    builder: (context) => const ChannelFileDisplayScreen(
+                      sortOptions: [
+                        SortOption(
+                          'created_at',
+                          direction: SortOption.ASC,
                         ),
-                        itemBuilder: (context, messages, index, tile) {
-                          return const ChannelFileDisplayScreen(
-                            sortOptions: [
-                              SortOption(
-                                'created_at',
-                                direction: SortOption.ASC,
-                              ),
-                            ],
-                            paginationParams: PaginationParams(limit: 20),
-                          );
-                        },
-                      ),
+                      ],
+                      paginationParams: PaginationParams(limit: 20),
                     ),
                   ),
                 );
               },
             ),
+            if (userRole == 'owner' || userRole == 'admin')
+              StreamOptionListTile(
+                tileColor: StreamChatTheme.of(context).colorTheme.appBg,
+                separatorColor: StreamChatTheme.of(context).colorTheme.disabled,
+                title: 'Members'.tr(),
+                titleTextStyle: StreamChatTheme.of(context).textTheme.body,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 20),
+                  child: Icon(
+                    FontAwesomeIcons.users,
+                    size: 19,
+                    color: StreamChatTheme.of(context).colorTheme.textHighEmphasis.withOpacity(0.5),
+                  ),
+                ),
+                trailing: StreamSvgIcon.right(
+                  color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MembersScreen(
+                        channel: widget.channel,
+                      ),
+                    ),
+                  ).then((value) => _getMembersPermissions());
+                },
+              ),
             if (userRole == 'owner' || userRole == 'admin')
               StreamOptionListTile(
                 tileColor: StreamChatTheme.of(context).colorTheme.appBg,
@@ -620,7 +618,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MemberPermissionsScreen(
+                      builder: (context) => GroupPermissionsScreen(
                         channel: widget.channel,
                       ),
                     ),

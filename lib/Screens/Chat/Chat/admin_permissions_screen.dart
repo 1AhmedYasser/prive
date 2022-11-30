@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Models/Chat/group_member.dart';
 import 'package:prive/UltraNetwork/ultra_loading_indicator.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -28,10 +29,12 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
   bool deleteOthersMessages = true;
   bool deleteMembers = true;
   List<GroupAdmin> groupAdmins = [];
+  List<GroupMember> groupMembers = [];
 
   @override
   void initState() {
     _getGroupAdmins();
+    _getGroupMembers();
     _getAdminPermissions();
     super.initState();
   }
@@ -182,6 +185,20 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
               padding: const EdgeInsets.only(top: 70),
               child: ElevatedButton(
                 onPressed: () {
+                  groupMembers.add(
+                    GroupMember(
+                      widget.admin.id,
+                      widget.admin.name,
+                      widget.admin.image,
+                      'member',
+                      MemberGroupPermissions(
+                        sendMessages: true,
+                        sendPhotos: true,
+                        sendVideos: true,
+                        sendVoiceRecords: true,
+                      ),
+                    ),
+                  );
                   groupAdmins.remove(
                     groupAdmins.firstWhereOrNull(
                       (admin) => admin.id == widget.admin.id,
@@ -197,6 +214,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                     animationDuration: const Duration(milliseconds: 0),
                     groupKey: 'loading',
                   );
+                  updateMembers(context);
                   updateAdmins(context, goBackAfterUpdate: true);
                 },
                 style: ElevatedButton.styleFrom(
@@ -253,6 +271,32 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
     });
   }
 
+  void updateMembers(BuildContext context, {bool goBackAfterUpdate = false}) {
+    List<Map<String, dynamic>> members = [];
+    for (var member in groupMembers) {
+      members.add({
+        'id': member.id,
+        'name': member.name,
+        'image': member.image,
+        'group_role': member.groupRole,
+        'members_permissions': {
+          'send_messages': member.memberPermissions?.sendMessages ?? true,
+          'send_photos': member.memberPermissions?.sendPhotos ?? true,
+          'send_videos': member.memberPermissions?.sendVideos ?? true,
+          'send_voice_records': member.memberPermissions?.sendVoiceRecords ?? true,
+        },
+      });
+    }
+    widget.channel.updatePartial(set: {'group_members': members}).then((value) {
+      if (goBackAfterUpdate) {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      }
+      BotToast.removeAll('loading');
+    });
+  }
+
   Widget _buildPermission(
     String title,
     bool permission,
@@ -282,6 +326,16 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
     for (var admin in admins) {
       GroupAdmin groupAdmin = GroupAdmin.fromJson(admin as Map<String, dynamic>);
       groupAdmins.add(groupAdmin);
+    }
+    setState(() {});
+  }
+
+  void _getGroupMembers() {
+    groupMembers = [];
+    List<dynamic>? members = widget.channel.extraData['group_members'] as List<dynamic>? ?? [];
+    for (var member in members) {
+      GroupMember groupMember = GroupMember.fromJson(member as Map<String, dynamic>);
+      groupMembers.add(groupMember);
     }
     setState(() {});
   }
