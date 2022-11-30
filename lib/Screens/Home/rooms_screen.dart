@@ -452,8 +452,10 @@ class _RoomsScreenState extends State<RoomsScreen> with TickerProviderStateMixin
           )
           .toList();
       roomsList = roomsList
-          .where((element) =>
-              element.speakers?.firstWhere((element) => element.isOwner == true).id != context.currentUser?.id)
+          .where(
+            (element) =>
+                element.speakers?.firstWhere((element) => element.isOwner == true).id != context.currentUser?.id,
+          )
           .toList();
       setState(() {
         isLoading = false;
