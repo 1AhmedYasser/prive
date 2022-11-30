@@ -20,6 +20,8 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
   /// The builder used when the file list is empty.
   final WidgetBuilder? emptyBuilder;
 
+  final Channel? channel;
+
   final ShowMessageCallback? onShowMessage;
 
   final StreamMessageThemeData messageTheme;
@@ -28,6 +30,7 @@ class ChannelMediaDisplayScreen extends StatefulWidget {
     Key? key,
     required this.messageTheme,
     this.sortOptions,
+    required this.channel,
     this.paginationParams = const PaginationParams(limit: 20),
     this.emptyBuilder,
     this.onShowMessage,
@@ -75,23 +78,71 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
         ),
         backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
       ),
-      body: _buildMediaGrid(),
-    );
-  }
+      // body: //_buildMediaGrid(),
+      body: StreamMessageSearchGridView(
+        controller: messageSearchListController,
+        itemBuilder: (BuildContext context, List<GetMessageResponse> values, int index) {
+          final media = <_AssetPackage>[];
 
-  Widget _buildMediaGrid() {
-    return StreamBuilder<List<GetMessageResponse>>(
-      builder: (context, snapshot) {
-        if (snapshot.data == null) {
+          for (var item in values) {
+            item.message.attachments
+                .where((e) => (e.type == 'image' || e.type == 'video') && e.ogScrapeUrl == null)
+                .forEach((e) {
+              VideoPlayerController? controller;
+              if (e.type == 'video') {
+                var cachedController = controllerCache[e.assetUrl];
+
+                if (cachedController == null) {
+                  controller = VideoPlayerController.network(e.assetUrl!);
+                  controller.initialize();
+                  controllerCache[e.assetUrl] = controller;
+                } else {
+                  controller = cachedController;
+                }
+              }
+              media.add(_AssetPackage(e, item.message, controller));
+            });
+          }
+
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StreamChannel(
+                    channel: widget.channel!,
+                    child: StreamFullScreenMedia(
+                      mediaAttachmentPackages: media[index].message.getAttachmentPackageList(),
+                      startIndex: media[index].message.attachments.indexOf(media[index].attachment),
+                      userName: media[index].message.user!.name,
+                      onShowMessage: widget.onShowMessage,
+                    ),
+                  ),
+                ),
+              );
+            },
+            child: media[index].attachment.type == 'image'
+                ? IgnorePointer(
+                    child: StreamImageAttachment(
+                      attachment: media[index].attachment,
+                      message: media[index].message,
+                      showTitle: false,
+                      imageThumbnailSize: Size(
+                        MediaQuery.of(context).size.width * 0.8,
+                        MediaQuery.of(context).size.height * 0.3,
+                      ),
+                      messageTheme: widget.messageTheme,
+                    ),
+                  )
+                : VideoPlayer(media[index].videoPlayer!),
+          );
+        },
+        loadingBuilder: (context) {
           return const Center(
             child: UltraLoadingIndicator(),
           );
-        }
-
-        if (snapshot.data!.isEmpty) {
-          if (widget.emptyBuilder != null) {
-            return widget.emptyBuilder!(context);
-          }
+        },
+        emptyBuilder: (context) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -120,79 +171,8 @@ class _ChannelMediaDisplayScreenState extends State<ChannelMediaDisplayScreen> {
               ],
             ),
           );
-        }
-
-        final media = <_AssetPackage>[];
-
-        for (var item in snapshot.data!) {
-          item.message.attachments
-              .where((e) => (e.type == 'image' || e.type == 'video') && e.ogScrapeUrl == null)
-              .forEach((e) {
-            VideoPlayerController? controller;
-            if (e.type == 'video') {
-              var cachedController = controllerCache[e.assetUrl];
-
-              if (cachedController == null) {
-                controller = VideoPlayerController.network(e.assetUrl!);
-                controller.initialize();
-                controllerCache[e.assetUrl] = controller;
-              } else {
-                controller = cachedController;
-              }
-            }
-            media.add(_AssetPackage(e, item.message, controller));
-          });
-        }
-
-        return LazyLoadScrollView(
-          onEndOfPage: () => search(),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-            itemBuilder: (context, position) {
-              var channel = StreamChannel.of(context).channel;
-              return Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StreamChannel(
-                          channel: channel,
-                          child: StreamFullScreenMedia(
-                            // mediaAttachments:
-                            //     media.map((e) => e.attachment).toList(),
-                            startIndex: position,
-                            //message: media[position].message,
-                            userName: media[position].message.user!.name,
-                            onShowMessage: widget.onShowMessage,
-                            mediaAttachmentPackages: const [],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: media[position].attachment.type == 'image'
-                      ? IgnorePointer(
-                          child: StreamImageAttachment(
-                            attachment: media[position].attachment,
-                            message: media[position].message,
-                            showTitle: false,
-                            imageThumbnailSize: Size(
-                              MediaQuery.of(context).size.width * 0.8,
-                              MediaQuery.of(context).size.height * 0.3,
-                            ),
-                            messageTheme: widget.messageTheme,
-                          ),
-                        )
-                      : VideoPlayer(media[position].videoPlayer!),
-                ),
-              );
-            },
-            itemCount: media.length,
-          ),
-        );
-      },
+        },
+      ),
     );
   }
 

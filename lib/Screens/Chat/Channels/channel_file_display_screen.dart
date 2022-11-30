@@ -54,7 +54,10 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
         centerTitle: true,
         title: Text(
           'Files',
-          style: TextStyle(color: StreamChatTheme.of(context).colorTheme.textHighEmphasis, fontSize: 16.0),
+          style: TextStyle(
+            color: StreamChatTheme.of(context).colorTheme.textHighEmphasis,
+            fontSize: 16.0,
+          ),
         ).tr(),
         leading: const Padding(
           padding: EdgeInsets.only(left: 10),
@@ -64,23 +67,34 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
         ),
         backgroundColor: StreamChatTheme.of(context).colorTheme.barsBg,
       ),
-      body: _buildMediaGrid(),
-    );
-  }
+      body: StreamMessageSearchListView(
+        controller: messageSearchListController,
+        itemBuilder: (BuildContext context, List<GetMessageResponse> values, int index, tile) {
+          final media = <Attachment, Message>{};
 
-  Widget _buildMediaGrid() {
-    return StreamBuilder<List<GetMessageResponse>>(
-      builder: (context, snapshot) {
-        if (snapshot.data == null) {
+          for (var item in values) {
+            item.message.attachments.where((e) => e.type == 'file').forEach((e) {
+              media[e] = item.message;
+            });
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: StreamFileAttachment(
+                message: media.values.toList()[index],
+                attachment: media.keys.toList()[index],
+              ),
+            ),
+          );
+        },
+        loadingBuilder: (context) {
           return const Center(
             child: UltraLoadingIndicator(),
           );
-        }
-
-        if (snapshot.data!.isEmpty) {
-          if (widget.emptyBuilder != null) {
-            return widget.emptyBuilder!(context);
-          }
+        },
+        emptyBuilder: (context) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -109,35 +123,8 @@ class _ChannelFileDisplayScreenState extends State<ChannelFileDisplayScreen> {
               ],
             ),
           );
-        }
-
-        final media = <Attachment, Message>{};
-
-        for (var item in snapshot.data!) {
-          item.message.attachments.where((e) => e.type == 'file').forEach((e) {
-            media[e] = item.message;
-          });
-        }
-
-        return LazyLoadScrollView(
-          onEndOfPage: () => search(),
-          child: ListView.builder(
-            itemBuilder: (context, position) {
-              return Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: StreamFileAttachment(
-                    message: media.values.toList()[position],
-                    attachment: media.keys.toList()[position],
-                  ),
-                ),
-              );
-            },
-            itemCount: media.length,
-          ),
-        );
-      },
+        },
+      ),
     );
   }
 

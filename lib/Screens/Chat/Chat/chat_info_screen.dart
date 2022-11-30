@@ -261,47 +261,14 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
-                        ),
-                      ],
-                    ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return PinnedMessagesScreen(
-                        messageTheme: widget.messageTheme,
-                        sortOptions: const [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                        onShowMessage: (m, c) async {
-                          // final client = StreamChat.of(context).client;
-                          // final message = m;
-                          // final channel = client.channel(
-                          //   c.type,
-                          //   id: c.id,
-                          // );
-                          // if (channel.state == null) {
-                          //   await channel.watch();
-                          // }
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   Routes.CHANNEL_PAGE,
-                          //   arguments: ChannelPageArgs(
-                          //     channel: channel,
-                          //     initialMessage: message,
-                          //   ),
-                          // );
-                        },
-                      );
-                    },
+                  child: PinnedMessagesScreen(
+                    messageTheme: widget.messageTheme,
+                    sortOptions: const [
+                      SortOption(
+                        'created_at',
+                        direction: SortOption.ASC,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -330,47 +297,15 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
-                        ),
-                      ],
-                    ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return ChannelMediaDisplayScreen(
-                        messageTheme: widget.messageTheme,
-                        sortOptions: const [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                        onShowMessage: (m, c) async {
-                          // final client = StreamChat.of(context).client;
-                          // final message = m;
-                          // final channel = client.channel(
-                          //   c.type,
-                          //   id: c.id,
-                          // );
-                          // if (channel.state == null) {
-                          //   await channel.watch();
-                          // }
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   Routes.CHANNEL_PAGE,
-                          //   arguments: ChannelPageArgs(
-                          //     channel: channel,
-                          //     initialMessage: message,
-                          //   ),
-                          // );
-                        },
-                      );
-                    },
+                  child: ChannelMediaDisplayScreen(
+                    messageTheme: widget.messageTheme,
+                    channel: channel,
+                    sortOptions: const [
+                      SortOption(
+                        'created_at',
+                        direction: SortOption.ASC,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -399,27 +334,13 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
               MaterialPageRoute(
                 builder: (context) => StreamChannel(
                   channel: channel,
-                  child: StreamMessageSearchListView(
-                    controller: StreamMessageSearchListController(
-                      client: StreamChat.of(context).client,
-                      filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                      sort: const [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
-                        ),
-                      ],
-                    ),
-                    itemBuilder: (context, messages, index, tile) {
-                      return const ChannelFileDisplayScreen(
-                        sortOptions: [
-                          SortOption(
-                            'created_at',
-                            direction: SortOption.ASC,
-                          ),
-                        ],
-                      );
-                    },
+                  child: const ChannelFileDisplayScreen(
+                    sortOptions: [
+                      SortOption(
+                        'created_at',
+                        direction: SortOption.ASC,
+                      ),
+                    ],
                   ),
                 ),
               ),

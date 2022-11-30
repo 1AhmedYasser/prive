@@ -432,47 +432,14 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                   MaterialPageRoute(
                     builder: (context) => StreamChannel(
                       channel: channel,
-                      child: StreamMessageSearchListView(
-                        controller: StreamMessageSearchListController(
-                          client: StreamChat.of(context).client,
-                          filter: Filter.in_('members', [StreamChat.of(context).currentUser!.id]),
-                          sort: const [
-                            SortOption(
-                              'created_at',
-                              direction: SortOption.ASC,
-                            ),
-                          ],
-                        ),
-                        itemBuilder: (context, messages, index, tile) {
-                          return PinnedMessagesScreen(
-                            messageTheme: widget.messageTheme,
-                            sortOptions: const [
-                              SortOption(
-                                'created_at',
-                                direction: SortOption.ASC,
-                              ),
-                            ],
-                            onShowMessage: (m, c) async {
-                              // final client = StreamChat.of(context).client;
-                              // final message = m;
-                              // final channel = client.channel(
-                              //   c.type,
-                              //   id: c.id,
-                              // );
-                              // if (channel.state == null) {
-                              //   await channel.watch();
-                              // }
-                              // Navigator.pushNamed(
-                              //   context,
-                              //   Routes.CHANNEL_PAGE,
-                              //   arguments: ChannelPageArgs(
-                              //     channel: channel,
-                              //     initialMessage: message,
-                              //   ),
-                              // );
-                            },
-                          );
-                        },
+                      child: PinnedMessagesScreen(
+                        messageTheme: widget.messageTheme,
+                        sortOptions: const [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -503,6 +470,7 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                     builder: (context) => StreamChannel(
                       channel: widget.channel,
                       child: ChannelMediaDisplayScreen(
+                        channel: channel,
                         messageTheme: widget.messageTheme,
                         sortOptions: const [
                           SortOption(
@@ -511,25 +479,6 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                           ),
                         ],
                         paginationParams: const PaginationParams(limit: 20),
-                        onShowMessage: (m, c) async {
-                          // final client = StreamChat.of(context).client;
-                          // final message = m;
-                          // final channel = client.channel(
-                          //   c.type,
-                          //   id: c.id,
-                          // );
-                          // if (channel.state == null) {
-                          //   await channel.watch();
-                          // }
-                          // await Navigator.pushNamed(
-                          //   context,
-                          //   Routes.CHANNEL_PAGE,
-                          //   arguments: ChannelPageArgs(
-                          //     channel: channel,
-                          //     initialMessage: message,
-                          //   ),
-                          // );
-                        },
                       ),
                     ),
                   ),
@@ -552,19 +501,20 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
                 color: StreamChatTheme.of(context).colorTheme.textLowEmphasis,
               ),
               onTap: () {
-                var channel = StreamChannel.of(context).channel;
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ChannelFileDisplayScreen(
-                      sortOptions: [
-                        SortOption(
-                          'created_at',
-                          direction: SortOption.ASC,
-                        ),
-                      ],
-                      paginationParams: PaginationParams(limit: 20),
+                    builder: (context) => StreamChannel(
+                      channel: widget.channel,
+                      child: const ChannelFileDisplayScreen(
+                        sortOptions: [
+                          SortOption(
+                            'created_at',
+                            direction: SortOption.ASC,
+                          ),
+                        ],
+                        paginationParams: PaginationParams(limit: 20),
+                      ),
                     ),
                   ),
                 );

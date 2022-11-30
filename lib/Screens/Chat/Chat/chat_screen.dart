@@ -20,6 +20,7 @@ import 'package:prive/Helpers/utils.dart';
 import 'package:prive/Models/Call/call.dart';
 import 'package:prive/Models/Call/call_member.dart';
 import 'package:prive/Models/Chat/group_admin.dart';
+import 'package:prive/Models/Chat/group_member.dart';
 import 'package:prive/Providers/call_provider.dart';
 import 'package:prive/Resources/animations.dart';
 import 'package:prive/Resources/images.dart';
@@ -105,8 +106,17 @@ class _ChatScreenState extends State<ChatScreen> {
   bool changeGroupInfo = true;
   bool deleteOthersMessages = true;
   bool deleteMembers = true;
+
+  // Member Permissions
+  bool memberSendMessages = true;
+  bool memberSendPhotos = true;
+  bool memberSendVideos = true;
+  bool memberSendVoiceRecords = true;
+
   List<GroupAdmin> groupAdmins = [];
+  List<GroupMember> groupMembers = [];
   GroupAdmin? adminSelf;
+  GroupMember? memberSelf;
 
   @override
   void initState() {
@@ -120,6 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
     unreadCountSubscription = StreamChannel.of(context).channel.state!.unreadCountStream.listen(_unreadCountHandler);
     _listenToFirebaseChanges();
     _getGroupAdmins();
+    _getGroupMembers();
     _getMembersPermissions();
   }
 
@@ -829,6 +840,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, state) {
                     _getMembersPermissions();
                     _getGroupAdmins();
+                    _getGroupMembers();
                     return StreamMessageInput(
                       messageInputController: _messageInputController,
                       showCommandsButton: false,
@@ -1103,6 +1115,7 @@ class _ChatScreenState extends State<ChatScreen> {
       stream: widget.channel.state?.channelStateStream,
       builder: (context, state) {
         _getGroupAdmins();
+        _getGroupMembers();
         return defaultMessage.copyWith(
           showUsername: true,
           messageTheme: getMessageTheme(context, details),
@@ -1620,6 +1633,21 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void _getGroupMembers() {
+    groupMembers = [];
+    List<dynamic>? members = widget.channel.extraData['group_members'] as List<dynamic>? ?? [];
+    for (var member in members) {
+      GroupMember groupMember = GroupMember.fromJson(member as Map<String, dynamic>);
+      groupMembers.add(groupMember);
+    }
+
+    memberSelf = groupMembers.firstWhereOrNull((member) => member.id == context.currentUser?.id);
+
+    if (memberSelf != null) {
+      _getMemberPermissions(memberSelf);
+    }
+  }
+
   void _getAdminPermissions(GroupAdmin? admin) {
     AdminGroupPermissions? permissions = admin?.groupPermissions;
     pinMessages = permissions?.pinMessages ?? true;
@@ -1628,5 +1656,13 @@ class _ChatScreenState extends State<ChatScreen> {
     changeGroupInfo = permissions?.changeGroupInfo ?? true;
     deleteOthersMessages = permissions?.deleteOthersMessages ?? true;
     deleteMembers = permissions?.deleteMembers ?? true;
+  }
+
+  void _getMemberPermissions(GroupMember? member) {
+    MemberGroupPermissions? permissions = member?.memberPermissions;
+    memberSendMessages = permissions?.sendMessages ?? true;
+    memberSendPhotos = permissions?.sendPhotos ?? true;
+    memberSendVideos = permissions?.sendVideos ?? true;
+    memberSendVoiceRecords = permissions?.sendVoiceRecords ?? true;
   }
 }
